@@ -166,20 +166,20 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-fix-hexo-upgrade-errors" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-fix-hexo-node-mismatch" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2021/08/01/fix-hexo-upgrade-errors/">迁移hexo到Node.js 14 解决部署时报错</a>
+      <a class="article-title" href="/2021/08/01/fix-hexo-node-mismatch/">迁移hexo到Node.js 14 解决部署时报错</a>
     </h1>
   
 
 
         
-        <a href="/2021/08/01/fix-hexo-upgrade-errors/" class="archive-article-date">
+        <a href="/2021/08/01/fix-hexo-node-mismatch/" class="archive-article-date">
   	<time datetime="2021-07-31T19:03:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-01</time>
 </a>
         
@@ -202,13 +202,13 @@ var _hmt = _hmt || [];
         
         
             
-            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>重装系统之后，安装了高版本的Node.js，发现hexo不适配。于是顺便更新了hexo，发现部署时报错，于是搜索之，找到解决方案。<br>PS：降级肯定是可以解决的，不过不够优雅（强迫症）。</p>
-<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>Node.js <code>14.17.4</code>, Hexo-cli <code>4.3.0</code>, Hexo <code>5.4.0</code></p>
-<h2 id="报错信息"><a href="#报错信息" class="headerlink" title="报错信息"></a>报错信息</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(node:21876) Warning: Accessing non-existent property &#x27;lineno&#x27; of module exports inside circular dependency</span><br><span class="line">(Use `node --trace-warnings ...` to show where the warning was created)</span><br><span class="line">(node:21876) Warning: Accessing non-existent property &#x27;column&#x27; of module exports inside circular dependency</span><br><span class="line">(node:21876) Warning: Accessing non-existent property &#x27;filename&#x27; of module exports inside circular dependency</span><br><span class="line">(node:21876) Warning: Accessing non-existent property &#x27;lineno&#x27; of module exports inside circular dependency</span><br><span class="line">(node:21876) Warning: Accessing non-existent property &#x27;column&#x27; of module exports inside circular dependency</span><br><span class="line">(node:21876) Warning: Accessing non-existent property &#x27;filename&#x27; of module exports inside circular dependency</span><br></pre></td></tr></table></figure>
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>重装系统之后，安装了高版本的Node.js，部署时报错，于是搜索之，发现原因是hexo版本不适配，一番尝试后解决。</p>
+<p>思路为：新建一个hexo项目，使用其配置文件，并手动安装缺失依赖。</p>
+<p>PS：降级肯定是可以解决的，不过不够优雅（强迫症）。</p>
 <p>
         
 
-          <a class="article-more-a" href="/2021/08/01/fix-hexo-upgrade-errors/#more">查看更多 >></a>
+          <a class="article-more-a" href="/2021/08/01/fix-hexo-node-mismatch/#more">查看更多 >></a>
         
     
     
@@ -233,7 +233,7 @@ var _hmt = _hmt || [];
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2021/08/01/fix-hexo-upgrade-errors/">展开全文 >></a>
+          <a class="article-more-a" href="/2021/08/01/fix-hexo-node-mismatch/">展开全文 >></a>
         </p>
       
 
@@ -301,7 +301,7 @@ var _hmt = _hmt || [];
             
             <p><h2 id="最终效果"><a href="#最终效果" class="headerlink" title="最终效果"></a>最终效果</h2><p>使用frida实现功能破解，未完全绕过完整性检测，猜测解密so文件时有校验</p>
 <h3 id="app分析"><a href="#app分析" class="headerlink" title="app分析"></a>app分析</h3><h4 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h4><p>游戏引擎为<code>il2cpp</code>，<code>libil2cpp.so</code>代码段加密，<code>global-metadata.dat</code>和<code>filelist</code>被加密。</p>
-<h4 id="逆向过程"><a href="#逆向过程" class="headerlink" title="逆向过程"></a>逆向过程</h4><h5 id="获取global-metadata-dat"><a href="#获取global-metadata-dat" class="headerlink" title="获取global-metadata.dat"></a>获取global-metadata.dat</h5><p>使用frida，从内存中dump并修复<code>libil2cpp.so</code>。然后使用IDA打开，搜索字符串<code>global-metadata.dat</code>，定位到<code>MetadataCache__Initialize</code>（偏移值<code>5580FC</code>），<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-final-1.png"></p>
+<h4 id="逆向分析过程"><a href="#逆向分析过程" class="headerlink" title="逆向分析过程"></a>逆向分析过程</h4><h5 id="获取global-metadata-dat"><a href="#获取global-metadata-dat" class="headerlink" title="获取global-metadata.dat"></a>获取global-metadata.dat</h5><p>使用frida，从内存中dump并修复<code>libil2cpp.so</code>。然后使用IDA打开，搜索字符串<code>global-metadata.dat</code>，定位到<code>MetadataCache__Initialize</code>（偏移值<code>5580FC</code>），<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-final-1.png"></p>
 <p>
         
 
@@ -1297,11 +1297,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Java</a>
+                <a href="javascript:void(0)" class="js-tag color2">Python</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Python</a>
+                <a href="javascript:void(0)" class="js-tag color5">Java</a>
               </li>
              
               <li class="article-tag-list-item">

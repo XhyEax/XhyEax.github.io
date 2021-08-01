@@ -17,7 +17,7 @@
 <meta property="og:description" content="概述多进程ptrace反调试是一种常见的反调试手段，思路为fork出子进程，在子进程中ptrace自身，使得调试器无法附加。通过修改源码来禁止指定进程fork 具体步骤定位到源码位置AOSP 5.1.1及6.0.1 fork函数位于：bionic&#x2F;libc&#x2F;bionic&#x2F;fork.cpp 添加过滤函数通过读取status文件来确定进程名，然后跟文件内容比较，相同则禁止其fork代码如下： 1234">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-11-20T01:45:32.637Z">
-<meta property="article:modified_time" content="2020-04-19T08:37:20.553Z">
+<meta property="article:modified_time" content="2021-08-01T03:47:13.950Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
@@ -513,11 +513,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Java</a>
+                <a href="javascript:void(0)" class="js-tag color2">Python</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Python</a>
+                <a href="javascript:void(0)" class="js-tag color5">Java</a>
               </li>
              
               <li class="article-tag-list-item">
