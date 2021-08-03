@@ -9,17 +9,17 @@
   <link rel="dns-prefetch" href="http://blog.xhyeax.com">
   <title>ARM Thumb状态下 相对pc寄存器寻址问题 | Xhy&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="概述在一篇文章（实现简易安卓inlinehook）中，Thumb状态下，相对寄存器pc寻址，结果不符合预期。谷歌后找到原因。 问题描述问题指令： 123B3AFB212 ldr r2,[pc,#2]            #令R2&#x3D;[pc+4+2&#x3D;B3AFB218]，结果变为[B3AFB216]B3AFB216 mov r0, r0                #替换为 mov r0, r0 方">
+  <meta name="description" content="概述在一篇文章（实现简易安卓inlinehook）中，Thumb状态下，相对寄存器pc寻址，结果不符合预期。谷歌后找到原因。 问题描述问题指令： 123B3AFB212 ldr r2,[pc,#2]            #预期R2&#x3D;[pc+4+2&#x3D;B3AFB218]，结果变为[B3AFB216]B3AFB216 mov r0, r0                #将pc赋值，替换为 mov r">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ARM Thumb状态下 相对pc寄存器寻址问题">
 <meta property="og:url" content="http://blog.xhyeax.com/2021/08/03/arm-thumb-pc-address/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="概述在一篇文章（实现简易安卓inlinehook）中，Thumb状态下，相对寄存器pc寻址，结果不符合预期。谷歌后找到原因。 问题描述问题指令： 123B3AFB212 ldr r2,[pc,#2]            #令R2&#x3D;[pc+4+2&#x3D;B3AFB218]，结果变为[B3AFB216]B3AFB216 mov r0, r0                #替换为 mov r0, r0 方">
+<meta property="og:description" content="概述在一篇文章（实现简易安卓inlinehook）中，Thumb状态下，相对寄存器pc寻址，结果不符合预期。谷歌后找到原因。 问题描述问题指令： 123B3AFB212 ldr r2,[pc,#2]            #预期R2&#x3D;[pc+4+2&#x3D;B3AFB218]，结果变为[B3AFB216]B3AFB216 mov r0, r0                #将pc赋值，替换为 mov r">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-address-not-4-byte.png">
 <meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-address-4-byte.png">
 <meta property="article:published_time" content="2021-08-02T19:27:33.000Z">
-<meta property="article:modified_time" content="2021-08-03T03:43:54.745Z">
+<meta property="article:modified_time" content="2021-08-03T04:00:50.510Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
@@ -193,21 +193,24 @@ var _hmt = _hmt || [];
       
     <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在一篇文章（<a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-1486586-1-1.html">实现简易安卓inlinehook</a>）中，Thumb状态下，相对寄存器pc寻址，结果不符合预期。谷歌后找到原因。</p>
 <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-address-not-4-byte.png"><br>问题指令：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">B3AFB212 ldr r2,[pc,#2]            #令R2=[pc+4+2=B3AFB218]，结果变为[B3AFB216]</span><br><span class="line">B3AFB216 mov r0, r0                #替换为 mov r0, r0 方便测试</span><br><span class="line">B3AFB218 xx xx xx xx               #回去的地址，以78563412为例（小端模式）</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">B3AFB212 ldr r2,[pc,#2]            #预期R2=[pc+4+2=B3AFB218]，结果变为[B3AFB216]</span><br><span class="line">B3AFB216 mov r0, r0                #将pc赋值，替换为 mov r0, r0 方便测试</span><br><span class="line">B3AFB218 xx xx xx xx               #跳回地址，以78563412为例（小端模式）</span><br></pre></td></tr></table></figure>
 <p>对应arm指令：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">DF F8 02 20</span><br><span class="line">00 46</span><br><span class="line">12 34 56 78</span><br></pre></td></tr></table></figure>
 
 <p>ldr指令位置为<code>B3AFB212</code>，注意到并未4字节对齐</p>
 <p>将指令位置对齐到4字节后，再次反编译，发现跳转地址正确<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-address-4-byte.png"></p>
-<h2 id="原因探究"><a href="#原因探究" class="headerlink" title="原因探究"></a>原因探究</h2><p>当pc寄存器被用于寄存器相对寻址操作时（如此处的ldr），会先被对齐到word（在32位CPU中即为4字节）（即使是在Thumb状态下）</p>
+<h2 id="原因探究"><a href="#原因探究" class="headerlink" title="原因探究"></a>原因探究</h2><p>当pc寄存器被用于相对寄存器寻址操作时（如此处的ldr），会先被对齐到word（在32位CPU中即为4字节）（即使是在Thumb状态下）<br>由于相对PC寻址通常是指定标签而非手动计算偏移，所以这个细节很容易被忽略。</p>
+<p>例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x159a ldr...[pc]</span><br></pre></td></tr></table></figure>
+<p><code>0x159a</code>+4 = <code>0x159e</code><br>再将其对齐到word，得到<code>0x159c</code></p>
 <p>见<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/29586536/about-arm-pc-value-in-thumb-16-32bits-mixed-instructions-stream">About arm pc value in thumb 16/32bits mixed instructions stream - Stack Overflow</a></p>
 <blockquote>
 <p>To further complicate matters, when the PC is used as a base register for addressing operations (i.e. adr/ldr/str/etc.) it is always the word-aligned value that is used, even in Thumb state. So, whilst executing a load instruction at 0x159a, the PC register will read as 0x159e, but the base address of ldr…[pc] is Align(0x159e, 4), i.e. 0x159c. Since PC-relative addressing is normally written by specifying a label rather than calculating offsets manually, this detail can be easy to miss.</p>
 </blockquote>
-<h2 id="指令解析"><a href="#指令解析" class="headerlink" title="指令解析"></a>指令解析</h2><p>再来看问题指令，就可以理解了：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">B3AFB212 ldr r2,[pc,#2]            #令R2=[pc+4+2]</span><br></pre></td></tr></table></figure>
+<h2 id="指令解析"><a href="#指令解析" class="headerlink" title="指令解析"></a>指令解析</h2><p>再来看问题指令，就可以理解了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">B3AFB212 ldr r2,[pc,#2]            #令R2=[Align(pc+4, word)+2]</span><br></pre></td></tr></table></figure>
 
-<p>pc=<code>B3AFB212</code>，对齐到word（在32位CPU中即4字节），变为<code>B3AFB210</code><br><code>B3AFB210</code>+4+2 = <code>B3AFB216</code></p>
+<p>pc=<code>B3AFB212</code>，pc+4=<code>B3AFB216</code>，再对齐到word，变为<code>B3AFB214</code><br><code>B3AFB214</code>+2 = <code>B3AFB216</code></p>
 
 
 
