@@ -166,103 +166,6 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-ubuntu-install" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/16/ubuntu-install/">Ubuntu18.04安装记录(与Win10双系统共存)</a>
-    </h1>
-  
-
-
-        
-        <a href="/2019/02/16/ubuntu-install/" class="archive-article-date">
-  	<time datetime="2019-02-16T06:37:23.606Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-02-16</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-
-      
-    
-        
-        
-            
-            
-        
-            
-            
-        
-            
-            
-        
-        
-            
-            <p><h2 id="第一步，分区"><a href="#第一步，分区" class="headerlink" title="第一步，分区"></a>第一步，分区</h2><p>Linux只有分区挂载目录的概念，所以需要在Windows下分出一块较大的未分配空间，不需要格式化</p>
-<h2 id="下载镜像并写入U盘"><a href="#下载镜像并写入U盘" class="headerlink" title="下载镜像并写入U盘"></a>下载镜像并写入U盘</h2><p>下载完镜像以后，使用软碟通将镜像写入U盘，然后重启。<br>PS: 如果U盘本身就支持efi启动的话，可以直接把镜像解压到U盘<br>开机后把握时机进入Boot Menu，选择从USB启动。<br>注意：需要在BIOS中关闭安全启动（Secure Boot）</p>
-<h2 id="安装Ubuntu"><a href="#安装Ubuntu" class="headerlink" title="安装Ubuntu"></a>安装Ubuntu</h2><h3 id="进入安装程序"><a href="#进入安装程序" class="headerlink" title="进入安装程序"></a>进入安装程序</h3><p>正常情况下，启动后会出现grub引导菜单，选择第二个即可进入Ubuntu安装程序。<br>然而，由于我的显卡是Nvidia的，无法进入安装界面。</p>
-<p>
-        
-
-          <a class="article-more-a" href="/2019/02/16/ubuntu-install/#more">查看更多 >></a>
-        
-    
-    
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/02/16/ubuntu-install/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="post-ida-call-analysis-fail" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1100,6 +1003,107 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2018/12/21/isa-ctf-4/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-fix-VSCODE-E1101-Error" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/18/fix-VSCODE-E1101-Error/">VS Code修复pylint报错E1101</a>
+    </h1>
+  
+
+
+        
+        <a href="/2018/12/18/fix-VSCODE-E1101-Error/" class="archive-article-date">
+  	<time datetime="2018-12-18T05:14:14.043Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-18</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+
+      
+    
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+            
+            <p><h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>使用pygame开发游戏（完成作业时），VS Code总是在pygame处报E1101错误，刚开始设置的<code>python.linting.mypyArgs</code>毫无用处</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;python.linting.mypyArgs&quot;</span>: [<span class="string">&quot;--disable=E1101&quot;</span>,]</span><br></pre></td></tr></table></figure>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>继续谷歌一下，找到<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/ab72e830b2a9">vs code中pylint报错E1101问题的解决</a><br>于是设置<code>python.linting.pylintArgs</code>参数，值为”–generate-members”，总算解决了这个问题</p>
+<p>
+        
+
+          <a class="article-more-a" href="/2018/12/18/fix-VSCODE-E1101-Error/#more">查看更多 >></a>
+        
+    
+    
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Python</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">VSCode</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/12/18/fix-VSCODE-E1101-Error/">展开全文 >></a>
         </p>
       
 

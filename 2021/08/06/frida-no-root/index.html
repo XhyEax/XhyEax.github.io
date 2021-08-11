@@ -7,19 +7,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://blog.xhyeax.com">
-  <title>frida-no-root | Xhy&#39;s Blog</title>
+  <title>Frida在无Root机器上的使用方案 | Xhy&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Blog of XhyEax, Share and make progress together.">
+  <meta name="description" content="概述大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，由此也就无法通过Magisk获取Root权限。本文基于VirtualApp框架及Frida-Gadget，实现不修改apk使用Frida。 方案修改框架源码阅读VirtualApp源码可知，在lib&#x2F;src&#x2F;main&#x2F;jni&#x2F;Foundation&#x2F;IOUniformer.cpp中hook了dlopen，并实现了onSoLoade">
 <meta property="og:type" content="article">
-<meta property="og:title" content="frida-no-root">
+<meta property="og:title" content="Frida在无Root机器上的使用方案">
 <meta property="og:url" content="http://blog.xhyeax.com/2021/08/06/frida-no-root/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="Blog of XhyEax, Share and make progress together.">
+<meta property="og:description" content="概述大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，由此也就无法通过Magisk获取Root权限。本文基于VirtualApp框架及Frida-Gadget，实现不修改apk使用Frida。 方案修改框架源码阅读VirtualApp源码可知，在lib&#x2F;src&#x2F;main&#x2F;jni&#x2F;Foundation&#x2F;IOUniformer.cpp中hook了dlopen，并实现了onSoLoade">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-08-06T06:03:48.000Z">
-<meta property="article:modified_time" content="2021-08-06T14:03:48.968Z">
+<meta property="article:modified_time" content="2021-08-11T13:21:15.809Z">
 <meta property="article:author" content="Xhy">
-<meta property="article:tag" content="XhyEax&#39;s Blog">
+<meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="Xhy&#39;s Blog" type="application/atom+xml">
@@ -173,7 +173,7 @@ var _hmt = _hmt || [];
         
   
     <h1 class="article-title" itemprop="name">
-      frida-no-root
+      Frida在无Root机器上的使用方案
     </h1>
   
 
@@ -188,7 +188,12 @@ var _hmt = _hmt || [];
     <div class="article-entry" itemprop="articleBody">
 
       
-    
+    <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，由此也就无法通过Magisk获取Root权限。本文基于<a target="_blank" rel="noopener" href="https://github.com/asLody/VirtualApp">VirtualApp框架</a>及<a target="_blank" rel="noopener" href="https://github.com/frida/frida">Frida-Gadget</a>，实现不修改apk使用Frida。</p>
+<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><h3 id="修改框架源码"><a href="#修改框架源码" class="headerlink" title="修改框架源码"></a>修改框架源码</h3><p>阅读<code>VirtualApp</code>源码可知，在<a target="_blank" rel="noopener" href="https://github.com/asLody/VirtualApp/blob/bd6f03cfd7cbf3ad63ec6198777a102c18112c2d/VirtualApp/lib/src/main/jni/Foundation/IOUniformer.cpp"><code>lib/src/main/jni/Foundation/IOUniformer.cpp</code></a>中hook了<code>dlopen</code>，并实现了<code>onSoLoaded</code>函数，可在该函数中通过传入的<code>filename</code>获取加载的动态库路径。</p>
+<p>由此，可以在<code>libart.so</code>加载后，手动调用<code>dlopen</code>加载<code>Frida-Gadget</code>。</p>
+<h3 id="编写Xposed模块"><a href="#编写Xposed模块" class="headerlink" title="编写Xposed模块"></a>编写Xposed模块</h3><p>除了修改源码，也可以自己编写一个Xposed模块，实现<code>Frida-Gadget</code>的加载。</p>
+<p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，手动调用<code>System.load</code>加载<code>Frida-Gadget</code>（需手动拷贝so文件）。</p>
+
 
 
       
@@ -222,6 +227,17 @@ var _hmt = _hmt || [];
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -287,8 +303,8 @@ var _hmt = _hmt || [];
 <nav id="article-nav">
   
   
-    <a href="/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">QQ 8.8.17 防撤回、无限打开闪照</div>
+    <a href="/2021/08/03/arm-thumb-pc-address/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">ARM Thumb状态下 相对pc寄存器寻址问题</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -315,7 +331,7 @@ var _hmt = _hmt || [];
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%A1%88"><span class="toc-number">2.</span> <span class="toc-text">方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E6%A1%86%E6%9E%B6%E6%BA%90%E7%A0%81"><span class="toc-number">2.1.</span> <span class="toc-text">修改框架源码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E5%86%99Xposed%E6%A8%A1%E5%9D%97"><span class="toc-number">2.2.</span> <span class="toc-text">编写Xposed模块</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>
