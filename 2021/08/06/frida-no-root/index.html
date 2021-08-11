@@ -7,17 +7,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://blog.xhyeax.com">
-  <title>Frida在无Root机器上的使用方案 | Xhy&#39;s Blog</title>
+  <title>Frida在无Root机器上的使用方案 (基于VirtualApp) | Xhy&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="概述大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，由此也就无法通过Magisk获取Root权限。本文基于VirtualApp框架及Frida-Gadget，实现不修改apk使用Frida。 方案修改框架源码阅读VirtualApp源码可知，在lib&#x2F;src&#x2F;main&#x2F;jni&#x2F;Foundation&#x2F;IOUniformer.cpp中hook了dlopen，并实现了onSoLoade">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Frida在无Root机器上的使用方案">
+<meta property="og:title" content="Frida在无Root机器上的使用方案 (基于VirtualApp)">
 <meta property="og:url" content="http://blog.xhyeax.com/2021/08/06/frida-no-root/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="概述大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，由此也就无法通过Magisk获取Root权限。本文基于VirtualApp框架及Frida-Gadget，实现不修改apk使用Frida。 方案修改框架源码阅读VirtualApp源码可知，在lib&#x2F;src&#x2F;main&#x2F;jni&#x2F;Foundation&#x2F;IOUniformer.cpp中hook了dlopen，并实现了onSoLoade">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-08-06T06:03:48.000Z">
-<meta property="article:modified_time" content="2021-08-11T13:21:15.809Z">
+<meta property="article:modified_time" content="2021-08-11T13:24:03.043Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
@@ -173,7 +173,7 @@ var _hmt = _hmt || [];
         
   
     <h1 class="article-title" itemprop="name">
-      Frida在无Root机器上的使用方案
+      Frida在无Root机器上的使用方案 (基于VirtualApp)
     </h1>
   
 
