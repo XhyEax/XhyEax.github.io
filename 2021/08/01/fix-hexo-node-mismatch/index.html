@@ -17,7 +17,7 @@
 <meta property="og:description" content="概述重装系统之后，安装了高版本的Node.js，部署时报错，于是搜索之，发现原因是hexo版本不适配，一番尝试后解决。 思路为：新建一个hexo项目，使用其配置文件，并手动安装缺失依赖。 PS：降级肯定是可以解决的，不过不够优雅（强迫症）。 环境Node.js 14.17.4, Hexo-cli 4.3.0, Hexo 5.4.0 报错信息1The &quot;mode&quot; argumen">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-07-31T19:03:39.000Z">
-<meta property="article:modified_time" content="2021-08-01T04:02:33.766Z">
+<meta property="article:modified_time" content="2021-08-12T00:57:10.137Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="经验">
 <meta name="twitter:card" content="summary">
@@ -205,6 +205,7 @@ var _hmt = _hmt || [];
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WARN  Deprecated config detected: &quot;external_link&quot; with a Boolean value is deprecated. See https://hexo.io/docs/configuration for more details.</span><br></pre></td></tr></table></figure>
 <p>将配置项修改为：</p>
 <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">external_link:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>PS：部署到git建议使用ssh协议</p>
 
 
 

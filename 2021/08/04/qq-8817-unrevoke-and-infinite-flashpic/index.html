@@ -7,15 +7,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://blog.xhyeax.com">
-  <title>Archives | Xhy&#39;s Blog</title>
+  <title>QQ 8.8.17 防撤回、无限打开闪照 | Xhy&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Blog of XhyEax, Share and make progress together.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Xhy&#39;s Blog">
-<meta property="og:url" content="http://blog.xhyeax.com/archives/index.html">
+  <meta name="description" content="概述之前写过一篇QQ8.1.3防撤回原理，每次更新后，都需要适配被混淆的类名。 今天更新了最新版QQ（8.8.17），发现使用到的类名都未被混淆，不过包结构有了一定变化（可能是重构了？），需要重新适配。 于是尝试使用objection分析撤回提示的实现，并编写Xposed模块。 防撤回与之前一样，设置com.tencent.mobileqq.app.message.QQMessageFacade.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="QQ 8.8.17 防撤回、无限打开闪照">
+<meta property="og:url" content="http://blog.xhyeax.com/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="Blog of XhyEax, Share and make progress together.">
+<meta property="og:description" content="概述之前写过一篇QQ8.1.3防撤回原理，每次更新后，都需要适配被混淆的类名。 今天更新了最新版QQ（8.8.17），发现使用到的类名都未被混淆，不过包结构有了一定变化（可能是重构了？），需要重新适配。 于是尝试使用objection分析撤回提示的实现，并编写Xposed模块。 防撤回与之前一样，设置com.tencent.mobileqq.app.message.QQMessageFacade.">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-08-04T00:33:08.000Z">
+<meta property="article:modified_time" content="2021-08-12T06:08:34.001Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="XhyEax&#39;s Blog">
 <meta name="twitter:card" content="summary">
@@ -164,408 +166,208 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-qq-8817-unrevoke-and-infinite-flashpic" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/08/06/frida-no-root/" class="archive-article-date">
-  	<time datetime="2021-08-06T06:03:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-06</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/08/06/frida-no-root/">Frida在无Root机器上的使用方案 (基于VirtualApp)</a>
+    <h1 class="article-title" itemprop="name">
+      QQ 8.8.17 防撤回、无限打开闪照
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
 
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/" class="archive-article-date">
+        
+        <a href="/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/" class="archive-article-date">
   	<time datetime="2021-08-04T00:33:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-04</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/">QQ 8.8.17 防撤回、无限打开闪照</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
+        
+      </header>
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/08/03/arm-thumb-pc-address/" class="archive-article-date">
-  	<time datetime="2021-08-02T19:27:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-03</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/08/03/arm-thumb-pc-address/">ARM Thumb状态下 相对pc寄存器寻址问题</a>
-    </h1>
-  
+    <div class="article-entry" itemprop="articleBody">
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/08/01/draw-and-guess-save-history/" class="archive-article-date">
-  	<time datetime="2021-07-31T20:06:47.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-01</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/08/01/draw-and-guess-save-history/">基于Mono注入 保存你画我猜历史房间数据</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">游戏逆向</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/08/01/fix-hexo-node-mismatch/" class="archive-article-date">
-  	<time datetime="2021-07-31T19:03:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-01</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/08/01/fix-hexo-node-mismatch/">迁移hexo到Node.js 14 解决部署时报错</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">经验</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/04/10/gslab2021-final-android/" class="archive-article-date">
-  	<time datetime="2021-04-10T12:30:32.366Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-10</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/04/10/gslab2021-final-android/">gslab2021 决赛 - 安卓客户端安全</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/04/04/gslab2021-pre-android/" class="archive-article-date">
-  	<time datetime="2021-04-04T13:28:32.366Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-04</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/04/04/gslab2021-pre-android/">gslab2021 初赛 - 安卓客户端安全</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/03/01/android-9-set-hotpot-ip/" class="archive-article-date">
-  	<time datetime="2021-03-01T09:57:36.248Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-01</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/03/01/android-9-set-hotpot-ip/">安卓9 设置热点固定IP (Xposed)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
       
-        </div></section>
+    <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前写过一篇<a href="https://blog.xhyeax.com/2019/09/18/qq-813-unrevoke-module-develop/">QQ8.1.3防撤回原理</a>，每次更新后，都需要适配被混淆的类名。</p>
+<p>今天更新了最新版QQ（<code>8.8.17</code>），发现使用到的类名都未被混淆，不过包结构有了一定变化（可能是重构了？），需要重新适配。</p>
+<p>于是尝试使用<code>objection</code>分析撤回提示的实现，并编写<code>Xposed</code>模块。</p>
+<h2 id="防撤回"><a href="#防撤回" class="headerlink" title="防撤回"></a>防撤回</h2><p>与之前一样，设置<code>com.tencent.mobileqq.app.message.QQMessageFacade.a(ArrayList.class, boolean.class)</code>方法的返回值为空即可</p>
+<h2 id="显示撤回提示"><a href="#显示撤回提示" class="headerlink" title="显示撤回提示"></a>显示撤回提示</h2><h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>定位到关键类<code>com.tencent.mobileqq.msg.api.impl.MessageFacadeImpl</code>，其中提供有<code>QQMessageFacade</code>类的接口，包括删除消息、增加消息等功能</p>
+<p>通过以前对旧版qq的分析可知，撤回消息的流程为：删除本地消息记录-创建撤回提示-增加撤回提示到本地</p>
+<p>因此，使用<code>objection</code> hook <code>addMessage</code>函数，打印参数和调用栈，查看撤回提示的增加流程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">android hooking watch class_method com.tencent.mobileqq.msg.api.impl.MessageFacadeImpl.addMessage --dump-args --dump-backtrace</span><br></pre></td></tr></table></figure>
+
+<p>日志如下：</p>
+<h4 id="撤回私聊消息"><a href="#撤回私聊消息" class="headerlink" title="撤回私聊消息"></a>撤回私聊消息</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.mobileqq.msg.api.impl.MessageFacadeImpl.addMessage(Native Method)</span><br><span class="line">com.tencent.mobileqq.graytip.UniteGrayTipMsgUtil.a(P:70)</span><br><span class="line">com.tencent.imcore.message.BaseMessageManager.a(P:2259)</span><br><span class="line">com.tencent.imcore.message.QQMessageFacade.a(P:1358)</span><br><span class="line">com.tencent.mobileqq.service.message.codec.decoder.msgType0x210.MsgType0x210Decoder.a(P:1017)</span><br></pre></td></tr></table></figure>
+<h4 id="撤回群聊消息"><a href="#撤回群聊消息" class="headerlink" title="撤回群聊消息"></a>撤回群聊消息</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.mobileqq.msg.api.impl.MessageFacadeImpl.addMessage(Native Method)</span><br><span class="line">com.tencent.mobileqq.graytip.UniteGrayTipMsgUtil.a(P:70)</span><br><span class="line">com.tencent.imcore.message.BaseMessageManager.a(P:2259)</span><br><span class="line">com.tencent.imcore.message.QQMessageFacade.a(P:1358)</span><br><span class="line">com.tencent.mobileqq.troop.utils.TroopTipsMsgMgr.a(P:462)</span><br></pre></td></tr></table></figure>
+
+<p>注意到无论是撤回私聊还是群聊消息，显示提示时都是调用<code>com.tencent.mobileqq.msg.api.impl.MessageFacadeImpl.addMessage(com.tencent.mobileqq.data.MessageRecord, java.lang.String, boolean, boolean, boolean, boolean)</code>，参数值为<code>false,true,true,false</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span>  <span class="comment">// com.tencent.mobileqq.msg.api.IMessageFacade</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addMessage</span><span class="params">(MessageRecord arg9, String arg10, <span class="keyword">boolean</span> arg11, <span class="keyword">boolean</span> arg12, <span class="keyword">boolean</span> arg13, <span class="keyword">boolean</span> arg14)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">this</span>.checkAppRuntimeInValid()) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.getMessageFacade().a(arg9, arg10, arg11, arg12, arg13, arg14);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该方法最终调用的是<code>BaseQQMessage.a(MessageRecord,String,boolean,boolean,boolean,boolean)</code>函数</p>
+<p>因此，我们构造完<code>MessageRecord</code>后，依葫芦画瓢，调用该函数即可。</p>
+<p>PS：此处是为了与正常流程保持一致。其实根据另一个<code>addMessage</code>函数，调用<code>BaseQQMessage.a(MessageRecord,String)</code>也是可以的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span>  <span class="comment">// com.tencent.mobileqq.msg.api.IMessageFacade</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addMessage</span><span class="params">(MessageRecord arg2, String arg3)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.getMessageFacade().a(arg2, arg3);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="无限打开闪照"><a href="#无限打开闪照" class="headerlink" title="无限打开闪照"></a>无限打开闪照</h2><p>定位到关键类<code>com.tencent.mobileqq.pic.api.impl.PicFlashImpl</code><br>有以下两个函数：<code>isFlashPicMsg</code>(判断消息是否为闪照)、<code>isFlashPicMsgReaded</code>(判断闪照是否已读)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span>  <span class="comment">// com.tencent.mobileqq.pic.api.IPicFlash</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isFlashPicMsg</span><span class="params">(MessageRecord arg1)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> FlashPicHelper.a(arg1);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span>  <span class="comment">// com.tencent.mobileqq.pic.api.IPicFlash</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isFlashPicMsgReaded</span><span class="params">(MessageRecord arg1)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> FlashPicHelper.b(arg1);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>hook前者，固定返回false，可实现闪照作为图片打开。<br>hook后者，固定返回false，可实现无限打开闪照。</p>
+<p>考虑到使用时需要判断是否为闪照，选择hook后者。</p>
+
+
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"></i>感谢支持</i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/img/alipay.jpg">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/10/15/vscode-debug-ucore/" class="archive-article-date">
-  	<time datetime="2020-10-15T00:35:14.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-10-15</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/10/15/vscode-debug-ucore/">在Linux下使用VSCode调试uCore内核代码</a>
-    </h1>
-  
+      
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">VSCode</a>
-        		</li>
-      		
-		</ul>
-	</div>
+      
 
-          
-
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://blog.xhyeax.com/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/09/19/set-python-version-in-linux/" class="archive-article-date">
-  	<time datetime="2020-09-19T06:19:07.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-09-19</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2021/08/06/frida-no-root/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Frida在无Root机器上的使用方案 (基于VirtualApp)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2021/08/03/arm-thumb-pc-address/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">ARM Thumb状态下 相对pc寄存器寻址问题</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/09/19/set-python-version-in-linux/">Linux设置默认Python版本</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Python</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%98%B2%E6%92%A4%E5%9B%9E"><span class="toc-number">2.</span> <span class="toc-text">防撤回</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%98%BE%E7%A4%BA%E6%92%A4%E5%9B%9E%E6%8F%90%E7%A4%BA"><span class="toc-number">3.</span> <span class="toc-text">显示撤回提示</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90"><span class="toc-number">3.1.</span> <span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%92%A4%E5%9B%9E%E7%A7%81%E8%81%8A%E6%B6%88%E6%81%AF"><span class="toc-number">3.1.1.</span> <span class="toc-text">撤回私聊消息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%92%A4%E5%9B%9E%E7%BE%A4%E8%81%8A%E6%B6%88%E6%81%AF"><span class="toc-number">3.1.2.</span> <span class="toc-text">撤回群聊消息</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A0%E9%99%90%E6%89%93%E5%BC%80%E9%97%AA%E7%85%A7"><span class="toc-number">4.</span> <span class="toc-text">无限打开闪照</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
   
-    </div></section>
   
 
-    
-    <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/archives/page/2/">2</a><a class="page-number" href="/archives/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/archives/page/10/">10</a><a class="extend next" rel="next" href="/archives/page/2/">Next &amp;raquo;</a>
-    </nav>
+  
+
+  
+
   
 
 
@@ -597,8 +399,8 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

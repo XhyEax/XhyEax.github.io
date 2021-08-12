@@ -9,15 +9,15 @@
   <link rel="dns-prefetch" href="http://blog.xhyeax.com">
   <title>QQ8.1.3防撤回(Xposed模块)的原理 | Xhy&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="概述开发一个适配QQ 8.1.3的防撤回插件，并显示撤回通知。 原理1. 防撤回设置com.tencent.mobileqq.app.message.QQMessageFacade.a(ArrayList.class, boolean.class)方法的返回值为空即可 12&#x2F;&#x2F;在beforeHookedMethod中执行param.setResult(null); 2. 获取必要信息上一个方法的第">
+  <meta name="description" content="概述开发一个适配QQ 8.1.3的防撤回插件，并显示撤回通知。 原理1. 防撤回设置com.tencent.mobileqq.app.message.QQMessageFacade.a(ArrayList.class, boolean.class)方法的返回值为空即可 12&#x2F;&#x2F;在beforeHookedMethod中执行param.setResult(null);  2. 获取必要信息上一个方法的">
 <meta property="og:type" content="article">
 <meta property="og:title" content="QQ8.1.3防撤回(Xposed模块)的原理">
 <meta property="og:url" content="http://blog.xhyeax.com/2019/09/18/qq-813-unrevoke-module-develop/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="概述开发一个适配QQ 8.1.3的防撤回插件，并显示撤回通知。 原理1. 防撤回设置com.tencent.mobileqq.app.message.QQMessageFacade.a(ArrayList.class, boolean.class)方法的返回值为空即可 12&#x2F;&#x2F;在beforeHookedMethod中执行param.setResult(null); 2. 获取必要信息上一个方法的第">
+<meta property="og:description" content="概述开发一个适配QQ 8.1.3的防撤回插件，并显示撤回通知。 原理1. 防撤回设置com.tencent.mobileqq.app.message.QQMessageFacade.a(ArrayList.class, boolean.class)方法的返回值为空即可 12&#x2F;&#x2F;在beforeHookedMethod中执行param.setResult(null);  2. 获取必要信息上一个方法的">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-09-17T23:55:19.073Z">
-<meta property="article:modified_time" content="2021-08-01T03:47:14.138Z">
+<meta property="article:modified_time" content="2021-08-12T03:28:41.790Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
@@ -191,17 +191,19 @@ var _hmt = _hmt || [];
     <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>开发一个适配QQ 8.1.3的防撤回插件，并显示撤回通知。</p>
 <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h3 id="1-防撤回"><a href="#1-防撤回" class="headerlink" title="1. 防撤回"></a>1. 防撤回</h3><p>设置<code>com.tencent.mobileqq.app.message.QQMessageFacade.a(ArrayList.class, boolean.class)</code>方法的返回值为空即可</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//在beforeHookedMethod中执行</span><br><span class="line">param.setResult(null);</span><br></pre></td></tr></table></figure>
+
 <h3 id="2-获取必要信息"><a href="#2-获取必要信息" class="headerlink" title="2. 获取必要信息"></a>2. 获取必要信息</h3><p>上一个方法的第一个参数(<code>ArrayList</code>)内容(<code>toString</code>)形如:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[RevokeMsgInfo[istroop= 1, shmsgseq= 356, frienduin= 1234568, fromuin= 12345678 msguid= 0, time= 1568796904, senduin= null, longmsgid= 0, longmsgcount=0 longmsgindex=0]</span><br></pre></td></tr></table></figure>
-<p>当<code>istroop= 1</code>，<code>frienduin</code>是群号。<br>其中<code>RevokeMsgInfo</code>对象还有一些<code>Field</code>，参数大致与内容相同。<br>所以我们有两种方式来获得构建信息的参数：解析<code>String</code>和反射获取<code>Field</code>值。<br>我个人采用的是后者。</p>
-<h3 id="3-显示撤回通知"><a href="#3-显示撤回通知" class="headerlink" title="3. 显示撤回通知"></a>3. 显示撤回通知</h3><p>这个功能的实现比较复杂，需要获取和生成一些类对象，为显示通知做准备。<br>最后是调用<code>com.tencent.mobileqq.app.message.QQMessageFacade.a(ArrayList.class, int.class)</code>方法来显示撤回通知。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//在beforeHookedMethod中执行</span><br><span class="line">callMethod(param.thisObject, &quot;a&quot;, tip, mSelfUin);</span><br></pre></td></tr></table></figure>
-<p>第一个参数通过对<code>MessageRecord</code>类型使用<code>ArrayList</code>进行封装产生。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Object&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line">list.add(messageRecord);</span><br></pre></td></tr></table></figure>
+<p>当<code>istroop</code>为1时，<code>frienduin</code>是群号，否则为好友qq。</p>
+<p>在某个版本后，<code>toString</code>的结果中<code>frienduin</code>被截断，所以解析字符串的方法行不通了。</p>
+<p>可以通过反射来获取需要的字段值。</p>
+<h3 id="3-显示撤回提示"><a href="#3-显示撤回提示" class="headerlink" title="3. 显示撤回提示"></a>3. 显示撤回提示</h3><p>这个功能的实现比较复杂，需要获取和生成一些类对象。</p>
+<p>首先通过反射获取到<code>QQAppInterface</code>实例（<code>QQMessageFacade</code>的字段）<br>然后调用<code>QQAppInterface.getCurrentAccountUin</code>方法获取自己的qq<br>再通过反射将<code>RevokeMsgInfo</code>字段取出，为构造撤回提示做准备。<br>然后通过<code>MessageRecordFactory</code>构造<code>MessageRecord</code>。<br>然后使用<code>ArrayList</code>将其打包。<br>最终调用<code>com.tencent.mobileqq.app.message.QQMessageFacade.a(ArrayList.class, int.class)</code>方法来显示撤回提示。</p>
 <p>具体可以参考<a target="_blank" rel="noopener" href="https://github.com/zpp0196/QQPurify/blob/master/app/src/main/java/me/zpp0196/qqpurify/hook/ExtensionHook.java">QQ净化的防撤回实现</a>。</p>
 <h3 id="4-进行一些操作"><a href="#4-进行一些操作" class="headerlink" title="4. 进行一些操作"></a>4. 进行一些操作</h3><h4 id="过滤"><a href="#过滤" class="headerlink" title="过滤"></a>过滤</h4><p>判断是否为自己撤回的信息，如果是则不做处理。</p>
 <h4 id="获取群成员名"><a href="#获取群成员名" class="headerlink" title="获取群成员名"></a>获取群成员名</h4><p>通过调用<code>ContactUtils</code>的函数来获得。</p>
-<h2 id="为什么要适配"><a href="#为什么要适配" class="headerlink" title="为什么要适配"></a>为什么要适配</h2><p>因为QQ版本不同，有些类名经过了混淆。<br>适配的关键是要找出原本类混淆过后的类名，可以通过反编译后对比smali代码来实现。<br>防撤回功能涉及以下两个被混淆的类：</p>
+<h2 id="为什么要适配"><a href="#为什么要适配" class="headerlink" title="为什么要适配"></a>为什么要适配</h2><p>因为QQ版本不同，有些类名经过了混淆。<br>适配的关键在于找出混淆后的类名。<br>可反编译dex后，根据特征（字符串、函数参数、类结构等）查找smali。</p>
+<p>防撤回功能涉及以下两个被混淆的类：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String MessageRecordFactory = &quot;avay&quot;;</span><br><span class="line">String ContactUtils = &quot;azcx&quot;;</span><br></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://github.com/langhun/QQUnrecalled">QQUnrecalled</a><br><a target="_blank" rel="noopener" href="https://github.com/zpp0196/QQPurify">QQPurify</a></p>
 
@@ -351,7 +353,7 @@ var _hmt = _hmt || [];
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E9%98%B2%E6%92%A4%E5%9B%9E"><span class="toc-number">2.1.</span> <span class="toc-text">1. 防撤回</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%8E%B7%E5%8F%96%E5%BF%85%E8%A6%81%E4%BF%A1%E6%81%AF"><span class="toc-number">2.2.</span> <span class="toc-text">2. 获取必要信息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%98%BE%E7%A4%BA%E6%92%A4%E5%9B%9E%E9%80%9A%E7%9F%A5"><span class="toc-number">2.3.</span> <span class="toc-text">3. 显示撤回通知</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E8%BF%9B%E8%A1%8C%E4%B8%80%E4%BA%9B%E6%93%8D%E4%BD%9C"><span class="toc-number">2.4.</span> <span class="toc-text">4. 进行一些操作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%87%E6%BB%A4"><span class="toc-number">2.4.1.</span> <span class="toc-text">过滤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E7%BE%A4%E6%88%90%E5%91%98%E5%90%8D"><span class="toc-number">2.4.2.</span> <span class="toc-text">获取群成员名</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E9%80%82%E9%85%8D"><span class="toc-number">3.</span> <span class="toc-text">为什么要适配</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">4.</span> <span class="toc-text">参考</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E9%98%B2%E6%92%A4%E5%9B%9E"><span class="toc-number">2.1.</span> <span class="toc-text">1. 防撤回</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%8E%B7%E5%8F%96%E5%BF%85%E8%A6%81%E4%BF%A1%E6%81%AF"><span class="toc-number">2.2.</span> <span class="toc-text">2. 获取必要信息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%98%BE%E7%A4%BA%E6%92%A4%E5%9B%9E%E6%8F%90%E7%A4%BA"><span class="toc-number">2.3.</span> <span class="toc-text">3. 显示撤回提示</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E8%BF%9B%E8%A1%8C%E4%B8%80%E4%BA%9B%E6%93%8D%E4%BD%9C"><span class="toc-number">2.4.</span> <span class="toc-text">4. 进行一些操作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%87%E6%BB%A4"><span class="toc-number">2.4.1.</span> <span class="toc-text">过滤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E7%BE%A4%E6%88%90%E5%91%98%E5%90%8D"><span class="toc-number">2.4.2.</span> <span class="toc-text">获取群成员名</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E9%80%82%E9%85%8D"><span class="toc-number">3.</span> <span class="toc-text">为什么要适配</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">4.</span> <span class="toc-text">参考</span></a></li></ol>
                     </div>
                 </span>
             </div>
