@@ -173,7 +173,7 @@ var _hmt = _hmt || [];
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2021/08/23/android-arm-got-hook/">实现简易Android GOT/PLT Hook (ARM)</a>
+      <a class="article-title" href="/2021/08/23/android-arm-got-hook/">实现简易Android ARM GOT Hook</a>
     </h1>
   
 
@@ -204,7 +204,7 @@ var _hmt = _hmt || [];
             
             <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，讨论<code>Android</code> ARM架构的<code>GOT/PLT Hook</code>。</p>
 <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>程序<code>加载</code>后，在执行之前，需要先进行<code>动态链接</code>，并进行<code>重定位</code>。</p>
-<p>调用外部函数时，需要先跳转到PLT(<code>Procedure Link Table</code> 程序链接表，位于代码段)，再跳转到GOT(<code>Global Offset Table</code> 全局偏移表，位于数据段)，获取函数地址。</p>
+<p>调用外部函数时，需要先跳转到PLT(<code>Procedure Link Table</code> 程序链接表，位于代码段)，再跳转到GOT(<code>Global Offset Table</code> 全局偏移表，位于数据段)，执行目标函数。</p>
 <p>
         
 

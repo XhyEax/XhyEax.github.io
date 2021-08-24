@@ -7,14 +7,14 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://blog.xhyeax.com">
-  <title>实现简易Android GOT/PLT Hook (ARM) | Xhy&#39;s Blog</title>
+  <title>实现简易Android ARM GOT Hook | Xhy&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="概述本文以Hook公共库libc.so的getpid函数为例，讨论Android ARM架构的GOT&#x2F;PLT Hook。 原理程序加载后，在执行之前，需要先进行动态链接，并进行重定位。 调用外部函数时，需要先跳转到PLT(Procedure Link Table 程序链接表，位于代码段)，再跳转到GOT(Global Offset Table 全局偏移表，位于数据段)，获取函数地址。 延迟绑定(L">
+  <meta name="description" content="概述本文以Hook公共库libc.so的getpid函数为例，讨论Android ARM架构的GOT&#x2F;PLT Hook。 原理程序加载后，在执行之前，需要先进行动态链接，并进行重定位。 调用外部函数时，需要先跳转到PLT(Procedure Link Table 程序链接表，位于代码段)，再跳转到GOT(Global Offset Table 全局偏移表，位于数据段)，执行目标函数。 延迟绑定(L">
 <meta property="og:type" content="article">
-<meta property="og:title" content="实现简易Android GOT&#x2F;PLT Hook (ARM)">
+<meta property="og:title" content="实现简易Android ARM GOT Hook">
 <meta property="og:url" content="http://blog.xhyeax.com/2021/08/23/android-arm-got-hook/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="概述本文以Hook公共库libc.so的getpid函数为例，讨论Android ARM架构的GOT&#x2F;PLT Hook。 原理程序加载后，在执行之前，需要先进行动态链接，并进行重定位。 调用外部函数时，需要先跳转到PLT(Procedure Link Table 程序链接表，位于代码段)，再跳转到GOT(Global Offset Table 全局偏移表，位于数据段)，获取函数地址。 延迟绑定(L">
+<meta property="og:description" content="概述本文以Hook公共库libc.so的getpid函数为例，讨论Android ARM架构的GOT&#x2F;PLT Hook。 原理程序加载后，在执行之前，需要先进行动态链接，并进行重定位。 调用外部函数时，需要先跳转到PLT(Procedure Link Table 程序链接表，位于代码段)，再跳转到GOT(Global Offset Table 全局偏移表，位于数据段)，执行目标函数。 延迟绑定(L">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-header.png">
 <meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-str.png">
@@ -22,7 +22,7 @@
 <meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-log.png">
 <meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-output.png">
 <meta property="article:published_time" content="2021-08-23T02:56:25.000Z">
-<meta property="article:modified_time" content="2021-08-23T17:54:26.896Z">
+<meta property="article:modified_time" content="2021-08-24T01:27:34.129Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
@@ -179,7 +179,7 @@ var _hmt = _hmt || [];
         
   
     <h1 class="article-title" itemprop="name">
-      实现简易Android GOT/PLT Hook (ARM)
+      实现简易Android ARM GOT Hook
     </h1>
   
 
@@ -196,11 +196,11 @@ var _hmt = _hmt || [];
       
     <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，讨论<code>Android</code> ARM架构的<code>GOT/PLT Hook</code>。</p>
 <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>程序<code>加载</code>后，在执行之前，需要先进行<code>动态链接</code>，并进行<code>重定位</code>。</p>
-<p>调用外部函数时，需要先跳转到PLT(<code>Procedure Link Table</code> 程序链接表，位于代码段)，再跳转到GOT(<code>Global Offset Table</code> 全局偏移表，位于数据段)，获取函数地址。</p>
+<p>调用外部函数时，需要先跳转到PLT(<code>Procedure Link Table</code> 程序链接表，位于代码段)，再跳转到GOT(<code>Global Offset Table</code> 全局偏移表，位于数据段)，执行目标函数。</p>
 <p>延迟绑定(<code>Lazy Binding</code>)：当外部函数被调用时，才进行地址解析和重定位</p>
-<p><strong>由于Android ARM架构不支持延迟绑定，在外部函数被调用之前，GOT已被解析为内存地址</strong> (可使用IDA动态调试验证)</p>
+<p><strong>由于Android ARM架构不支持延迟绑定，在linker重定位后，GOT已被填充为内存地址</strong> (可使用IDA动态调试验证)</p>
 <p>因此，可以通过比对函数地址，修改指定模块的GOT表项，实现对外部导入函数的Hook</p>
-<h2 id="具体思路"><a href="#具体思路" class="headerlink" title="具体思路"></a>具体思路</h2><p>编写so库，在so加载的构造函数（<code>linker</code>会主动调用）中完成以下操作：定位目标模块基址、解析ELF文件得到GOT表地址及其大小、遍历GOT表替换目标函数地址。</p>
+<h2 id="具体思路"><a href="#具体思路" class="headerlink" title="具体思路"></a>具体思路</h2><p>编写so库，在so加载的构造函数（<code>linker</code>会主动调用）中完成以下操作：定位目标模块基址、基于链接视图（<code>Linking View</code>）解析ELF文件，得到GOT表地址及其大小、遍历GOT表替换目标函数地址。</p>
 <h2 id="注入方式"><a href="#注入方式" class="headerlink" title="注入方式"></a>注入方式</h2><p>使用<code>LIEF</code>修改ELF文件，导入该动态库。</p>
 <h2 id="编译环境"><a href="#编译环境" class="headerlink" title="编译环境"></a>编译环境</h2><p><code>Android Studio 2020.3.1</code>、<code>Gradle 7.0.1</code>、<code>CMake 3.18.1</code>、<code>NDK 23.0.7599858</code><br><code>ABI</code>:<code>armeabi-v7a</code></p>
 <p>PS：其实也可以脱离<code>Android Studio</code>手动编译，见<a href="https://blog.xhyeax.com/2021/08/22/arm-compile-without-as/">使用CMake交叉编译Android ARM程序</a></p>
@@ -217,41 +217,42 @@ var _hmt = _hmt || [];
 <p>打开<code>/proc/self/maps</code>文件，遍历内容，根据权限及模块路径找到基址。</p>
 <h4 id="获取GOT表地址及其大小"><a href="#获取GOT表地址及其大小" class="headerlink" title="获取GOT表地址及其大小"></a>获取GOT表地址及其大小</h4><p>篇幅所限，此处仅给出思路，完整代码见<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a></p>
 <p>根据模块路径打开ELF文件（本例为<code>/data/local/tmp/victim-patch</code>），解析ELF文件结构（图片均为<code>010Editor</code> ELF模板解析结果）:</p>
-<p>首先通过<code>elf header</code>得到<code>section header</code>偏移（<code>e_shoff</code>）、字符串表索引（<code>e_shstrndx</code>）、<code>section header</code>大小(<code>e_shentsize</code>)和总<code>section header</code>个数（<code>e_shnum</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-header.png"></p>
+<p>首先通过<code>elf header</code>得到<code>section header table</code>的起始偏移（<code>e_shoff</code>）、字符串表索引（<code>e_shstrndx</code>）、<code>section header</code>大小(<code>e_shentsize</code>)和总<code>section header</code>个数（<code>e_shnum</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-header.png"></p>
 <p>然后计算出字符串表<code>section header</code>的偏移地址（<code>e_shoff</code> + <code>e_shstrndx</code> * <code>e_shentsize</code>），从而得到字符串表的偏移值（<code>s_offset</code>）及其大小（<code>s_size</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-str.png"></p>
-<p>再遍历<code>section header</code>，查找<code>sh_type</code>=<code>SHT_PROGBITS</code>且section名（通过<code>sh_name</code>查询字符串表）为<code>.got</code>的section，得到GOT表偏移值（<code>s_offset</code>）及其大小（<code>s_size</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-got.png"></p>
+<p>再遍历<code>section header table</code>，查找<code>sh_type</code>=<code>SHT_PROGBITS</code>且section名（通过<code>sh_name</code>查询字符串表）为<code>.got</code>的section，得到GOT表偏移值（<code>s_offset</code>）及其大小（<code>s_size</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-got.png"></p>
 <p>最终将GOT表偏移值与模块基址相加，得到GOT表地址。</p>
 <h4 id="替换GOT表项"><a href="#替换GOT表项" class="headerlink" title="替换GOT表项"></a>替换GOT表项</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">replaceGOT</span><span class="params">(<span class="keyword">uintptr_t</span> GOTBase, <span class="keyword">int</span> GOTSize, <span class="keyword">uintptr_t</span> replace, <span class="keyword">uintptr_t</span> ori)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; GOTSize; ++i) &#123;</span><br><span class="line">        <span class="keyword">uintptr_t</span> addr = GOTBase + i * <span class="number">4</span>;</span><br><span class="line">        <span class="keyword">uintptr_t</span> item = *(<span class="keyword">uintptr_t</span> * )(addr);</span><br><span class="line"><span class="comment">//        LOGI(&quot;GOT [%d]: %X\n&quot;, i, item);</span></span><br><span class="line">        <span class="keyword">if</span> (item == ori) &#123;</span><br><span class="line">            <span class="built_in">LOGI</span>(<span class="string">&quot;replace %X to %X\n&quot;</span>, ori, replace);</span><br><span class="line">            <span class="built_in">mprotect</span>((<span class="keyword">void</span> *) <span class="built_in">PAGE_START</span>(addr), PAGE_SIZE, PROT_READ | PROT_WRITE);</span><br><span class="line">            *(<span class="keyword">uintptr_t</span> *) addr = replace;</span><br><span class="line">            __builtin___clear_cache((<span class="keyword">char</span> *) <span class="built_in">PAGE_START</span>(addr), (<span class="keyword">char</span> *) <span class="built_in">PAGE_END</span>(addr));</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">LOGI</span>(<span class="string">&quot;replaceGOT %X not found!\n&quot;</span>, ori);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>遍历GOT表，查找到目标函数地址后，将该地址权限设置为可读可写，然后替换函数地址，并刷新CPU Cache以清空指令缓存。</p>
-<h2 id="使用LIEF添加依赖"><a href="#使用LIEF添加依赖" class="headerlink" title="使用LIEF添加依赖"></a>使用LIEF添加依赖</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lief</span><br><span class="line"></span><br><span class="line">elf = lief.parse(<span class="string">&quot;victim&quot;</span>)</span><br><span class="line">elf.add_library(<span class="string">&quot;/data/local/tmp/libinject.so&quot;</span>)</span><br><span class="line">elf.write(<span class="string">&quot;victim-patch&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="使用LIEF添加依赖"><a href="#使用LIEF添加依赖" class="headerlink" title="使用LIEF添加依赖"></a>使用LIEF添加依赖</h2><p>打开<code>victim/build/intermediates/cmake/debug/obj/armeabi-v7a/</code>目录，使用<code>LIEF</code>注入<code>victim</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lief</span><br><span class="line"></span><br><span class="line">elf = lief.parse(<span class="string">&quot;victim&quot;</span>)</span><br><span class="line">elf.add_library(<span class="string">&quot;/data/local/tmp/libinject.so&quot;</span>)</span><br><span class="line">elf.write(<span class="string">&quot;victim-patch&quot;</span>)</span><br></pre></td></tr></table></figure>
 
 <h2 id="使用termux-elf-cleaner处理ELF文件（可选）"><a href="#使用termux-elf-cleaner处理ELF文件（可选）" class="headerlink" title="使用termux-elf-cleaner处理ELF文件（可选）"></a>使用termux-elf-cleaner处理ELF文件（可选）</h2><p>使用最新版本的NDK编译<code>victim</code>，执行时提示<code>WARNING: linker: unsupported flags DT_FLAGS_1=0x8000001</code>(不影响运行)，使用<code>termux-elf-cleaner</code>处理后，<code>WARNING</code>消失</p>
 <p>执行以下命令即可替换<code>victim-patch</code>的<code>DT_FLAGS_1</code>，去除<code>WARNING</code></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">elf-cleaner.exe victim-patch</span><br></pre></td></tr></table></figure>
 
-<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>将生成的<code>libinject.so</code>和<code>victim-patch</code>（位于）发送到手机的<code>/data/local/tmp/</code>目录</p>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>打开<code>inject/build/intermediates/cmake/debug/obj/armeabi-v7a/</code>目录，<br>将生成的<code>libinject.so</code>和<code>victim-patch</code>发送到手机的<code>/data/local/tmp/</code>目录</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb push libinject.so /data/local/tmp</span><br><span class="line">adb push victim-patch /data/local/tmp</span><br></pre></td></tr></table></figure>
 
-<p>设置可执行权限，并运行<code>victim-patch</code></p>
+<p>设置可执行权限，运行<code>victim-patch</code></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb shell chmod +x /data/local/tmp/victim-patch</span><br><span class="line">adb shell /data/local/tmp/victim-patch</span><br></pre></td></tr></table></figure>
 
 <p>日志及运行结果：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-log.png"></p>
 <p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-output.png"></p>
-<p><code>getpid</code>返回值被修改，成功实现<code>GOT Hook</code>。</p>
+<p>成功实现对<code>getpid</code>函数的<code>GOT Hook</code>。</p>
 <h2 id="存在的问题"><a href="#存在的问题" class="headerlink" title="存在的问题"></a>存在的问题</h2><ol>
 <li>未绕过<code>dlopen</code>命名空间限制，在<code>Android 7</code>以上无法打开非公共库</li>
 <li>未hook<code>dlopen</code>，无法实时修改加载模块的GOT表</li>
-<li>基于链接视图（<code>Linking View</code>）静态解析ELF，无法hook加壳的so</li>
-<li>基于maps解析，兼容性可能存在一定问题</li>
-<li>基于静态注入，无法绕过完整性检测</li>
+<li>解析maps获取模块基址，兼容性可能存在一定问题</li>
+<li>基于链接视图静态解析ELF，无法处理加壳的so</li>
+<li>静态注入可执行文件，无法绕过完整性检测</li>
+<li>目标模块路径硬编码，通用性不足</li>
 <li>未提供卸载函数，无法恢复GOT表</li>
 <li>…</li>
 </ol>
-<p>（名副其实的<strong>简易</strong>）</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本项目，学习了<code>GOT Hook</code>原理以及ELF文件结构，目的已基本达到。虽然功能还不够完善，但短期内应该不会再改动了（俗话说得好：不要重复造轮子）。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本项目，学习了<code>GOT Hook</code>原理和ELF文件结构，目的基本达到。虽然功能还不够完善，但短期内应该不会再改动了（俗话说得好：不要重复造轮子）。</p>
 <p>实际应用可以考虑使用字节的<a target="_blank" rel="noopener" href="https://github.com/bytedance/bhook">bhook</a></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/byhook/article/details/103500524">android中基于plt/got的hook实现原理</a><br><a href="%5Bhttps://linyt.blog.csdn.net/article/details/51636753%5D">聊聊Linux动态链接中的PLT和GOT(2)——延迟重定位</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/zfyouxi/p/4592146.html">基于Android的ELF PLT/GOT符号和重定向过程ELF Hook实现</a><br><a target="_blank" rel="noopener" href="https://github.com/termux/termux-packages/issues/4894">WARNING: linker: unsupported flags DT_FLAGS_1=0x8000001</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/108274829">constructor属性函数在动态库加载中的执行顺序</a><br><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-948942-1-1.html">Android7.0以上命名空间详解(dlopen限制)</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/u011247544/article/details/78564564">Android中GOT表HOOK手动实现</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/mmmmar/p/8228391.html">Android GOT Hook</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/269441842">PLT HOOK</a><br><a target="_blank" rel="noopener" href="https://github.com/bytedance/bhook">bhook</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/byhook/article/details/103500524">android中基于plt/got的hook实现原理</a><br><a href="%5Bhttps://linyt.blog.csdn.net/article/details/51636753%5D">聊聊Linux动态链接中的PLT和GOT(2)——延迟重定位</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/zfyouxi/p/4592146.html">基于Android的ELF PLT/GOT符号和重定向过程ELF Hook实现</a><br><a target="_blank" rel="noopener" href="https://github.com/termux/termux-packages/issues/4894">WARNING: linker: unsupported flags DT_FLAGS_1=0x8000001</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/108274829">constructor属性函数在动态库加载中的执行顺序</a><br><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-948942-1-1.html">Android7.0以上命名空间详解(dlopen限制)</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/u011247544/article/details/78564564">Android中GOT表HOOK手动实现</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/mmmmar/p/8228391.html">Android GOT Hook</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/269441842">PLT HOOK</a><br><a target="_blank" rel="noopener" href="https://github.com/iqiyi/xhook">xhook</a><br><a target="_blank" rel="noopener" href="https://github.com/bytedance/bhook">bhook</a></p>
 
 
 
