@@ -22,7 +22,7 @@
 <meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-log.png">
 <meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-output.png">
 <meta property="article:published_time" content="2021-08-23T02:56:25.000Z">
-<meta property="article:modified_time" content="2021-08-24T01:47:31.163Z">
+<meta property="article:modified_time" content="2021-08-24T01:53:35.589Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
@@ -199,7 +199,7 @@ var _hmt = _hmt || [];
 <p>调用外部函数时，需要先跳转到PLT(<code>Procedure Link Table</code> 程序链接表，位于代码段)，再跳转到GOT(<code>Global Offset Table</code> 全局偏移表，位于数据段)，执行目标函数。</p>
 <p>延迟绑定(<code>Lazy Binding</code>)：当外部函数被调用时，才进行地址解析和重定位</p>
 <p><strong>由于Android ARM架构不支持延迟绑定，在linker重定位后，GOT已被填充为内存地址</strong> (可使用IDA动态调试验证)</p>
-<p>因此，可以通过比对函数地址，修改指定模块的GOT表项，实现对外部导入函数的Hook</p>
+<p>因此，可以通过比对函数地址，修改指定模块的对应GOT表项，实现对外部导入函数的Hook</p>
 <h2 id="具体思路"><a href="#具体思路" class="headerlink" title="具体思路"></a>具体思路</h2><p>编写so库，在so加载的构造函数（<code>linker</code>会主动调用）中完成以下操作：定位目标模块基址、基于链接视图（<code>Linking View</code>）解析ELF文件，得到GOT表地址及大小、遍历GOT表替换目标函数地址。</p>
 <h2 id="注入方式"><a href="#注入方式" class="headerlink" title="注入方式"></a>注入方式</h2><p>使用<code>LIEF</code>修改ELF文件，导入该动态库。</p>
 <h2 id="编译环境"><a href="#编译环境" class="headerlink" title="编译环境"></a>编译环境</h2><p><code>Android Studio 2020.3.1</code>、<code>Gradle 7.0.1</code>、<code>CMake 3.18.1</code>、<code>NDK 23.0.7599858</code><br><code>ABI</code>:<code>armeabi-v7a</code></p>
