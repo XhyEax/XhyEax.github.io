@@ -166,6 +166,103 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-android-9-set-hotpot-ip" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/01/android-9-set-hotpot-ip/">安卓9 设置热点固定IP (Xposed)</a>
+    </h1>
+  
+
+
+        
+        <a href="/2021/03/01/android-9-set-hotpot-ip/" class="archive-article-date">
+  	<time datetime="2021-03-01T09:57:36.248Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-01</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+
+      
+    
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+            
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定IP。</p>
+<h2 id="跟踪源代码"><a href="#跟踪源代码" class="headerlink" title="跟踪源代码"></a>跟踪源代码</h2><p>定位到<code>com.android.server.connectivity.tethering.TetherInterfaceStateMachine</code>类（<a target="_blank" rel="noopener" href="http://aospxref.com/android-9.0.0_r61/xref/frameworks/base/services/core/java/com/android/server/connectivity/tethering/TetherInterfaceStateMachine.java">源代码</a>）</p>
+<p>函数调用链：<code>startIPv4</code>-<code>configureIPv4</code>-<code>getRandomWifiIPv4Address</code></p>
+<p>
+        
+
+          <a class="article-more-a" href="/2021/03/01/android-9-set-hotpot-ip/#more">查看更多 >></a>
+        
+    
+    
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/01/android-9-set-hotpot-ip/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-vscode-debug-ucore" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1018,103 +1115,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2020/04/15/python-specify-pip-source-url/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-wsl-move-to-non-os-disk" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/04/15/wsl-move-to-non-os-disk/">迁移WSL至非系统盘</a>
-    </h1>
-  
-
-
-        
-        <a href="/2020/04/15/wsl-move-to-non-os-disk/" class="archive-article-date">
-  	<time datetime="2020-04-15T06:17:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-
-      
-    
-        
-        
-            
-            
-        
-            
-            
-        
-            
-            
-        
-        
-            
-            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>由于要在WSL中使用Docker，系统盘空间不足，故迁移WSL到D盘</p>
-<h2 id="迁移步骤"><a href="#迁移步骤" class="headerlink" title="迁移步骤"></a>迁移步骤</h2><h3 id="删除temp文件夹"><a href="#删除temp文件夹" class="headerlink" title="删除temp文件夹"></a>删除temp文件夹</h3><p>打开wsl文件夹：<br><code>C:\Users\用户名\AppData\Local\Packages\WSL文件夹\LocalState</code><br>WSL文件夹名：<br>Ubuntu ：<code>CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc</code><br>Ubuntu 18.04 LTS：<code>CanonicalGroupLimited.Ubuntu18.04onWindows_79rhkp1fndgsc</code><br>Kali Linux：<code>KaliLinux.54290C8133FEE_ey8k8hqnwqnmg</code><br>删除temp文件夹</p>
-<h3 id="（可选操作）"><a href="#（可选操作）" class="headerlink" title="（可选操作）"></a>（可选操作）</h3><p>也可以先转换为wsl2再进行迁移</p>
-<p>
-        
-
-          <a class="article-more-a" href="/2020/04/15/wsl-move-to-non-os-disk/#more">查看更多 >></a>
-        
-    
-    
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">WSL</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/04/15/wsl-move-to-non-os-disk/">展开全文 >></a>
         </p>
       
 

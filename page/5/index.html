@@ -166,6 +166,103 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-android_mod_fork_to_bypass_antidebug" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/11/20/android_mod_fork_to_bypass_antidebug/">修改安卓系统源码(fork) 绕过多进程ptrace反调试</a>
+    </h1>
+  
+
+
+        
+        <a href="/2019/11/20/android_mod_fork_to_bypass_antidebug/" class="archive-article-date">
+  	<time datetime="2019-11-20T01:45:32.637Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-11-20</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+
+      
+    
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+            
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>多进程ptrace反调试是一种常见的反调试手段，思路为fork出子进程，在子进程中ptrace自身，使得调试器无法附加。通过修改源码来禁止指定进程fork</p>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><h3 id="定位到源码位置"><a href="#定位到源码位置" class="headerlink" title="定位到源码位置"></a>定位到源码位置</h3><p>AOSP 5.1.1及6.0.1 fork函数位于：<code>bionic/libc/bionic/fork.cpp</code></p>
+<h3 id="添加过滤函数"><a href="#添加过滤函数" class="headerlink" title="添加过滤函数"></a>添加过滤函数</h3><p>通过读取status文件来确定进程名，然后跟文件内容比较，相同则禁止其fork<br>代码如下：</p>
+<p>
+        
+
+          <a class="article-more-a" href="/2019/11/20/android_mod_fork_to_bypass_antidebug/#more">查看更多 >></a>
+        
+    
+    
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/11/20/android_mod_fork_to_bypass_antidebug/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-assemble-own-riru-module" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -997,103 +1094,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/10/03/android-import-as-system-cert/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-anti-web-js-debugger-code" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/28/anti-web-js-debugger-code/">绕过网站js中的debugger反调试</a>
-    </h1>
-  
-
-
-        
-        <a href="/2019/09/28/anti-web-js-debugger-code/" class="archive-article-date">
-  	<time datetime="2019-09-28T04:21:18.258Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-28</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-
-      
-    
-        
-        
-            
-            
-        
-            
-            
-        
-            
-            
-        
-        
-            
-            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用开发者工具(F12)分析一个网站时发现：<br>每隔一段时间就会有js代码主动触发调试器断点，妨碍分析。<br>问之度娘，遂得解法。</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h2 id="1-使用控制台对方法进行nop"><a href="#1-使用控制台对方法进行nop" class="headerlink" title="1. 使用控制台对方法进行nop"></a>1. 使用控制台对方法进行nop</h2><p>有两种情况，一种是直接调用debugger，如：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_$gy</span>(<span class="params"></span>)</span>&#123;<span class="keyword">debugger</span>;&#125;</span><br></pre></td></tr></table></figure>
-<p>
-        
-
-          <a class="article-more-a" href="/2019/09/28/anti-web-js-debugger-code/#more">查看更多 >></a>
-        
-    
-    
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">经验</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/28/anti-web-js-debugger-code/">展开全文 >></a>
         </p>
       
 

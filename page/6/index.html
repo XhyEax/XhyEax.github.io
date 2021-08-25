@@ -166,6 +166,103 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-anti-web-js-debugger-code" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/28/anti-web-js-debugger-code/">绕过网站js中的debugger反调试</a>
+    </h1>
+  
+
+
+        
+        <a href="/2019/09/28/anti-web-js-debugger-code/" class="archive-article-date">
+  	<time datetime="2019-09-28T04:21:18.258Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-28</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+
+      
+    
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+            
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用开发者工具(F12)分析一个网站时发现：<br>每隔一段时间就会有js代码主动触发调试器断点，妨碍分析。<br>问之度娘，遂得解法。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h2 id="1-使用控制台对方法进行nop"><a href="#1-使用控制台对方法进行nop" class="headerlink" title="1. 使用控制台对方法进行nop"></a>1. 使用控制台对方法进行nop</h2><p>有两种情况，一种是直接调用debugger，如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_$gy</span>(<span class="params"></span>)</span>&#123;<span class="keyword">debugger</span>;&#125;</span><br></pre></td></tr></table></figure>
+<p>
+        
+
+          <a class="article-more-a" href="/2019/09/28/anti-web-js-debugger-code/#more">查看更多 >></a>
+        
+    
+    
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">经验</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/28/anti-web-js-debugger-code/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-andlua-app-reverse" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1018,103 +1115,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/09/13/android-source-mod-anti-antidebug/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-android-kernel-reverse-anti-antidebug" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/13/android-kernel-reverse-anti-antidebug/">逆向修改安卓内核 x64 过TracerPID反调试</a>
-    </h1>
-  
-
-
-        
-        <a href="/2019/09/13/android-kernel-reverse-anti-antidebug/" class="archive-article-date">
-  	<time datetime="2019-09-12T16:42:11.329Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-13</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-
-      
-    
-        
-        
-            
-            
-        
-            
-            
-        
-            
-            
-        
-        
-            
-            <p><h2 id="建议在git-bash下操作"><a href="#建议在git-bash下操作" class="headerlink" title="建议在git bash下操作"></a>建议在git bash下操作</h2><p>本人解压<code>kernel.gz</code>时使用的不是命令行，导致没有看到输出信息<code>gzip trailing garbage ignored</code>，进而没有对这些数据进行处理，浪费了很多时间。</p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手动nop掉TracerPID反调试代码，当然比不上直接修改内核来的快。<br>如果有内核源码以及环境，当然可以通过直接修改源码的方式生成<code>boot.img</code>。<br>在无内核源码（或者还没配置安卓源码编译环境）的情况下则只能通过逆向来修改内核。</p>
-<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p><code>Redmi Note 3</code>, <code>arm64</code>, <code>cm12.1</code></p>
-<p>
-        
-
-          <a class="article-more-a" href="/2019/09/13/android-kernel-reverse-anti-antidebug/#more">查看更多 >></a>
-        
-    
-    
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/13/android-kernel-reverse-anti-antidebug/">展开全文 >></a>
         </p>
       
 
