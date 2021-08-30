@@ -166,6 +166,103 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-android-arm-plt-hook" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/08/30/android-arm-plt-hook/">实现简易Android ARM GOT Hook (二)</a>
+    </h1>
+  
+
+
+        
+        <a href="/2021/08/30/android-arm-plt-hook/" class="archive-article-date">
+  	<time datetime="2021-08-30T02:56:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+
+      
+    
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+            
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>前文<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">实现简易Android ARM GOT Hook</a>通过解析ELF section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。</p>
+<p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的执行视图，讨论<code>Android</code> ARM架构的<code>GOT/PLT Hook</code>。</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>基于执行视图解析内存中的ELF，解析<code>.dynamic</code>段得到<code>.rel.plt</code>、<code>.rel.dyn</code>、<code>.dynsym</code>、<br><code>.dynstr</code>和<code>.hash</code>表。通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找导入符号，再遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，得到函数在GOT表中的偏移。</p>
+<p>
+        
+
+          <a class="article-more-a" href="/2021/08/30/android-arm-plt-hook/#more">查看更多 >></a>
+        
+    
+    
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/08/30/android-arm-plt-hook/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-why-linux-rm-dirfile-need-x" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -299,9 +396,9 @@ var _hmt = _hmt || [];
         
         
             
-            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，讨论<code>Android</code> ARM架构的<code>GOT/PLT Hook</code>。</p>
+            <p><h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p>第二篇：<a href="https://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/">实现简易Android ARM GOT Hook (二)</a><br>基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的链接视图，讨论<code>Android</code> ARM架构的<code>GOT/PLT Hook</code>。</p>
 <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>程序<code>加载</code>后，在执行之前，需要先进行<code>动态链接</code>，并进行<code>重定位</code>。</p>
-<p>调用外部函数时，需要先跳转到PLT(<code>Procedure Link Table</code> 程序链接表，位于代码段)，再跳转到GOT(<code>Global Offset Table</code> 全局偏移表，位于数据段)，执行目标函数。</p>
 <p>
         
 
@@ -999,103 +1096,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/04/10/gslab2021-final-android/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-gslab2021-pre-android" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/04/04/gslab2021-pre-android/">gslab2021 初赛 - 安卓客户端安全</a>
-    </h1>
-  
-
-
-        
-        <a href="/2021/04/04/gslab2021-pre-android/" class="archive-article-date">
-  	<time datetime="2021-04-04T13:28:32.366Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-04</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-
-      
-    
-        
-        
-            
-            
-        
-            
-            
-        
-            
-            
-        
-        
-            
-            <p><h2 id="最终效果"><a href="#最终效果" class="headerlink" title="最终效果"></a>最终效果</h2><p>成功实现RocketMouse直装破解版</p>
-<h3 id="app分析"><a href="#app分析" class="headerlink" title="app分析"></a>app分析</h3><h4 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h4><p>首先查看apk文件结构，发现是<code>mono</code>引擎的unity3d游戏，且<code>Assembly-CSharp.dll</code>已加密。<br>并且存在<code>assets/filelist</code>文件，测试发现是apk中各个文件的crc32校验值。</p>
-<h4 id="java层"><a href="#java层" class="headerlink" title="java层"></a>java层</h4><p>使用frida的spawn模式启动app，弹出对话框，点击对话框会退出进程，于是使用jeb打开该apk文件。<br>发现<code>com.tencent.games.sec2021.Sec2021MsgBox</code>的<code>onDismiss</code>函数存在退出代码。</p>
-<p>
-        
-
-          <a class="article-more-a" href="/2021/04/04/gslab2021-pre-android/#more">查看更多 >></a>
-        
-    
-    
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/04/04/gslab2021-pre-android/">展开全文 >></a>
         </p>
       
 

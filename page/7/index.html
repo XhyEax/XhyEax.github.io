@@ -166,6 +166,103 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-android-source-mod-anti-antidebug" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/13/android-source-mod-anti-antidebug/">修改安卓内核源码 过State TracerPID反调试</a>
+    </h1>
+  
+
+
+        
+        <a href="/2019/09/13/android-source-mod-anti-antidebug/" class="archive-article-date">
+  	<time datetime="2019-09-13T03:23:31.161Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-13</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+
+      
+    
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+            
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>修改安卓内核源码来绕过State字段及TracePid字段反调试</p>
+<h2 id="目标文件"><a href="#目标文件" class="headerlink" title="目标文件"></a>目标文件</h2><p>打开内核源码目录，<code>/fs/proc</code>下的<code>base.c</code>和<code>array.c</code></p>
+<h2 id="修改点"><a href="#修改点" class="headerlink" title="修改点"></a>修改点</h2><h3 id="base-c"><a href="#base-c" class="headerlink" title="base.c"></a>base.c</h3><h4 id="proc-pid-wchan函数"><a href="#proc-pid-wchan函数" class="headerlink" title="proc_pid_wchan函数"></a>proc_pid_wchan函数</h4><p>最后一个else分支改成</p>
+<p>
+        
+
+          <a class="article-more-a" href="/2019/09/13/android-source-mod-anti-antidebug/#more">查看更多 >></a>
+        
+    
+    
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/13/android-source-mod-anti-antidebug/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-android-kernel-reverse-anti-antidebug" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1008,103 +1105,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/04/07/2019-hzwas-wp/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-emui9-magisk-install" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/04/02/emui9-magisk-install/">emui9安装Magisk框架</a>
-    </h1>
-  
-
-
-        
-        <a href="/2019/04/02/emui9-magisk-install/" class="archive-article-date">
-  	<time datetime="2019-04-01T20:49:28.809Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-04-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-
-      
-    
-        
-        
-            
-            
-        
-            
-            
-        
-            
-            
-        
-        
-            
-            <p><h2 id="准备条件"><a href="#准备条件" class="headerlink" title="准备条件"></a>准备条件</h2><p>(设备已解锁BL，电脑fastboot环境正常是前提条件)<br>已下载magisk框架rec安装包（<a target="_blank" rel="noopener" href="https://github.com/topjohnwu/Magisk/releases/">github下载</a>），有sd卡（<code>adb sideload</code>未测试是否可安装，建议用内存卡），并已安装第三方recovery（以下简称rec）<br>或<br>已安装magisk框架app，且有原厂<code>recovery_ramdisk</code>镜像</p>
-<h2 id="安装方式"><a href="#安装方式" class="headerlink" title="安装方式"></a>安装方式</h2><p>fastboot刷入命令（华为没有boot分区，所以rec也是通过这个指令刷入）<br>(BOOT.img请自行替换为对应镜像名)</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastboot flash recovery_ramdisk BOOT.img</span><br></pre></td></tr></table></figure>
-<p>
-        
-
-          <a class="article-more-a" href="/2019/04/02/emui9-magisk-install/#more">查看更多 >></a>
-        
-    
-    
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">经验</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/04/02/emui9-magisk-install/">展开全文 >></a>
         </p>
       
 

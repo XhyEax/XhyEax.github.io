@@ -166,6 +166,103 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-fix_error_log_qseecomd_aosp" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/11/20/fix_error_log_qseecomd_aosp/">修复 AOSP QSEECOMD 错误日志</a>
+    </h1>
+  
+
+
+        
+        <a href="/2019/11/20/fix_error_log_qseecomd_aosp/" class="archive-article-date">
+  	<time datetime="2019-11-20T02:05:12.087Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-11-20</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+
+      
+    
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+            
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>刷入自己编译的AOSP系统，一直有日志输出，TAG为<code>QSEECOMD</code>，日志内容如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">11-20 17:34:14.924 30350-30350/? D/QSEECOMD:: qseecom listener services process entry PPID = 1</span><br><span class="line">11-20 17:34:14.924 30350-30350/? E/QSEECOMD:: Listener: index = 0, hierarchy = 0</span><br><span class="line">11-20 17:34:14.925 30350-30350/? E/QSEECOMD:: Init dlopen(librpmb.so, RLTD_NOW) is failed....</span><br><span class="line">11-20 17:34:14.925 30350-30350/? E/QSEECOMD:: ERROR: RPMB_INIT failed, shall not start listener services</span><br></pre></td></tr></table></figure>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>百度得知是<code>librpmb.so</code>以及<code>libssd.so</code>文件缺失，到<a target="_blank" rel="noopener" href="https://developers.google.com/android/images">官网</a>下载原版镜像（可根据系统代号查找）<br>提取出这两个文件，导入<code>/system/lib/</code>后重启即可（注意权限设置）<br>也可打包成magisk模块刷入（下载地址：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1AcnT-D9x8EE0Z6Jzuxgscw">https://pan.baidu.com/s/1AcnT-D9x8EE0Z6Jzuxgscw</a> 提取码: hqh5）<br>为了让下次编译系统时自动包含这两个文件，把它们复制到<code>out/target/product/hammerhead/system/lib/</code></p>
+<p>
+        
+
+          <a class="article-more-a" href="/2019/11/20/fix_error_log_qseecomd_aosp/#more">查看更多 >></a>
+        
+    
+    
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/11/20/fix_error_log_qseecomd_aosp/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-android_mod_fork_to_bypass_antidebug" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -997,103 +1094,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/10/07/vivado-custom-ip-and-instantiation/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-android-import-as-system-cert" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/10/03/android-import-as-system-cert/">安卓7.0及以上 导入为系统证书</a>
-    </h1>
-  
-
-
-        
-        <a href="/2019/10/03/android-import-as-system-cert/" class="archive-article-date">
-  	<time datetime="2019-10-02T19:30:48.215Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-10-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-
-      
-    
-        
-        
-            
-            
-        
-            
-            
-        
-            
-            
-        
-        
-            
-            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>从安卓7.0开始，Android更改了对用户安装证书的默认信任行为。应用程序默认只信任系统级别的CA证书。<br>所以需要hook第三方包的证书校验函数（如JustTrustMe）或者直接导入为系统证书以供抓包</p>
-<h2 id="导入方法"><a href="#导入方法" class="headerlink" title="导入方法"></a>导入方法</h2><h3 id="1-导出-der证书文件"><a href="#1-导出-der证书文件" class="headerlink" title="1. 导出.der证书文件"></a>1. 导出.der证书文件</h3><p>从抓包应用中导出即可。</p>
-<h3 id="2-转换为pem格式并重命名"><a href="#2-转换为pem格式并重命名" class="headerlink" title="2. 转换为pem格式并重命名"></a>2. 转换为pem格式并重命名</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">　　openssl x509 -inform DER -<span class="keyword">in</span> cacert.der -out cacert.pem</span><br><span class="line">　　openssl x509 -inform PEM -subject_hash_old -<span class="keyword">in</span> cacert.pem |head -1</span><br><span class="line">　　mv cacert.pem &lt;<span class="built_in">hash</span>&gt;.0</span><br></pre></td></tr></table></figure>
-<p>
-        
-
-          <a class="article-more-a" href="/2019/10/03/android-import-as-system-cert/#more">查看更多 >></a>
-        
-    
-    
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/10/03/android-import-as-system-cert/">展开全文 >></a>
         </p>
       
 

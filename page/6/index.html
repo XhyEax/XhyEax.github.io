@@ -166,6 +166,103 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-android-import-as-system-cert" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/10/03/android-import-as-system-cert/">安卓7.0及以上 导入为系统证书</a>
+    </h1>
+  
+
+
+        
+        <a href="/2019/10/03/android-import-as-system-cert/" class="archive-article-date">
+  	<time datetime="2019-10-02T19:30:48.215Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-10-03</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+
+      
+    
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+            
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>从安卓7.0开始，Android更改了对用户安装证书的默认信任行为。应用程序默认只信任系统级别的CA证书。<br>所以需要hook第三方包的证书校验函数（如JustTrustMe）或者直接导入为系统证书以供抓包</p>
+<h2 id="导入方法"><a href="#导入方法" class="headerlink" title="导入方法"></a>导入方法</h2><h3 id="1-导出-der证书文件"><a href="#1-导出-der证书文件" class="headerlink" title="1. 导出.der证书文件"></a>1. 导出.der证书文件</h3><p>从抓包应用中导出即可。</p>
+<h3 id="2-转换为pem格式并重命名"><a href="#2-转换为pem格式并重命名" class="headerlink" title="2. 转换为pem格式并重命名"></a>2. 转换为pem格式并重命名</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">　　openssl x509 -inform DER -<span class="keyword">in</span> cacert.der -out cacert.pem</span><br><span class="line">　　openssl x509 -inform PEM -subject_hash_old -<span class="keyword">in</span> cacert.pem |head -1</span><br><span class="line">　　mv cacert.pem &lt;<span class="built_in">hash</span>&gt;.0</span><br></pre></td></tr></table></figure>
+<p>
+        
+
+          <a class="article-more-a" href="/2019/10/03/android-import-as-system-cert/#more">查看更多 >></a>
+        
+    
+    
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/10/03/android-import-as-system-cert/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-anti-web-js-debugger-code" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1018,103 +1115,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/09/13/ida-as-port-reverse/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-android-source-mod-anti-antidebug" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/13/android-source-mod-anti-antidebug/">修改安卓内核源码 过State TracerPID反调试</a>
-    </h1>
-  
-
-
-        
-        <a href="/2019/09/13/android-source-mod-anti-antidebug/" class="archive-article-date">
-  	<time datetime="2019-09-13T03:23:31.161Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-13</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-
-      
-    
-        
-        
-            
-            
-        
-            
-            
-        
-            
-            
-        
-        
-            
-            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>修改安卓内核源码来绕过State字段及TracePid字段反调试</p>
-<h2 id="目标文件"><a href="#目标文件" class="headerlink" title="目标文件"></a>目标文件</h2><p>打开内核源码目录，<code>/fs/proc</code>下的<code>base.c</code>和<code>array.c</code></p>
-<h2 id="修改点"><a href="#修改点" class="headerlink" title="修改点"></a>修改点</h2><h3 id="base-c"><a href="#base-c" class="headerlink" title="base.c"></a>base.c</h3><h4 id="proc-pid-wchan函数"><a href="#proc-pid-wchan函数" class="headerlink" title="proc_pid_wchan函数"></a>proc_pid_wchan函数</h4><p>最后一个else分支改成</p>
-<p>
-        
-
-          <a class="article-more-a" href="/2019/09/13/android-source-mod-anti-antidebug/#more">查看更多 >></a>
-        
-    
-    
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/13/android-source-mod-anti-antidebug/">展开全文 >></a>
         </p>
       
 
