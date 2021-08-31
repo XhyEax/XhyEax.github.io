@@ -202,9 +202,9 @@ var _hmt = _hmt || [];
         
         
             
-            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>前文<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">简易Android ARM&amp;ARM64 GOT Hook (一)</a>通过解析ELF section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。</p>
-<p>本文仍以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的执行视图(<code>Execution View</code>)，讨论<code>Android</code> <code>ARM&amp;ARM64</code>架构的<code>GOT/PLT Hook</code>。</p>
-<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>基于执行视图解析内存中的ELF，解析<code>.dynamic</code>段得到<code>.rel.plt</code>、<code>.rel.dyn</code>、<code>.dynsym</code>、<br><code>.dynstr</code>和<code>.hash</code>表。通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找导入符号，再遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，得到函数偏移。</p>
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>前文<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">简易Android ARM&amp;ARM64 GOT Hook (一)</a>，基于链接视图，解析section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。</p>
+<p>本文基于ELF的执行视图(<code>Execution View</code>)，讨论<code>Android</code> <code>ARM&amp;ARM64</code>架构的<code>GOT/PLT Hook</code>（仍以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例）。</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><ol>
 <p>
         
 
