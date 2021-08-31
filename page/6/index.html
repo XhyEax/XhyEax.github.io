@@ -166,6 +166,103 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-vivado-custom-ip-and-instantiation" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/10/07/vivado-custom-ip-and-instantiation/">Vivado 自定义IP核并实例化调用</a>
+    </h1>
+  
+
+
+        
+        <a href="/2019/10/07/vivado-custom-ip-and-instantiation/" class="archive-article-date">
+  	<time datetime="2019-10-06T18:38:24.855Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-10-07</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+
+      
+    
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+            
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>作业：将四选一数据选择器封装成IP，用以实现八选一数据选择器。</p>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><h3 id="将项目封装成IP"><a href="#将项目封装成IP" class="headerlink" title="将项目封装成IP"></a>将项目封装成IP</h3><p>打开要封装的项目，然后点击工具栏<br><code>Tools</code>-<code>Create and Package New IP</code>-<code>Next</code><br>打包当前项目即可（选择完<code>Package your current project</code>后一路Next）<br>（当然，这里也可以手动选择路径进行打包）<br>然后会出现<code>Packaging Steps</code>窗口<br>如果不想修改配置的话，可以直接选择最后一步，<code>Review and Package</code>-<code>Package IP</code></p>
+<h3 id="在其他项目中导入"><a href="#在其他项目中导入" class="headerlink" title="在其他项目中导入"></a>在其他项目中导入</h3><p>打开需要调用IP的项目，点击左侧<br><code>Flow Navigator</code>-<code>IP Catalog</code><br>在空白处右键，<code>Add Repository</code>，选择之前打包的文件夹<br>(如果之前打包的是项目的话，则对应<code>.srcs</code>文件夹，如<code>D:\source\Vivado\mux_8_1\mux_8_1.srcs</code>)<br>然后双击导入的IP，导入并生成<br>导入成功后，在<code>Sources</code>-<code>IP Sources</code>中可以看到IP<br>其中<code>Instantiation Template</code>即为实例化模板</p>
+<p>
+        
+
+          <a class="article-more-a" href="/2019/10/07/vivado-custom-ip-and-instantiation/#more">查看更多 >></a>
+        
+    
+    
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Vivado</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/10/07/vivado-custom-ip-and-instantiation/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-android-import-as-system-cert" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1018,103 +1115,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/09/14/android-debug-onload/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-ida-as-port-reverse" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/13/ida-as-port-reverse/">修改IDA android_server默认端口</a>
-    </h1>
-  
-
-
-        
-        <a href="/2019/09/13/ida-as-port-reverse/" class="archive-article-date">
-  	<time datetime="2019-09-13T04:00:49.490Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-13</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-
-      
-    
-        
-        
-            
-            
-        
-            
-            
-        
-            
-            
-        
-        
-            
-            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>也许有的反调试会检测23946端口是否占用，所以保险起见不妨使用别的端口。<br>可以使用<code>./android_server -p12345</code>指定端口，但是不如直接逆向修改默认端口。</p>
-<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>ida载入android_server，进入main函数，按F5查看伪代码，定位到23946（0x5dba）位置，直接修改即可。<br>可以把<code>5D BA</code>改为<code>39 30</code>，即12345端口</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jiaoxiake/p/6801093.html">浅谈android反调试之 转发端口</a></p>
-<p>
-        
-
-          <a class="article-more-a" href="/2019/09/13/ida-as-port-reverse/#more">查看更多 >></a>
-        
-    
-    
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">IDA</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/13/ida-as-port-reverse/">展开全文 >></a>
         </p>
       
 

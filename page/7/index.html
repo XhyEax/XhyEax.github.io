@@ -166,6 +166,103 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-ida-as-port-reverse" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/13/ida-as-port-reverse/">修改IDA android_server默认端口</a>
+    </h1>
+  
+
+
+        
+        <a href="/2019/09/13/ida-as-port-reverse/" class="archive-article-date">
+  	<time datetime="2019-09-13T04:00:49.490Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-13</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+
+      
+    
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+            
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>也许有的反调试会检测23946端口是否占用，所以保险起见不妨使用别的端口。<br>可以使用<code>./android_server -p12345</code>指定端口，但是不如直接逆向修改默认端口。</p>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>ida载入android_server，进入main函数，按F5查看伪代码，定位到23946（0x5dba）位置，直接修改即可。<br>可以把<code>5D BA</code>改为<code>39 30</code>，即12345端口</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jiaoxiake/p/6801093.html">浅谈android反调试之 转发端口</a></p>
+<p>
+        
+
+          <a class="article-more-a" href="/2019/09/13/ida-as-port-reverse/#more">查看更多 >></a>
+        
+    
+    
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">IDA</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/13/ida-as-port-reverse/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-android-source-mod-anti-antidebug" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1008,103 +1105,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/04/13/vscode-cpp-multiplefile/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2019-hzwas-wp" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/04/07/2019-hzwas-wp/">2019中国杭州网络安全技能大赛 预选赛 哈夫曼之谜 &amp; EasyCpp Writeup</a>
-    </h1>
-  
-
-
-        
-        <a href="/2019/04/07/2019-hzwas-wp/" class="archive-article-date">
-  	<time datetime="2019-04-07T04:03:45.844Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-04-07</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-
-      
-    
-        
-        
-            
-            
-        
-            
-            
-        
-            
-            
-        
-        
-            
-            <p><h2 id="Reverse-EasyCpp"><a href="#Reverse-EasyCpp" class="headerlink" title="Reverse EasyCpp"></a>Reverse EasyCpp</h2><p>[2019/10/25更新]<br>首先读入16个数字，然后生成一个斐波那契数组，长度也为16<br>然后对输入数组进行操作，从第二位开始，都加上第一位的值（<code>transform</code>）<br>动态调试可知<code>accumulate</code>的匿名函数对运算完的数组做反转操作<br>然后与斐波那契数组比较，相同则输出flag<br>也就是说输入的第一个数字是不会变的，所以就是987<br>后面的数字直接脚本跑一下就可以得到结果了</p>
-<h2 id="Crypto-哈夫曼之谜-100pt"><a href="#Crypto-哈夫曼之谜-100pt" class="headerlink" title="Crypto 哈夫曼之谜 100pt"></a>Crypto 哈夫曼之谜 100pt</h2><p>二叉树是真的还没学，还好找到了大佬的代码<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/zl1085372438/article/details/54694552">南邮数据结构实验二—二叉树的基本操作及哈夫曼编码译码系统的实现</a></p>
-<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>得到一个文本，内容如下</p>
-<p>
-        
-
-          <a class="article-more-a" href="/2019/04/07/2019-hzwas-wp/#more">查看更多 >></a>
-        
-    
-    
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">CTF</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/04/07/2019-hzwas-wp/">展开全文 >></a>
         </p>
       
 
