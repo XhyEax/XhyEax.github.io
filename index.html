@@ -493,7 +493,7 @@ var _hmt = _hmt || [];
         
         
             
-            <p><h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><p>第二篇：<a href="https://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/">简易Android ARM&amp;ARM64 GOT Hook (二)</a><br>基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址</p>
+            <p><h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><p><a href="https://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/">简易Android ARM&amp;ARM64 GOT Hook (二)</a><br>基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址</p>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的链接视图(<code>Linking View</code>)，讨论<code>Android</code> <code>ARM&amp;ARM64</code>架构的<code>GOT/PLT Hook</code>。</p>
 <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>程序<code>加载</code>后，在执行之前，需要先进行<code>动态链接</code>，并进行<code>重定位</code>。</p>
 <p>
