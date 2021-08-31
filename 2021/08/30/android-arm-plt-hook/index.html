@@ -7,14 +7,14 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://blog.xhyeax.com">
-  <title>实现简易Android ARM GOT Hook (二) | Xhy&#39;s Blog</title>
+  <title>实现简易Android ARM&amp;ARM64 GOT Hook (二) | Xhy&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="概述前文实现简易Android ARM GOT Hook通过解析ELF section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。 本文以Hook公共库libc.so的getpid函数为例，基于ELF的执行视图，讨论Android ARM架构的GOT&#x2F;PLT Hook。 思路基于执行视图解析内存中的ELF，解析.dynamic段得到.rel.plt、.rel.dyn、.dy">
+  <meta name="description" content="概述前文实现简易Android ARM&amp;ARM64 GOT Hook通过解析ELF section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。 本文仍以Hook公共库libc.so的getpid函数为例，基于ELF的执行视图(Execution View)，讨论Android ARM&amp;ARM64架构的GOT&#x2F;PLT Hook。 思路基于执行视图解析内存中的E">
 <meta property="og:type" content="article">
-<meta property="og:title" content="实现简易Android ARM GOT Hook (二)">
+<meta property="og:title" content="实现简易Android ARM&amp;ARM64 GOT Hook (二)">
 <meta property="og:url" content="http://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="概述前文实现简易Android ARM GOT Hook通过解析ELF section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。 本文以Hook公共库libc.so的getpid函数为例，基于ELF的执行视图，讨论Android ARM架构的GOT&#x2F;PLT Hook。 思路基于执行视图解析内存中的ELF，解析.dynamic段得到.rel.plt、.rel.dyn、.dy">
+<meta property="og:description" content="概述前文实现简易Android ARM&amp;ARM64 GOT Hook通过解析ELF section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。 本文仍以Hook公共库libc.so的getpid函数为例，基于ELF的执行视图(Execution View)，讨论Android ARM&amp;ARM64架构的GOT&#x2F;PLT Hook。 思路基于执行视图解析内存中的E">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-elf-header.png">
 <meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-ph-dynamic.png">
@@ -22,8 +22,10 @@
 <meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-reldyn.png">
 <meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-dynsym-str.png">
 <meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-hash.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-log.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-plt-hook-log.png">
 <meta property="article:published_time" content="2021-08-30T02:56:25.000Z">
-<meta property="article:modified_time" content="2021-08-30T16:16:30.593Z">
+<meta property="article:modified_time" content="2021-08-31T02:47:31.850Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
@@ -180,7 +182,7 @@ var _hmt = _hmt || [];
         
   
     <h1 class="article-title" itemprop="name">
-      实现简易Android ARM GOT Hook (二)
+      实现简易Android ARM&amp;ARM64 GOT Hook (二)
     </h1>
   
 
@@ -195,24 +197,30 @@ var _hmt = _hmt || [];
     <div class="article-entry" itemprop="articleBody">
 
       
-    <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>前文<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">实现简易Android ARM GOT Hook</a>通过解析ELF section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。</p>
-<p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的执行视图，讨论<code>Android</code> ARM架构的<code>GOT/PLT Hook</code>。</p>
+    <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>前文<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">实现简易Android ARM&amp;ARM64 GOT Hook</a>通过解析ELF section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。</p>
+<p>本文仍以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的<code>执行视图</code>(<code>Execution View</code>)，讨论<code>Android</code> <code>ARM&amp;ARM64</code>架构的<code>GOT/PLT Hook</code>。</p>
 <h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>基于执行视图解析内存中的ELF，解析<code>.dynamic</code>段得到<code>.rel.plt</code>、<code>.rel.dyn</code>、<code>.dynsym</code>、<br><code>.dynstr</code>和<code>.hash</code>表。通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找导入符号，再遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，得到函数在GOT表中的偏移。</p>
 <p>注入方式及编译环境同前文，不再赘述。</p>
-<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><p>代码见<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a>的<code>getSymAddrDynamic</code>函数</p>
+<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><h3 id="适配ARM64"><a href="#适配ARM64" class="headerlink" title="适配ARM64"></a>适配ARM64</h3><h4 id="添加宏"><a href="#添加宏" class="headerlink" title="添加宏"></a>添加宏</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__LP64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELFW(what) Elf64_ ## what</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_TYPE(what) ELF64_R_TYPE(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_SYM(what) ELF64_R_SYM(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELFW(what) Elf32_ ## what</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_TYPE(what) ELF32_R_TYPE(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_SYM(what) ELF32_R_SYM(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h3><p>见<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a>的<code>getSymAddrDynamic</code>函数</p>
 <h3 id="获取-dynamic段"><a href="#获取-dynamic段" class="headerlink" title="获取.dynamic段"></a>获取.dynamic段</h3><p>解析maps文件获取到模块地址后，基于执行视图解析ELF。</p>
 <p>从<code>elf header</code>中得到<code>program header table</code>的起始偏移（<code>e_phoff</code>）、<code>program header</code>大小(<code>e_phentsize</code>)和总<code>program header</code>个数（<code>e_phnum</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-elf-header.png"></p>
 <p>遍历<code>program header table</code>，查找<code>p_type</code>为<code>PT_DYNAMIC</code>的<code>program header</code>，得到<code>.dynamic</code>段在内存中的偏移值（<code>p_vaddr</code>）和大小（<code>p_memsz</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-ph-dynamic.png"></p>
 <p>将模块基址与<code>.dynamic</code>偏移值相加，得到<code>.dynamic</code>段的起始地址。</p>
-<h3 id="解析-dynamic段"><a href="#解析-dynamic段" class="headerlink" title="解析.dynamic段"></a>解析.dynamic段</h3><p>遍历<code>.dynamic</code>段，根据<code>d_tag</code>解析不同的表。<br><code>.rel.plt</code>：<code>DT_JMPREL</code>（大小储存在<code>DT_PLTRELSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-relplt.png"><br><code>.rel.dyn</code>：<code>DT_REL</code>（大小储存在<code>DT_RELSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-reldyn.png"><br><code>.dynsym</code>：<code>DT_SYMTAB</code>（大小储存在<code>DT_SYMENT</code>）<br><code>.dynstr</code>：<code>DT_STRTAB</code>（大小储存在<code>DT_STRSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-dynsym-str.png"><br><code>.hash</code>：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-hash.png"></p>
+<h3 id="解析-dynamic段"><a href="#解析-dynamic段" class="headerlink" title="解析.dynamic段"></a>解析.dynamic段</h3><p>遍历<code>.dynamic</code>段，根据<code>d_tag</code>解析不同的表。<br><code>.rel.plt</code>：<code>DT_JMPREL</code>（大小储存在<code>DT_PLTRELSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-relplt.png"><br><code>.rel.dyn</code>：<code>DT_REL</code>（大小储存在<code>DT_RELSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-reldyn.png"><br><code>.dynsym</code>：<code>DT_SYMTAB</code><br><code>.dynstr</code>：<code>DT_STRTAB</code>（大小储存在<code>DT_STRSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-dynsym-str.png"><br><code>.hash</code>：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-hash.png"></p>
 <p>注：解析<code>.dynamic</code>的ELF模板来自<a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-948942-1-1.html">Android7.0以上命名空间详解(dlopen限制)附上010editor模块</a></p>
-<h3 id="查找地址并替换"><a href="#查找地址并替换" class="headerlink" title="查找地址并替换"></a>查找地址并替换</h3><p>通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找符号。</p>
+<h3 id="查找符号"><a href="#查找符号" class="headerlink" title="查找符号"></a>查找符号</h3><p>通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找符号。</p>
 <blockquote>
 <p>.hash -&gt; .dynsym -&gt; .dynstr，时间复杂度：O(x) + O(1) + O(1)<br>.dynsym -&gt; .dynstr，时间复杂度：O(n) + O(1)</p>
 </blockquote>
-<p>遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，比对符号，得到偏移值（<code>r_offset</code>）后，计算内存地址。</p>
+<h3 id="计算地址并替换"><a href="#计算地址并替换" class="headerlink" title="计算地址并替换"></a>计算地址并替换</h3><p>遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，比对符号，得到偏移值（<code>r_offset</code>）后，计算内存地址。</p>
 <p>替换该内存地址对应的函数，同<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">前文</a>，不再赘述。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>主要学习了<code>.dynamic</code>段的解析，以及导入符号的查找方式。改进了之前的Hook方式，但仍存在许多不足。这次是真的短期内不会再改动了。（<strong>不要重复造轮子</strong>）</p>
+<h2 id="调试段错误"><a href="#调试段错误" class="headerlink" title="调试段错误"></a>调试段错误</h2><p><code>ARM</code>架构可以正常查找符号，<code>ARM64</code>却提示段错误，于是使用<code>IDA</code>调试。</p>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>替换<code>libinject.so</code>即可测试。</p>
+<p>日志：<br>ARM：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-log.png"></p>
+<p>ARM64：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-plt-hook-log.png"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>主要学习了<code>.dynamic</code>段的解析，导入符号的查找方式以及<code>ARM64</code>段错误的处理。改进了之前的Hook方式，但仍存在许多不足。这次是真的短期内不会再改动了。（<strong>不要重复造轮子</strong>）</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/L173864930/article/details/40507359">基于Android的ELF PLT/GOT符号和重定向过程ELF Hook实现</a><br><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-267842.htm">ELF文件格式与got表hook简单实现</a><br><a target="_blank" rel="noopener" href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-42444.html">动态节 - 链接程序和库指南</a><br><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-255670.htm">ELF文件结构详解</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/269441842">PLT HOOK</a><br><a target="_blank" rel="noopener" href="https://github.com/bytedance/bhook">bhook</a><br><a target="_blank" rel="noopener" href="https://github.com/iqiyi/xhook">xhook</a></p>
 
 
@@ -352,7 +360,7 @@ var _hmt = _hmt || [];
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">具体实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96-dynamic%E6%AE%B5"><span class="toc-number">3.1.</span> <span class="toc-text">获取.dynamic段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90-dynamic%E6%AE%B5"><span class="toc-number">3.2.</span> <span class="toc-text">解析.dynamic段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E5%9C%B0%E5%9D%80%E5%B9%B6%E6%9B%BF%E6%8D%A2"><span class="toc-number">3.3.</span> <span class="toc-text">查找地址并替换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">5.</span> <span class="toc-text">参考</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">具体实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%82%E9%85%8DARM64"><span class="toc-number">3.1.</span> <span class="toc-text">适配ARM64</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E5%AE%8F"><span class="toc-number">3.1.1.</span> <span class="toc-text">添加宏</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81"><span class="toc-number">3.2.</span> <span class="toc-text">核心代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96-dynamic%E6%AE%B5"><span class="toc-number">3.3.</span> <span class="toc-text">获取.dynamic段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90-dynamic%E6%AE%B5"><span class="toc-number">3.4.</span> <span class="toc-text">解析.dynamic段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E7%AC%A6%E5%8F%B7"><span class="toc-number">3.5.</span> <span class="toc-text">查找符号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%9C%B0%E5%9D%80%E5%B9%B6%E6%9B%BF%E6%8D%A2"><span class="toc-number">3.6.</span> <span class="toc-text">计算地址并替换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B0%83%E8%AF%95%E6%AE%B5%E9%94%99%E8%AF%AF"><span class="toc-number">4.</span> <span class="toc-text">调试段错误</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="toc-number">5.</span> <span class="toc-text">测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">6.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">7.</span> <span class="toc-text">参考</span></a></li></ol>
                     </div>
                 </span>
             </div>

@@ -173,7 +173,7 @@ var _hmt = _hmt || [];
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2021/08/30/android-arm-plt-hook/">实现简易Android ARM GOT Hook (二)</a>
+      <a class="article-title" href="/2021/08/30/android-arm-plt-hook/">实现简易Android ARM&amp;ARM64 GOT Hook (二)</a>
     </h1>
   
 
@@ -202,8 +202,8 @@ var _hmt = _hmt || [];
         
         
             
-            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>前文<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">实现简易Android ARM GOT Hook</a>通过解析ELF section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。</p>
-<p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的执行视图，讨论<code>Android</code> ARM架构的<code>GOT/PLT Hook</code>。</p>
+            <p><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>前文<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">实现简易Android ARM&amp;ARM64 GOT Hook</a>通过解析ELF section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。</p>
+<p>本文仍以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的<code>执行视图</code>(<code>Execution View</code>)，讨论<code>Android</code> <code>ARM&amp;ARM64</code>架构的<code>GOT/PLT Hook</code>。</p>
 <h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>基于执行视图解析内存中的ELF，解析<code>.dynamic</code>段得到<code>.rel.plt</code>、<code>.rel.dyn</code>、<code>.dynsym</code>、<br><code>.dynstr</code>和<code>.hash</code>表。通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找导入符号，再遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，得到函数在GOT表中的偏移。</p>
 <p>
         
@@ -367,7 +367,7 @@ var _hmt = _hmt || [];
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2021/08/23/android-arm-got-hook/">实现简易Android ARM GOT Hook</a>
+      <a class="article-title" href="/2021/08/23/android-arm-got-hook/">实现简易Android ARM&amp;ARM64 GOT Hook</a>
     </h1>
   
 
@@ -396,8 +396,8 @@ var _hmt = _hmt || [];
         
         
             
-            <p><h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p>第二篇：<a href="https://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/">实现简易Android ARM GOT Hook (二)</a><br>基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址</p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的链接视图，讨论<code>Android</code> ARM架构的<code>GOT/PLT Hook</code>。</p>
+            <p><h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><p>第二篇：<a href="https://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/">实现简易Android ARM&amp;ARM64 GOT Hook (二)</a><br>基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的链接视图(<code>Linking View</code>)，讨论<code>Android</code> <code>ARM&amp;ARM64</code>架构的<code>GOT/PLT Hook</code>。</p>
 <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>程序<code>加载</code>后，在执行之前，需要先进行<code>动态链接</code>，并进行<code>重定位</code>。</p>
 <p>
         
