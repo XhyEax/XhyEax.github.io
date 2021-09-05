@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"xhyeax.gitee.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="之前的尝试一开始使用wsl1进行编译，即使用了ccache，编译耗时仍难以接受（编译了很久都没结束）之后又使用wsl2进行编译，编译还是需要很久原因猜测：源码位于D盘，wsl访问文件可能需要经过转换，因此IO操作速度慢。搜索发现WSL 1 与 WSL 2 之间的用户体验更改中提到：  请确保将你要使用 Linux 应用程序频繁访问的文件放在 Linux 根文件系统中，以享受文件性能优势。 这些文件">
 <meta property="og:type" content="article">
 <meta property="og:title" content="WSL(Ubuntu 18.04)编译安卓6.0.0_r1源码">
-<meta property="og:url" content="https://xhyeax.gitee.io/2020/04/14/wsl-18-04-android-6-source/index.html">
+<meta property="og:url" content="https://blog.xhyeax.com/2020/04/14/wsl-18-04-android-6-source/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="之前的尝试一开始使用wsl1进行编译，即使用了ccache，编译耗时仍难以接受（编译了很久都没结束）之后又使用wsl2进行编译，编译还是需要很久原因猜测：源码位于D盘，wsl访问文件可能需要经过转换，因此IO操作速度慢。搜索发现WSL 1 与 WSL 2 之间的用户体验更改中提到：  请确保将你要使用 Linux 应用程序频繁访问的文件放在 Linux 根文件系统中，以享受文件性能优势。 这些文件">
 <meta property="og:locale" content="zh_CN">
@@ -34,7 +34,7 @@
 <meta property="article:tag" content="WSL">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://xhyeax.gitee.io/2020/04/14/wsl-18-04-android-6-source/">
+<link rel="canonical" href="https://blog.xhyeax.com/2020/04/14/wsl-18-04-android-6-source/">
 
 
 <script id="page-configurations">
@@ -195,7 +195,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/2020/04/14/wsl-18-04-android-6-source/">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/wsl-18-04-android-6-source/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -245,8 +245,8 @@
 </blockquote>
 <h2 id="最终方案"><a href="#最终方案" class="headerlink" title="最终方案"></a>最终方案</h2><p>将源码压缩包移动到linux文件系统下，再解压<br>或者使用repo工具下载源码到linux文件系统</p>
 <span id="more"></span>
-<h2 id="方法一-使用docker-aosp-建议"><a href="#方法一-使用docker-aosp-建议" class="headerlink" title="方法一 使用docker-aosp(建议)"></a>方法一 使用docker-aosp(建议)</h2><p>见<a target="_blank" rel="noopener" href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">在WSL2中使用docker编译安卓源码</a></p>
-<h2 id="方法二-直接使用wsl系统进行编译"><a href="#方法二-直接使用wsl系统进行编译" class="headerlink" title="方法二 直接使用wsl系统进行编译"></a>方法二 直接使用wsl系统进行编译</h2><p>如果使用wsl2，步骤与<a target="_blank" rel="noopener" href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">Ubuntu 19.10 编译安卓6.0.0_r1源码</a>一致<br>wsl1则需要先进行以下配置</p>
+<h2 id="方法一-使用docker-aosp-建议"><a href="#方法一-使用docker-aosp-建议" class="headerlink" title="方法一 使用docker-aosp(建议)"></a>方法一 使用docker-aosp(建议)</h2><p>见<a href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">在WSL2中使用docker编译安卓源码</a></p>
+<h2 id="方法二-直接使用wsl系统进行编译"><a href="#方法二-直接使用wsl系统进行编译" class="headerlink" title="方法二 直接使用wsl系统进行编译"></a>方法二 直接使用wsl系统进行编译</h2><p>如果使用wsl2，步骤与<a href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">Ubuntu 19.10 编译安卓6.0.0_r1源码</a>一致<br>wsl1则需要先进行以下配置</p>
 <h2 id="wsl1需要进行的操作"><a href="#wsl1需要进行的操作" class="headerlink" title="wsl1需要进行的操作"></a>wsl1需要进行的操作</h2><h3 id="配置大小写敏感"><a href="#配置大小写敏感" class="headerlink" title="配置大小写敏感"></a>配置大小写敏感</h3><h4 id="方法一-配置wsl自动挂载"><a href="#方法一-配置wsl自动挂载" class="headerlink" title="方法一 配置wsl自动挂载"></a>方法一 配置wsl自动挂载</h4><p>编辑<code>/etc/wsl.conf</code>，写入：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[automount]</span><br><span class="line">enabled = true</span><br><span class="line">options = &quot;metadata,umask=0000,uid=0,gid=0,case=force&quot;</span><br><span class="line">mountFsTab = false</span><br></pre></td></tr></table></figure>
 <p>保存后重启PC</p>

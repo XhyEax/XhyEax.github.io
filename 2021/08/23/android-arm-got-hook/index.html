@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"xhyeax.gitee.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="更新简易Android ARM&amp;ARM64 GOT Hook (二)基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址 概述本文以Hook公共库libc.so的getpid函数为例，基于ELF的链接视图(Linking View)，讨论Android ARM&amp;ARM64架构的GOT&#x2F;PLT Hook。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="简易Android ARM&amp;ARM64 GOT Hook (一)">
-<meta property="og:url" content="https://xhyeax.gitee.io/2021/08/23/android-arm-got-hook/index.html">
+<meta property="og:url" content="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="更新简易Android ARM&amp;ARM64 GOT Hook (二)基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址 概述本文以Hook公共库libc.so的getpid函数为例，基于ELF的链接视图(Linking View)，讨论Android ARM&amp;ARM64架构的GOT&#x2F;PLT Hook。">
 <meta property="og:locale" content="zh_CN">
@@ -40,7 +40,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-header.png">
 
-<link rel="canonical" href="https://xhyeax.gitee.io/2021/08/23/android-arm-got-hook/">
+<link rel="canonical" href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">
 
 
 <script id="page-configurations">
@@ -201,7 +201,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/2021/08/23/android-arm-got-hook/">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -245,7 +245,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><p><a target="_blank" rel="noopener" href="https://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/">简易Android ARM&amp;ARM64 GOT Hook (二)</a><br>基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址</p>
+        <h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><p><a href="https://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/">简易Android ARM&amp;ARM64 GOT Hook (二)</a><br>基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址</p>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的链接视图(<code>Linking View</code>)，讨论<code>Android</code> <code>ARM&amp;ARM64</code>架构的<code>GOT/PLT Hook</code>。</p>
 <span id="more"></span>
 <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>程序<code>加载</code>后，在执行之前，需要先进行<code>动态链接</code>，并进行<code>重定位</code>。</p>
@@ -256,7 +256,7 @@
 <h2 id="具体思路"><a href="#具体思路" class="headerlink" title="具体思路"></a>具体思路</h2><p>编写so库，在so加载的构造函数（<code>linker</code>会主动调用）中完成以下操作：定位目标模块基址、基于链接视图解析ELF文件，得到GOT表地址及大小、遍历GOT表替换目标函数地址。</p>
 <h2 id="注入方式"><a href="#注入方式" class="headerlink" title="注入方式"></a>注入方式</h2><p>使用<code>LIEF</code>修改ELF文件，导入该动态库。</p>
 <h2 id="编译环境"><a href="#编译环境" class="headerlink" title="编译环境"></a>编译环境</h2><p><code>Android Studio 2020.3.1</code>、<code>Gradle 7.0.1</code>、<code>CMake 3.18.1</code>、<code>NDK 23.0.7599858</code><br><code>ABI</code>: <code>armeabi-v7a,arm64-v8a</code></p>
-<p>PS：其实也可以脱离<code>Android Studio</code>手动编译，见<a target="_blank" rel="noopener" href="https://blog.xhyeax.com/2021/08/22/arm-compile-without-as/">使用CMake交叉编译Android ARM程序</a></p>
+<p>PS：其实也可以脱离<code>Android Studio</code>手动编译，见<a href="https://blog.xhyeax.com/2021/08/22/arm-compile-without-as/">使用CMake交叉编译Android ARM程序</a></p>
 <h2 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h2><p>使用<code>Android Studio</code>创建<code>Native C++</code>项目，然后增加两个<code>Android Native Library</code>模块，分别命名为<code>victim</code>和<code>inject</code></p>
 <h3 id="待注入程序"><a href="#待注入程序" class="headerlink" title="待注入程序"></a>待注入程序</h3><h4 id="victim-cpp"><a href="#victim-cpp" class="headerlink" title="victim.cpp"></a>victim.cpp</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;my pid: %d\n&quot;</span>, <span class="built_in">getpid</span>());</span><br><span class="line">    <span class="comment">// getchar();</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>调用<code>getpid</code>获取进程id（IDA动态调试时使用<code>getchar</code>，方便查看内存）</p>

@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"xhyeax.gitee.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="概述修改安卓内核源码来绕过State字段及TracePid字段反调试 目标文件打开内核源码目录，&#x2F;fs&#x2F;proc下的base.c和array.c 修改点base.cproc_pid_wchan函数最后一个else分支改成 123456else    &amp;#123;   &#x2F;&#x2F;修改部分        if(strstr(symname,&quot;trace&quot;))            ret">
 <meta property="og:type" content="article">
 <meta property="og:title" content="修改安卓内核源码 过State TracerPID反调试">
-<meta property="og:url" content="https://xhyeax.gitee.io/2019/09/13/android-source-mod-anti-antidebug/index.html">
+<meta property="og:url" content="https://blog.xhyeax.com/2019/09/13/android-source-mod-anti-antidebug/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="概述修改安卓内核源码来绕过State字段及TracePid字段反调试 目标文件打开内核源码目录，&#x2F;fs&#x2F;proc下的base.c和array.c 修改点base.cproc_pid_wchan函数最后一个else分支改成 123456else    &amp;#123;   &#x2F;&#x2F;修改部分        if(strstr(symname,&quot;trace&quot;))            ret">
 <meta property="og:locale" content="zh_CN">
@@ -33,7 +33,7 @@
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://xhyeax.gitee.io/2019/09/13/android-source-mod-anti-antidebug/">
+<link rel="canonical" href="https://blog.xhyeax.com/2019/09/13/android-source-mod-anti-antidebug/">
 
 
 <script id="page-configurations">
@@ -194,7 +194,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/2019/09/13/android-source-mod-anti-antidebug/">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/13/android-source-mod-anti-antidebug/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -246,7 +246,7 @@
 <p>因为/proc/pid/wchan 和 /proc/pid/task/pid/wchan在调试状态下，里面内容为ptrace_stop, 非调试的状态下为ep_poll</p>
 </blockquote>
 <h3 id="array-c"><a href="#array-c" class="headerlink" title="array.c"></a>array.c</h3><h4 id="1-task-state-array字符数组"><a href="#1-task-state-array字符数组" class="headerlink" title="1. task_state_array字符数组"></a>1. task_state_array字符数组</h4><p>将4和8对应的字符（<code>&quot;T (stopped)&quot;</code>和<code>&quot;t (tracing stop)&quot;</code>）<br>都改成<code>&quot;S (sleeping)&quot;</code></p>
-<h4 id="2-task-state函数"><a href="#2-task-state函数" class="headerlink" title="2. task_state函数"></a>2. task_state函数</h4><p>与前文（<a target="_blank" rel="noopener" href="https://blog.xhyeax.com/2019/09/13/android-kernel-reverse-anti-antidebug/">逆向修改安卓内核 x64 过TracerPID反调试</a>）目的一致，置<code>TracerPid</code>为0<br>将参数<code>tpid</code>改为0即可</p>
+<h4 id="2-task-state函数"><a href="#2-task-state函数" class="headerlink" title="2. task_state函数"></a>2. task_state函数</h4><p>与前文（<a href="https://blog.xhyeax.com/2019/09/13/android-kernel-reverse-anti-antidebug/">逆向修改安卓内核 x64 过TracerPID反调试</a>）目的一致，置<code>TracerPid</code>为0<br>将参数<code>tpid</code>改为0即可</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">seq_printf</span>(m,</span><br><span class="line">		<span class="string">&quot;State:\t%s\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Tgid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Pid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;PPid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;TracerPid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Uid:\t%d\t%d\t%d\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Gid:\t%d\t%d\t%d\t%d\n&quot;</span>,</span><br><span class="line">		<span class="built_in">get_task_state</span>(p),</span><br><span class="line">		<span class="built_in">task_tgid_nr_ns</span>(p, ns),</span><br><span class="line">		<span class="built_in">pid_nr_ns</span>(pid, ns),</span><br><span class="line">		<span class="comment">//修改部分</span></span><br><span class="line">		ppid, <span class="comment">/*tpid*/</span><span class="number">0</span>,</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;uid),</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;euid),</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;suid),</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;fsuid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;gid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;egid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;sgid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;fsgid));</span><br></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-940605-1-1.html">Android反调试——从源码入手</a></p>
 

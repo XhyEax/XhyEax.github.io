@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"xhyeax.gitee.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="概述之前写过一篇QQ8.1.3防撤回原理，每次更新后，都需要适配被混淆的类名。 今天更新了最新版QQ（8.8.17），发现使用到的类名都未被混淆，不过包结构有了一定变化（可能是重构了？），需要重新适配。 于是尝试使用objection分析撤回提示的实现，并编写Xposed模块。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="QQ 8.8.17 防撤回、无限打开闪照">
-<meta property="og:url" content="https://xhyeax.gitee.io/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/index.html">
+<meta property="og:url" content="https://blog.xhyeax.com/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="概述之前写过一篇QQ8.1.3防撤回原理，每次更新后，都需要适配被混淆的类名。 今天更新了最新版QQ（8.8.17），发现使用到的类名都未被混淆，不过包结构有了一定变化（可能是重构了？），需要重新适配。 于是尝试使用objection分析撤回提示的实现，并编写Xposed模块。">
 <meta property="og:locale" content="zh_CN">
@@ -33,7 +33,7 @@
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://xhyeax.gitee.io/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/">
+<link rel="canonical" href="https://blog.xhyeax.com/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/">
 
 
 <script id="page-configurations">
@@ -194,7 +194,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -238,7 +238,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前写过一篇<a target="_blank" rel="noopener" href="https://blog.xhyeax.com/2019/09/18/qq-813-unrevoke-module-develop/">QQ8.1.3防撤回原理</a>，每次更新后，都需要适配被混淆的类名。</p>
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前写过一篇<a href="https://blog.xhyeax.com/2019/09/18/qq-813-unrevoke-module-develop/">QQ8.1.3防撤回原理</a>，每次更新后，都需要适配被混淆的类名。</p>
 <p>今天更新了最新版QQ（<code>8.8.17</code>），发现使用到的类名都未被混淆，不过包结构有了一定变化（可能是重构了？），需要重新适配。</p>
 <p>于是尝试使用<code>objection</code>分析撤回提示的实现，并编写<code>Xposed</code>模块。</p>
 <span id="more"></span>
