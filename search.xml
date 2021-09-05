@@ -49,28 +49,6 @@
       </tags>
   </entry>
   <entry>
-    <title>送给最好的TA app分析</title>
-    <url>/2019/09/27/andlua-app-reverse/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天群里有人传了个apk文件，名字叫<code>送给最好的TA</code>。这是一个整人app，安装并打开会播放一段音频，并循环调节媒体音量，维持最大值。从后台划掉/卸载/关机都可以停止该程序。<br><strong>网传所谓的截图、获取设备信息并上传等行为均不存在。反编译后看到的截图相关代码实际上并没有被调用，只是打包apk时封装进去的类，关键逻辑位于main.lua中。</strong></p>
-<span id="more"></span>
-<h2 id="apk分析"><a href="#apk分析" class="headerlink" title="apk分析"></a>apk分析</h2><p>拿到样本之后，别急着安装运行，先看看它的目录结构。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-0.png"><br>打开assets文件夹，看到有一个mp3文件以及两个加密后的lua脚本：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-1.png"><br>运行app后会自动播放这个音频文件，先对它进行替换。<br>这里使用AU对该mp3进行静音处理后，重打包并签名。<br>（其实也可以替换成自己想要播放的音频）</p>
-<h2 id="找到加载lua的关键函数"><a href="#找到加载lua的关键函数" class="headerlink" title="找到加载lua的关键函数"></a>找到加载lua的关键函数</h2><p>众所周知，lua脚本需要加载，而在加载之前肯定是要先解密的，所以只要找到解密函数，然后就可以把解密后的lua脚本dump出来。<br>使用<code>IDA</code>打开<code>libluajava.so</code>，经过分析找到函数<code>luaL_loadbufferx</code><br><code>luaL_loadbufferx</code>的第二个参数是加密的字节数组，第三个参数是大小，第四个参数是lua文件位置。<br>程序在这个函数中加载加密lua脚本，其中对脚本进行了解密操作。<br>根据第四个参数我们可以区分目前加载的lua脚本名称，从而选择性地dump<br>（即在函数开头下断点，查看第四个参数内容）<br><code>luaL_loadbufferx</code>函数伪代码如下：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-2.png"><br>首先对输入的字节数组进行判断，如果以1B开头，且第二位不是0C，则进行解密操作，否则直接调用<code>j_lua_load</code>加载lua脚本<br>在第41行下断点即可获取到解密后的字节数组，从而dump</p>
-<h2 id="动态调试进行dump"><a href="#动态调试进行dump" class="headerlink" title="动态调试进行dump"></a>动态调试进行dump</h2><p>具体步骤可以参考我之前写的文章 <a href="https://blog.xhyeax.com/2019/09/14/android-debug-onload/">IDA调试安卓so 在libart.so OpenMemory下断点</a><br><code>IDA</code>在第41行断下之后，运行python脚本dump即可</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> idaapi</span><br><span class="line">data = idaapi.dbg_read_memory(<span class="number">0xf4daff00</span>, <span class="number">0x3000</span>)</span><br><span class="line">fp = <span class="built_in">open</span>(<span class="string">&#x27;d:\\dump.lua&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>)</span><br><span class="line">fp.write(data)</span><br><span class="line">fp.close()</span><br></pre></td></tr></table></figure>
-<p>此处的<code>0xf4daff00, 0x3000</code>需要替换成解密后字节的起始地址和长度<br>长度写大一点也没事，可以再用<code>010Editor</code>删除（所以我这写的<code>0x3000</code>）</p>
-<h2 id="分析lua"><a href="#分析lua" class="headerlink" title="分析lua"></a>分析lua</h2><p>由于dump出来的lua是字节码，并不是源码形式。所以还需要反编译后才能查看源码。（使用<code>unluac_2015_06_13.jar</code>进行反编译）<br><code>init.lua</code>中进行包名、版本号、主题、权限等配置</p>
-<figure class="highlight lua"><table><tr><td class="code"><pre><span class="line"><span class="keyword">local</span> L0_0</span><br><span class="line">appname = <span class="string">&quot;送给最好的TA&quot;</span></span><br><span class="line">appver = <span class="string">&quot;1.0&quot;</span></span><br><span class="line">appcode = <span class="string">&quot;10&quot;</span></span><br><span class="line">appsdk = <span class="string">&quot;15&quot;</span></span><br><span class="line">path_pattern = <span class="string">&quot;&quot;</span></span><br><span class="line">packagename = <span class="string">&quot;com.sgzh.dt&quot;</span></span><br><span class="line">theme = <span class="string">&quot;Theme_DeviceDefault_Dialog_NoActionBar_MinWidth&quot;</span></span><br><span class="line">app_key = <span class="string">&quot;&quot;</span></span><br><span class="line">app_channel = <span class="string">&quot;&quot;</span></span><br><span class="line">developer = <span class="string">&quot;&quot;</span></span><br><span class="line">description = <span class="string">&quot;&quot;</span></span><br><span class="line">debugmode = <span class="literal">false</span></span><br><span class="line">L0_0 = &#123;</span><br><span class="line">  <span class="string">&quot;INTERNET&quot;</span>,</span><br><span class="line">  <span class="string">&quot;WRITE_EXTERNAL_STORAGE&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">user_permission = L0_0</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>主要功能在<code>main.lua</code>中完成:</p>
-<figure class="highlight lua"><table><tr><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">&quot;import&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.app.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.os.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.widget.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.view.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.view.View&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.content.Context&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.media.MediaPlayer&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.media.AudioManager&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;com.androlua.Ticker&quot;</span>)</span><br><span class="line">activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">activity.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE)</span><br><span class="line">m = MediaPlayer()</span><br><span class="line">m.reset()</span><br><span class="line">m.setDataSource(activity.getLuaDir() .. <span class="string">&quot;/0.mp3&quot;</span>)</span><br><span class="line">m.prepare()</span><br><span class="line">m.start()</span><br><span class="line">m.setLooping(<span class="literal">true</span>)</span><br><span class="line">ti = Ticker()</span><br><span class="line">ti.Period = <span class="number">10</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">ti.onTick</span><span class="params">()</span></span></span><br><span class="line">  activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">  activity.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line">ti.start()</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">onKeyDown</span><span class="params">(A0_0, A1_1)</span></span></span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">string</span>.<span class="built_in">find</span>(<span class="built_in">tostring</span>(A1_1), <span class="string">&quot;KEYCODE_BACK&quot;</span>) ~= <span class="literal">nil</span> <span class="keyword">then</span></span><br><span class="line">    activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<p>首先设置音频源文件路径为0.mp3，使用单曲循环模式播放音频。然后使用<code>Ticker</code>循环调节媒体音量至最大值，同时拦截了返回键。<br>主要功能其实跟以前那个叫目力的app差不多。（不过今天这个apk的音频就太那啥了…）</p>
-<h2 id="静音样本下载"><a href="#静音样本下载" class="headerlink" title="静音样本下载"></a>静音样本下载</h2><p><a href="https://pan.baidu.com/s/1jTUcjknxr-fwETgtEVpQSg">https://pan.baidu.com/s/1jTUcjknxr-fwETgtEVpQSg</a></p>
-<h2 id="dump出来的lua"><a href="#dump出来的lua" class="headerlink" title="dump出来的lua"></a>dump出来的lua</h2><p><a href="https://pan.baidu.com/s/1X0un1jgVB6QAgPRqNu_3Wg">https://pan.baidu.com/s/1X0un1jgVB6QAgPRqNu_3Wg</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>2019吾爱破解论坛春节红包四题Writeup</title>
     <url>/2019/02/19/52pojie-2019-red-packet/</url>
     <content><![CDATA[<p>解题方法并不唯一，仅供参考。</p>
@@ -104,79 +82,6 @@
 ]]></content>
       <tags>
         <tag>CTF</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>简易Android ARM&amp;ARM64 GOT Hook (二)</title>
-    <url>/2021/08/30/android-arm-plt-hook/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>前文<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">简易Android ARM&amp;ARM64 GOT Hook (一)</a>，基于链接视图，解析section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。</p>
-<p>本文基于ELF的执行视图(<code>Execution View</code>)，讨论<code>Android</code> <code>ARM&amp;ARM64</code>架构的<code>GOT/PLT Hook</code>（仍以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例）。</p>
-<span id="more"></span>
-<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><ol>
-<li>通过maps文件获取模块基址，解析内存中的ELF。</li>
-<li>查找并解析<code>.dynamic</code>段，得到<code>.rel.plt</code>、<code>.rel.dyn</code>、<code>.dynsym</code>、<code>.dynstr</code>和<code>.hash</code>表。</li>
-<li>通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找导入符号，再遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，得到函数偏移。</li>
-<li>基址加上偏移得到内存地址，修改函数地址即可。</li>
-</ol>
-<p>注入方式及编译环境同<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">前文</a>，不再赘述。</p>
-<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><h3 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 基于执行视图解析ELF</span></span><br><span class="line"><span class="function"><span class="keyword">uintptr_t</span> <span class="title">hackBySegment</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *moudle_path, <span class="keyword">const</span> <span class="keyword">char</span> *target_lib, <span class="keyword">const</span> <span class="keyword">char</span> *target_func,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">uintptr_t</span> replace)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">LOGI</span>(<span class="string">&quot;hackDynamic start.\n&quot;</span>);</span><br><span class="line">    <span class="comment">// 获取目标函数地址</span></span><br><span class="line">    <span class="keyword">void</span> *handle = <span class="built_in">dlopen</span>(target_lib, RTLD_LAZY);</span><br><span class="line">    <span class="keyword">auto</span> ori = (<span class="keyword">uintptr_t</span>) <span class="built_in">dlsym</span>(handle, target_func);</span><br><span class="line">    <span class="built_in">LOGI</span>(<span class="string">&quot;hackDynamic getpid addr: %lX\n&quot;</span>, ori);</span><br><span class="line">    <span class="comment">// 获取符号地址 (解析Segment)</span></span><br><span class="line">    <span class="keyword">uintptr_t</span> replaceAddr = <span class="built_in">getSymAddrDynamic</span>(moudle_path, target_func);</span><br><span class="line">    <span class="comment">// 替换地址</span></span><br><span class="line">    <span class="built_in">replaceFunction</span>(replaceAddr, replace, ori);</span><br><span class="line">    <span class="keyword">return</span> ori;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整代码见<a href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a></p>
-<h3 id="获取-dynamic段"><a href="#获取-dynamic段" class="headerlink" title="获取.dynamic段"></a>获取.dynamic段</h3><p>解析maps文件获取到模块地址后，基于执行视图解析ELF。</p>
-<p>从<code>elf header</code>中得到<code>program header table</code>的起始偏移（<code>e_phoff</code>）、<code>program header</code>大小(<code>e_phentsize</code>)和总<code>program header</code>个数（<code>e_phnum</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-elf-header.png"></p>
-<p>遍历<code>program header table</code>，查找<code>p_type</code>为<code>PT_DYNAMIC</code>的<code>program header</code>，得到<code>.dynamic</code>段在内存中的偏移值（<code>p_vaddr</code>）和大小（<code>p_memsz</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-ph-dynamic.png"></p>
-<p>将模块基址与<code>.dynamic</code>偏移值相加，得到<code>.dynamic</code>段的起始地址。</p>
-<h3 id="解析-dynamic段"><a href="#解析-dynamic段" class="headerlink" title="解析.dynamic段"></a>解析.dynamic段</h3><p>遍历<code>.dynamic</code>段，根据<code>d_tag</code>解析不同的表。<br><code>.rel.plt</code>：<code>DT_JMPREL</code>（大小储存在<code>DT_PLTRELSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-relplt.png"><br><code>.rel.dyn</code>：<code>DT_REL</code>（大小储存在<code>DT_RELSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-reldyn.png"><br><code>.dynsym</code>：<code>DT_SYMTAB</code><br><code>.dynstr</code>：<code>DT_STRTAB</code><br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-dynsym-str.png"><br><code>.hash</code>：<code>DT_HASH</code><br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-hash.png"></p>
-<p>注：解析<code>.dynamic</code>的ELF模板来自<a href="https://www.52pojie.cn/thread-948942-1-1.html">Android7.0以上命名空间详解(dlopen限制)附上010editor模块</a></p>
-<h3 id="查找符号"><a href="#查找符号" class="headerlink" title="查找符号"></a>查找符号</h3><p>通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找符号。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ELFW</span>(Sym) *target = <span class="literal">nullptr</span>;</span><br><span class="line"><span class="keyword">uint32_t</span> hash = <span class="built_in">elf_sysv_hash</span>((<span class="keyword">const</span> <span class="keyword">uint8_t</span> *) symName);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">uint32_t</span> i = buckets[hash % buckets_cnt];</span><br><span class="line">        <span class="number">0</span> != i; i = chains[i]) &#123;</span><br><span class="line">    <span class="built_in">ELFW</span>(Sym) *sym = dynsym + i;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> type = <span class="built_in">ELF_ST_TYPE</span>(sym-&gt;st_info);</span><br><span class="line">    <span class="keyword">if</span> (STT_FUNC != type &amp;&amp; STT_GNU_IFUNC != type &amp;&amp; STT_NOTYPE != type)</span><br><span class="line">        <span class="keyword">continue</span>; <span class="comment">// find function only, allow no-type</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> == <span class="built_in">strcmp</span>(dynstr + sym-&gt;st_name, symName)) &#123;</span><br><span class="line">        target = sym;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>具体操作为：</p>
-<ol>
-<li><p>计算符号名称的哈希值，然后从<code>.hash</code>获取符号在<code>.dynsym</code>中的索引。</p>
-<blockquote>
-<p>接受符号名称的散列函数会返回一个值，用于计算 bucket 索引。因此，如果散列函数为某个名称返回值 x，则 bucket [x% nbucket] 将会计算出索引 y。此索引为符号表和链表的索引。如果符号表项不是需要的名称，则 chain[y] 将使用相同的散列值计算出符号表的下一项。</p>
-</blockquote>
-</li>
-<li><p>通过索引从<code>.dynsym</code>获取符号，根据符号类型和符号名（通过<code>st_name</code>从<code>.dynstr</code>获取字符串），判断与目标函数是否匹配。</p>
-</li>
-</ol>
-<p>PS：也可直接遍历<code>.dynsym</code>并比对字符串，时间复杂度更高</p>
-<blockquote>
-<p>.hash -&gt; .dynsym -&gt; .dynstr，时间复杂度：O(x) + O(1) + O(1)<br>.dynsym -&gt; .dynstr，时间复杂度：O(n) + O(1)</p>
-</blockquote>
-<h3 id="计算内存地址"><a href="#计算内存地址" class="headerlink" title="计算内存地址"></a>计算内存地址</h3><p>遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，比对符号和重定位类型，获取函数偏移值（<code>r_offset</code>）。与模块基址相加得到内存地址。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; rel_plt_cnt; i++) &#123;</span><br><span class="line">        <span class="built_in">ELFW</span>(Rel) &amp;rel = rel_plt[i];</span><br><span class="line">        <span class="keyword">if</span> (&amp;(dynsym[<span class="built_in">ELF_R_SYM</span>(rel.r_info)]) == target &amp;&amp;</span><br><span class="line">            <span class="built_in">ELF_R_TYPE</span>(rel.r_info) == ELF_R_JUMP_SLOT) &#123;</span><br><span class="line"><span class="comment">//            LOGI(&quot;target r_offset: %lX&quot;, rel.r_offset);</span></span><br><span class="line">            <span class="keyword">return</span> moduleBase + rel.r_offset;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; rel_dyn_cnt; i++) &#123;</span><br><span class="line">        <span class="built_in">ELFW</span>(Rel) &amp;rel = rel_dyn[i];</span><br><span class="line">        <span class="keyword">if</span> (&amp;(dynsym[<span class="built_in">ELF_R_SYM</span>(rel.r_info)]) == target &amp;&amp;</span><br><span class="line">            (<span class="built_in">ELF_R_TYPE</span>(rel.r_info) == ELF_R_ABS</span><br><span class="line">             || <span class="built_in">ELF_R_TYPE</span>(rel.r_info) == ELF_R_GLOB_DAT)) &#123;</span><br><span class="line"><span class="comment">//            LOGI(&quot;target r_offset: %lX&quot;, rel.r_offset);</span></span><br><span class="line">            <span class="keyword">return</span> moduleBase + rel.r_offset;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>之后替换该内存地址对应的函数即可，同<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">前文</a>。</p>
-<h3 id="适配ARM64"><a href="#适配ARM64" class="headerlink" title="适配ARM64"></a>适配ARM64</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__LP64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELFW(what) Elf64_ ## what</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_TYPE(what) ELF64_R_TYPE(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_SYM(what) ELF64_R_SYM(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELFW(what) Elf32_ ## what</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_TYPE(what) ELF32_R_TYPE(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_SYM(what) ELF32_R_SYM(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__arm__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_JUMP_SLOT R_ARM_JUMP_SLOT     <span class="comment">//.rel.plt</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_GLOB_DAT  R_ARM_GLOB_DAT      <span class="comment">//.rel.dyn</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_ABS       R_ARM_ABS32         <span class="comment">//.rel.dyn</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">elif</span> defined(__aarch64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_JUMP_SLOT R_AARCH64_JUMP_SLOT</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_GLOB_DAT  R_AARCH64_GLOB_DAT</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_ABS       R_AARCH64_ABS64</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
-
-<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>同<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">前文</a>，替换动态库即可测试。</p>
-<h2 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h2><h3 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h3><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-log.png"></p>
-<h3 id="ARM64"><a href="#ARM64" class="headerlink" title="ARM64"></a>ARM64</h3><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-plt-hook-log.png"></p>
-<h2 id="作为动态链接库"><a href="#作为动态链接库" class="headerlink" title="作为动态链接库"></a>作为动态链接库</h2><p>详见<a href="https://github.com/XhyEax/AndroidGOTHook">项目</a>的<code>vitcim_app</code>模块。</p>
-<p>通过配置<code>CMakeLists.txt</code>将<code>libinject.so</code>作为动态库链接，在<code>JNI_OnLoad</code>调用<code>hackBySegment</code>替换<code>getpid</code>函数。</p>
-<p>日志如下：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-so-plt-hook-log.png"></p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>主要学习了<code>.dynamic</code>段的解析和导入符号的查找方式。虽然实现了基于执行视图解析ELF，但仍存在许多不足。不过这次是真的短期内不会再改动了。（<strong>不要重复造轮子</strong>）</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/L173864930/article/details/40507359">基于Android的ELF PLT/GOT符号和重定向过程ELF Hook实现</a><br><a href="https://bbs.pediy.com/thread-267842.htm">ELF文件格式与got表hook简单实现</a><br><a href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-54839.html">重定位节 - 链接程序和库指南</a><br><a href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-79797.html">符号表节 - 链接程序和库指南</a><br><a href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-48031.html">散列表节 - 链接程序和库指南</a><br><a href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-42444.html">动态节 - 链接程序和库指南</a><br><a href="https://bbs.pediy.com/thread-255670.htm">ELF文件结构详解</a><br><a href="https://zhuanlan.zhihu.com/p/269441842">PLT HOOK</a><br><a href="https://github.com/bytedance/bhook">bhook</a><br><a href="https://github.com/iqiyi/xhook">xhook</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>安卓9 设置热点固定IP (Xposed)</title>
-    <url>/2021/03/01/android-9-set-hotpot-ip/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定IP。</p>
-<h2 id="跟踪源代码"><a href="#跟踪源代码" class="headerlink" title="跟踪源代码"></a>跟踪源代码</h2><p>定位到<code>com.android.server.connectivity.tethering.TetherInterfaceStateMachine</code>类（<a href="http://aospxref.com/android-9.0.0_r61/xref/frameworks/base/services/core/java/com/android/server/connectivity/tethering/TetherInterfaceStateMachine.java">源代码</a>）</p>
-<p>函数调用链：<code>startIPv4</code>-<code>configureIPv4</code>-<code>getRandomWifiIPv4Address</code></p>
-<p><code>getRandomWifiIPv4Address</code>函数对主机IP地址进行随机处理，然后返回字符串。修改其返回值，即可固定IP。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>使用Xposed框架Hook该函数（过滤包名android），设置返回值为<code>192.168.43.1</code>即可</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hook</span> <span class="keyword">implements</span> <span class="title">IXposedHookLoadPackage</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String classname = <span class="string">&quot;com.android.server.connectivity.tethering.TetherInterfaceStateMachine&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String methodname = <span class="string">&quot;getRandomWifiIPv4Address&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String WIFI_HOST_IFACE_ADDR = <span class="string">&quot;192.168.43.1&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleLoadPackage</span><span class="params">(XC_LoadPackage.LoadPackageParam lpparam)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (lpparam.packageName.equals(<span class="string">&quot;android&quot;</span>)) &#123;</span><br><span class="line">            Class clz = XposedHelpers.findClass(classname, lpparam.classLoader);</span><br><span class="line"></span><br><span class="line">            findAndHookMethod(clz, methodname, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">                    <span class="keyword">return</span> WIFI_HOST_IFACE_ADDR;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/sinat_20059415/article/details/82956145]">（九十七）Android O WiFi热点 开启流程梳理续（二）</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
       </tags>
   </entry>
   <entry>
@@ -253,6 +158,101 @@
       </tags>
   </entry>
   <entry>
+    <title>送给最好的TA app分析</title>
+    <url>/2019/09/27/andlua-app-reverse/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天群里有人传了个apk文件，名字叫<code>送给最好的TA</code>。这是一个整人app，安装并打开会播放一段音频，并循环调节媒体音量，维持最大值。从后台划掉/卸载/关机都可以停止该程序。<br><strong>网传所谓的截图、获取设备信息并上传等行为均不存在。反编译后看到的截图相关代码实际上并没有被调用，只是打包apk时封装进去的类，关键逻辑位于main.lua中。</strong></p>
+<span id="more"></span>
+<h2 id="apk分析"><a href="#apk分析" class="headerlink" title="apk分析"></a>apk分析</h2><p>拿到样本之后，别急着安装运行，先看看它的目录结构。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-0.png"><br>打开assets文件夹，看到有一个mp3文件以及两个加密后的lua脚本：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-1.png"><br>运行app后会自动播放这个音频文件，先对它进行替换。<br>这里使用AU对该mp3进行静音处理后，重打包并签名。<br>（其实也可以替换成自己想要播放的音频）</p>
+<h2 id="找到加载lua的关键函数"><a href="#找到加载lua的关键函数" class="headerlink" title="找到加载lua的关键函数"></a>找到加载lua的关键函数</h2><p>众所周知，lua脚本需要加载，而在加载之前肯定是要先解密的，所以只要找到解密函数，然后就可以把解密后的lua脚本dump出来。<br>使用<code>IDA</code>打开<code>libluajava.so</code>，经过分析找到函数<code>luaL_loadbufferx</code><br><code>luaL_loadbufferx</code>的第二个参数是加密的字节数组，第三个参数是大小，第四个参数是lua文件位置。<br>程序在这个函数中加载加密lua脚本，其中对脚本进行了解密操作。<br>根据第四个参数我们可以区分目前加载的lua脚本名称，从而选择性地dump<br>（即在函数开头下断点，查看第四个参数内容）<br><code>luaL_loadbufferx</code>函数伪代码如下：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-2.png"><br>首先对输入的字节数组进行判断，如果以1B开头，且第二位不是0C，则进行解密操作，否则直接调用<code>j_lua_load</code>加载lua脚本<br>在第41行下断点即可获取到解密后的字节数组，从而dump</p>
+<h2 id="动态调试进行dump"><a href="#动态调试进行dump" class="headerlink" title="动态调试进行dump"></a>动态调试进行dump</h2><p>具体步骤可以参考我之前写的文章 <a href="https://blog.xhyeax.com/2019/09/14/android-debug-onload/">IDA调试安卓so 在libart.so OpenMemory下断点</a><br><code>IDA</code>在第41行断下之后，运行python脚本dump即可</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> idaapi</span><br><span class="line">data = idaapi.dbg_read_memory(<span class="number">0xf4daff00</span>, <span class="number">0x3000</span>)</span><br><span class="line">fp = <span class="built_in">open</span>(<span class="string">&#x27;d:\\dump.lua&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>)</span><br><span class="line">fp.write(data)</span><br><span class="line">fp.close()</span><br></pre></td></tr></table></figure>
+<p>此处的<code>0xf4daff00, 0x3000</code>需要替换成解密后字节的起始地址和长度<br>长度写大一点也没事，可以再用<code>010Editor</code>删除（所以我这写的<code>0x3000</code>）</p>
+<h2 id="分析lua"><a href="#分析lua" class="headerlink" title="分析lua"></a>分析lua</h2><p>由于dump出来的lua是字节码，并不是源码形式。所以还需要反编译后才能查看源码。（使用<code>unluac_2015_06_13.jar</code>进行反编译）<br><code>init.lua</code>中进行包名、版本号、主题、权限等配置</p>
+<figure class="highlight lua"><table><tr><td class="code"><pre><span class="line"><span class="keyword">local</span> L0_0</span><br><span class="line">appname = <span class="string">&quot;送给最好的TA&quot;</span></span><br><span class="line">appver = <span class="string">&quot;1.0&quot;</span></span><br><span class="line">appcode = <span class="string">&quot;10&quot;</span></span><br><span class="line">appsdk = <span class="string">&quot;15&quot;</span></span><br><span class="line">path_pattern = <span class="string">&quot;&quot;</span></span><br><span class="line">packagename = <span class="string">&quot;com.sgzh.dt&quot;</span></span><br><span class="line">theme = <span class="string">&quot;Theme_DeviceDefault_Dialog_NoActionBar_MinWidth&quot;</span></span><br><span class="line">app_key = <span class="string">&quot;&quot;</span></span><br><span class="line">app_channel = <span class="string">&quot;&quot;</span></span><br><span class="line">developer = <span class="string">&quot;&quot;</span></span><br><span class="line">description = <span class="string">&quot;&quot;</span></span><br><span class="line">debugmode = <span class="literal">false</span></span><br><span class="line">L0_0 = &#123;</span><br><span class="line">  <span class="string">&quot;INTERNET&quot;</span>,</span><br><span class="line">  <span class="string">&quot;WRITE_EXTERNAL_STORAGE&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">user_permission = L0_0</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>主要功能在<code>main.lua</code>中完成:</p>
+<figure class="highlight lua"><table><tr><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">&quot;import&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.app.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.os.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.widget.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.view.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.view.View&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.content.Context&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.media.MediaPlayer&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.media.AudioManager&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;com.androlua.Ticker&quot;</span>)</span><br><span class="line">activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">activity.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE)</span><br><span class="line">m = MediaPlayer()</span><br><span class="line">m.reset()</span><br><span class="line">m.setDataSource(activity.getLuaDir() .. <span class="string">&quot;/0.mp3&quot;</span>)</span><br><span class="line">m.prepare()</span><br><span class="line">m.start()</span><br><span class="line">m.setLooping(<span class="literal">true</span>)</span><br><span class="line">ti = Ticker()</span><br><span class="line">ti.Period = <span class="number">10</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">ti.onTick</span><span class="params">()</span></span></span><br><span class="line">  activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">  activity.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line">ti.start()</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">onKeyDown</span><span class="params">(A0_0, A1_1)</span></span></span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">string</span>.<span class="built_in">find</span>(<span class="built_in">tostring</span>(A1_1), <span class="string">&quot;KEYCODE_BACK&quot;</span>) ~= <span class="literal">nil</span> <span class="keyword">then</span></span><br><span class="line">    activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>首先设置音频源文件路径为0.mp3，使用单曲循环模式播放音频。然后使用<code>Ticker</code>循环调节媒体音量至最大值，同时拦截了返回键。<br>主要功能其实跟以前那个叫目力的app差不多。（不过今天这个apk的音频就太那啥了…）</p>
+<h2 id="静音样本下载"><a href="#静音样本下载" class="headerlink" title="静音样本下载"></a>静音样本下载</h2><p><a href="https://pan.baidu.com/s/1jTUcjknxr-fwETgtEVpQSg">https://pan.baidu.com/s/1jTUcjknxr-fwETgtEVpQSg</a></p>
+<h2 id="dump出来的lua"><a href="#dump出来的lua" class="headerlink" title="dump出来的lua"></a>dump出来的lua</h2><p><a href="https://pan.baidu.com/s/1X0un1jgVB6QAgPRqNu_3Wg">https://pan.baidu.com/s/1X0un1jgVB6QAgPRqNu_3Wg</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>简易Android ARM&amp;ARM64 GOT Hook (二)</title>
+    <url>/2021/08/30/android-arm-plt-hook/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>前文<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">简易Android ARM&amp;ARM64 GOT Hook (一)</a>，基于链接视图，解析section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。</p>
+<p>本文基于ELF的执行视图(<code>Execution View</code>)，讨论<code>Android</code> <code>ARM&amp;ARM64</code>架构的<code>GOT/PLT Hook</code>（仍以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例）。</p>
+<span id="more"></span>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><ol>
+<li>通过maps文件获取模块基址，解析内存中的ELF。</li>
+<li>查找并解析<code>.dynamic</code>段，得到<code>.rel.plt</code>、<code>.rel.dyn</code>、<code>.dynsym</code>、<code>.dynstr</code>和<code>.hash</code>表。</li>
+<li>通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找导入符号，再遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，得到函数偏移。</li>
+<li>基址加上偏移得到内存地址，修改函数地址即可。</li>
+</ol>
+<p>注入方式及编译环境同<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">前文</a>，不再赘述。</p>
+<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><h3 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 基于执行视图解析ELF</span></span><br><span class="line"><span class="function"><span class="keyword">uintptr_t</span> <span class="title">hackBySegment</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *moudle_path, <span class="keyword">const</span> <span class="keyword">char</span> *target_lib, <span class="keyword">const</span> <span class="keyword">char</span> *target_func,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">uintptr_t</span> replace)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">LOGI</span>(<span class="string">&quot;hackDynamic start.\n&quot;</span>);</span><br><span class="line">    <span class="comment">// 获取目标函数地址</span></span><br><span class="line">    <span class="keyword">void</span> *handle = <span class="built_in">dlopen</span>(target_lib, RTLD_LAZY);</span><br><span class="line">    <span class="keyword">auto</span> ori = (<span class="keyword">uintptr_t</span>) <span class="built_in">dlsym</span>(handle, target_func);</span><br><span class="line">    <span class="built_in">LOGI</span>(<span class="string">&quot;hackDynamic getpid addr: %lX\n&quot;</span>, ori);</span><br><span class="line">    <span class="comment">// 获取符号地址 (解析Segment)</span></span><br><span class="line">    <span class="keyword">uintptr_t</span> replaceAddr = <span class="built_in">getSymAddrDynamic</span>(moudle_path, target_func);</span><br><span class="line">    <span class="comment">// 替换地址</span></span><br><span class="line">    <span class="built_in">replaceFunction</span>(replaceAddr, replace, ori);</span><br><span class="line">    <span class="keyword">return</span> ori;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整代码见<a href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a></p>
+<h3 id="获取-dynamic段"><a href="#获取-dynamic段" class="headerlink" title="获取.dynamic段"></a>获取.dynamic段</h3><p>解析maps文件获取到模块地址后，基于执行视图解析ELF。</p>
+<p>从<code>elf header</code>中得到<code>program header table</code>的起始偏移（<code>e_phoff</code>）、<code>program header</code>大小(<code>e_phentsize</code>)和总<code>program header</code>个数（<code>e_phnum</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-elf-header.png"></p>
+<p>遍历<code>program header table</code>，查找<code>p_type</code>为<code>PT_DYNAMIC</code>的<code>program header</code>，得到<code>.dynamic</code>段在内存中的偏移值（<code>p_vaddr</code>）和大小（<code>p_memsz</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-ph-dynamic.png"></p>
+<p>将模块基址与<code>.dynamic</code>偏移值相加，得到<code>.dynamic</code>段的起始地址。</p>
+<h3 id="解析-dynamic段"><a href="#解析-dynamic段" class="headerlink" title="解析.dynamic段"></a>解析.dynamic段</h3><p>遍历<code>.dynamic</code>段，根据<code>d_tag</code>解析不同的表。<br><code>.rel.plt</code>：<code>DT_JMPREL</code>（大小储存在<code>DT_PLTRELSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-relplt.png"><br><code>.rel.dyn</code>：<code>DT_REL</code>（大小储存在<code>DT_RELSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-reldyn.png"><br><code>.dynsym</code>：<code>DT_SYMTAB</code><br><code>.dynstr</code>：<code>DT_STRTAB</code><br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-dynsym-str.png"><br><code>.hash</code>：<code>DT_HASH</code><br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-hash.png"></p>
+<p>注：解析<code>.dynamic</code>的ELF模板来自<a href="https://www.52pojie.cn/thread-948942-1-1.html">Android7.0以上命名空间详解(dlopen限制)附上010editor模块</a></p>
+<h3 id="查找符号"><a href="#查找符号" class="headerlink" title="查找符号"></a>查找符号</h3><p>通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找符号。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ELFW</span>(Sym) *target = <span class="literal">nullptr</span>;</span><br><span class="line"><span class="keyword">uint32_t</span> hash = <span class="built_in">elf_sysv_hash</span>((<span class="keyword">const</span> <span class="keyword">uint8_t</span> *) symName);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">uint32_t</span> i = buckets[hash % buckets_cnt];</span><br><span class="line">        <span class="number">0</span> != i; i = chains[i]) &#123;</span><br><span class="line">    <span class="built_in">ELFW</span>(Sym) *sym = dynsym + i;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> type = <span class="built_in">ELF_ST_TYPE</span>(sym-&gt;st_info);</span><br><span class="line">    <span class="keyword">if</span> (STT_FUNC != type &amp;&amp; STT_GNU_IFUNC != type &amp;&amp; STT_NOTYPE != type)</span><br><span class="line">        <span class="keyword">continue</span>; <span class="comment">// find function only, allow no-type</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> == <span class="built_in">strcmp</span>(dynstr + sym-&gt;st_name, symName)) &#123;</span><br><span class="line">        target = sym;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体操作为：</p>
+<ol>
+<li><p>计算符号名称的哈希值，然后从<code>.hash</code>获取符号在<code>.dynsym</code>中的索引。</p>
+<blockquote>
+<p>接受符号名称的散列函数会返回一个值，用于计算 bucket 索引。因此，如果散列函数为某个名称返回值 x，则 bucket [x% nbucket] 将会计算出索引 y。此索引为符号表和链表的索引。如果符号表项不是需要的名称，则 chain[y] 将使用相同的散列值计算出符号表的下一项。</p>
+</blockquote>
+</li>
+<li><p>通过索引从<code>.dynsym</code>获取符号，根据符号类型和符号名（通过<code>st_name</code>从<code>.dynstr</code>获取字符串），判断与目标函数是否匹配。</p>
+</li>
+</ol>
+<p>PS：也可直接遍历<code>.dynsym</code>并比对字符串，时间复杂度更高</p>
+<blockquote>
+<p>.hash -&gt; .dynsym -&gt; .dynstr，时间复杂度：O(x) + O(1) + O(1)<br>.dynsym -&gt; .dynstr，时间复杂度：O(n) + O(1)</p>
+</blockquote>
+<h3 id="计算内存地址"><a href="#计算内存地址" class="headerlink" title="计算内存地址"></a>计算内存地址</h3><p>遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，比对符号和重定位类型，获取函数偏移值（<code>r_offset</code>）。与模块基址相加得到内存地址。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; rel_plt_cnt; i++) &#123;</span><br><span class="line">        <span class="built_in">ELFW</span>(Rel) &amp;rel = rel_plt[i];</span><br><span class="line">        <span class="keyword">if</span> (&amp;(dynsym[<span class="built_in">ELF_R_SYM</span>(rel.r_info)]) == target &amp;&amp;</span><br><span class="line">            <span class="built_in">ELF_R_TYPE</span>(rel.r_info) == ELF_R_JUMP_SLOT) &#123;</span><br><span class="line"><span class="comment">//            LOGI(&quot;target r_offset: %lX&quot;, rel.r_offset);</span></span><br><span class="line">            <span class="keyword">return</span> moduleBase + rel.r_offset;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; rel_dyn_cnt; i++) &#123;</span><br><span class="line">        <span class="built_in">ELFW</span>(Rel) &amp;rel = rel_dyn[i];</span><br><span class="line">        <span class="keyword">if</span> (&amp;(dynsym[<span class="built_in">ELF_R_SYM</span>(rel.r_info)]) == target &amp;&amp;</span><br><span class="line">            (<span class="built_in">ELF_R_TYPE</span>(rel.r_info) == ELF_R_ABS</span><br><span class="line">             || <span class="built_in">ELF_R_TYPE</span>(rel.r_info) == ELF_R_GLOB_DAT)) &#123;</span><br><span class="line"><span class="comment">//            LOGI(&quot;target r_offset: %lX&quot;, rel.r_offset);</span></span><br><span class="line">            <span class="keyword">return</span> moduleBase + rel.r_offset;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后替换该内存地址对应的函数即可，同<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">前文</a>。</p>
+<h3 id="适配ARM64"><a href="#适配ARM64" class="headerlink" title="适配ARM64"></a>适配ARM64</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__LP64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELFW(what) Elf64_ ## what</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_TYPE(what) ELF64_R_TYPE(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_SYM(what) ELF64_R_SYM(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELFW(what) Elf32_ ## what</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_TYPE(what) ELF32_R_TYPE(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_SYM(what) ELF32_R_SYM(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__arm__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_JUMP_SLOT R_ARM_JUMP_SLOT     <span class="comment">//.rel.plt</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_GLOB_DAT  R_ARM_GLOB_DAT      <span class="comment">//.rel.dyn</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_ABS       R_ARM_ABS32         <span class="comment">//.rel.dyn</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">elif</span> defined(__aarch64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_JUMP_SLOT R_AARCH64_JUMP_SLOT</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_GLOB_DAT  R_AARCH64_GLOB_DAT</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_ABS       R_AARCH64_ABS64</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>同<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">前文</a>，替换动态库即可测试。</p>
+<h2 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h2><h3 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h3><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-log.png"></p>
+<h3 id="ARM64"><a href="#ARM64" class="headerlink" title="ARM64"></a>ARM64</h3><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-plt-hook-log.png"></p>
+<h2 id="作为动态链接库"><a href="#作为动态链接库" class="headerlink" title="作为动态链接库"></a>作为动态链接库</h2><p>详见<a href="https://github.com/XhyEax/AndroidGOTHook">项目</a>的<code>vitcim_app</code>模块。</p>
+<p>通过配置<code>CMakeLists.txt</code>将<code>libinject.so</code>作为动态库链接，在<code>JNI_OnLoad</code>调用<code>hackBySegment</code>替换<code>getpid</code>函数。</p>
+<p>日志如下：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-so-plt-hook-log.png"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>主要学习了<code>.dynamic</code>段的解析和导入符号的查找方式。虽然实现了基于执行视图解析ELF，但仍存在许多不足。不过这次是真的短期内不会再改动了。（<strong>不要重复造轮子</strong>）</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/L173864930/article/details/40507359">基于Android的ELF PLT/GOT符号和重定向过程ELF Hook实现</a><br><a href="https://bbs.pediy.com/thread-267842.htm">ELF文件格式与got表hook简单实现</a><br><a href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-54839.html">重定位节 - 链接程序和库指南</a><br><a href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-79797.html">符号表节 - 链接程序和库指南</a><br><a href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-48031.html">散列表节 - 链接程序和库指南</a><br><a href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-42444.html">动态节 - 链接程序和库指南</a><br><a href="https://bbs.pediy.com/thread-255670.htm">ELF文件结构详解</a><br><a href="https://zhuanlan.zhihu.com/p/269441842">PLT HOOK</a><br><a href="https://github.com/bytedance/bhook">bhook</a><br><a href="https://github.com/iqiyi/xhook">xhook</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>安卓9 设置热点固定IP (Xposed)</title>
+    <url>/2021/03/01/android-9-set-hotpot-ip/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定IP。</p>
+<h2 id="跟踪源代码"><a href="#跟踪源代码" class="headerlink" title="跟踪源代码"></a>跟踪源代码</h2><p>定位到<code>com.android.server.connectivity.tethering.TetherInterfaceStateMachine</code>类（<a href="http://aospxref.com/android-9.0.0_r61/xref/frameworks/base/services/core/java/com/android/server/connectivity/tethering/TetherInterfaceStateMachine.java">源代码</a>）</p>
+<p>函数调用链：<code>startIPv4</code>-<code>configureIPv4</code>-<code>getRandomWifiIPv4Address</code></p>
+<p><code>getRandomWifiIPv4Address</code>函数对主机IP地址进行随机处理，然后返回字符串。修改其返回值，即可固定IP。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>使用Xposed框架Hook该函数（过滤包名android），设置返回值为<code>192.168.43.1</code>即可</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hook</span> <span class="keyword">implements</span> <span class="title">IXposedHookLoadPackage</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String classname = <span class="string">&quot;com.android.server.connectivity.tethering.TetherInterfaceStateMachine&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String methodname = <span class="string">&quot;getRandomWifiIPv4Address&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String WIFI_HOST_IFACE_ADDR = <span class="string">&quot;192.168.43.1&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleLoadPackage</span><span class="params">(XC_LoadPackage.LoadPackageParam lpparam)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (lpparam.packageName.equals(<span class="string">&quot;android&quot;</span>)) &#123;</span><br><span class="line">            Class clz = XposedHelpers.findClass(classname, lpparam.classLoader);</span><br><span class="line"></span><br><span class="line">            findAndHookMethod(clz, methodname, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">                    <span class="keyword">return</span> WIFI_HOST_IFACE_ADDR;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/sinat_20059415/article/details/82956145]">（九十七）Android O WiFi热点 开启流程梳理续（二）</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>IDA调试安卓so 在libart.so OpenMemory下断点</title>
     <url>/2019/09/14/android-debug-onload/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>如果想要在so加载时就下断点的话，需要以调试模式运行，并使用ddms进行jdb的连接。</p>
@@ -304,31 +304,6 @@
       </tags>
   </entry>
   <entry>
-    <title>修复反编译资源文件报错问题(resource spec)</title>
-    <url>/2019/02/28/android-reverse-fix-arsc/</url>
-    <content><![CDATA[<h2 id="关于0x01010540错误"><a href="#关于0x01010540错误" class="headerlink" title="关于0x01010540错误"></a>关于<code>0x01010540</code>错误</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code><br>具体方法见后文</p>
-<h2 id="关于0x01010543错误"><a href="#关于0x01010543错误" class="headerlink" title="关于0x01010543错误"></a>关于<code>0x01010543</code>错误</h2><p>如果只有</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
-<p>没有<code>UndefinedResObject</code><br>则更换<code>apktool</code>后再试<br><code>apktool</code>可以在<a href="https://down.52pojie.cn/Tools/Android_Tools/">爱盘</a>下载</p>
-<p>实在要修复的话，往下看：（都是修改<code>resources.arsc</code>）</p>
-<h2 id="修复UndefinedResObject错误"><a href="#修复UndefinedResObject错误" class="headerlink" title="修复UndefinedResObject错误"></a>修复UndefinedResObject错误</h2><p>报错信息：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; brut.androlib.err.UndefinedResObject: resource spec: 0x7f000006</span><br></pre></td></tr></table></figure>
-
-<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><code>aapt dump</code>查看apk的资源信息，并保存到文件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">aapt d --values resources test.apk &gt;1.txt</span><br></pre></td></tr></table></figure>
-<p>找到<code>DataType</code>数据类型不正确的值（搜索<code>attribute</code>即可）对应的描述符（一般是把7f改成00，<code>0x00000006</code>）<br>文件中没有识别出正确的数据类型，显示的是<code>(attribute) 0x00000006</code><br>使用<code>010Editor</code>，Ctrl+F，字节形式搜索对应描述的16进制数的小端字节（就是<code>00000006</code>写成<code>06000000</code>）<br>然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
-<h2 id="修复resource-spec-0x01010543"><a href="#修复resource-spec-0x01010543" class="headerlink" title="修复resource spec: 0x01010543"></a>修复resource spec: 0x01010543</h2><p>报错信息：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
-<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>12345678</code>写成<code>78564312</code>）<br>这里我们搜索<code>43050101</code>，然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
-<h2 id="修复resource-spec-0x01010540"><a href="#修复resource-spec-0x01010540" class="headerlink" title="修复resource spec: 0x01010540"></a>修复resource spec: 0x01010540</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code></p>
-<h3 id="解决方法-2"><a href="#解决方法-2" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>40050101</code>换成<code>8f040101</code>）</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u012400885/article/details/80409689">记录Android Killer反编译时遇到的异常</a><br><a href="http://blog.csdn.net/pwelyn/article/details/50620136">保护Android resources文件不被反编译原理分析</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>逆向修改安卓内核 x64 过TracerPID反调试</title>
     <url>/2019/09/13/android-kernel-reverse-anti-antidebug/</url>
     <content><![CDATA[<h2 id="建议在git-bash下操作"><a href="#建议在git-bash下操作" class="headerlink" title="建议在git bash下操作"></a>建议在git bash下操作</h2><p>本人解压<code>kernel.gz</code>时使用的不是命令行，导致没有看到输出信息<code>gzip trailing garbage ignored</code>，进而没有对这些数据进行处理，浪费了很多时间。</p>
@@ -361,6 +336,31 @@
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">fastboot flash boot boot.img</span><br><span class="line">fastboot reboot</span><br></pre></td></tr></table></figure>
 <p>如果成功的话就直接正常开机了，失败的话看看是不是修改错了内核文件的内容，从原内核开始修改，再次尝试</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.xmsec.cc/re-modify-kernel-bypass-antidebug/">逆向修改内核，绕过TracerPID反调试</a><br><a href="https://blog.csdn.net/Druke/article/details/80502571">逆向修改MIUI（X64）内核，反制TracerPID反调试踩坑指南</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>修复反编译资源文件报错问题(resource spec)</title>
+    <url>/2019/02/28/android-reverse-fix-arsc/</url>
+    <content><![CDATA[<h2 id="关于0x01010540错误"><a href="#关于0x01010540错误" class="headerlink" title="关于0x01010540错误"></a>关于<code>0x01010540</code>错误</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code><br>具体方法见后文</p>
+<h2 id="关于0x01010543错误"><a href="#关于0x01010543错误" class="headerlink" title="关于0x01010543错误"></a>关于<code>0x01010543</code>错误</h2><p>如果只有</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
+<p>没有<code>UndefinedResObject</code><br>则更换<code>apktool</code>后再试<br><code>apktool</code>可以在<a href="https://down.52pojie.cn/Tools/Android_Tools/">爱盘</a>下载</p>
+<p>实在要修复的话，往下看：（都是修改<code>resources.arsc</code>）</p>
+<h2 id="修复UndefinedResObject错误"><a href="#修复UndefinedResObject错误" class="headerlink" title="修复UndefinedResObject错误"></a>修复UndefinedResObject错误</h2><p>报错信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; brut.androlib.err.UndefinedResObject: resource spec: 0x7f000006</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><code>aapt dump</code>查看apk的资源信息，并保存到文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">aapt d --values resources test.apk &gt;1.txt</span><br></pre></td></tr></table></figure>
+<p>找到<code>DataType</code>数据类型不正确的值（搜索<code>attribute</code>即可）对应的描述符（一般是把7f改成00，<code>0x00000006</code>）<br>文件中没有识别出正确的数据类型，显示的是<code>(attribute) 0x00000006</code><br>使用<code>010Editor</code>，Ctrl+F，字节形式搜索对应描述的16进制数的小端字节（就是<code>00000006</code>写成<code>06000000</code>）<br>然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
+<h2 id="修复resource-spec-0x01010543"><a href="#修复resource-spec-0x01010543" class="headerlink" title="修复resource spec: 0x01010543"></a>修复resource spec: 0x01010543</h2><p>报错信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
+<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>12345678</code>写成<code>78564312</code>）<br>这里我们搜索<code>43050101</code>，然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
+<h2 id="修复resource-spec-0x01010540"><a href="#修复resource-spec-0x01010540" class="headerlink" title="修复resource spec: 0x01010540"></a>修复resource spec: 0x01010540</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code></p>
+<h3 id="解决方法-2"><a href="#解决方法-2" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>40050101</code>换成<code>8f040101</code>）</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u012400885/article/details/80409689">记录Android Killer反编译时遇到的异常</a><br><a href="http://blog.csdn.net/pwelyn/article/details/50620136">保护Android resources文件不被反编译原理分析</a></p>
 ]]></content>
       <tags>
         <tag>Android</tag>
@@ -471,6 +471,18 @@
       </tags>
   </entry>
   <entry>
+    <title>apt update 报错 the public key is not available</title>
+    <url>/2020/04/16/apt-pk-not-available/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><code>apt-get update</code>出现<code>The following signatures couldn&#39;t be verified because the public key is not available</code>错误，则需要手动添加key</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>执行以下命令：(<code>B02C46DF417A0893</code>替换为报错信息中显示的值)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo gpg --keyserver keyserver.ubuntu.com --recv B02C46DF417A0893</span><br><span class="line">sudo gpg --export --armor B02C46DF417A0893 | sudo apt-key add -</span><br><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/zhuiqiuzhuoyue583/article/details/90597499">解决GPG error: The following signatures couldn’t be verified because the public key is not available</a></p>
+]]></content>
+      <tags>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>方舟生存进化 Linux(CentOS) 开服、mod安装</title>
     <url>/2020/03/03/ark-server-linux/</url>
     <content><![CDATA[<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>阿里云服务器，CentOS 7.7 64位， 2核CPU，4G内存，4G交换空间</p>
@@ -538,18 +550,6 @@
 ]]></content>
       <tags>
         <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>apt update 报错 the public key is not available</title>
-    <url>/2020/04/16/apt-pk-not-available/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><code>apt-get update</code>出现<code>The following signatures couldn&#39;t be verified because the public key is not available</code>错误，则需要手动添加key</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>执行以下命令：(<code>B02C46DF417A0893</code>替换为报错信息中显示的值)</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo gpg --keyserver keyserver.ubuntu.com --recv B02C46DF417A0893</span><br><span class="line">sudo gpg --export --armor B02C46DF417A0893 | sudo apt-key add -</span><br><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/zhuiqiuzhuoyue583/article/details/90597499">解决GPG error: The following signatures couldn’t be verified because the public key is not available</a></p>
-]]></content>
-      <tags>
-        <tag>Linux</tag>
       </tags>
   </entry>
   <entry>
@@ -649,8 +649,12 @@
   <entry>
     <title>更换Hexo博客主题为NexT</title>
     <url>/2021/09/05/change-hexo-theme-to-next/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>换个了博客主题。主要<a href="https://theme-next.iissnan.com/">NexT 使用文档</a>进行配置，记录一下遇到的问题。</p>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>换个了博客主题。主要参考<a href="https://theme-next.iissnan.com/">NexT 使用文档</a>进行配置，记录一下遇到的问题。</p>
 <h2 id="语言配置"><a href="#语言配置" class="headerlink" title="语言配置"></a>语言配置</h2><p><code>主题配置文件</code>和<code>站点配置文件</code>都需要设置<code>language: zh-CN</code></p>
+<h2 id="阅读全文"><a href="#阅读全文" class="headerlink" title="阅读全文"></a>阅读全文</h2><p>在文章中使用 <code>&lt;!-- more --&gt;</code> 手动进行截断 (Hexo 提供的方式)</p>
+<p>由于修改了文件，文章修改时间都变成了同一天。</p>
+<p>可以设置<code>主题配置文件</code>的<code>updated_at.enable</code>为<code>false</code>，关闭修改时间显示。</p>
+<p>后续准备写个Python脚本，将根据文章内的创建时间修改文件的最后修改时间。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.zhihu.com/question/54237326/answer/485305059">hexo next language设置成zh-CN，也有zh-CN.yml文件，就是不显示中文？ - 杨坤的回答 - 知乎</a></p>
 ]]></content>
       <tags>
@@ -730,6 +734,17 @@
       </tags>
   </entry>
   <entry>
+    <title>修复VSCode Segmentation Fault in cygwinS</title>
+    <url>/2019/07/03/cpp_vscode_segmentation_fault_cygwinS/</url>
+    <content><![CDATA[<h2 id="段错误"><a href="#段错误" class="headerlink" title="段错误"></a>段错误</h2><p>一般来说是因为爆栈了，使用动态数组即可。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/kangyupl/article/details/90723526">VSCODE调试时在cygwin.S中发生段错误</a></p>
+]]></content>
+      <tags>
+        <tag>C++</tag>
+        <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C++中模板类的输出流重载</title>
     <url>/2019/05/07/cpp-template-class-cout-overload/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在模板类中使用输出流重载发现报错，g++提示</p>
@@ -755,17 +770,6 @@
       </tags>
   </entry>
   <entry>
-    <title>修复VSCode Segmentation Fault in cygwinS</title>
-    <url>/2019/07/03/cpp_vscode_segmentation_fault_cygwinS/</url>
-    <content><![CDATA[<h2 id="段错误"><a href="#段错误" class="headerlink" title="段错误"></a>段错误</h2><p>一般来说是因为爆栈了，使用动态数组即可。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/kangyupl/article/details/90723526">VSCODE调试时在cygwin.S中发生段错误</a></p>
-]]></content>
-      <tags>
-        <tag>C++</tag>
-        <tag>VSCode</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>VS设置C#默认以管理员身份调试及启动</title>
     <url>/2020/04/14/csharp-run-as-admin/</url>
     <content><![CDATA[<h2 id="默认以管理员身份调试"><a href="#默认以管理员身份调试" class="headerlink" title="默认以管理员身份调试"></a>默认以管理员身份调试</h2><p>右键项目，添加应用程序清单文件。<br>将<code>&lt;requestedExecutionLevel level=&quot;asInvoker&quot; uiAccess=&quot;false&quot; /&gt;</code><br><code>asInvoker</code>修改为<code>requireAdministrator</code><br>保存后再次点击运行，将提示使用其他凭据重新启动。</p>
@@ -787,14 +791,6 @@
 ]]></content>
       <tags>
         <tag>Linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>导出sqlite3数据库为sql</title>
-    <url>/2019/10/15/db-sqlite3-to-sql/</url>
-    <content><![CDATA[<h2 id="执行以下语句即可"><a href="#执行以下语句即可" class="headerlink" title="执行以下语句即可"></a>执行以下语句即可</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sqlite3 db.sqlite3 &quot;.dump&quot; &gt; new.sql</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>经验</tag>
       </tags>
   </entry>
   <entry>
@@ -859,6 +855,14 @@
 ]]></content>
       <tags>
         <tag>游戏逆向</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>导出sqlite3数据库为sql</title>
+    <url>/2019/10/15/db-sqlite3-to-sql/</url>
+    <content><![CDATA[<h2 id="执行以下语句即可"><a href="#执行以下语句即可" class="headerlink" title="执行以下语句即可"></a>执行以下语句即可</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sqlite3 db.sqlite3 &quot;.dump&quot; &gt; new.sql</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>经验</tag>
       </tags>
   </entry>
   <entry>
@@ -966,17 +970,6 @@
       </tags>
   </entry>
   <entry>
-    <title>修复crypto模块import失败（Python2）</title>
-    <url>/2019/01/26/fix-crypto-py2/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用Python2.7安装好pycrypto模块后，还是报错，搜索得到解决方案</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>打开Python2.7安装目录，找到<code>Lib/site-package/crypto</code>文件夹<br>重命名为Crypto即可</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/fawaikuangtu123/p/9761943.html">解释Crypto模块怎么就这么”皮”？No module named “Crypto”</a></p>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>修复Flash插件提示地区不符的问题</title>
     <url>/2019/01/26/fix-flash/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Adobe Flash Player 从 30 版本开始，中国大陆地区用户只能使用特供版<br>后台存在广告服务、弹出广告窗口、捆绑流氓软件的行为。<br>由于有的网站只能用flash，而安装国际版flash又提示地区不符，所以需要找个办法解决。</p>
@@ -994,21 +987,14 @@
       </tags>
   </entry>
   <entry>
-    <title>修复双系统（Win+Linux）时间不同步问题</title>
-    <url>/2019/02/16/fix-linux-time/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>笔记本装了win10+Ubuntu18.04双系统，但是两个系统的时间并不同步，相差8小时（正好是时区数）。于是搜索之，找到解决方案</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>Windows 与 Mac/Linux 看待系统硬件时间（Hardware Ttime，或称实时时间，即RTC，Real_Time Clock）的方式不同。<br>Windows把计算机硬件时间当作本地时间(local time)，所以在Windows系统中显示的时间跟BIOS中显示的时间是一样的。<br>而Linux/Unix/Mac把计算机硬件时间当作UTC（Universal Time Coordinated，世界统一时间）， 所以在Linux/Unix/Mac系统启动后在该时间的基础上，加上电脑设置的时区数。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>所以只需要使两个系统对待硬件时间的方式一致即可。<br>自然，有两种方法。</p>
-<h3 id="方法1-修改Linux系统"><a href="#方法1-修改Linux系统" class="headerlink" title="方法1 修改Linux系统"></a>方法1 修改Linux系统</h3><p>打开终端，执行<br><code>timedatectl set-local-rtc 1</code><br>禁用Linux系统的UTC时间，重启即可生效（不需要管理员权限）</p>
-<blockquote>
-<p>提示： 在 Ubuntu 16.04 版本以前，关闭UTC的方法是编辑/etc/default/rcS，将UTC=yes改成UTC=no， 但在Ubuntu 16.04使用systemd启动之后，时间改成了由timedatectl来管理</p>
-</blockquote>
-<p>如果时间还是不对，就先在设置里修改系统时间为当前时间（北京时间），然后执行<br><code>timedatectl set-local-rtc 1</code><br>再<br><code>sudo hwclock -w</code><br>写入当前时间到硬件</p>
-<h3 id="方法2-修改Windows系统（不建议）"><a href="#方法2-修改Windows系统（不建议）" class="headerlink" title="方法2 修改Windows系统（不建议）"></a>方法2 修改Windows系统（不建议）</h3><p>Win+X，打开<code>Powershell</code>（管理员），执行<br><code>Reg add HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v RealTimeIsUniversal /t REG_DWORD /d 1</code><br>解释：设置<code>RealTimeIsUniversal</code>键值为1，也就是把RTC当作UTC<br>然而我用这种方法，切换几次系统以后时间往后推了16小时= =<br>所以个人不推荐使用这种方法</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/zyqblog/article/details/79318955?utm_source=copy">解决Windows10与Ubuntu16.04双系统时间不一样问题！</a></p>
+    <title>修复crypto模块import失败（Python2）</title>
+    <url>/2019/01/26/fix-crypto-py2/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用Python2.7安装好pycrypto模块后，还是报错，搜索得到解决方案</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>打开Python2.7安装目录，找到<code>Lib/site-package/crypto</code>文件夹<br>重命名为Crypto即可</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/fawaikuangtu123/p/9761943.html">解释Crypto模块怎么就这么”皮”？No module named “Crypto”</a></p>
 ]]></content>
       <tags>
-        <tag>Linux</tag>
+        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -1049,6 +1035,24 @@
       </tags>
   </entry>
   <entry>
+    <title>修复双系统（Win+Linux）时间不同步问题</title>
+    <url>/2019/02/16/fix-linux-time/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>笔记本装了win10+Ubuntu18.04双系统，但是两个系统的时间并不同步，相差8小时（正好是时区数）。于是搜索之，找到解决方案</p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>Windows 与 Mac/Linux 看待系统硬件时间（Hardware Ttime，或称实时时间，即RTC，Real_Time Clock）的方式不同。<br>Windows把计算机硬件时间当作本地时间(local time)，所以在Windows系统中显示的时间跟BIOS中显示的时间是一样的。<br>而Linux/Unix/Mac把计算机硬件时间当作UTC（Universal Time Coordinated，世界统一时间）， 所以在Linux/Unix/Mac系统启动后在该时间的基础上，加上电脑设置的时区数。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>所以只需要使两个系统对待硬件时间的方式一致即可。<br>自然，有两种方法。</p>
+<h3 id="方法1-修改Linux系统"><a href="#方法1-修改Linux系统" class="headerlink" title="方法1 修改Linux系统"></a>方法1 修改Linux系统</h3><p>打开终端，执行<br><code>timedatectl set-local-rtc 1</code><br>禁用Linux系统的UTC时间，重启即可生效（不需要管理员权限）</p>
+<blockquote>
+<p>提示： 在 Ubuntu 16.04 版本以前，关闭UTC的方法是编辑/etc/default/rcS，将UTC=yes改成UTC=no， 但在Ubuntu 16.04使用systemd启动之后，时间改成了由timedatectl来管理</p>
+</blockquote>
+<p>如果时间还是不对，就先在设置里修改系统时间为当前时间（北京时间），然后执行<br><code>timedatectl set-local-rtc 1</code><br>再<br><code>sudo hwclock -w</code><br>写入当前时间到硬件</p>
+<h3 id="方法2-修改Windows系统（不建议）"><a href="#方法2-修改Windows系统（不建议）" class="headerlink" title="方法2 修改Windows系统（不建议）"></a>方法2 修改Windows系统（不建议）</h3><p>Win+X，打开<code>Powershell</code>（管理员），执行<br><code>Reg add HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v RealTimeIsUniversal /t REG_DWORD /d 1</code><br>解释：设置<code>RealTimeIsUniversal</code>键值为1，也就是把RTC当作UTC<br>然而我用这种方法，切换几次系统以后时间往后推了16小时= =<br>所以个人不推荐使用这种方法</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/zyqblog/article/details/79318955?utm_source=copy">解决Windows10与Ubuntu16.04双系统时间不一样问题！</a></p>
+]]></content>
+      <tags>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>gcc编译Python模块失败(找不到Python.h)</title>
     <url>/2018/12/07/fix-python-h/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>服务器恢复快照以后，一大堆东西都要重新安装。<br>安装PyCrypto时发生错误，提示<br><code>Python.h: No such file or directory</code><br>于是 首先执行 <code>yum upgrade</code>，升级下试试<br>然而还是编译错误，所以肯定是没有安装依赖</p>
@@ -1086,20 +1090,6 @@
 ]]></content>
       <tags>
         <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Frida在无Root机器上的使用方案 (基于VirtualApp)</title>
-    <url>/2021/08/06/frida-no-root/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，因此也就无法通过Magisk获取Root权限。<br>本文基于<a href="https://github.com/asLody/VirtualApp">VirtualApp框架</a>及<a href="https://github.com/frida/frida">Frida-Gadget</a>，实现不修改apk使用Frida。</p>
-<span id="more"></span>
-<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><h3 id="修改框架源码"><a href="#修改框架源码" class="headerlink" title="修改框架源码"></a>修改框架源码</h3><p>阅读<code>VirtualApp</code>源码可知，在<a href="https://github.com/asLody/VirtualApp/blob/bd6f03cfd7cbf3ad63ec6198777a102c18112c2d/VirtualApp/lib/src/main/jni/Foundation/IOUniformer.cpp"><code>lib/src/main/jni/Foundation/IOUniformer.cpp</code></a>中hook了<code>dlopen</code>，并实现了<code>onSoLoaded</code>函数，可在该函数中通过传入的<code>filename</code>获取加载的动态库路径。</p>
-<p>由此，可以在<code>libart.so</code>加载后，手动调用<code>dlopen</code>加载<code>Frida-Gadget</code>（将arm版本的so文件及配置文件添加到<code>lib\src\main\jniLibs\armeabi-v7a</code>）。</p>
-<h3 id="编写Xposed模块"><a href="#编写Xposed模块" class="headerlink" title="编写Xposed模块"></a>编写Xposed模块</h3><p>除了修改源码，也可以自己编写一个Xposed模块，实现<code>Frida-Gadget</code>的加载。</p>
-<p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，手动调用<code>System.load</code>加载<code>Frida-Gadget</code>（需手动拷贝相关文件到应用的libs文件夹）。</p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
       </tags>
   </entry>
   <entry>
@@ -1155,6 +1145,20 @@
 ]]></content>
       <tags>
         <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Frida在无Root机器上的使用方案 (基于VirtualApp)</title>
+    <url>/2021/08/06/frida-no-root/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，因此也就无法通过Magisk获取Root权限。<br>本文基于<a href="https://github.com/asLody/VirtualApp">VirtualApp框架</a>及<a href="https://github.com/frida/frida">Frida-Gadget</a>，实现不修改apk使用Frida。</p>
+<span id="more"></span>
+<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><h3 id="修改框架源码"><a href="#修改框架源码" class="headerlink" title="修改框架源码"></a>修改框架源码</h3><p>阅读<code>VirtualApp</code>源码可知，在<a href="https://github.com/asLody/VirtualApp/blob/bd6f03cfd7cbf3ad63ec6198777a102c18112c2d/VirtualApp/lib/src/main/jni/Foundation/IOUniformer.cpp"><code>lib/src/main/jni/Foundation/IOUniformer.cpp</code></a>中hook了<code>dlopen</code>，并实现了<code>onSoLoaded</code>函数，可在该函数中通过传入的<code>filename</code>获取加载的动态库路径。</p>
+<p>由此，可以在<code>libart.so</code>加载后，手动调用<code>dlopen</code>加载<code>Frida-Gadget</code>（将arm版本的so文件及配置文件添加到<code>lib\src\main\jniLibs\armeabi-v7a</code>）。</p>
+<h3 id="编写Xposed模块"><a href="#编写Xposed模块" class="headerlink" title="编写Xposed模块"></a>编写Xposed模块</h3><p>除了修改源码，也可以自己编写一个Xposed模块，实现<code>Frida-Gadget</code>的加载。</p>
+<p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，手动调用<code>System.load</code>加载<code>Frida-Gadget</code>（需手动拷贝相关文件到应用的libs文件夹）。</p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
       </tags>
   </entry>
   <entry>
@@ -1327,6 +1331,23 @@
       </tags>
   </entry>
   <entry>
+    <title>如何支持博主？</title>
+    <url>/2018/12/01/how-to-support-me/</url>
+    <content><![CDATA[<p>众所周知，支持主要分为经济上和精神上的支持。</p>
+<span id="more"></span>
+<h1 id="经济上"><a href="#经济上" class="headerlink" title="经济上"></a>经济上</h1><p>我 博主 打钱 ( • ̀ω•́ )</p>
+<h2 id="支付宝"><a href="#支付宝" class="headerlink" title="支付宝"></a>支付宝</h2><img src="/assets/img/alipay.jpg" width = "300" height = "300"  align=center />
+## B站充电
+打开[我的B站主页](http://space.bilibili.com/23219232)，点击为TA充电
+（年度大会员每个月有5B币=50电池，9号过期，你懂我意思吧 ←_← ）
+
+<h1 id="精神上"><a href="#精神上" class="headerlink" title="精神上"></a>精神上</h1><p>用意念支持博主即可(´・ω・`)</p>
+]]></content>
+      <tags>
+        <tag>支持</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>i春秋 第二届春秋欢乐赛 ReCreators&amp;Hello World Writeup</title>
     <url>/2019/01/26/icq-2nd-happy-rec/</url>
     <content><![CDATA[<h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h2><h3 id="观察"><a href="#观察" class="headerlink" title="观察"></a>观察</h3><p>浏览器打开，只有一个<code>Hello, World!</code><br>查看源代码看到有个</p>
@@ -1342,6 +1363,17 @@
 <h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">3441344134383435353535323533344534423541344135353334353333323446344134453433353533323536343335343441354134343535353535343433343634423335344334363437353634333443344235413434343534443536344235343439344534433535353535363533344234393541343435363435353533323531343933353443343534443536344234453442353634363436344235333442344634413445343335363446353533323534344233353436353634353532353335373439353634413534343535363332344234413541343634353442353234423533344134413442353535393532353334383439353535413436343735333332353734413532343434353539353234423534344135353541343534393533354135363439353634433436344235353532353334423335343634353334353334333536344233353441343634373534343334443441344134343436344235343442353334413445344235353446353335333444344235363441353634463535333234443441353234323435353335363533344534423444354134363531353335333446343935413433353634423535353235333441353234343535353535343533343734413536344135353537353633323442344234413433343534423535333235363441344534423435353735343533343734423541344235363435353133323438344134453443343535333536343334363442354134363535333635333332344234393541343335353332353634333443344235363436343533343532343334363441333534433436343735373533344334433441343434363444353434423532343734413435343535353533344135333442353634443536343535333332344434393335343535363535353635333534344234443541343634373533353335373439353634333535343735363533344234423445343635353535353334333436343734413437353634373536353334423442354134373435343935323442353834413445343934353533353335333436343935413437353634393533333235343441344534383435344435363442353434423541344135353539353334413536344135363443343535373536344135333443343234363435353535343433343634393335344334353437353634333443344334413434343634443534333235353439344534323535353935323533343434423532343735363444353533323535344134363445343534393536344234363441353535413436344635333533343734393335344235353446353634413533344135323436343635353532353334363441344534413534343535343332344234413541343334363442353633323534344234453437343535333536353334383442354134353535333234443533343834413441344534353535353234423538344233353432353634393533333233323439344534333536353335353541353334413445343634363435353133323535343935363442353634373536343334423441354134343436344435343442353534393445343435353537353234413533343935363434353634423531333234443441353234363435343535363533353034423541344534363444353233323442344135323433353434393536344235343441344534353536353535333433353734413445344234353437353434423441343735363437343534423533344235333442344534363435353735373533343334423536343435363437353535333537344134453438343535393536353335343442353634413536343735333541353634393541344334353442353635323533343933353435353634443534343334373439333534423436343735343433344334423541343735363444353534423532343734413443353535373534353334453442353533323436344235353332344134413445344534353437353635333445344234453441353634353533353235353437344134423536344635353533343434393532343635363444353335333536343735413442343535373536333234423441354134363535344235363332353734423445343734353539353135333437344235413433353634333535333234383441343533323535333235363442354134423532343235353531353334423536344334413442353533323535333234423442344534343535353535343433353634423445344335363437353334333443344334413434343634423445343335353439344534413535353535343533344434393541343735363444353335333536344134453439353635353532353335303442344435413436344635333533344634413536343434353437353635333534343935323437343534443533343335363439353634423435343735323533343834413441343734353442353634423537344234453436343535393533353334373442354134373536343735333332353434413445343834353535353634423538344233353441353534393533333235333439344134423534343935363441353334423541343634363535353335333436344334363441343535373534353334433442344134343436344235343332353434413444354134353539353235333444343935353541343634443535333234353441344134383435344435323433344334423445344135353446353335333445344334413433343534463536333234343441353234363535353535343433353634413536344134353537353635333443344135413435343534423536333235373441344534453435353735353533343834423541343735363433344435333537344134413434343534443532344235323442343935413435353935323332344634393441344334353332353535323533343934453436343533343532343335373441333534433435353735363442344334413541343434353444353434423534343734413442353535333534344135333439353634433536344435353332344534413436343634353537353634423443344135413441353634463533333234463439353234423536343735363533353334423536343535363535353234423537344133353441343534373535353334423441343535413436344235363442353334423445343734353535353635333434343935413439353634373444353335383441344134433435344235323442343434423541343634363437353333323442343935413443343534373536333234433439353634363535333234453533353534373441343934353533353034393344</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>修改IDA android_server默认端口</title>
+    <url>/2019/09/13/ida-as-port-reverse/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>也许有的反调试会检测23946端口是否占用，所以保险起见不妨使用别的端口。<br>可以使用<code>./android_server -p12345</code>指定端口，但是不如直接逆向修改默认端口。</p>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>ida载入android_server，进入main函数，按F5查看伪代码，定位到23946（0x5dba）位置，直接修改即可。<br>可以把<code>5D BA</code>改为<code>39 30</code>，即12345端口</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/jiaoxiake/p/6801093.html">浅谈android反调试之 转发端口</a></p>
+]]></content>
+      <tags>
+        <tag>IDA</tag>
       </tags>
   </entry>
   <entry>
@@ -1365,38 +1397,23 @@
       </tags>
   </entry>
   <entry>
-    <title>如何支持博主？</title>
-    <url>/2018/12/01/how-to-support-me/</url>
-    <content><![CDATA[<p>众所周知，支持主要分为经济上和精神上的支持。</p>
-<span id="more"></span>
-<h1 id="经济上"><a href="#经济上" class="headerlink" title="经济上"></a>经济上</h1><p>我 博主 打钱 ( • ̀ω•́ )</p>
-<h2 id="支付宝"><a href="#支付宝" class="headerlink" title="支付宝"></a>支付宝</h2><img src="/assets/img/alipay.jpg" width = "300" height = "300"  align=center />
-## B站充电
-打开[我的B站主页](http://space.bilibili.com/23219232)，点击为TA充电
-（年度大会员每个月有5B币=50电池，9号过期，你懂我意思吧 ←_← ）
-
-<h1 id="精神上"><a href="#精神上" class="headerlink" title="精神上"></a>精神上</h1><p>用意念支持博主即可(´・ω・`)</p>
-]]></content>
-      <tags>
-        <tag>支持</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>修改IDA android_server默认端口</title>
-    <url>/2019/09/13/ida-as-port-reverse/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>也许有的反调试会检测23946端口是否占用，所以保险起见不妨使用别的端口。<br>可以使用<code>./android_server -p12345</code>指定端口，但是不如直接逆向修改默认端口。</p>
-<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>ida载入android_server，进入main函数，按F5查看伪代码，定位到23946（0x5dba）位置，直接修改即可。<br>可以把<code>5D BA</code>改为<code>39 30</code>，即12345端口</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/jiaoxiake/p/6801093.html">浅谈android反调试之 转发端口</a></p>
+    <title>IDA不能F5查看伪代码的解决方法(call analysis failed)</title>
+    <url>/2019/02/16/ida-call-analysis-fail/</url>
+    <content><![CDATA[<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>定位到报错的代码位置，双击函数，进入以后按一次F5，再返回就可以F5了。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/xiangshangbashaonian/article/details/82889924">解决IDA出现Decompilation failure: call analysis failed不可以F5的问题</a></p>
 ]]></content>
       <tags>
         <tag>IDA</tag>
       </tags>
   </entry>
   <entry>
-    <title>IDA不能F5查看伪代码的解决方法(call analysis failed)</title>
-    <url>/2019/02/16/ida-call-analysis-fail/</url>
-    <content><![CDATA[<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>定位到报错的代码位置，双击函数，进入以后按一次F5，再返回就可以F5了。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/xiangshangbashaonian/article/details/82889924">解决IDA出现Decompilation failure: call analysis failed不可以F5的问题</a></p>
+    <title>IDA不能F5查看伪代码的解决方法（positive sp value）</title>
+    <url>/2018/11/30/ida-positive-sp/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-30-12.png"><br>在函数中F5失败，提示堆栈指针为正数，故需要修复堆栈平衡</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>去设置中打开堆栈指针（Stack pointer）显示（也就是sp）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-33-01.png"></p>
+<p>按G定位到4012B9，发现return时的指针是-10（hex）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-34-15.png"></p>
+<p>找到最接近的call（401295），在该行修改sp值（按alt+K或者右键修改）,设置偏移值为-0x10<br>（目的就是使return前的sp为0）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_09-55-41.png"><br>修复后：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-35-09.png"><br>然后就可以愉快地F5了</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://bbs.pediy.com/thread-158896.htm">IDA sp-analysis failed 不能F5的 解决方案之(二)</a><br><a href="https://bbs.pediy.com/thread-140002.htm">IDA sp-analysis failed 不能F5的 解决方案之(一)</a></p>
 ]]></content>
       <tags>
         <tag>IDA</tag>
@@ -1481,19 +1498,6 @@
 ]]></content>
       <tags>
         <tag>CTF</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>IDA不能F5查看伪代码的解决方法（positive sp value）</title>
-    <url>/2018/11/30/ida-positive-sp/</url>
-    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-30-12.png"><br>在函数中F5失败，提示堆栈指针为正数，故需要修复堆栈平衡</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>去设置中打开堆栈指针（Stack pointer）显示（也就是sp）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-33-01.png"></p>
-<p>按G定位到4012B9，发现return时的指针是-10（hex）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-34-15.png"></p>
-<p>找到最接近的call（401295），在该行修改sp值（按alt+K或者右键修改）,设置偏移值为-0x10<br>（目的就是使return前的sp为0）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_09-55-41.png"><br>修复后：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-35-09.png"><br>然后就可以愉快地F5了</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://bbs.pediy.com/thread-158896.htm">IDA sp-analysis failed 不能F5的 解决方案之(二)</a><br><a href="https://bbs.pediy.com/thread-140002.htm">IDA sp-analysis failed 不能F5的 解决方案之(一)</a></p>
-]]></content>
-      <tags>
-        <tag>IDA</tag>
       </tags>
   </entry>
   <entry>
@@ -1598,17 +1602,6 @@
       </tags>
   </entry>
   <entry>
-    <title>使用Magisk指令修改 ro.debuggable（不刷机）</title>
-    <url>/2019/09/15/magisk-set-debuggable/</url>
-    <content><![CDATA[<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><h3 id="使用magisk指令修改："><a href="#使用magisk指令修改：" class="headerlink" title="使用magisk指令修改："></a>使用magisk指令修改：</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">magisk resetprop ro.debuggable 1</span><br><span class="line">stop;start;</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.renyiwei.com/archives/1704.html">Android修改ro.debuggable 华为真机adb调试所有进程</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>MIPS冒泡排序 计算机组成原理与设计（第五版）</title>
     <url>/2020/03/28/mips-bubble-sort/</url>
     <content><![CDATA[<h2 id="代码如下"><a href="#代码如下" class="headerlink" title="代码如下"></a>代码如下</h2><p>（非递减排序）</p>
@@ -1617,6 +1610,17 @@
 ]]></content>
       <tags>
         <tag>MIPS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用Magisk指令修改 ro.debuggable（不刷机）</title>
+    <url>/2019/09/15/magisk-set-debuggable/</url>
+    <content><![CDATA[<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><h3 id="使用magisk指令修改："><a href="#使用magisk指令修改：" class="headerlink" title="使用magisk指令修改："></a>使用magisk指令修改：</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">magisk resetprop ro.debuggable 1</span><br><span class="line">stop;start;</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.renyiwei.com/archives/1704.html">Android修改ro.debuggable 华为真机adb调试所有进程</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
       </tags>
   </entry>
   <entry>
@@ -1991,31 +1995,6 @@
       </tags>
   </entry>
   <entry>
-    <title>在Linux下使用VSCode调试uCore内核代码</title>
-    <url>/2020/10/15/vscode-debug-ucore/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>操作系统实验使用的是清华大学的uCore，而实验指导书使用的是命令行调试。由于内核是由C语言编写的，于是尝试使用VSCode调试内核代码。（调试boot还是得<code>make debug</code>）</p>
-<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>Ubuntu 18.04，已根据指导书配置环境，并安装了VSCode</p>
-<h2 id="配置步骤"><a href="#配置步骤" class="headerlink" title="配置步骤"></a>配置步骤</h2><h3 id="安装拓展"><a href="#安装拓展" class="headerlink" title="安装拓展"></a>安装拓展</h3><p>安装<code>C/C++</code>拓展<br>PS：建议安装语言包，搜索<code>Chinese</code>即可找到</p>
-<span id="more"></span>
-<h3 id="修改Makefile"><a href="#修改Makefile" class="headerlink" title="修改Makefile"></a>修改Makefile</h3><p>打开<code>Makefile</code>，搜索<code>debug:</code>，添加</p>
-<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="section">debug-nogdb: <span class="variable">$(UCOREIMG)</span></span></span><br><span class="line">	<span class="variable">$(V)</span><span class="variable">$(QEMU)</span> -S -s -parallel stdio -hda <span class="variable">$&lt;</span> -serial null</span><br></pre></td></tr></table></figure>
-<p>PS：其实就是去掉了gdb自动附加的命令，因为要使用VSCode启动的gdb去附加</p>
-<h3 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h3><h4 id="launch-json"><a href="#launch-json" class="headerlink" title="launch.json"></a>launch.json</h4><p>使用VSCode打开LABX文件夹（如LAB1），然后按下F5，选择<code>C++(GDB/LLDB)</code>，将跳转到<code>launch.json</code>文件<br>然后将</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;program&quot;</span>: <span class="string">&quot;输入程序名称，例如 $&#123;workspaceFolder&#125;/a.out&quot;</span>,</span><br></pre></td></tr></table></figure>
-<p>替换为</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;miDebuggerServerAddress&quot;</span>: <span class="string">&quot;localhost:1234&quot;</span>,</span><br><span class="line"><span class="string">&quot;program&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/bin/kernel&quot;</span>,</span><br><span class="line"><span class="string">&quot;preLaunchTask&quot;</span>: <span class="string">&quot;build-debug-nogdb&quot;</span>,</span><br></pre></td></tr></table></figure>
-<h4 id="tasks-json"><a href="#tasks-json" class="headerlink" title="tasks.json"></a>tasks.json</h4><p>在<code>.vscode</code>文件夹下创建<code>tasks.json</code>文件，填入以下内容：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;2.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;tasks&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build-debug-nogdb&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;debug-nogdb&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;isBackground&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">&quot;problemMatcher&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;pattern&quot;</span>: &#123;</span><br><span class="line">          <span class="attr">&quot;regexp&quot;</span>: <span class="string">&quot;.&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">&quot;background&quot;</span>: &#123;</span><br><span class="line">          <span class="attr">&quot;activeOnStart&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">          <span class="attr">&quot;beginsPattern&quot;</span>: <span class="string">&quot;.&quot;</span>,</span><br><span class="line">          <span class="attr">&quot;endsPattern&quot;</span>: <span class="string">&quot;.&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>PS：将<code>.vscode</code>文件夹复制到其他LAB下即可直接使用</p>
-<h3 id="下断点调试"><a href="#下断点调试" class="headerlink" title="下断点调试"></a>下断点调试</h3><p>在内核代码中下断点（如<code>kern/init/init.c</code>），然后按下F5即可进行调试<br>(如果调试时报错，并且是语法错误，选择<code>仍要调试</code>即可继续调试)</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/whileskies/p/13138491.html">ucore lab0 实验准备</a><br><a href="http://martin1994.sinaapp.com/archives/942">使用 VSCode 运行 Task 并自动 Attach Debugger</a><br><a href="https://stackoverflow.com/questions/44242048/how-to-make-vscode-not-wait-for-finishing-a-prelaunchtask">How to make vscode not wait for finishing a preLaunchTask?</a></p>
-]]></content>
-      <tags>
-        <tag>Linux</tag>
-        <tag>VSCode</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>VSCode中配置git使用ssh连接</title>
     <url>/2020/04/13/vscode-git-by-ssh/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用HTTPS协议时需要输入账号密码，比较麻烦，虽然可以配置自动保存密码，但明文保存可能导致安全性的降低。<br>在部署博客时也收到了github的邮件提醒：</p>
@@ -2039,6 +2018,31 @@
       <tags>
         <tag>VSCode</tag>
         <tag>Git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在Linux下使用VSCode调试uCore内核代码</title>
+    <url>/2020/10/15/vscode-debug-ucore/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>操作系统实验使用的是清华大学的uCore，而实验指导书使用的是命令行调试。由于内核是由C语言编写的，于是尝试使用VSCode调试内核代码。（调试boot还是得<code>make debug</code>）</p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>Ubuntu 18.04，已根据指导书配置环境，并安装了VSCode</p>
+<h2 id="配置步骤"><a href="#配置步骤" class="headerlink" title="配置步骤"></a>配置步骤</h2><h3 id="安装拓展"><a href="#安装拓展" class="headerlink" title="安装拓展"></a>安装拓展</h3><p>安装<code>C/C++</code>拓展<br>PS：建议安装语言包，搜索<code>Chinese</code>即可找到</p>
+<span id="more"></span>
+<h3 id="修改Makefile"><a href="#修改Makefile" class="headerlink" title="修改Makefile"></a>修改Makefile</h3><p>打开<code>Makefile</code>，搜索<code>debug:</code>，添加</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="section">debug-nogdb: <span class="variable">$(UCOREIMG)</span></span></span><br><span class="line">	<span class="variable">$(V)</span><span class="variable">$(QEMU)</span> -S -s -parallel stdio -hda <span class="variable">$&lt;</span> -serial null</span><br></pre></td></tr></table></figure>
+<p>PS：其实就是去掉了gdb自动附加的命令，因为要使用VSCode启动的gdb去附加</p>
+<h3 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h3><h4 id="launch-json"><a href="#launch-json" class="headerlink" title="launch.json"></a>launch.json</h4><p>使用VSCode打开LABX文件夹（如LAB1），然后按下F5，选择<code>C++(GDB/LLDB)</code>，将跳转到<code>launch.json</code>文件<br>然后将</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;program&quot;</span>: <span class="string">&quot;输入程序名称，例如 $&#123;workspaceFolder&#125;/a.out&quot;</span>,</span><br></pre></td></tr></table></figure>
+<p>替换为</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;miDebuggerServerAddress&quot;</span>: <span class="string">&quot;localhost:1234&quot;</span>,</span><br><span class="line"><span class="string">&quot;program&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/bin/kernel&quot;</span>,</span><br><span class="line"><span class="string">&quot;preLaunchTask&quot;</span>: <span class="string">&quot;build-debug-nogdb&quot;</span>,</span><br></pre></td></tr></table></figure>
+<h4 id="tasks-json"><a href="#tasks-json" class="headerlink" title="tasks.json"></a>tasks.json</h4><p>在<code>.vscode</code>文件夹下创建<code>tasks.json</code>文件，填入以下内容：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;2.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;tasks&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build-debug-nogdb&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;debug-nogdb&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;isBackground&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">&quot;problemMatcher&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;pattern&quot;</span>: &#123;</span><br><span class="line">          <span class="attr">&quot;regexp&quot;</span>: <span class="string">&quot;.&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">&quot;background&quot;</span>: &#123;</span><br><span class="line">          <span class="attr">&quot;activeOnStart&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">          <span class="attr">&quot;beginsPattern&quot;</span>: <span class="string">&quot;.&quot;</span>,</span><br><span class="line">          <span class="attr">&quot;endsPattern&quot;</span>: <span class="string">&quot;.&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>PS：将<code>.vscode</code>文件夹复制到其他LAB下即可直接使用</p>
+<h3 id="下断点调试"><a href="#下断点调试" class="headerlink" title="下断点调试"></a>下断点调试</h3><p>在内核代码中下断点（如<code>kern/init/init.c</code>），然后按下F5即可进行调试<br>(如果调试时报错，并且是语法错误，选择<code>仍要调试</code>即可继续调试)</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/whileskies/p/13138491.html">ucore lab0 实验准备</a><br><a href="http://martin1994.sinaapp.com/archives/942">使用 VSCode 运行 Task 并自动 Attach Debugger</a><br><a href="https://stackoverflow.com/questions/44242048/how-to-make-vscode-not-wait-for-finishing-a-prelaunchtask">How to make vscode not wait for finishing a preLaunchTask?</a></p>
+]]></content>
+      <tags>
+        <tag>Linux</tag>
+        <tag>VSCode</tag>
       </tags>
   </entry>
   <entry>
@@ -2148,6 +2152,27 @@
       </tags>
   </entry>
   <entry>
+    <title>WSL中使用adb</title>
+    <url>/2020/04/14/wsl-adb/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>尝试在wsl中使用adb，发现找不到设备。搜索一番发现是因为adb版本不统一导致的。<br>注意：wsl2中adb无法查询到usb设备，可以通过使用ip地址连接(需要root权限)，或降级到wsl1</p>
+<blockquote>
+<p>在 WSL 2 的初始版本中，将会限制硬件访问支持，例如：你将无法访问 GPU、串行或 USB 设备。<br><a href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-faq">WSL2 - 常见问题</a></p>
+</blockquote>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h3 id="Linux安装adb"><a href="#Linux安装adb" class="headerlink" title="Linux安装adb"></a>Linux安装adb</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt-get install android-tools-adb</span><br></pre></td></tr></table></figure>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="查询adb版本"><a href="#查询adb版本" class="headerlink" title="查询adb版本"></a>查询adb版本</h3><p>使用</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb version</span><br></pre></td></tr></table></figure>
+<p>查看adb版本，发现windows是<code>1.0.41</code>，而WSL下是<code>1.0.39</code></p>
+<h3 id="停用adb服务"><a href="#停用adb服务" class="headerlink" title="停用adb服务"></a>停用adb服务</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb kill-server</span><br></pre></td></tr></table></figure>
+<h3 id="统一版本"><a href="#统一版本" class="headerlink" title="统一版本"></a>统一版本</h3><p>个人是把windows的adb文件替换为<code>1.0.39</code>版本，从而实现内外都可使用adb命令。</p>
+<h2 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h2><p><a href="https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA">https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA</a> 提取码: 2333</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/weixin_42600072/article/details/103129441"></a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>WSL</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>WSL(Ubuntu 18.04)编译安卓6.0.0_r1源码</title>
     <url>/2020/04/14/wsl-18-04-android-6-source/</url>
     <content><![CDATA[<h2 id="之前的尝试"><a href="#之前的尝试" class="headerlink" title="之前的尝试"></a>之前的尝试</h2><p>一开始使用wsl1进行编译，即使用了ccache，编译耗时仍难以接受（编译了很久都没结束）<br>之后又使用wsl2进行编译，编译还是需要很久<br>原因猜测：源码位于D盘，wsl访问文件可能需要经过转换，因此IO操作速度慢。<br>搜索发现<a href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-ux-changes">WSL 1 与 WSL 2 之间的用户体验更改</a>中提到：</p>
@@ -2177,27 +2202,6 @@
 <p>报错&lt;1&gt;：bin/bash: prebuilts/misc/linux-x86/bison/bison: cannot execute binary file<br>报错原因：在x86 64位系统执行32位程序<br><code>sudo cp /usr/bin/bison prebuilts/misc/linux-x86/bison</code><br>参考：<a href="https://mp.weixin.qq.com/s/lxR3kIKHY_gshdpDVNP7OA">Win10之WSL编译Android源码</a></p>
 </blockquote>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/tangjie134/article/details/102796330">Ubuntu18.04 (WSL) 编译RK3399 Android8.1源码</a><br><a href="https://blog.csdn.net/u010164190/article/details/102585931">WSL配置C/D盘大小写敏感</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-        <tag>WSL</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>WSL中使用adb</title>
-    <url>/2020/04/14/wsl-adb/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>尝试在wsl中使用adb，发现找不到设备。搜索一番发现是因为adb版本不统一导致的。<br>注意：wsl2中adb无法查询到usb设备，可以通过使用ip地址连接(需要root权限)，或降级到wsl1</p>
-<blockquote>
-<p>在 WSL 2 的初始版本中，将会限制硬件访问支持，例如：你将无法访问 GPU、串行或 USB 设备。<br><a href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-faq">WSL2 - 常见问题</a></p>
-</blockquote>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h3 id="Linux安装adb"><a href="#Linux安装adb" class="headerlink" title="Linux安装adb"></a>Linux安装adb</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt-get install android-tools-adb</span><br></pre></td></tr></table></figure>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="查询adb版本"><a href="#查询adb版本" class="headerlink" title="查询adb版本"></a>查询adb版本</h3><p>使用</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb version</span><br></pre></td></tr></table></figure>
-<p>查看adb版本，发现windows是<code>1.0.41</code>，而WSL下是<code>1.0.39</code></p>
-<h3 id="停用adb服务"><a href="#停用adb服务" class="headerlink" title="停用adb服务"></a>停用adb服务</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb kill-server</span><br></pre></td></tr></table></figure>
-<h3 id="统一版本"><a href="#统一版本" class="headerlink" title="统一版本"></a>统一版本</h3><p>个人是把windows的adb文件替换为<code>1.0.39</code>版本，从而实现内外都可使用adb命令。</p>
-<h2 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h2><p><a href="https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA">https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA</a> 提取码: 2333</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/weixin_42600072/article/details/103129441"></a></p>
 ]]></content>
       <tags>
         <tag>Android</tag>
