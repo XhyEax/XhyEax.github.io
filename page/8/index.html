@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"xhyeax.gitee.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="Blog of XhyEax">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Xhy&#39;s Blog">
-<meta property="og:url" content="http://blog.xhyeax.com/page/8/index.html">
+<meta property="og:url" content="https://xhyeax.gitee.io/xhyeax/page/8/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="Blog of XhyEax">
 <meta property="og:locale" content="zh_CN">
@@ -31,7 +31,7 @@
 <meta property="article:tag" content="XhyEax&#39;s Blog">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://blog.xhyeax.com/page/8/">
+<link rel="canonical" href="https://xhyeax.gitee.io/xhyeax/page/8/">
 
 
 <script id="page-configurations">
@@ -191,7 +191,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/04/30/vscode-cpp-exe-encoding/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/04/30/vscode-cpp-exe-encoding/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -231,7 +231,7 @@
       
           <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>中文字符串在编辑界面正常显示，编译生成的exe中文乱码。源文件编码为UTF-8，设置输出的可执行文件编码为GB2312后正常显示。<br>解决方案：添加编译参数<code>-fexec-charset=GB2312</code></p>
 <h2 id="修改方法"><a href="#修改方法" class="headerlink" title="修改方法"></a>修改方法</h2><h3 id="1-tasks-json中直接使用g-的情况"><a href="#1-tasks-json中直接使用g-的情况" class="headerlink" title="1. tasks.json中直接使用g++的情况"></a>1. tasks.json中直接使用g++的情况</h3><p>具体方法：<br>在tasks[args]中添加<code>&quot;-fexec-charset=GB2312&quot;</code></p>
-<h3 id="1-tasks-json中使用make的情况"><a href="#1-tasks-json中使用make的情况" class="headerlink" title="1. tasks.json中使用make的情况"></a>1. tasks.json中使用make的情况</h3><p>在makefile中添加<code>-fexec-charset=GB2312</code><br>比如<a href="https://blog.xhyeax.com/2019/04/13/vscode-cpp-multiplefile/">上一篇博文</a>中的makefile，则在<code>CCOBJFLAG</code>后添加该参数，变为</p>
+<h3 id="1-tasks-json中使用make的情况"><a href="#1-tasks-json中使用make的情况" class="headerlink" title="1. tasks.json中使用make的情况"></a>1. tasks.json中使用make的情况</h3><p>在makefile中添加<code>-fexec-charset=GB2312</code><br>比如<a target="_blank" rel="noopener" href="https://blog.xhyeax.com/2019/04/13/vscode-cpp-multiplefile/">上一篇博文</a>中的makefile，则在<code>CCOBJFLAG</code>后添加该参数，变为</p>
 <figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CCOBJFLAG := <span class="variable">$(CCFLAG)</span> -c -fexec-charset=GB2312</span><br></pre></td></tr></table></figure>
       
     </div>
@@ -251,7 +251,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/04/13/vscode-cpp-multiplefile/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/04/13/vscode-cpp-multiplefile/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -323,7 +323,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/04/07/2019-hzwas-wp/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/04/07/2019-hzwas-wp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -388,7 +388,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/04/02/emui9-magisk-install/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/04/02/emui9-magisk-install/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -453,7 +453,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/03/15/android-floatview/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/03/15/android-floatview/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -516,7 +516,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/02/28/android-reverse-fix-arsc/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/02/28/android-reverse-fix-arsc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -590,7 +590,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/02/19/52pojie-2019-red-packet/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/02/19/52pojie-2019-red-packet/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -659,7 +659,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/02/16/ubuntu-install/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/02/16/ubuntu-install/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -725,7 +725,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/02/16/ida-call-analysis-fail/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/02/16/ida-call-analysis-fail/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -784,7 +784,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/02/16/fix-linux-time/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/02/16/fix-linux-time/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">

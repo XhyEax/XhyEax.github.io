@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"xhyeax.gitee.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="概述也许有的反调试会检测23946端口是否占用，所以保险起见不妨使用别的端口。可以使用.&#x2F;android_server -p12345指定端口，但是不如直接逆向修改默认端口。 方法ida载入android_server，进入main函数，按F5查看伪代码，定位到23946（0x5dba）位置，直接修改即可。可以把5D BA改为39 30，即12345端口 参考浅谈android反调试之 转发端口">
 <meta property="og:type" content="article">
 <meta property="og:title" content="修改IDA android_server默认端口">
-<meta property="og:url" content="http://blog.xhyeax.com/2019/09/13/ida-as-port-reverse/index.html">
+<meta property="og:url" content="https://xhyeax.gitee.io/xhyeax/2019/09/13/ida-as-port-reverse/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="概述也许有的反调试会检测23946端口是否占用，所以保险起见不妨使用别的端口。可以使用.&#x2F;android_server -p12345指定端口，但是不如直接逆向修改默认端口。 方法ida载入android_server，进入main函数，按F5查看伪代码，定位到23946（0x5dba）位置，直接修改即可。可以把5D BA改为39 30，即12345端口 参考浅谈android反调试之 转发端口">
 <meta property="og:locale" content="zh_CN">
@@ -33,7 +33,7 @@
 <meta property="article:tag" content="IDA">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://blog.xhyeax.com/2019/09/13/ida-as-port-reverse/">
+<link rel="canonical" href="https://xhyeax.gitee.io/xhyeax/2019/09/13/ida-as-port-reverse/">
 
 
 <script id="page-configurations">
@@ -194,7 +194,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/09/13/ida-as-port-reverse/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/09/13/ida-as-port-reverse/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">

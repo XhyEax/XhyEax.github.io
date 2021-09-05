@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"xhyeax.gitee.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="概述今天群里有人传了个apk文件，名字叫送给最好的TA。这是一个整人app，安装并打开会播放一段音频，并循环调节媒体音量，维持最大值。从后台划掉&#x2F;卸载&#x2F;关机都可以停止该程序。网传所谓的截图、获取设备信息并上传等行为均不存在。反编译后看到的截图相关代码实际上并没有被调用，只是打包apk时封装进去的类，关键逻辑位于main.lua中。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="送给最好的TA app分析">
-<meta property="og:url" content="http://blog.xhyeax.com/2019/09/27/andlua-app-reverse/index.html">
+<meta property="og:url" content="https://xhyeax.gitee.io/xhyeax/2019/09/27/andlua-app-reverse/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="概述今天群里有人传了个apk文件，名字叫送给最好的TA。这是一个整人app，安装并打开会播放一段音频，并循环调节媒体音量，维持最大值。从后台划掉&#x2F;卸载&#x2F;关机都可以停止该程序。网传所谓的截图、获取设备信息并上传等行为均不存在。反编译后看到的截图相关代码实际上并没有被调用，只是打包apk时封装进去的类，关键逻辑位于main.lua中。">
 <meta property="og:locale" content="zh_CN">
@@ -37,7 +37,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-0.png">
 
-<link rel="canonical" href="http://blog.xhyeax.com/2019/09/27/andlua-app-reverse/">
+<link rel="canonical" href="https://xhyeax.gitee.io/xhyeax/2019/09/27/andlua-app-reverse/">
 
 
 <script id="page-configurations">
@@ -198,7 +198,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2019/09/27/andlua-app-reverse/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2019/09/27/andlua-app-reverse/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -246,7 +246,7 @@
 <span id="more"></span>
 <h2 id="apk分析"><a href="#apk分析" class="headerlink" title="apk分析"></a>apk分析</h2><p>拿到样本之后，别急着安装运行，先看看它的目录结构。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-0.png"><br>打开assets文件夹，看到有一个mp3文件以及两个加密后的lua脚本：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-1.png"><br>运行app后会自动播放这个音频文件，先对它进行替换。<br>这里使用AU对该mp3进行静音处理后，重打包并签名。<br>（其实也可以替换成自己想要播放的音频）</p>
 <h2 id="找到加载lua的关键函数"><a href="#找到加载lua的关键函数" class="headerlink" title="找到加载lua的关键函数"></a>找到加载lua的关键函数</h2><p>众所周知，lua脚本需要加载，而在加载之前肯定是要先解密的，所以只要找到解密函数，然后就可以把解密后的lua脚本dump出来。<br>使用<code>IDA</code>打开<code>libluajava.so</code>，经过分析找到函数<code>luaL_loadbufferx</code><br><code>luaL_loadbufferx</code>的第二个参数是加密的字节数组，第三个参数是大小，第四个参数是lua文件位置。<br>程序在这个函数中加载加密lua脚本，其中对脚本进行了解密操作。<br>根据第四个参数我们可以区分目前加载的lua脚本名称，从而选择性地dump<br>（即在函数开头下断点，查看第四个参数内容）<br><code>luaL_loadbufferx</code>函数伪代码如下：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-2.png"><br>首先对输入的字节数组进行判断，如果以1B开头，且第二位不是0C，则进行解密操作，否则直接调用<code>j_lua_load</code>加载lua脚本<br>在第41行下断点即可获取到解密后的字节数组，从而dump</p>
-<h2 id="动态调试进行dump"><a href="#动态调试进行dump" class="headerlink" title="动态调试进行dump"></a>动态调试进行dump</h2><p>具体步骤可以参考我之前写的文章 <a href="https://blog.xhyeax.com/2019/09/14/android-debug-onload/">IDA调试安卓so 在libart.so OpenMemory下断点</a><br><code>IDA</code>在第41行断下之后，运行python脚本dump即可</p>
+<h2 id="动态调试进行dump"><a href="#动态调试进行dump" class="headerlink" title="动态调试进行dump"></a>动态调试进行dump</h2><p>具体步骤可以参考我之前写的文章 <a target="_blank" rel="noopener" href="https://blog.xhyeax.com/2019/09/14/android-debug-onload/">IDA调试安卓so 在libart.so OpenMemory下断点</a><br><code>IDA</code>在第41行断下之后，运行python脚本dump即可</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> idaapi</span><br><span class="line">data = idaapi.dbg_read_memory(<span class="number">0xf4daff00</span>, <span class="number">0x3000</span>)</span><br><span class="line">fp = <span class="built_in">open</span>(<span class="string">&#x27;d:\\dump.lua&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>)</span><br><span class="line">fp.write(data)</span><br><span class="line">fp.close()</span><br></pre></td></tr></table></figure>
 <p>此处的<code>0xf4daff00, 0x3000</code>需要替换成解密后字节的起始地址和长度<br>长度写大一点也没事，可以再用<code>010Editor</code>删除（所以我这写的<code>0x3000</code>）</p>
 <h2 id="分析lua"><a href="#分析lua" class="headerlink" title="分析lua"></a>分析lua</h2><p>由于dump出来的lua是字节码，并不是源码形式。所以还需要反编译后才能查看源码。（使用<code>unluac_2015_06_13.jar</code>进行反编译）<br><code>init.lua</code>中进行包名、版本号、主题、权限等配置</p>

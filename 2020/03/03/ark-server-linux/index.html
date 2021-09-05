@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"xhyeax.gitee.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="环境阿里云服务器，CentOS 7.7 64位， 2核CPU，4G内存，4G交换空间 交换空间配置见Linux配置虚拟内存文件 开服准备创建用户并设置密码12adduser arkserverpasswd arkserver 开放以下端口127777&#x2F;udp27015&#x2F;udp PS：云服务器一般是在安全组规则中设置放行同时关闭系统自带的防火墙（root用户执行service firewalld s">
 <meta property="og:type" content="article">
 <meta property="og:title" content="方舟生存进化 Linux(CentOS) 开服、mod安装">
-<meta property="og:url" content="http://blog.xhyeax.com/2020/03/03/ark-server-linux/index.html">
+<meta property="og:url" content="https://xhyeax.gitee.io/xhyeax/2020/03/03/ark-server-linux/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="环境阿里云服务器，CentOS 7.7 64位， 2核CPU，4G内存，4G交换空间 交换空间配置见Linux配置虚拟内存文件 开服准备创建用户并设置密码12adduser arkserverpasswd arkserver 开放以下端口127777&#x2F;udp27015&#x2F;udp PS：云服务器一般是在安全组规则中设置放行同时关闭系统自带的防火墙（root用户执行service firewalld s">
 <meta property="og:locale" content="zh_CN">
@@ -35,7 +35,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ark-server.png">
 
-<link rel="canonical" href="http://blog.xhyeax.com/2020/03/03/ark-server-linux/">
+<link rel="canonical" href="https://xhyeax.gitee.io/xhyeax/2020/03/03/ark-server-linux/">
 
 
 <script id="page-configurations">
@@ -196,7 +196,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.xhyeax.com/2020/03/03/ark-server-linux/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2020/03/03/ark-server-linux/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -241,7 +241,7 @@
 
       
         <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>阿里云服务器，CentOS 7.7 64位， 2核CPU，4G内存，4G交换空间</p>
-<h3 id="交换空间配置"><a href="#交换空间配置" class="headerlink" title="交换空间配置"></a>交换空间配置</h3><p>见<a href="https://blog.xhyeax.com/2020/03/25/linux-set-swapfile/">Linux配置虚拟内存文件</a></p>
+<h3 id="交换空间配置"><a href="#交换空间配置" class="headerlink" title="交换空间配置"></a>交换空间配置</h3><p>见<a target="_blank" rel="noopener" href="https://blog.xhyeax.com/2020/03/25/linux-set-swapfile/">Linux配置虚拟内存文件</a></p>
 <h2 id="开服准备"><a href="#开服准备" class="headerlink" title="开服准备"></a>开服准备</h2><h3 id="创建用户并设置密码"><a href="#创建用户并设置密码" class="headerlink" title="创建用户并设置密码"></a>创建用户并设置密码</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adduser arkserver</span><br><span class="line">passwd arkserver</span><br></pre></td></tr></table></figure>
 <h3 id="开放以下端口"><a href="#开放以下端口" class="headerlink" title="开放以下端口"></a>开放以下端口</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">7777/udp</span><br><span class="line">27015/udp</span><br></pre></td></tr></table></figure>
 <p>PS：云服务器一般是在安全组规则中设置放行<br>同时关闭系统自带的防火墙（root用户执行<code>service firewalld stop</code>）</p>
