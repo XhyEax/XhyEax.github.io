@@ -23,7 +23,7 @@
   <meta name="description" content="问题在函数中F5失败，提示堆栈指针为正数，故需要修复堆栈平衡 解决方案去设置中打开堆栈指针（Stack pointer）显示（也就是sp） 按G定位到4012B9，发现return时的指针是-10（hex） 找到最接近的call（401295），在该行修改sp值（按alt+K或者右键修改）,设置偏移值为-0x10（目的就是使return前的sp为0）修复后：然后就可以愉快地F5了 参考IDA sp">
 <meta property="og:type" content="article">
 <meta property="og:title" content="IDA不能F5查看伪代码的解决方法（positive sp value）">
-<meta property="og:url" content="https://xhyeax.gitee.io/xhyeax/2018/11/30/ida-positive-sp/index.html">
+<meta property="og:url" content="https://xhyeax.gitee.io/2018/11/30/ida-positive-sp/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="问题在函数中F5失败，提示堆栈指针为正数，故需要修复堆栈平衡 解决方案去设置中打开堆栈指针（Stack pointer）显示（也就是sp） 按G定位到4012B9，发现return时的指针是-10（hex） 找到最接近的call（401295），在该行修改sp值（按alt+K或者右键修改）,设置偏移值为-0x10（目的就是使return前的sp为0）修复后：然后就可以愉快地F5了 参考IDA sp">
 <meta property="og:locale" content="zh_CN">
@@ -39,7 +39,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-30-12.png">
 
-<link rel="canonical" href="https://xhyeax.gitee.io/xhyeax/2018/11/30/ida-positive-sp/">
+<link rel="canonical" href="https://xhyeax.gitee.io/2018/11/30/ida-positive-sp/">
 
 
 <script id="page-configurations">
@@ -200,7 +200,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/xhyeax/2018/11/30/ida-positive-sp/">
+    <link itemprop="mainEntityOfPage" href="https://xhyeax.gitee.io/2018/11/30/ida-positive-sp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
