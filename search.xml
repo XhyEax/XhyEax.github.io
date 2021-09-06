@@ -34,21 +34,6 @@
       </tags>
   </entry>
   <entry>
-    <title>2020吾爱破解论坛春节红包前三题 Writeup</title>
-    <url>/2020/01/29/52pojie-2020-red-packet/</url>
-    <content><![CDATA[<p>解题方法并不唯一，仅供参考。</p>
-<h2 id="题目打包下载地址"><a href="#题目打包下载地址" class="headerlink" title="题目打包下载地址"></a>题目打包下载地址</h2><p><a href="https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar">https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar</a></p>
-<h2 id="第一题-送分题"><a href="#第一题-送分题" class="headerlink" title="第一题 送分题"></a>第一题 送分题</h2><p>关注“吾爱破解论坛”微信公众号，回复指定字符串即可获得本题正确口令。</p>
-<h2 id="第二题-Windows-初级题"><a href="#第二题-Windows-初级题" class="headerlink" title="第二题 Windows 初级题"></a>第二题 Windows 初级题</h2><p>使用<code>PEiD</code>查壳，得知该程序是<code>UPX</code>壳，并修改了区段名。于是使用<code>OD</code>脱壳，再用<code>ImportREConstructor</code>修复IAT。<br>再次查壳，得到<code>Borland Delphi v3.0 *</code>。故使用<code>IDR</code>（<a href="https://down.52pojie.cn/Tools/Disassemblers/IDR%20(Interactive%20Delphi%20Reconstructor).rar">爱盘下载地址</a>）进行分析。<br>查看窗体，定位到关键函数<code>TForm1.edtPwdChange</code>：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-1.png"><br>其中对输入字符串进行切片，然后分别进行md5计算，并与以下字符比较：<br><code>E7EE5F4653E31955CACC7CD68E2A7839</code><br><code>ea6b2efbdd4255a9f1b3bbc6399b58f4</code><br><code>c8d46d341bea4fd5bff866a65ff8aea9</code><br>反查md5并拼接即可得到<code>52pojie2019game</code><br>输入进行校验，得到提示：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-2.png"><br>将该字符串回复到公众号即可获得本题正确口令。</p>
-<h2 id="第三题-Android-初级题"><a href="#第三题-Android-初级题" class="headerlink" title="第三题 Android 初级题"></a>第三题 Android 初级题</h2><p>使用<code>AndroidKiller</code>反编译，打开<code>MainActivity.smali</code>，发现<code>checkFlag</code>和<code>onClick</code>方法被nativie化了。<br>于是使用<code>IDA</code>打开<code>libcrack_j2c.so</code>，定位到<code>onClick</code>方法，可以发现是通过JNI反射调用Java方法。由此可以大致分析出程序流程：<br>首先获取输入框文本，对长度进行判断，为30则调用<code>checkFlag</code>方法进行检查<br>在<code>checkFlag</code>方法中，定位到关键位置：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-3.png"><br>由此可知，安装并打开该APP后，输入30位长度的字符串，点击确定就会调用<code>equals</code>方法<br>于是使用<code>Frida</code>进行hook，打印出调用该方法的参数和实例内容，从而得到真码：<br><code>ed61f6308c74bcf35c71729d4db24c</code><br>将该字符串回复到公众号即可获得本题正确口令。<br>Frida脚本如下：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(Java.available)</span><br><span class="line">&#123;</span><br><span class="line">    Java.perform(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">       <span class="keyword">var</span> <span class="built_in">String</span>= Java.use(<span class="string">&#x27;java.lang.String&#x27;</span>);</span><br><span class="line">		<span class="built_in">String</span>.equals.overload(<span class="string">&quot;java.lang.Object&quot;</span>).implementation=<span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="built_in">this</span>.toString());</span><br><span class="line">        <span class="built_in">console</span>.log(obj);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.equals(obj);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="此处应有分割线"><a href="#此处应有分割线" class="headerlink" title="此处应有分割线"></a>此处应有分割线</h2><p>祝各位身体健康，心想事成！</p>
-]]></content>
-      <tags>
-        <tag>CTF</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>2019吾爱破解论坛春节红包四题Writeup</title>
     <url>/2019/02/19/52pojie-2019-red-packet/</url>
     <content><![CDATA[<p>解题方法并不唯一，仅供参考。</p>
@@ -104,6 +89,21 @@
 ]]></content>
       <tags>
         <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>2020吾爱破解论坛春节红包前三题 Writeup</title>
+    <url>/2020/01/29/52pojie-2020-red-packet/</url>
+    <content><![CDATA[<p>解题方法并不唯一，仅供参考。</p>
+<h2 id="题目打包下载地址"><a href="#题目打包下载地址" class="headerlink" title="题目打包下载地址"></a>题目打包下载地址</h2><p><a href="https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar">https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar</a></p>
+<h2 id="第一题-送分题"><a href="#第一题-送分题" class="headerlink" title="第一题 送分题"></a>第一题 送分题</h2><p>关注“吾爱破解论坛”微信公众号，回复指定字符串即可获得本题正确口令。</p>
+<h2 id="第二题-Windows-初级题"><a href="#第二题-Windows-初级题" class="headerlink" title="第二题 Windows 初级题"></a>第二题 Windows 初级题</h2><p>使用<code>PEiD</code>查壳，得知该程序是<code>UPX</code>壳，并修改了区段名。于是使用<code>OD</code>脱壳，再用<code>ImportREConstructor</code>修复IAT。<br>再次查壳，得到<code>Borland Delphi v3.0 *</code>。故使用<code>IDR</code>（<a href="https://down.52pojie.cn/Tools/Disassemblers/IDR%20(Interactive%20Delphi%20Reconstructor).rar">爱盘下载地址</a>）进行分析。<br>查看窗体，定位到关键函数<code>TForm1.edtPwdChange</code>：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-1.png"><br>其中对输入字符串进行切片，然后分别进行md5计算，并与以下字符比较：<br><code>E7EE5F4653E31955CACC7CD68E2A7839</code><br><code>ea6b2efbdd4255a9f1b3bbc6399b58f4</code><br><code>c8d46d341bea4fd5bff866a65ff8aea9</code><br>反查md5并拼接即可得到<code>52pojie2019game</code><br>输入进行校验，得到提示：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-2.png"><br>将该字符串回复到公众号即可获得本题正确口令。</p>
+<h2 id="第三题-Android-初级题"><a href="#第三题-Android-初级题" class="headerlink" title="第三题 Android 初级题"></a>第三题 Android 初级题</h2><p>使用<code>AndroidKiller</code>反编译，打开<code>MainActivity.smali</code>，发现<code>checkFlag</code>和<code>onClick</code>方法被nativie化了。<br>于是使用<code>IDA</code>打开<code>libcrack_j2c.so</code>，定位到<code>onClick</code>方法，可以发现是通过JNI反射调用Java方法。由此可以大致分析出程序流程：<br>首先获取输入框文本，对长度进行判断，为30则调用<code>checkFlag</code>方法进行检查<br>在<code>checkFlag</code>方法中，定位到关键位置：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-3.png"><br>由此可知，安装并打开该APP后，输入30位长度的字符串，点击确定就会调用<code>equals</code>方法<br>于是使用<code>Frida</code>进行hook，打印出调用该方法的参数和实例内容，从而得到真码：<br><code>ed61f6308c74bcf35c71729d4db24c</code><br>将该字符串回复到公众号即可获得本题正确口令。<br>Frida脚本如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(Java.available)</span><br><span class="line">&#123;</span><br><span class="line">    Java.perform(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">       <span class="keyword">var</span> <span class="built_in">String</span>= Java.use(<span class="string">&#x27;java.lang.String&#x27;</span>);</span><br><span class="line">		<span class="built_in">String</span>.equals.overload(<span class="string">&quot;java.lang.Object&quot;</span>).implementation=<span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="built_in">this</span>.toString());</span><br><span class="line">        <span class="built_in">console</span>.log(obj);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.equals(obj);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="此处应有分割线"><a href="#此处应有分割线" class="headerlink" title="此处应有分割线"></a>此处应有分割线</h2><p>祝各位身体健康，心想事成！</p>
+]]></content>
+      <tags>
+        <tag>CTF</tag>
       </tags>
   </entry>
   <entry>
@@ -304,6 +304,31 @@
       </tags>
   </entry>
   <entry>
+    <title>修复反编译资源文件报错问题(resource spec)</title>
+    <url>/2019/02/28/android-reverse-fix-arsc/</url>
+    <content><![CDATA[<h2 id="关于0x01010540错误"><a href="#关于0x01010540错误" class="headerlink" title="关于0x01010540错误"></a>关于<code>0x01010540</code>错误</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code><br>具体方法见后文</p>
+<h2 id="关于0x01010543错误"><a href="#关于0x01010543错误" class="headerlink" title="关于0x01010543错误"></a>关于<code>0x01010543</code>错误</h2><p>如果只有</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
+<p>没有<code>UndefinedResObject</code><br>则更换<code>apktool</code>后再试<br><code>apktool</code>可以在<a href="https://down.52pojie.cn/Tools/Android_Tools/">爱盘</a>下载</p>
+<p>实在要修复的话，往下看：（都是修改<code>resources.arsc</code>）</p>
+<h2 id="修复UndefinedResObject错误"><a href="#修复UndefinedResObject错误" class="headerlink" title="修复UndefinedResObject错误"></a>修复UndefinedResObject错误</h2><p>报错信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; brut.androlib.err.UndefinedResObject: resource spec: 0x7f000006</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><code>aapt dump</code>查看apk的资源信息，并保存到文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">aapt d --values resources test.apk &gt;1.txt</span><br></pre></td></tr></table></figure>
+<p>找到<code>DataType</code>数据类型不正确的值（搜索<code>attribute</code>即可）对应的描述符（一般是把7f改成00，<code>0x00000006</code>）<br>文件中没有识别出正确的数据类型，显示的是<code>(attribute) 0x00000006</code><br>使用<code>010Editor</code>，Ctrl+F，字节形式搜索对应描述的16进制数的小端字节（就是<code>00000006</code>写成<code>06000000</code>）<br>然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
+<h2 id="修复resource-spec-0x01010543"><a href="#修复resource-spec-0x01010543" class="headerlink" title="修复resource spec: 0x01010543"></a>修复resource spec: 0x01010543</h2><p>报错信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
+<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>12345678</code>写成<code>78564312</code>）<br>这里我们搜索<code>43050101</code>，然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
+<h2 id="修复resource-spec-0x01010540"><a href="#修复resource-spec-0x01010540" class="headerlink" title="修复resource spec: 0x01010540"></a>修复resource spec: 0x01010540</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code></p>
+<h3 id="解决方法-2"><a href="#解决方法-2" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>40050101</code>换成<code>8f040101</code>）</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u012400885/article/details/80409689">记录Android Killer反编译时遇到的异常</a><br><a href="http://blog.csdn.net/pwelyn/article/details/50620136">保护Android resources文件不被反编译原理分析</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>逆向修改安卓内核 x64 过TracerPID反调试</title>
     <url>/2019/09/13/android-kernel-reverse-anti-antidebug/</url>
     <content><![CDATA[<h2 id="建议在git-bash下操作"><a href="#建议在git-bash下操作" class="headerlink" title="建议在git bash下操作"></a>建议在git bash下操作</h2><p>本人解压<code>kernel.gz</code>时使用的不是命令行，导致没有看到输出信息<code>gzip trailing garbage ignored</code>，进而没有对这些数据进行处理，浪费了很多时间。</p>
@@ -342,6 +367,16 @@
       </tags>
   </entry>
   <entry>
+    <title>Android Studio 导入so</title>
+    <url>/2019/08/02/android-studio-import-so/</url>
+    <content><![CDATA[<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在<code>src/main</code>目录下新建<code>jniLibs</code>文件夹 ，添加cpu架构文件夹，如<code>armeabi-v7a</code>，把so文件复制进去即可。<br>编译时会自动打包。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/anhenzhufeng/article/details/78913341">Android studio添加第三方库和so</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>修改安卓内核源码 过State TracerPID反调试</title>
     <url>/2019/09/13/android-source-mod-anti-antidebug/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>修改安卓内核源码来绕过State字段及TracePid字段反调试</p>
@@ -361,35 +396,19 @@
       </tags>
   </entry>
   <entry>
-    <title>修复反编译资源文件报错问题(resource spec)</title>
-    <url>/2019/02/28/android-reverse-fix-arsc/</url>
-    <content><![CDATA[<h2 id="关于0x01010540错误"><a href="#关于0x01010540错误" class="headerlink" title="关于0x01010540错误"></a>关于<code>0x01010540</code>错误</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code><br>具体方法见后文</p>
-<h2 id="关于0x01010543错误"><a href="#关于0x01010543错误" class="headerlink" title="关于0x01010543错误"></a>关于<code>0x01010543</code>错误</h2><p>如果只有</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
-<p>没有<code>UndefinedResObject</code><br>则更换<code>apktool</code>后再试<br><code>apktool</code>可以在<a href="https://down.52pojie.cn/Tools/Android_Tools/">爱盘</a>下载</p>
-<p>实在要修复的话，往下看：（都是修改<code>resources.arsc</code>）</p>
-<h2 id="修复UndefinedResObject错误"><a href="#修复UndefinedResObject错误" class="headerlink" title="修复UndefinedResObject错误"></a>修复UndefinedResObject错误</h2><p>报错信息：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; brut.androlib.err.UndefinedResObject: resource spec: 0x7f000006</span><br></pre></td></tr></table></figure>
-
-<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><code>aapt dump</code>查看apk的资源信息，并保存到文件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">aapt d --values resources test.apk &gt;1.txt</span><br></pre></td></tr></table></figure>
-<p>找到<code>DataType</code>数据类型不正确的值（搜索<code>attribute</code>即可）对应的描述符（一般是把7f改成00，<code>0x00000006</code>）<br>文件中没有识别出正确的数据类型，显示的是<code>(attribute) 0x00000006</code><br>使用<code>010Editor</code>，Ctrl+F，字节形式搜索对应描述的16进制数的小端字节（就是<code>00000006</code>写成<code>06000000</code>）<br>然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
-<h2 id="修复resource-spec-0x01010543"><a href="#修复resource-spec-0x01010543" class="headerlink" title="修复resource spec: 0x01010543"></a>修复resource spec: 0x01010543</h2><p>报错信息：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
-<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>12345678</code>写成<code>78564312</code>）<br>这里我们搜索<code>43050101</code>，然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
-<h2 id="修复resource-spec-0x01010540"><a href="#修复resource-spec-0x01010540" class="headerlink" title="修复resource spec: 0x01010540"></a>修复resource spec: 0x01010540</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code></p>
-<h3 id="解决方法-2"><a href="#解决方法-2" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>40050101</code>换成<code>8f040101</code>）</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u012400885/article/details/80409689">记录Android Killer反编译时遇到的异常</a><br><a href="http://blog.csdn.net/pwelyn/article/details/50620136">保护Android resources文件不被反编译原理分析</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Android Studio 导入so</title>
-    <url>/2019/08/02/android-studio-import-so/</url>
-    <content><![CDATA[<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在<code>src/main</code>目录下新建<code>jniLibs</code>文件夹 ，添加cpu架构文件夹，如<code>armeabi-v7a</code>，把so文件复制进去即可。<br>编译时会自动打包。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/anhenzhufeng/article/details/78913341">Android studio添加第三方库和so</a></p>
+    <title>修改安卓系统源码(fork) 绕过多进程ptrace反调试</title>
+    <url>/2019/11/20/android_mod_fork_to_bypass_antidebug/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>多进程ptrace反调试是一种常见的反调试手段，思路为fork出子进程，在子进程中ptrace自身，使得调试器无法附加。通过修改源码来禁止指定进程fork</p>
+<span id="more"></span>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><h3 id="定位到源码位置"><a href="#定位到源码位置" class="headerlink" title="定位到源码位置"></a>定位到源码位置</h3><p>AOSP 5.1.1及6.0.1 fork函数位于：<code>bionic/libc/bionic/fork.cpp</code></p>
+<h3 id="添加过滤函数"><a href="#添加过滤函数" class="headerlink" title="添加过滤函数"></a>添加过滤函数</h3><p>通过读取status文件来确定进程名，然后跟文件内容比较，相同则禁止其fork<br>代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">filter</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> fcmdline = <span class="number">-1</span>;</span><br><span class="line">  <span class="keyword">char</span> szCmdline[<span class="number">64</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">  <span class="keyword">char</span> szProcName[<span class="number">256</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">  <span class="keyword">char</span> szTargetPNames[<span class="number">512</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">  <span class="keyword">int</span> procid = <span class="built_in">getpid</span>();</span><br><span class="line">  <span class="built_in">sprintf</span>(szCmdline, <span class="string">&quot;/proc/%d/cmdline&quot;</span>, procid);</span><br><span class="line">  fcmdline = <span class="built_in">open</span>(szCmdline, O_RDONLY, <span class="number">0644</span>);</span><br><span class="line">  <span class="keyword">if</span> (fcmdline &gt; <span class="number">0</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">read</span>(fcmdline, szProcName, <span class="number">256</span>);</span><br><span class="line">    <span class="built_in">close</span>(fcmdline);</span><br><span class="line">  &#125;</span><br><span class="line">  fcmdline = <span class="built_in">open</span>(<span class="string">&quot;/data/filter&quot;</span>, O_RDONLY);</span><br><span class="line">  <span class="keyword">if</span> (fcmdline &gt; <span class="number">0</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">read</span>(fcmdline, szTargetPNames, <span class="number">512</span>);</span><br><span class="line">    <span class="built_in">close</span>(fcmdline);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (szProcName[<span class="number">0</span>] &amp;&amp; szTargetPNames[<span class="number">0</span>] &amp;&amp; <span class="built_in">strstr</span>(szTargetPNames, szProcName) != <span class="literal">NULL</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="在fork函数中调用过滤函数"><a href="#在fork函数中调用过滤函数" class="headerlink" title="在fork函数中调用过滤函数"></a>在fork函数中调用过滤函数</h3><p>fork函数开头添加：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="built_in">filter</span>()) <span class="keyword">return</span> <span class="number">-1</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="重新编译并打包"><a href="#重新编译并打包" class="headerlink" title="重新编译并打包"></a>重新编译并打包</h3><p>重新编译libc和linker后，打包系统镜像并刷入<br>PS：也可以只替换文件，但是需要注意文件权限设置</p>
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>将程序包名写入<code>/data/filter</code>，例如<br><code>echo &quot;com.xhy.test&quot; &gt; /data/pkgname</code><br>并设置权限</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">chmod 777 /data/pkgname</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://topsrc.cn/archives/207/">修改fork.c绕过多进程ptrace反调试</a></p>
 ]]></content>
       <tags>
         <tag>Android</tag>
@@ -417,25 +436,6 @@
       </tags>
   </entry>
   <entry>
-    <title>修改安卓系统源码(fork) 绕过多进程ptrace反调试</title>
-    <url>/2019/11/20/android_mod_fork_to_bypass_antidebug/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>多进程ptrace反调试是一种常见的反调试手段，思路为fork出子进程，在子进程中ptrace自身，使得调试器无法附加。通过修改源码来禁止指定进程fork</p>
-<span id="more"></span>
-<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><h3 id="定位到源码位置"><a href="#定位到源码位置" class="headerlink" title="定位到源码位置"></a>定位到源码位置</h3><p>AOSP 5.1.1及6.0.1 fork函数位于：<code>bionic/libc/bionic/fork.cpp</code></p>
-<h3 id="添加过滤函数"><a href="#添加过滤函数" class="headerlink" title="添加过滤函数"></a>添加过滤函数</h3><p>通过读取status文件来确定进程名，然后跟文件内容比较，相同则禁止其fork<br>代码如下：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">filter</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> fcmdline = <span class="number">-1</span>;</span><br><span class="line">  <span class="keyword">char</span> szCmdline[<span class="number">64</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">  <span class="keyword">char</span> szProcName[<span class="number">256</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">  <span class="keyword">char</span> szTargetPNames[<span class="number">512</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">  <span class="keyword">int</span> procid = <span class="built_in">getpid</span>();</span><br><span class="line">  <span class="built_in">sprintf</span>(szCmdline, <span class="string">&quot;/proc/%d/cmdline&quot;</span>, procid);</span><br><span class="line">  fcmdline = <span class="built_in">open</span>(szCmdline, O_RDONLY, <span class="number">0644</span>);</span><br><span class="line">  <span class="keyword">if</span> (fcmdline &gt; <span class="number">0</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">read</span>(fcmdline, szProcName, <span class="number">256</span>);</span><br><span class="line">    <span class="built_in">close</span>(fcmdline);</span><br><span class="line">  &#125;</span><br><span class="line">  fcmdline = <span class="built_in">open</span>(<span class="string">&quot;/data/filter&quot;</span>, O_RDONLY);</span><br><span class="line">  <span class="keyword">if</span> (fcmdline &gt; <span class="number">0</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">read</span>(fcmdline, szTargetPNames, <span class="number">512</span>);</span><br><span class="line">    <span class="built_in">close</span>(fcmdline);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (szProcName[<span class="number">0</span>] &amp;&amp; szTargetPNames[<span class="number">0</span>] &amp;&amp; <span class="built_in">strstr</span>(szTargetPNames, szProcName) != <span class="literal">NULL</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="在fork函数中调用过滤函数"><a href="#在fork函数中调用过滤函数" class="headerlink" title="在fork函数中调用过滤函数"></a>在fork函数中调用过滤函数</h3><p>fork函数开头添加：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="built_in">filter</span>()) <span class="keyword">return</span> <span class="number">-1</span>;</span><br></pre></td></tr></table></figure>
-<h3 id="重新编译并打包"><a href="#重新编译并打包" class="headerlink" title="重新编译并打包"></a>重新编译并打包</h3><p>重新编译libc和linker后，打包系统镜像并刷入<br>PS：也可以只替换文件，但是需要注意文件权限设置</p>
-<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>将程序包名写入<code>/data/filter</code>，例如<br><code>echo &quot;com.xhy.test&quot; &gt; /data/pkgname</code><br>并设置权限</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">chmod 777 /data/pkgname</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://topsrc.cn/archives/207/">修改fork.c绕过多进程ptrace反调试</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>在WSL2中使用docker编译安卓源码</title>
     <url>/2020/04/16/aosp-docker/</url>
     <content><![CDATA[<h3 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h3><p><a href="https://blog.xhyeax.com/2020/04/15/wsl2-docker/">在WSL2(Ubuntu 18.04)中安装docker并配置自启动</a></p>
@@ -443,27 +443,28 @@
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://xxxxxx.mirror.aliyuncs.com&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>重启docker</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo service docker restart</span><br></pre></td></tr></table></figure>
-<span id="more"></span>
 <h3 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h3><p>编译安卓5.0到6.0，则克隆<code>android-5</code>分支</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/XhyEax/docker-aosp -b android-5</span><br></pre></td></tr></table></figure>
 <p>7.0及以上直接克隆即可</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/XhyEax/docker-aosp</span><br></pre></td></tr></table></figure>
-<h3 id="配置源码保存路径（可选）"><a href="#配置源码保存路径（可选）" class="headerlink" title="配置源码保存路径（可选）"></a>配置源码保存路径（可选）</h3><p>默认保存到<code>~/aosp-root</code></p>
+<h3 id="配置源码保存路径（可选）"><a href="#配置源码保存路径（可选）" class="headerlink" title="配置源码保存路径（可选）"></a>配置源码保存路径（可选）</h3><p>默认保存到<code>~/aosp-root</code> (即<code>/root/aosp-root</code>)</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export AOSP_VOL=~/Android/</span><br></pre></td></tr></table></figure>
 <h3 id="手动配置镜像版本（可选）"><a href="#手动配置镜像版本（可选）" class="headerlink" title="手动配置镜像版本（可选）"></a>手动配置镜像版本（可选）</h3><p>以编译6.0系统为例，修改<code>aosp</code>的第十二行为：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">AOSP_IMAGE=$&#123;AOSP_IMAGE:-kylemanna/aosp:5.0-lolipop&#125;</span><br></pre></td></tr></table></figure>
 <p>所有tag：<a href="https://hub.docker.com/r/kylemanna/aosp/tags">dockerhub kylemanna/aosp tags</a></p>
-<h3 id="只进入bash"><a href="#只进入bash" class="headerlink" title="只进入bash"></a>只进入bash</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">./aosp</span><br></pre></td></tr></table></figure>
-<h3 id="已有源码：直接编译系统"><a href="#已有源码：直接编译系统" class="headerlink" title="已有源码：直接编译系统"></a>已有源码：直接编译系统</h3><p>进入容器的bash后，执行</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">prebuilts/misc/linux-x86/ccache/ccache -M 100G</span><br><span class="line">source build/envsetup.sh</span><br><span class="line">lunch aosp_arm-eng</span><br><span class="line">cpus=$(grep ^processor /proc/cpuinfo | wc -l)</span><br><span class="line">make -j $[2*$cpus]</span><br></pre></td></tr></table></figure>
-<p><code>aosp_arm-eng</code>替换成编译目标</p>
-<h3 id="无源码：下载源码并编译"><a href="#无源码：下载源码并编译" class="headerlink" title="无源码：下载源码并编译"></a>无源码：下载源码并编译</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd tests</span><br><span class="line">bash ./build-aosp.sh</span><br></pre></td></tr></table></figure>
-<p>该脚本下载的是<code>android-6.0.0_r1</code>的代码，编译目标为<code>aosp_arm-eng</code>，如需更换请自行修改脚本</p>
-<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>如果需要编译nexus5使用的版本，还需要下载驱动文件。<br>见：<a href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">Ubuntu 19.10 编译安卓6.0.0_r1源码</a><br>并修改脚本中的<code>aosp_arm-eng</code>为<code>aosp_hammerhead-userdebug</code></p>
-<h3 id="以root用户登录bash"><a href="#以root用户登录bash" class="headerlink" title="以root用户登录bash"></a>以root用户登录bash</h3><p>主要用于修改系统文件</p>
+<h3 id="启动容器-进入bash"><a href="#启动容器-进入bash" class="headerlink" title="启动容器 进入bash"></a>启动容器 进入bash</h3><p>用于测试文件夹映射是否正确</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">./aosp</span><br></pre></td></tr></table></figure>
+<p><strong>注意：不要用exit退出，会关闭容器。使用<code>Ctrl+P+Q</code></strong></p>
+<h3 id="以root用户进入bash"><a href="#以root用户进入bash" class="headerlink" title="以root用户进入bash"></a>以root用户进入bash</h3><p>用于编译系统</p>
 <h4 id="查询容器id"><a href="#查询容器id" class="headerlink" title="查询容器id"></a>查询容器id</h4><p>启动docker容器后，复制容器id（用户名后面的字符）<br>也可以使用<code>docker ps</code>查询</p>
 <h4 id="root用户登录bash"><a href="#root用户登录bash" class="headerlink" title="root用户登录bash"></a>root用户登录bash</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker exec --privileged -u root -it 容器id bash</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/tiann/docker-aosp">tiann/docker-aosp</a><br><a href="https://www.cnblogs.com/asminfo/p/6789258.html">使用docker创建aosp编译环境</a><br><a href="https://blog.csdn.net/weixin_43569697/article/details/89279225">docker下载镜像太慢的解决方案</a></p>
+<h3 id="已有源码：直接编译系统"><a href="#已有源码：直接编译系统" class="headerlink" title="已有源码：直接编译系统"></a>已有源码：直接编译系统</h3><p>进入容器的bash后，打开源码目录，执行以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">prebuilts/misc/linux-x86/ccache/ccache -M 100G</span><br><span class="line">source build/envsetup.sh</span><br><span class="line">lunch aosp_arm-eng</span><br><span class="line">cpus=$(grep ^processor /proc/cpuinfo | wc -l)</span><br><span class="line">make -j $[2*$cpus]</span><br></pre></td></tr></table></figure>
+<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>如果需要编译手机（如nexus5）使用的系统镜像，还需要下载驱动文件。<br>见：<a href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">Ubuntu 19.10 编译安卓6.0.0_r1源码</a><br>并修改脚本中的<code>aosp_arm-eng</code>为<code>aosp_hammerhead-userdebug</code></p>
+<h3 id="无源码：下载源码并编译"><a href="#无源码：下载源码并编译" class="headerlink" title="无源码：下载源码并编译"></a>无源码：下载源码并编译</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd tests</span><br><span class="line">bash ./build-aosp.sh</span><br></pre></td></tr></table></figure>
+<p>该脚本下载的是<code>android-6.0.0_r1</code>的代码，编译目标为<code>aosp_arm-eng</code>，如需更换请自行修改脚本</p>
+<h3 id="删除容器"><a href="#删除容器" class="headerlink" title="删除容器"></a>删除容器</h3><p><code>docker ps</code>找到容器id，执行<code>docker rm -f 容器id</code>删除</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/tiann/docker-aosp">tiann/docker-aosp</a><br><a href="https://www.cnblogs.com/asminfo/p/6789258.html">使用docker创建aosp编译环境</a><br><a href="https://blog.csdn.net/weixin_43569697/article/details/89279225">docker下载镜像太慢的解决方案</a><br><a href="https://www.jianshu.com/p/b1ce248d2a42">Docker退出容器不关闭容器的方法</a></p>
 ]]></content>
       <tags>
         <tag>Android</tag>
@@ -662,20 +663,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Microsoft Edge (Chromium内核)安装IDM插件</title>
-    <url>/2019/09/16/chromium-edge-idm-support/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天从<code>Chrome</code>迁移到了<code>Microsoft Edge, based on Chromium</code><br>期间发现谷歌应用商店居然没有IDM拓展，只有<a href="https://chrome.google.com/webstore/detail/open-with-internet-downlo/epgilldoipfbdlneomlmegekaoonchcj">Open With Internet Download Manager</a><br>而这个插件需要打<code>native messaging host</code>补丁，补丁不适用于<code>Edge</code>，于是自己研究了一下解决方法</p>
-<h2 id="解决方法："><a href="#解决方法：" class="headerlink" title="解决方法："></a>解决方法：</h2><p>修改配置文件，手动添加授权拓展</p>
-<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><p>定位到注册表<code>计算机\HKEY_CURRENT_USER\Software\Google\Chrome\NativeMessagingHosts\com.microsoft.browsercore</code><br>项目值为<code>C:\Program Files\Windows Security\BrowserCore\manifest.json</code><br>定位到该文件，修改文件权限后，在<code>allowed_origins</code>中添加:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;chrome-extension://epgilldoipfbdlneomlmegekaoonchcj/&quot;,</span><br></pre></td></tr></table></figure>
-<p>重启<code>Edge</code>即可正常调用<code>IDM</code><br>PS: 需要手动修改下拓展设置，配置为本地IDM路径</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/alexmarcoo/open-in-native-client">Open-in Native Client</a><br><a href="https://www.cnblogs.com/champagne/p/4861209.html">Chrome浏览器扩展开发系列之十四：本地消息机制Native messaging</a></p>
-]]></content>
-      <tags>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hexo主题增加鼠标点击效果</title>
     <url>/2018/11/30/click-word/</url>
     <content><![CDATA[<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p>将以下代码放到主题源文件目录下，如 <code>/themes/yilia/source/js/</code> 下新建文件 <code>click-word.js</code>，代码见下文。<br>下载jquery文件（<a href="https://code.jquery.com/jquery-3.3.1.min.js">目前最新版本</a>），放到同一目录下（个人喜好）。<br>修改布局文件，<code>/themes/next/layout/_layout.ejs</code>，在末尾body中添加</p>
@@ -684,6 +671,34 @@
 <h2 id="js代码"><a href="#js代码" class="headerlink" title="js代码"></a>js代码</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> a_idx = <span class="number">0</span>;</span><br><span class="line">jQuery(<span class="built_in">document</span>).ready(<span class="function"><span class="keyword">function</span>(<span class="params">$</span>) </span>&#123;</span><br><span class="line">    $(<span class="string">&quot;body&quot;</span>).click(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> a = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="string">&quot;富强&quot;</span>, <span class="string">&quot;民主&quot;</span>, <span class="string">&quot;文明&quot;</span>, <span class="string">&quot;和谐&quot;</span>, <span class="string">&quot;自由&quot;</span>, <span class="string">&quot;平等&quot;</span>, <span class="string">&quot;公正&quot;</span> ,<span class="string">&quot;法治&quot;</span>, <span class="string">&quot;爱国&quot;</span>, <span class="string">&quot;敬业&quot;</span>, <span class="string">&quot;诚信&quot;</span>, <span class="string">&quot;友善&quot;</span>);</span><br><span class="line">        <span class="keyword">var</span> $i = $(<span class="string">&quot;&lt;span /&gt;&quot;</span>).text(a[a_idx]);</span><br><span class="line">        a_idx = (a_idx + <span class="number">1</span>) % a.length;</span><br><span class="line">        <span class="keyword">var</span> x = e.pageX,</span><br><span class="line">        y = e.pageY;</span><br><span class="line">        $i.css(&#123;</span><br><span class="line">            <span class="string">&quot;z-index&quot;</span>: <span class="number">999999999999999999999999999999999999999999999999999999999999999999999</span>,</span><br><span class="line">            <span class="string">&quot;top&quot;</span>: y - <span class="number">20</span>,</span><br><span class="line">            <span class="string">&quot;left&quot;</span>: x,</span><br><span class="line">            <span class="string">&quot;position&quot;</span>: <span class="string">&quot;absolute&quot;</span>,</span><br><span class="line">            <span class="string">&quot;font-weight&quot;</span>: <span class="string">&quot;bold&quot;</span>,</span><br><span class="line">            <span class="string">&quot;color&quot;</span>: <span class="string">&quot;#ff6651&quot;</span></span><br><span class="line">        &#125;);</span><br><span class="line">        $(<span class="string">&quot;body&quot;</span>).append($i);</span><br><span class="line">        $i.animate(&#123;</span><br><span class="line">            <span class="string">&quot;top&quot;</span>: y - <span class="number">180</span>,</span><br><span class="line">            <span class="string">&quot;opacity&quot;</span>: <span class="number">0</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="number">1500</span>,</span><br><span class="line">        <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            $i.remove();</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://www.wujunjie.net/2018/03/03/jquery%E5%AF%8C%E5%BC%BA%E3%80%81%E6%B0%91%E4%B8%BB%E3%80%81%E6%96%87%E6%98%8E%E3%80%81%E5%92%8C%E8%B0%90%E7%89%B9%E6%95%88%E4%BB%A3%E7%A0%81/">jquery”富强、民主、文明、和谐”特效代码</a><br><a href="https://asdfv1929.github.io/2018/01/26/click-love/">Hexo NexT主题添加点击爱心效果</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>命令行运行java class文件提示“找不到或无法加载主类”的解决方法</title>
+    <url>/2020/03/30/cmd-java-class-file/</url>
+    <content><![CDATA[<h2 id="报错原因"><a href="#报错原因" class="headerlink" title="报错原因"></a>报错原因</h2><blockquote>
+<p>1.java指令默认在寻找class文件的地址是通过CLASSPATH环境变量中指定的目录中寻找的。<br>2.忽略了package的影响。加载一个类，是需要完整的类名，所以必须要把包名带上</p>
+</blockquote>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>指定生成class文件的文件夹为classpath，执行java指令，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">java -classpath &quot;D:\source\Java\Painter\bin&quot; app.OpenGLApp</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/IToBeNo_1/article/details/90115468">控制台中运行java类提示”找不到或无法加载主类”错误的原因及解决方案</a></p>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Microsoft Edge (Chromium内核)安装IDM插件</title>
+    <url>/2019/09/16/chromium-edge-idm-support/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天从<code>Chrome</code>迁移到了<code>Microsoft Edge, based on Chromium</code><br>期间发现谷歌应用商店居然没有IDM拓展，只有<a href="https://chrome.google.com/webstore/detail/open-with-internet-downlo/epgilldoipfbdlneomlmegekaoonchcj">Open With Internet Download Manager</a><br>而这个插件需要打<code>native messaging host</code>补丁，补丁不适用于<code>Edge</code>，于是自己研究了一下解决方法</p>
+<h2 id="解决方法："><a href="#解决方法：" class="headerlink" title="解决方法："></a>解决方法：</h2><p>修改配置文件，手动添加授权拓展</p>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><p>定位到注册表<code>计算机\HKEY_CURRENT_USER\Software\Google\Chrome\NativeMessagingHosts\com.microsoft.browsercore</code><br>项目值为<code>C:\Program Files\Windows Security\BrowserCore\manifest.json</code><br>定位到该文件，修改文件权限后，在<code>allowed_origins</code>中添加:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;chrome-extension://epgilldoipfbdlneomlmegekaoonchcj/&quot;,</span><br></pre></td></tr></table></figure>
+<p>重启<code>Edge</code>即可正常调用<code>IDM</code><br>PS: 需要手动修改下拓展设置，配置为本地IDM路径</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/alexmarcoo/open-in-native-client">Open-in Native Client</a><br><a href="https://www.cnblogs.com/champagne/p/4861209.html">Chrome浏览器扩展开发系列之十四：本地消息机制Native messaging</a></p>
 ]]></content>
       <tags>
         <tag>经验</tag>
@@ -704,20 +719,6 @@
       </tags>
   </entry>
   <entry>
-    <title>命令行运行java class文件提示“找不到或无法加载主类”的解决方法</title>
-    <url>/2020/03/30/cmd-java-class-file/</url>
-    <content><![CDATA[<h2 id="报错原因"><a href="#报错原因" class="headerlink" title="报错原因"></a>报错原因</h2><blockquote>
-<p>1.java指令默认在寻找class文件的地址是通过CLASSPATH环境变量中指定的目录中寻找的。<br>2.忽略了package的影响。加载一个类，是需要完整的类名，所以必须要把包名带上</p>
-</blockquote>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>指定生成class文件的文件夹为classpath，执行java指令，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">java -classpath &quot;D:\source\Java\Painter\bin&quot; app.OpenGLApp</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/IToBeNo_1/article/details/90115468">控制台中运行java类提示”找不到或无法加载主类”错误的原因及解决方案</a></p>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C++中类的成员函数的函数指针</title>
     <url>/2019/05/01/cpp-class-member-func-ptr/</url>
     <content><![CDATA[<h2 id="获取指针"><a href="#获取指针" class="headerlink" title="获取指针"></a>获取指针</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">staticmember</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;static&quot;</span> &lt;&lt; endl; &#125;	 <span class="comment">//static member</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">nonstatic</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;nonstatic&quot;</span> &lt;&lt; endl; &#125;			 <span class="comment">//nonstatic member</span></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">virtualmember</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;virtual&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">//virtual member</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	A a;</span><br><span class="line">	<span class="comment">//static成员函数,取得的是该函数在内存中的实际地址，而且因为static成员是全局的，所以不能用A::限定符</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (*ptrstatic)() = &amp;A::staticmember;</span><br><span class="line">	<span class="comment">//nonstatic成员函数 取得的是该函数在内存中的实际地址</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (A::*ptrnonstatic)() = &amp;A::nonstatic;</span><br><span class="line">	<span class="comment">//虚函数取得的是虚函数表中的偏移值，这样可以保证能过指针调用时同样的多态效果</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (A::*ptrvirtual)() = &amp;A::virtualmember;</span><br><span class="line">	<span class="comment">//函数指针的使用方式</span></span><br><span class="line">	<span class="built_in">ptrstatic</span>();</span><br><span class="line">	(a.*ptrnonstatic)();</span><br><span class="line">	(a.*ptrvirtual)();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -731,17 +732,6 @@
 ]]></content>
       <tags>
         <tag>C++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>修复VSCode Segmentation Fault in cygwinS</title>
-    <url>/2019/07/03/cpp_vscode_segmentation_fault_cygwinS/</url>
-    <content><![CDATA[<h2 id="段错误"><a href="#段错误" class="headerlink" title="段错误"></a>段错误</h2><p>一般来说是因为爆栈了，使用动态数组即可。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/kangyupl/article/details/90723526">VSCODE调试时在cygwin.S中发生段错误</a></p>
-]]></content>
-      <tags>
-        <tag>C++</tag>
-        <tag>VSCode</tag>
       </tags>
   </entry>
   <entry>
@@ -770,6 +760,17 @@
       </tags>
   </entry>
   <entry>
+    <title>修复VSCode Segmentation Fault in cygwinS</title>
+    <url>/2019/07/03/cpp_vscode_segmentation_fault_cygwinS/</url>
+    <content><![CDATA[<h2 id="段错误"><a href="#段错误" class="headerlink" title="段错误"></a>段错误</h2><p>一般来说是因为爆栈了，使用动态数组即可。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/kangyupl/article/details/90723526">VSCODE调试时在cygwin.S中发生段错误</a></p>
+]]></content>
+      <tags>
+        <tag>C++</tag>
+        <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>VS设置C#默认以管理员身份调试及启动</title>
     <url>/2020/04/14/csharp-run-as-admin/</url>
     <content><![CDATA[<h2 id="默认以管理员身份调试"><a href="#默认以管理员身份调试" class="headerlink" title="默认以管理员身份调试"></a>默认以管理员身份调试</h2><p>右键项目，添加应用程序清单文件。<br>将<code>&lt;requestedExecutionLevel level=&quot;asInvoker&quot; uiAccess=&quot;false&quot; /&gt;</code><br><code>asInvoker</code>修改为<code>requireAdministrator</code><br>保存后再次点击运行，将提示使用其他凭据重新启动。</p>
@@ -782,14 +783,6 @@
       </tags>
   </entry>
   <entry>
-    <title>导出sqlite3数据库为sql</title>
-    <url>/2019/10/15/db-sqlite3-to-sql/</url>
-    <content><![CDATA[<h2 id="执行以下语句即可"><a href="#执行以下语句即可" class="headerlink" title="执行以下语句即可"></a>执行以下语句即可</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sqlite3 db.sqlite3 &quot;.dump&quot; &gt; new.sql</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Linux通过环境变量设置curl代理</title>
     <url>/2020/04/16/curl-set-proxy-by-pathvar/</url>
     <content><![CDATA[<h2 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export http_proxy=http://your-ip-address:port/</span><br><span class="line">export http_proxy=http://user:password@your-proxy-ip-address:port</span><br></pre></td></tr></table></figure>
@@ -799,6 +792,14 @@
 ]]></content>
       <tags>
         <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>导出sqlite3数据库为sql</title>
+    <url>/2019/10/15/db-sqlite3-to-sql/</url>
+    <content><![CDATA[<h2 id="执行以下语句即可"><a href="#执行以下语句即可" class="headerlink" title="执行以下语句即可"></a>执行以下语句即可</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sqlite3 db.sqlite3 &quot;.dump&quot; &gt; new.sql</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>经验</tag>
       </tags>
   </entry>
   <entry>
@@ -981,23 +982,6 @@
       </tags>
   </entry>
   <entry>
-    <title>修复Flash插件提示地区不符的问题</title>
-    <url>/2019/01/26/fix-flash/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Adobe Flash Player 从 30 版本开始，中国大陆地区用户只能使用特供版<br>后台存在广告服务、弹出广告窗口、捆绑流氓软件的行为。<br>由于有的网站只能用flash，而安装国际版flash又提示地区不符，所以需要找个办法解决。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="安装直装版（由roustar31制作）"><a href="#安装直装版（由roustar31制作）" class="headerlink" title="安装直装版（由roustar31制作）"></a>安装直装版（由roustar31制作）</h3><p>运行程序后，会卸载原版flash再自动安装。</p>
-<blockquote>
-<p>IE浏览器使用AX版本<br>Chrome系浏览器及QQ使用PPAPI版本<br>Firefox或其他使用NPAPI版本</p>
-</blockquote>
-<p>PS：若安装后仍无效，请使用压缩包中的文件替换系统及浏览器的<code>pepflashplayer.dll</code>（具体路径自行搜索）</p>
-<h3 id="下载地址"><a href="#下载地址" class="headerlink" title="下载地址"></a>下载地址</h3><h4 id="直装版"><a href="#直装版" class="headerlink" title="直装版"></a>直装版</h4><p><a href="https://lanzous.com/b00e2zxej">https://lanzous.com/b00e2zxej</a><br>密码:gz09</p>
-<h4 id="补丁"><a href="#补丁" class="headerlink" title="补丁"></a>补丁</h4><p><a href="https://lanzous.com/b00dx336j">https://lanzous.com/b00dx336j</a><br>密码:f0ph</p>
-<h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p><a href="https://www.repaik.com/forum.php?mod=viewthread&tid=340482">Adobe Flash Player AX/NP/PP 特别版</a></p>
-]]></content>
-      <tags>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>迁移Hexo到Node.js 14 解决部署时报错</title>
     <url>/2021/08/01/fix-hexo-node-mismatch/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>重装系统之后，安装了高版本的Node.js，部署时报错，于是搜索之，发现原因是hexo版本不适配，一番尝试后解决。</p>
@@ -1029,6 +1013,23 @@
 <p>然后执行<code>yarn install</code> </p>
 <p>PS：<code>yarn</code>需要手动安装</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.haoyizebo.com/posts/710984d0/">解决 Hexo 在使用 Node.js 14 时的 Accessing non-existent property ‘xxx’ of module exports inside circular dependency 问题</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>修复Flash插件提示地区不符的问题</title>
+    <url>/2019/01/26/fix-flash/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Adobe Flash Player 从 30 版本开始，中国大陆地区用户只能使用特供版<br>后台存在广告服务、弹出广告窗口、捆绑流氓软件的行为。<br>由于有的网站只能用flash，而安装国际版flash又提示地区不符，所以需要找个办法解决。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="安装直装版（由roustar31制作）"><a href="#安装直装版（由roustar31制作）" class="headerlink" title="安装直装版（由roustar31制作）"></a>安装直装版（由roustar31制作）</h3><p>运行程序后，会卸载原版flash再自动安装。</p>
+<blockquote>
+<p>IE浏览器使用AX版本<br>Chrome系浏览器及QQ使用PPAPI版本<br>Firefox或其他使用NPAPI版本</p>
+</blockquote>
+<p>PS：若安装后仍无效，请使用压缩包中的文件替换系统及浏览器的<code>pepflashplayer.dll</code>（具体路径自行搜索）</p>
+<h3 id="下载地址"><a href="#下载地址" class="headerlink" title="下载地址"></a>下载地址</h3><h4 id="直装版"><a href="#直装版" class="headerlink" title="直装版"></a>直装版</h4><p><a href="https://lanzous.com/b00e2zxej">https://lanzous.com/b00e2zxej</a><br>密码:gz09</p>
+<h4 id="补丁"><a href="#补丁" class="headerlink" title="补丁"></a>补丁</h4><p><a href="https://lanzous.com/b00dx336j">https://lanzous.com/b00dx336j</a><br>密码:f0ph</p>
+<h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p><a href="https://www.repaik.com/forum.php?mod=viewthread&tid=340482">Adobe Flash Player AX/NP/PP 特别版</a></p>
 ]]></content>
       <tags>
         <tag>经验</tag>
@@ -1299,18 +1300,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Hexo&#39;s Usage</title>
-    <url>/2018/11/28/hello-world/</url>
-    <content><![CDATA[<h2 id="My-Usage-After-changing-some-files"><a href="#My-Usage-After-changing-some-files" class="headerlink" title="My Usage (After changing some files)"></a>My Usage (After changing some files)</h2><h3 id="On-local-server"><a href="#On-local-server" class="headerlink" title="On local server"></a>On local server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</span><br></pre></td></tr></table></figure>
-<h3 id="Deploy-to-Github-After-checking"><a href="#Deploy-to-Github-After-checking" class="headerlink" title="Deploy to Github(After checking)"></a>Deploy to Github(After checking)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo d</span><br></pre></td></tr></table></figure>
-
-<p>Reference: <a href="https://blog.ctftools.com/2017/12/post233/">Hexo安装配置并托管至github</a></p>
-]]></content>
-      <tags>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>手动修复Windows打开方式（修改注册表）</title>
     <url>/2018/11/29/how-to-fix-fileExts/</url>
     <content><![CDATA[<p>由于不小心把.gitignore设置成了以文本形式打开，导致在Explorer中显示为空文件名的文本文件（非常不顺眼）<br>（Windows的默认设置中无法删除打开方式）<br>而且有的文件手动设置了默认打开方式后也不管用<br>于是通过修改注册表实现</p>
@@ -1325,6 +1314,18 @@
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">.gitignore.</span><br></pre></td></tr></table></figure>
 <p>保存即可（由于没有拓展名，会自动删除末尾的点）</p>
 <p>参考：<a href="https://blog.csdn.net/erikaIT/article/details/71637167">windows注册表文件关联机制</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hexo&#39;s Usage</title>
+    <url>/2018/11/28/hello-world/</url>
+    <content><![CDATA[<h2 id="My-Usage-After-changing-some-files"><a href="#My-Usage-After-changing-some-files" class="headerlink" title="My Usage (After changing some files)"></a>My Usage (After changing some files)</h2><h3 id="On-local-server"><a href="#On-local-server" class="headerlink" title="On local server"></a>On local server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</span><br></pre></td></tr></table></figure>
+<h3 id="Deploy-to-Github-After-checking"><a href="#Deploy-to-Github-After-checking" class="headerlink" title="Deploy to Github(After checking)"></a>Deploy to Github(After checking)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo d</span><br></pre></td></tr></table></figure>
+
+<p>Reference: <a href="https://blog.ctftools.com/2017/12/post233/">Hexo安装配置并托管至github</a></p>
 ]]></content>
       <tags>
         <tag>经验</tag>
@@ -1565,6 +1566,33 @@
       <tags>
         <tag>CTF</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Kali 2021.2 安装记录 (Win10双系统)</title>
+    <url>/2021/09/06/kali-install-with-win10/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>为尝鲜<code>Windows 11</code>，把之前的<code>Ubuntu</code>删了。结果<code>Windows 11</code>用起来并不顺手。为了方便调试和开发（自带root终端），决定安装<code>Kali 2021.2</code>。</p>
+<p>前文见<a href="https://blog.xhyeax.com/2019/02/16/ubuntu-install/">Ubuntu18.04安装记录(与Win10双系统共存)</a></p>
+<span id="more"></span>
+<h2 id="使用Ventoy制作启动U盘"><a href="#使用Ventoy制作启动U盘" class="headerlink" title="使用Ventoy制作启动U盘"></a>使用Ventoy制作启动U盘</h2><p>步骤见官网：<a href="https://www.ventoy.net/cn/index.html">Ventoy</a><br>记得备份U盘数据</p>
+<h2 id="下载系统镜像"><a href="#下载系统镜像" class="headerlink" title="下载系统镜像"></a>下载系统镜像</h2><p>推荐在镜像站下载，如<a href="https://mirrors.tuna.tsinghua.edu.cn/">清华大学开源软件镜像站</a></p>
+<p>下载完成后，直接拷贝到U盘即可</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>进入<code>BIOS</code>，关闭安全启动(<code>secure boot</code>)，并修改启动顺序，优先从U盘启动</p>
+<p>选择图形化安装（第一个），语言选中文，按步骤安装即可（分区见下文）</p>
+<p>PS：建议连接网络安装，可自动同步时间</p>
+<h2 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h2><p>主要有以下三个分区：</p>
+<p><code>efi</code> (固态)： 有的话可以不做修改，直接使用固态盘的EFI分区即可。没有则创建256M的EFI分区<br><code>swap</code> (固态)： 交换空间，一般设置为内存的1到2倍，个人是设置的8G<br><code>/</code>： 剩下的空间可直接分配给该分区</p>
+<p><code>/home</code>、<code>/var</code>和<code>/usr</code>等路径如果不配置的话，就是跟<code>/</code>在同一个分区</p>
+<p>PS： 个人觉得不配置反而方便一点，不用考虑每个分区的容量</p>
+<h2 id="系统软件"><a href="#系统软件" class="headerlink" title="系统软件"></a>系统软件</h2><p>按照默认配置安装桌面环境和工具，之后等待系统安装完成即可</p>
+<h2 id="启动系统"><a href="#启动系统" class="headerlink" title="启动系统"></a>启动系统</h2><p>系统安装完成后会提示拔出安装介质，此时拔出U盘，重启后，选择第一个选项进入<code>Kali</code>系统</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h3><p><a href="https://zhuanlan.zhihu.com/p/82361096">kali安装docker环境</a><br>建议配置镜像下载加速，见<a href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">在WSL2中使用docker编译安卓源码 </a></p>
+<h3 id="搜狗输入法"><a href="#搜狗输入法" class="headerlink" title="搜狗输入法"></a>搜狗输入法</h3><p><a href="https://pinyin.sogou.com/linux/help.php">搜狗输入法 安装指南</a><br>安装完成后，需要重启系统</p>
+<p><code>设置</code>-<code>Fcitx配置</code>，增加一个<code>键盘 - 英语</code>输入法。（方便<code>Ctrl+Shift</code>切换输入法）</p>
+<p>可在<code>全局配置</code>中设置快捷键和外观（需要<code>显示高级选项</code>，可关闭<code>切换输入法时显示输入法提示</code>）</p>
+<h3 id="VS-Code"><a href="#VS-Code" class="headerlink" title="VS Code"></a>VS Code</h3><p><a href="https://code.visualstudio.com/">VS Code官网</a>下载<code>.deb</code>后，</p>
+<p>运行<code>sudo dpkg -i code_xxxx.deb</code>安装即可</p>
+<h3 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h3><p>其他软件的安装方式请自行搜索。</p>
+]]></content>
   </entry>
   <entry>
     <title>LaTeX公式复制到Word中显示</title>
@@ -1892,14 +1920,15 @@
 <span id="more"></span>
 <h2 id="安装Ubuntu"><a href="#安装Ubuntu" class="headerlink" title="安装Ubuntu"></a>安装Ubuntu</h2><h3 id="进入安装程序"><a href="#进入安装程序" class="headerlink" title="进入安装程序"></a>进入安装程序</h3><p>正常情况下，启动后会出现grub引导菜单，选择第二个即可进入Ubuntu安装程序。<br>然而，由于我的显卡是Nvidia的，无法进入安装界面。</p>
 <h4 id="英伟达显卡解决方案"><a href="#英伟达显卡解决方案" class="headerlink" title="英伟达显卡解决方案"></a>英伟达显卡解决方案</h4><p>在grub菜单画面时，按<code>e</code>编辑开机指令，<code>quite splash</code>改为<code>nomodeset</code><br>安装完毕重启后，同样方法进入系统，打开终端执行<br><code>sudo gedit /etc/default/grub</code><br>找到<code>quiet splash</code>将其改为<code>nomodeset</code>即可，更新grub后重启<br><code>sudo update-grub</code></p>
-<h3 id="按步骤安装即可"><a href="#按步骤安装即可" class="headerlink" title="按步骤安装即可"></a>按步骤安装即可</h3><p>安装步骤参考<a href="https://blog.csdn.net/ysy950803/article/details/52643737">亲测UEFI启动模式的电脑安装Win10和Ubuntu双系统</a><br>以下步骤皆来自该博文</p>
+<h3 id="按步骤安装即可"><a href="#按步骤安装即可" class="headerlink" title="按步骤安装即可"></a>按步骤安装即可</h3><p>安装步骤参考<a href="https://blog.csdn.net/ysy950803/article/details/52643737">亲测UEFI启动模式的电脑安装Win10和Ubuntu双系统</a><br>以下步骤皆来自该博文<br>// 复制开始</p>
 <h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项:"></a>注意事项:</h4><p>如果你选择了安装更新和第三方软件，那么一定要记得联网，否则会卡死在最后的进度条上，所以最好不要勾选。另外，不要选择“与其它系统共存”那一项，而选择最后那个“其它选项（创建自己的分区）”。<br>最最最关键的就是分区这一步，这一步直接影响你安装双系统是否成功！找到刚才分割出的未分配空间，点”+“按钮来挂载分区。选择的时候一定要看清楚，一般来说根据大小就能判断，不要手滑把Win所在的空间给格式化掉了。并且，可能会看到一些几十MB或者一百来MB的已用空间，不要去动它们，可能是分区恢复盘之类的：</p>
-<h4 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h4><p>swap交换空间，这个也就是虚拟内存的地方，选择主分区和空间起始位置。如果你给Ubuntu系统分区容量足够的话，最好是能给到你物理内存的2倍大小，像我8GB内存，就可以给个16GB的空间给它，这个看个人使用情况，太小也不好，太大也没用。（其实我只给了8GB，没什么问题）</p>
+<h4 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h4><p>swap和efi建议放在固态盘上</p>
+<p>swap交换空间，这个也就是虚拟内存的地方，选择主分区和空间起始位置。如果你给Ubuntu系统分区容量足够的话，最好是能给到你物理内存的2倍大小，像我8GB内存，就可以给个16GB的空间给它，这个看个人使用情况，太小也不好，太大也没用。（其实我只给了8GB，没什么问题）</p>
 <p>新建 efi系统分区 ， 选中逻辑分区 （这里不是主分区，请勿怀疑，老式的boot挂载才是主分区）和空间起始位置，大小最好不要小于256MB，系统引导文件都会在里面，如果这分区满了可能会带来未知问题。我给的512MB，它的作用和boot引导分区一样，只是引导方式不同。不要按照那些老教程去选boot引导分区，也就是最后你的挂载点里没有“/boot”这一项，否则你就没办法UEFI启动两个系统了。</p>
 <p>挂载“/home” ， 类型为EXT4日志文件系统，选中逻辑分区和空间起始位置，这个相当于你的个人文件夹，类似Windows里的User，如果你是个娱乐向的用户，我建议最好能分配稍微大点，因为你的图片、视频、下载内容基本都在这里面，这些东西可不像在Win上面你想移动就能移动的。<br>总的来说，最好不要低于8GB，我Ubuntu分区的总大小是64GB，这里我给了12GB给home。<br>（这里特别提醒一下，Ubuntu最新发行版不建议强制获取Root权限，因为我已经玩崩过一次。所以你以后很多文档、图片、包括免安装软件等资源不得不直接放在home分支下面。你作为图形界面用户，只对home分支有完全的读写执行权限，其余分支例如usr你只能在终端使用sudo命令来操作文件，不利于存放一些直接解压使用的免安装软件。因此，建议home分支多分配一点空间，32GB最好……）</p>
 <p>挂载“/usr” （也可以不挂，就直接包括在“/”当中），类型为EXT4日志文件系统，选中逻辑分区和空间起始位置，这个相当于你的软件安装位置，Linux下一般来说安装第三方软件你是没办法更改安装目录的，系统都会统一地安装到/usr目录下面，因此你就知道了，这个分区必须要大，我给了32GB。</p>
 <p>最后，挂载“/” ，类型为EXT4日志文件系统，选中逻辑分区和空间起始位置，<br>因为除了home和usr还有很多别的目录，但那些都不是最重要的，“/”就把除了之前你挂载的home和usr外的全部杂项囊括了，大小也不要太小，最好不低于8GB。如果你非要挨个仔细分配空间，那么你需要知道这些各个分区的含义（Linux(ubuntu)分区挂载点介绍）<br>不过就算你把所有目录都自定义分配了空间也必须要给“/”挂载点分配一定的空间。</p>
-<h4 id="重要提示"><a href="#重要提示" class="headerlink" title="重要提示"></a>重要提示</h4><p>分配好各个挂载点后，还有一个至关重要的步骤，那就是选择“安装引导启动器的设备”，默认是错误的，既然我们为Ubuntu分配了efi系统引导分区，那么显然，这里应该把它改成刚刚分配efi引导的那个分区。</p>
+<h4 id="重要提示"><a href="#重要提示" class="headerlink" title="重要提示"></a>重要提示</h4><p>分配好各个挂载点后，还有一个至关重要的步骤，那就是选择“安装引导启动器的设备”，默认是错误的，既然我们为Ubuntu分配了efi系统引导分区，那么显然，这里应该把它改成刚刚分配efi引导的那个分区。<br>// 复制结束</p>
 <h4 id="安装完成"><a href="#安装完成" class="headerlink" title="安装完成"></a>安装完成</h4><p>安装成功后，会提示重启（记得拔掉U盘）。</p>
 <h3 id="个人经验"><a href="#个人经验" class="headerlink" title="个人经验"></a>个人经验</h3><p>由于初始分辨率太低了，我分完区以后点击不了下一步= =（使用Tab和方向键也切换不过去）。<br>最后把安装语言设置成了英文，下一步显示出来了。<br>安装过程中可能会黑屏，只是系统关闭了显示器的正常现象，不必惊慌。<br>我的是Ubuntu所有分区都在机械硬盘上，然后重启后还是显示出了windows系统</p>
 <h2 id="其他问题"><a href="#其他问题" class="headerlink" title="其他问题"></a>其他问题</h2><h3 id="未安装驱动，分辨率太低"><a href="#未安装驱动，分辨率太低" class="headerlink" title="未安装驱动，分辨率太低"></a>未安装驱动，分辨率太低</h3><h4 id="临时解决方案"><a href="#临时解决方案" class="headerlink" title="临时解决方案"></a>临时解决方案</h4><p><code>sudo gedit /etc/default/grub</code><br>找到文件中的分辨率相关内容，将其分辨率改为你屏幕的分辨率，例如<code>1920X1080</code><br><code>sudo update-grub</code><br>更新后重启</p>

@@ -28,7 +28,7 @@
 <meta property="og:description" content="第一步，分区Linux只有分区挂载目录的概念，所以需要在Windows下分出一块较大的未分配空间，不需要格式化 下载镜像并写入U盘下载完镜像以后，使用软碟通将镜像写入U盘，然后重启。PS: 如果U盘本身就支持efi启动的话，可以直接把镜像解压到U盘开机后把握时机进入Boot Menu，选择从USB启动。注意：需要在BIOS中关闭安全启动（Secure Boot）">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-02-16T06:37:23.606Z">
-<meta property="article:modified_time" content="2021-09-05T03:25:59.577Z">
+<meta property="article:modified_time" content="2021-09-06T08:00:07.339Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
@@ -243,14 +243,15 @@
 <span id="more"></span>
 <h2 id="安装Ubuntu"><a href="#安装Ubuntu" class="headerlink" title="安装Ubuntu"></a>安装Ubuntu</h2><h3 id="进入安装程序"><a href="#进入安装程序" class="headerlink" title="进入安装程序"></a>进入安装程序</h3><p>正常情况下，启动后会出现grub引导菜单，选择第二个即可进入Ubuntu安装程序。<br>然而，由于我的显卡是Nvidia的，无法进入安装界面。</p>
 <h4 id="英伟达显卡解决方案"><a href="#英伟达显卡解决方案" class="headerlink" title="英伟达显卡解决方案"></a>英伟达显卡解决方案</h4><p>在grub菜单画面时，按<code>e</code>编辑开机指令，<code>quite splash</code>改为<code>nomodeset</code><br>安装完毕重启后，同样方法进入系统，打开终端执行<br><code>sudo gedit /etc/default/grub</code><br>找到<code>quiet splash</code>将其改为<code>nomodeset</code>即可，更新grub后重启<br><code>sudo update-grub</code></p>
-<h3 id="按步骤安装即可"><a href="#按步骤安装即可" class="headerlink" title="按步骤安装即可"></a>按步骤安装即可</h3><p>安装步骤参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/ysy950803/article/details/52643737">亲测UEFI启动模式的电脑安装Win10和Ubuntu双系统</a><br>以下步骤皆来自该博文</p>
+<h3 id="按步骤安装即可"><a href="#按步骤安装即可" class="headerlink" title="按步骤安装即可"></a>按步骤安装即可</h3><p>安装步骤参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/ysy950803/article/details/52643737">亲测UEFI启动模式的电脑安装Win10和Ubuntu双系统</a><br>以下步骤皆来自该博文<br>// 复制开始</p>
 <h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项:"></a>注意事项:</h4><p>如果你选择了安装更新和第三方软件，那么一定要记得联网，否则会卡死在最后的进度条上，所以最好不要勾选。另外，不要选择“与其它系统共存”那一项，而选择最后那个“其它选项（创建自己的分区）”。<br>最最最关键的就是分区这一步，这一步直接影响你安装双系统是否成功！找到刚才分割出的未分配空间，点”+“按钮来挂载分区。选择的时候一定要看清楚，一般来说根据大小就能判断，不要手滑把Win所在的空间给格式化掉了。并且，可能会看到一些几十MB或者一百来MB的已用空间，不要去动它们，可能是分区恢复盘之类的：</p>
-<h4 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h4><p>swap交换空间，这个也就是虚拟内存的地方，选择主分区和空间起始位置。如果你给Ubuntu系统分区容量足够的话，最好是能给到你物理内存的2倍大小，像我8GB内存，就可以给个16GB的空间给它，这个看个人使用情况，太小也不好，太大也没用。（其实我只给了8GB，没什么问题）</p>
+<h4 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h4><p>swap和efi建议放在固态盘上</p>
+<p>swap交换空间，这个也就是虚拟内存的地方，选择主分区和空间起始位置。如果你给Ubuntu系统分区容量足够的话，最好是能给到你物理内存的2倍大小，像我8GB内存，就可以给个16GB的空间给它，这个看个人使用情况，太小也不好，太大也没用。（其实我只给了8GB，没什么问题）</p>
 <p>新建 efi系统分区 ， 选中逻辑分区 （这里不是主分区，请勿怀疑，老式的boot挂载才是主分区）和空间起始位置，大小最好不要小于256MB，系统引导文件都会在里面，如果这分区满了可能会带来未知问题。我给的512MB，它的作用和boot引导分区一样，只是引导方式不同。不要按照那些老教程去选boot引导分区，也就是最后你的挂载点里没有“/boot”这一项，否则你就没办法UEFI启动两个系统了。</p>
 <p>挂载“/home” ， 类型为EXT4日志文件系统，选中逻辑分区和空间起始位置，这个相当于你的个人文件夹，类似Windows里的User，如果你是个娱乐向的用户，我建议最好能分配稍微大点，因为你的图片、视频、下载内容基本都在这里面，这些东西可不像在Win上面你想移动就能移动的。<br>总的来说，最好不要低于8GB，我Ubuntu分区的总大小是64GB，这里我给了12GB给home。<br>（这里特别提醒一下，Ubuntu最新发行版不建议强制获取Root权限，因为我已经玩崩过一次。所以你以后很多文档、图片、包括免安装软件等资源不得不直接放在home分支下面。你作为图形界面用户，只对home分支有完全的读写执行权限，其余分支例如usr你只能在终端使用sudo命令来操作文件，不利于存放一些直接解压使用的免安装软件。因此，建议home分支多分配一点空间，32GB最好……）</p>
 <p>挂载“/usr” （也可以不挂，就直接包括在“/”当中），类型为EXT4日志文件系统，选中逻辑分区和空间起始位置，这个相当于你的软件安装位置，Linux下一般来说安装第三方软件你是没办法更改安装目录的，系统都会统一地安装到/usr目录下面，因此你就知道了，这个分区必须要大，我给了32GB。</p>
 <p>最后，挂载“/” ，类型为EXT4日志文件系统，选中逻辑分区和空间起始位置，<br>因为除了home和usr还有很多别的目录，但那些都不是最重要的，“/”就把除了之前你挂载的home和usr外的全部杂项囊括了，大小也不要太小，最好不低于8GB。如果你非要挨个仔细分配空间，那么你需要知道这些各个分区的含义（Linux(ubuntu)分区挂载点介绍）<br>不过就算你把所有目录都自定义分配了空间也必须要给“/”挂载点分配一定的空间。</p>
-<h4 id="重要提示"><a href="#重要提示" class="headerlink" title="重要提示"></a>重要提示</h4><p>分配好各个挂载点后，还有一个至关重要的步骤，那就是选择“安装引导启动器的设备”，默认是错误的，既然我们为Ubuntu分配了efi系统引导分区，那么显然，这里应该把它改成刚刚分配efi引导的那个分区。</p>
+<h4 id="重要提示"><a href="#重要提示" class="headerlink" title="重要提示"></a>重要提示</h4><p>分配好各个挂载点后，还有一个至关重要的步骤，那就是选择“安装引导启动器的设备”，默认是错误的，既然我们为Ubuntu分配了efi系统引导分区，那么显然，这里应该把它改成刚刚分配efi引导的那个分区。<br>// 复制结束</p>
 <h4 id="安装完成"><a href="#安装完成" class="headerlink" title="安装完成"></a>安装完成</h4><p>安装成功后，会提示重启（记得拔掉U盘）。</p>
 <h3 id="个人经验"><a href="#个人经验" class="headerlink" title="个人经验"></a>个人经验</h3><p>由于初始分辨率太低了，我分完区以后点击不了下一步= =（使用Tab和方向键也切换不过去）。<br>最后把安装语言设置成了英文，下一步显示出来了。<br>安装过程中可能会黑屏，只是系统关闭了显示器的正常现象，不必惊慌。<br>我的是Ubuntu所有分区都在机械硬盘上，然后重启后还是显示出了windows系统</p>
 <h2 id="其他问题"><a href="#其他问题" class="headerlink" title="其他问题"></a>其他问题</h2><h3 id="未安装驱动，分辨率太低"><a href="#未安装驱动，分辨率太低" class="headerlink" title="未安装驱动，分辨率太低"></a>未安装驱动，分辨率太低</h3><h4 id="临时解决方案"><a href="#临时解决方案" class="headerlink" title="临时解决方案"></a>临时解决方案</h4><p><code>sudo gedit /etc/default/grub</code><br>找到文件中的分辨率相关内容，将其分辨率改为你屏幕的分辨率，例如<code>1920X1080</code><br><code>sudo update-grub</code><br>更新后重启</p>
@@ -374,7 +375,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">101</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

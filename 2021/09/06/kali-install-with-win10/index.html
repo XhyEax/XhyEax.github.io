@@ -20,18 +20,20 @@
     var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Blog of XhyEax">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Xhy&#39;s Blog">
-<meta property="og:url" content="https://blog.xhyeax.com/archives/page/6/index.html">
+  <meta name="description" content="概述为尝鲜Windows 11，把之前的Ubuntu删了。结果Windows 11用起来并不顺手。为了方便调试和开发（自带root终端），决定安装Kali 2021.2。 前文见Ubuntu18.04安装记录(与Win10双系统共存)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kali 2021.2 安装记录 (Win10双系统)">
+<meta property="og:url" content="https://blog.xhyeax.com/2021/09/06/kali-install-with-win10/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="Blog of XhyEax">
+<meta property="og:description" content="概述为尝鲜Windows 11，把之前的Ubuntu删了。结果Windows 11用起来并不顺手。为了方便调试和开发（自带root终端），决定安装Kali 2021.2。 前文见Ubuntu18.04安装记录(与Win10双系统共存)">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-09-05T17:11:59.000Z">
+<meta property="article:modified_time" content="2021-09-06T06:30:05.604Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="XhyEax&#39;s Blog">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://blog.xhyeax.com/archives/page/6/">
+<link rel="canonical" href="https://blog.xhyeax.com/2021/09/06/kali-install-with-win10/">
 
 
 <script id="page-configurations">
@@ -39,12 +41,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | Xhy's Blog</title>
+  <title>Kali 2021.2 安装记录 (Win10双系统) | Xhy's Blog</title>
   
 
 
@@ -185,235 +187,120 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        
-        <span class="collection-header">很好! 目前共计 102 篇日志。 继续努力。</span>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/09/06/kali-install-with-win10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Kali 2021.2 安装记录 (Win10双系统)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-06 01:11:59" itemprop="dateCreated datePublished" datetime="2021-09-06T01:11:59+08:00">2021-09-06</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2019</span>
-    </div>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-10-22T09:14:14+08:00"
-              content="2019-10-22">
-          10-22
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2019/10/22/hackersgame-2019-fails/" itemprop="url">
-            <span itemprop="name">Hackersgame 2019 的一些失败尝试及复现</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-10-22T09:13:24+08:00"
-              content="2019-10-22">
-          10-22
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2019/10/22/hackersgame-2019-writeup/" itemprop="url">
-            <span itemprop="name">Hackersgame 2019 部分writeup</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-10-15T13:40:57+08:00"
-              content="2019-10-15">
-          10-15
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2019/10/15/db-sqlite3-to-sql/" itemprop="url">
-            <span itemprop="name">导出sqlite3数据库为sql</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-10-07T02:38:24+08:00"
-              content="2019-10-07">
-          10-07
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2019/10/07/vivado-custom-ip-and-instantiation/" itemprop="url">
-            <span itemprop="name">Vivado 自定义IP核并实例化调用</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-10-03T03:30:48+08:00"
-              content="2019-10-03">
-          10-03
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2019/10/03/android-import-as-system-cert/" itemprop="url">
-            <span itemprop="name">安卓7.0及以上 导入为系统证书</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-09-28T12:21:18+08:00"
-              content="2019-09-28">
-          09-28
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2019/09/28/anti-web-js-debugger-code/" itemprop="url">
-            <span itemprop="name">绕过网站js中的debugger反调试</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-09-27T09:15:25+08:00"
-              content="2019-09-27">
-          09-27
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2019/09/27/andlua-app-reverse/" itemprop="url">
-            <span itemprop="name">送给最好的TA app分析</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-09-18T07:55:19+08:00"
-              content="2019-09-18">
-          09-18
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2019/09/18/qq-813-unrevoke-module-develop/" itemprop="url">
-            <span itemprop="name">QQ8.1.3防撤回(Xposed模块)的原理</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-09-16T14:45:27+08:00"
-              content="2019-09-16">
-          09-16
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2019/09/16/chromium-edge-idm-support/" itemprop="url">
-            <span itemprop="name">Microsoft Edge (Chromium内核)安装IDM插件</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2019-09-15T07:18:00+08:00"
-              content="2019-09-15">
-          09-15
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2019/09/15/magisk-set-debuggable/" itemprop="url">
-            <span itemprop="name">使用Magisk指令修改 ro.debuggable（不刷机）</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>为尝鲜<code>Windows 11</code>，把之前的<code>Ubuntu</code>删了。结果<code>Windows 11</code>用起来并不顺手。为了方便调试和开发（自带root终端），决定安装<code>Kali 2021.2</code>。</p>
+<p>前文见<a href="https://blog.xhyeax.com/2019/02/16/ubuntu-install/">Ubuntu18.04安装记录(与Win10双系统共存)</a></p>
+<span id="more"></span>
+<h2 id="使用Ventoy制作启动U盘"><a href="#使用Ventoy制作启动U盘" class="headerlink" title="使用Ventoy制作启动U盘"></a>使用Ventoy制作启动U盘</h2><p>步骤见官网：<a target="_blank" rel="noopener" href="https://www.ventoy.net/cn/index.html">Ventoy</a><br>记得备份U盘数据</p>
+<h2 id="下载系统镜像"><a href="#下载系统镜像" class="headerlink" title="下载系统镜像"></a>下载系统镜像</h2><p>推荐在镜像站下载，如<a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/">清华大学开源软件镜像站</a></p>
+<p>下载完成后，直接拷贝到U盘即可</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>进入<code>BIOS</code>，关闭安全启动(<code>secure boot</code>)，并修改启动顺序，优先从U盘启动</p>
+<p>选择图形化安装（第一个），语言选中文，按步骤安装即可（分区见下文）</p>
+<p>PS：建议连接网络安装，可自动同步时间</p>
+<h2 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h2><p>主要有以下三个分区：</p>
+<p><code>efi</code> (固态)： 有的话可以不做修改，直接使用固态盘的EFI分区即可。没有则创建256M的EFI分区<br><code>swap</code> (固态)： 交换空间，一般设置为内存的1到2倍，个人是设置的8G<br><code>/</code>： 剩下的空间可直接分配给该分区</p>
+<p><code>/home</code>、<code>/var</code>和<code>/usr</code>等路径如果不配置的话，就是跟<code>/</code>在同一个分区</p>
+<p>PS： 个人觉得不配置反而方便一点，不用考虑每个分区的容量</p>
+<h2 id="系统软件"><a href="#系统软件" class="headerlink" title="系统软件"></a>系统软件</h2><p>按照默认配置安装桌面环境和工具，之后等待系统安装完成即可</p>
+<h2 id="启动系统"><a href="#启动系统" class="headerlink" title="启动系统"></a>启动系统</h2><p>系统安装完成后会提示拔出安装介质，此时拔出U盘，重启后，选择第一个选项进入<code>Kali</code>系统</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h3><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/82361096">kali安装docker环境</a><br>建议配置镜像下载加速，见<a href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">在WSL2中使用docker编译安卓源码 </a></p>
+<h3 id="搜狗输入法"><a href="#搜狗输入法" class="headerlink" title="搜狗输入法"></a>搜狗输入法</h3><p><a target="_blank" rel="noopener" href="https://pinyin.sogou.com/linux/help.php">搜狗输入法 安装指南</a><br>安装完成后，需要重启系统</p>
+<p><code>设置</code>-<code>Fcitx配置</code>，增加一个<code>键盘 - 英语</code>输入法。（方便<code>Ctrl+Shift</code>切换输入法）</p>
+<p>可在<code>全局配置</code>中设置快捷键和外观（需要<code>显示高级选项</code>，可关闭<code>切换输入法时显示输入法提示</code>）</p>
+<h3 id="VS-Code"><a href="#VS-Code" class="headerlink" title="VS Code"></a>VS Code</h3><p><a target="_blank" rel="noopener" href="https://code.visualstudio.com/">VS Code官网</a>下载<code>.deb</code>后，</p>
+<p>运行<code>sudo dpkg -i code_xxxx.deb</code>安装即可</p>
+<h3 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h3><p>其他软件的安装方式请自行搜索。</p>
 
     </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
-  
-  
-  
+</div>
 
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/09/05/change-hexo-theme-to-next/" rel="prev" title="更换Hexo博客主题为NexT">
+      <i class="fa fa-chevron-left"></i> 更换Hexo博客主题为NexT
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
   
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/archives/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/archives/">1</a><span class="space">&hellip;</span><a class="page-number" href="/archives/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/archives/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/archives/page/11/">11</a><a class="extend next" rel="next" href="/archives/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
+  
+  
 
 
 
@@ -465,6 +352,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Ventoy%E5%88%B6%E4%BD%9C%E5%90%AF%E5%8A%A8U%E7%9B%98"><span class="nav-number">2.</span> <span class="nav-text">使用Ventoy制作启动U盘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E7%B3%BB%E7%BB%9F%E9%95%9C%E5%83%8F"><span class="nav-number">3.</span> <span class="nav-text">下载系统镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">4.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%8C%BA"><span class="nav-number">5.</span> <span class="nav-text">分区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%BD%AF%E4%BB%B6"><span class="nav-number">6.</span> <span class="nav-text">系统软件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E7%B3%BB%E7%BB%9F"><span class="nav-number">7.</span> <span class="nav-text">启动系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">8.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#docker"><span class="nav-number">8.1.</span> <span class="nav-text">docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%9C%E7%8B%97%E8%BE%93%E5%85%A5%E6%B3%95"><span class="nav-number">8.2.</span> <span class="nav-text">搜狗输入法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VS-Code"><span class="nav-number">8.3.</span> <span class="nav-text">VS Code</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E5%A4%9A"><span class="nav-number">8.4.</span> <span class="nav-text">更多</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

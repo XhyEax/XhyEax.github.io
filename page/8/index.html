@@ -191,6 +191,71 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/05/01/cpp-class-member-func-ptr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/05/01/cpp-class-member-func-ptr/" class="post-title-link" itemprop="url">C++中类的成员函数的函数指针</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-05-01 06:38:44" itemprop="dateCreated datePublished" datetime="2019-05-01T06:38:44+08:00">2019-05-01</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="获取指针"><a href="#获取指针" class="headerlink" title="获取指针"></a>获取指针</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">staticmember</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;static&quot;</span> &lt;&lt; endl; &#125;	 <span class="comment">//static member</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">nonstatic</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;nonstatic&quot;</span> &lt;&lt; endl; &#125;			 <span class="comment">//nonstatic member</span></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">virtualmember</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;virtual&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">//virtual member</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	A a;</span><br><span class="line">	<span class="comment">//static成员函数,取得的是该函数在内存中的实际地址，而且因为static成员是全局的，所以不能用A::限定符</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (*ptrstatic)() = &amp;A::staticmember;</span><br><span class="line">	<span class="comment">//nonstatic成员函数 取得的是该函数在内存中的实际地址</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (A::*ptrnonstatic)() = &amp;A::nonstatic;</span><br><span class="line">	<span class="comment">//虚函数取得的是虚函数表中的偏移值，这样可以保证能过指针调用时同样的多态效果</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (A::*ptrvirtual)() = &amp;A::virtualmember;</span><br><span class="line">	<span class="comment">//函数指针的使用方式</span></span><br><span class="line">	<span class="built_in">ptrstatic</span>();</span><br><span class="line">	(a.*ptrnonstatic)();</span><br><span class="line">	(a.*ptrvirtual)();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="在map中使用指针"><a href="#在map中使用指针" class="headerlink" title="在map中使用指针"></a>在map中使用指针</h2><p>直接使用对应类型也是可以的，比如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">map&lt;string, <span class="keyword">void</span> (A::*)()&gt; zeroParmsFuns;</span><br></pre></td></tr></table></figure>
+<p>不过为了方便起见，还是自定义类型吧</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(A::*func)</span><span class="params">()</span></span>;</span><br><span class="line">map&lt;string, func&gt; zeroParmsFuns;</span><br></pre></td></tr></table></figure>
+<p>使用迭代器来遍历map，funcName是函数名，对应map的key</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">map&lt;string, func&gt;::iterator iter = zeroParmsFuns.<span class="built_in">find</span>(funcName);</span><br><span class="line">       <span class="keyword">if</span> (iter != zeroParmsFuns.<span class="built_in">end</span>())</span><br><span class="line">       &#123;</span><br><span class="line">           (<span class="keyword">this</span>-&gt;*(iter-&gt;second))();</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lidabo/p/3597559.html">C++中怎么获取类的成员函数的函数指针？</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/limedia/p/cxx_class_inner_poiner.html">C++ 类内函数指针的使用的使用</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/30/vscode-cpp-exe-encoding/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -780,73 +845,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/16/fix-linux-time/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/02/16/fix-linux-time/" class="post-title-link" itemprop="url">修复双系统（Win+Linux）时间不同步问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-02-16 13:54:29" itemprop="dateCreated datePublished" datetime="2019-02-16T13:54:29+08:00">2019-02-16</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>笔记本装了win10+Ubuntu18.04双系统，但是两个系统的时间并不同步，相差8小时（正好是时区数）。于是搜索之，找到解决方案</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>Windows 与 Mac/Linux 看待系统硬件时间（Hardware Ttime，或称实时时间，即RTC，Real_Time Clock）的方式不同。<br>Windows把计算机硬件时间当作本地时间(local time)，所以在Windows系统中显示的时间跟BIOS中显示的时间是一样的。<br>而Linux/Unix/Mac把计算机硬件时间当作UTC（Universal Time Coordinated，世界统一时间）， 所以在Linux/Unix/Mac系统启动后在该时间的基础上，加上电脑设置的时区数。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>所以只需要使两个系统对待硬件时间的方式一致即可。<br>自然，有两种方法。</p>
-<h3 id="方法1-修改Linux系统"><a href="#方法1-修改Linux系统" class="headerlink" title="方法1 修改Linux系统"></a>方法1 修改Linux系统</h3><p>打开终端，执行<br><code>timedatectl set-local-rtc 1</code><br>禁用Linux系统的UTC时间，重启即可生效（不需要管理员权限）</p>
-<blockquote>
-<p>提示： 在 Ubuntu 16.04 版本以前，关闭UTC的方法是编辑/etc/default/rcS，将UTC=yes改成UTC=no， 但在Ubuntu 16.04使用systemd启动之后，时间改成了由timedatectl来管理</p>
-</blockquote>
-<p>如果时间还是不对，就先在设置里修改系统时间为当前时间（北京时间），然后执行<br><code>timedatectl set-local-rtc 1</code><br>再<br><code>sudo hwclock -w</code><br>写入当前时间到硬件</p>
-<h3 id="方法2-修改Windows系统（不建议）"><a href="#方法2-修改Windows系统（不建议）" class="headerlink" title="方法2 修改Windows系统（不建议）"></a>方法2 修改Windows系统（不建议）</h3><p>Win+X，打开<code>Powershell</code>（管理员），执行<br><code>Reg add HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v RealTimeIsUniversal /t REG_DWORD /d 1</code><br>解释：设置<code>RealTimeIsUniversal</code>键值为1，也就是把RTC当作UTC<br>然而我用这种方法，切换几次系统以后时间往后推了16小时= =<br>所以个人不推荐使用这种方法</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zyqblog/article/details/79318955?utm_source=copy">解决Windows10与Ubuntu16.04双系统时间不一样问题！</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -918,7 +916,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">101</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
