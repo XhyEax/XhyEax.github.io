@@ -377,7 +377,7 @@
       </tags>
   </entry>
   <entry>
-    <title>修改安卓内核源码 过State TracerPID反调试</title>
+    <title>修改安卓内核源码 过State TracerPid wchan反调试</title>
     <url>/2019/09/13/android-source-mod-anti-antidebug/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>修改安卓内核源码来绕过State字段及TracePid字段反调试</p>
 <h2 id="目标文件"><a href="#目标文件" class="headerlink" title="目标文件"></a>目标文件</h2><p>打开内核源码目录，<code>/fs/proc</code>下的<code>base.c</code>和<code>array.c</code></p>
@@ -443,21 +443,23 @@
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://xxxxxx.mirror.aliyuncs.com&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>重启docker</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo service docker restart</span><br></pre></td></tr></table></figure>
+<span id="more"></span>
 <h3 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h3><p>编译安卓5.0到6.0，则克隆<code>android-5</code>分支</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/XhyEax/docker-aosp -b android-5</span><br></pre></td></tr></table></figure>
 <p>7.0及以上直接克隆即可</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/XhyEax/docker-aosp</span><br></pre></td></tr></table></figure>
 <h3 id="配置源码保存路径（可选）"><a href="#配置源码保存路径（可选）" class="headerlink" title="配置源码保存路径（可选）"></a>配置源码保存路径（可选）</h3><p>默认保存到<code>~/aosp-root</code> (即<code>/root/aosp-root</code>)</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export AOSP_VOL=~/Android/</span><br></pre></td></tr></table></figure>
+<p>也可修改<code>aosp</code>中的<code>AOSP_VOL</code></p>
 <h3 id="手动配置镜像版本（可选）"><a href="#手动配置镜像版本（可选）" class="headerlink" title="手动配置镜像版本（可选）"></a>手动配置镜像版本（可选）</h3><p>以编译6.0系统为例，修改<code>aosp</code>的第十二行为：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">AOSP_IMAGE=$&#123;AOSP_IMAGE:-kylemanna/aosp:5.0-lolipop&#125;</span><br></pre></td></tr></table></figure>
 <p>所有tag：<a href="https://hub.docker.com/r/kylemanna/aosp/tags">dockerhub kylemanna/aosp tags</a></p>
-<h3 id="启动容器-进入bash"><a href="#启动容器-进入bash" class="headerlink" title="启动容器 进入bash"></a>启动容器 进入bash</h3><p>用于测试文件夹映射是否正确</p>
+<h3 id="启动容器-进入bash"><a href="#启动容器-进入bash" class="headerlink" title="启动容器 进入bash"></a>启动容器 进入bash</h3><p>用于测试文件夹映射是否正确，进入后执行<code>ls</code></p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">./aosp</span><br></pre></td></tr></table></figure>
-<p><strong>注意：不要用exit退出，会关闭容器。使用<code>Ctrl+P+Q</code></strong></p>
+<p><strong>注意：不要用<code>exit</code>退出，会关闭容器。使用<code>Ctrl+P+Q</code></strong></p>
 <h3 id="以root用户进入bash"><a href="#以root用户进入bash" class="headerlink" title="以root用户进入bash"></a>以root用户进入bash</h3><p>用于编译系统</p>
-<h4 id="查询容器id"><a href="#查询容器id" class="headerlink" title="查询容器id"></a>查询容器id</h4><p>启动docker容器后，复制容器id（用户名后面的字符）<br>也可以使用<code>docker ps</code>查询</p>
-<h4 id="root用户登录bash"><a href="#root用户登录bash" class="headerlink" title="root用户登录bash"></a>root用户登录bash</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker exec --privileged -u root -it 容器id bash</span><br></pre></td></tr></table></figure>
+<h4 id="查询容器id"><a href="#查询容器id" class="headerlink" title="查询容器id"></a>查询容器id</h4><p>启动docker容器后，复制容器id（用户名后面的字符）<br>也可以使用<code>docker ps</code>查询<br>（下面是使用命令提取出第一个容器id）</p>
+<h4 id="root用户登录bash"><a href="#root用户登录bash" class="headerlink" title="root用户登录bash"></a>root用户登录bash</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cid=$(docker ps | grep aosp | cut -d&quot; &quot; -f1) &amp;&amp; echo $cid</span><br><span class="line">docker exec --privileged -u root -it $cid bash</span><br></pre></td></tr></table></figure>
 <h3 id="已有源码：直接编译系统"><a href="#已有源码：直接编译系统" class="headerlink" title="已有源码：直接编译系统"></a>已有源码：直接编译系统</h3><p>进入容器的bash后，打开源码目录，执行以下命令：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">prebuilts/misc/linux-x86/ccache/ccache -M 100G</span><br><span class="line">source build/envsetup.sh</span><br><span class="line">lunch aosp_arm-eng</span><br><span class="line">cpus=$(grep ^processor /proc/cpuinfo | wc -l)</span><br><span class="line">make -j $[2*$cpus]</span><br></pre></td></tr></table></figure>
 <h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>如果需要编译手机（如nexus5）使用的系统镜像，还需要下载驱动文件。<br>见：<a href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">Ubuntu 19.10 编译安卓6.0.0_r1源码</a><br>并修改脚本中的<code>aosp_arm-eng</code>为<code>aosp_hammerhead-userdebug</code></p>
@@ -469,6 +471,7 @@
       <tags>
         <tag>Android</tag>
         <tag>Linux</tag>
+        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
@@ -2307,11 +2310,20 @@
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo chmod +x /etc/init.wsl</span><br></pre></td></tr></table></figure>
 <h4 id="Windows开机自启"><a href="#Windows开机自启" class="headerlink" title="Windows开机自启"></a>Windows开机自启</h4><p>win+r，<code>shell:startup</code>，在该目录下创建vbs脚本<br><code>linux-start.vbs</code></p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Set ws = WScript.CreateObject(&quot;WScript.Shell&quot;)</span><br><span class="line">ws.run &quot;wsl -d ubuntu -u root /etc/init.wsl&quot;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://zhuanlan.zhihu.com/p/74489613">WSL 2中安装Docker</a><br><a href="https://www.cnblogs.com/blog5277/p/12071400.html">WSL2（Ubuntu）安装Docker</a><br><a href="https://www.xu.ci/2019/12/windowswsl2ubuntu.html">Windows开机启动WSL2（Ubuntu）的启动项</a></p>
+<h4 id="添加当前用户进docker组"><a href="#添加当前用户进docker组" class="headerlink" title="添加当前用户进docker组"></a>添加当前用户进docker组</h4><ol>
+<li>查看是否创建docker 组<br><code>cat /etc/group | grep docker</code></li>
+<li>创建docker组，第一步打印出东西证明以前建过，就直接跳过这一步。<br><code>sudo groupadd docker</code></li>
+<li>将用户添加到docker分组<br><code>sudo usermod -aG docker 用户名</code></li>
+<li>查看有没有生效<br><code>cat /etc/group</code></li>
+<li>重启docker<br><code>sudo systemctl restart docker</code></li>
+<li>给docker.sock添加权限<br><code>sudo chmod a+rw /var/run/docker.sock</code></li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://zhuanlan.zhihu.com/p/74489613">WSL 2中安装Docker</a><br><a href="https://www.cnblogs.com/blog5277/p/12071400.html">WSL2（Ubuntu）安装Docker</a><br><a href="https://www.xu.ci/2019/12/windowswsl2ubuntu.html">Windows开机启动WSL2（Ubuntu）的启动项</a><br><a href="https://www.cnblogs.com/zyh1994/p/13688542.html">解决运行docker命令要用sudo的问题</a></p>
 ]]></content>
       <tags>
         <tag>Linux</tag>
         <tag>WSL</tag>
+        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
@@ -2494,6 +2506,49 @@
 ]]></content>
       <tags>
         <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用docker编译安卓内核源码</title>
+    <url>/2021/09/13/docker-compile-android-kernel/</url>
+    <content><![CDATA[<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>PC：<code>Kali 2021.2</code><br>手机：<code>Nexus 5</code>、<code>Android 6.0.1</code><br>内核版本：<code>3.4</code></p>
+<span id="more"></span>
+<h2 id="Docker相关"><a href="#Docker相关" class="headerlink" title="Docker相关"></a>Docker相关</h2><p>详见<a href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">在WSL2中使用docker编译安卓源码</a></p>
+<h2 id="下载内核源码"><a href="#下载内核源码" class="headerlink" title="下载内核源码"></a>下载内核源码</h2><h3 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://aosp.tuna.tsinghua.edu.cn/kernel/msm.git</span><br></pre></td></tr></table></figure>
+<h3 id="查询分支"><a href="#查询分支" class="headerlink" title="查询分支"></a>查询分支</h3><p>手机设置-关于手机-内核版本，形如<code>3.4.0-g32ac281</code>，其中<code>short commit id</code>即为末尾七位字符<code>32ac281</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git branch -r --contains &lt;short commit id&gt;</span><br></pre></td></tr></table></figure>
+<p>得到如下结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">origin/android-msm-hammerhead-3.4-marshmallow</span><br><span class="line">origin/android-msm-hammerhead-3.4-marshmallow-mr2</span><br><span class="line">origin/android-msm-hammerhead-3.4-marshmallow-mr3</span><br></pre></td></tr></table></figure>
+<h3 id="检出分支"><a href="#检出分支" class="headerlink" title="检出分支"></a>检出分支</h3><p>注意：mr3版本有bug，无法查询Wifi，最后使用的是<code>android-msm-hammerhead-3.4-marshmallow</code>分支</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git checkout -b android-msm-hammerhead-3.4-marshmallow origin/android-msm-hammerhead-3.4-marshmallow</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用root用户进入容器bash"><a href="#使用root用户进入容器bash" class="headerlink" title="使用root用户进入容器bash"></a>使用root用户进入容器bash</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cid=$(docker ps | grep aosp | cut -d&quot; &quot; -f1) &amp;&amp; echo $cid</span><br><span class="line">docker exec --privileged -u root -it $cid bash</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置GCC"><a href="#配置GCC" class="headerlink" title="配置GCC"></a>配置GCC</h2><h3 id="已有安卓源码：直接配置环境变量"><a href="#已有安卓源码：直接配置环境变量" class="headerlink" title="已有安卓源码：直接配置环境变量"></a>已有安卓源码：直接配置环境变量</h3><p>找到源码中gcc编译器位置，添加进PATH即可：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export PATH=/aosp/android-6.0.0_r1/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin:$PATH</span><br></pre></td></tr></table></figure>
+<h3 id="无安卓源码：手动下载后配置"><a href="#无安卓源码：手动下载后配置" class="headerlink" title="无安卓源码：手动下载后配置"></a>无安卓源码：手动下载后配置</h3><p>下载gcc</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://aosp.tuna.tsinghua.edu.cn/platform/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8</span><br></pre></td></tr></table></figure>
+<p>配置环境变量</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export PATH=/aosp/arm-eabi-4.8/bin:$PATH</span><br></pre></td></tr></table></figure>
+
+<h2 id="编译内核"><a href="#编译内核" class="headerlink" title="编译内核"></a>编译内核</h2><p>切换到内核目录，执行以下命令即可：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export ARCH=arm</span><br><span class="line">export SUBARCH=arm</span><br><span class="line">export CROSS_COMPILE=arm-eabi-</span><br><span class="line">make hammerhead_defconfig</span><br><span class="line">cpus=$(grep ^processor /proc/cpuinfo | wc -l)</span><br><span class="line">make -j$[2*$cpus]</span><br></pre></td></tr></table></figure>
+
+<h2 id="打包镜像"><a href="#打包镜像" class="headerlink" title="打包镜像"></a>打包镜像</h2><h3 id="已有安卓源码：直接编译生成"><a href="#已有安卓源码：直接编译生成" class="headerlink" title="已有安卓源码：直接编译生成"></a>已有安卓源码：直接编译生成</h3><p>打开源码目录，执行以下操作：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">source ./build/envsetup.sh</span><br><span class="line">lunch aosp_hammerhead-userdebug</span><br></pre></td></tr></table></figure>
+<p>然后设置内核文件位置（默认使用<code>/aosp/android-6.0.0_r1/device/lge/zImage-dtb</code>）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export TARGET_PREBUILT_KERNEL=/aosp/kernel/msm/arch/arm/boot/zImage-dtb</span><br></pre></td></tr></table></figure>
+<p>之后打包即可</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cpus=$(grep ^processor /proc/cpuinfo | wc -l)</span><br><span class="line">make -j$[2*$cpus]</span><br></pre></td></tr></table></figure>
+<p>生成的镜像位于<code>out/target/produuct/hammerhead/boot.img</code></p>
+<h3 id="无安卓源码：手动重打包"><a href="#无安卓源码：手动重打包" class="headerlink" title="无安卓源码：手动重打包"></a>无安卓源码：手动重打包</h3><p>使用<code>mkbootimg</code>和<code>unmkbootimg</code>重打包镜像</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p><a href="https://blog.xhyeax.com/2019/09/13/android-source-mod-anti-antidebug/">修改安卓内核源码 过State TracerPid wchan反调试</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.52pojie.cn/thread-940605-1-1.html">Android反调试——从源码入手</a><br><a href="https://bbs.pediy.com/thread-254443.htm">nexus5重新编译手机内核，手机WiFi无法正常使用</a><br><a href="https://blog.csdn.net/weixin_42268494/article/details/111907114">android dtb文件位置_android 内核源码编译到刷机</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>Linux</tag>
+        <tag>Docker</tag>
       </tags>
   </entry>
 </search>

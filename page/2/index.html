@@ -191,6 +191,73 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/" class="post-title-link" itemprop="url">QQ 8.8.17 防撤回、无限打开闪照</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-08-04 08:33:08" itemprop="dateCreated datePublished" datetime="2021-08-04T08:33:08+08:00">2021-08-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前写过一篇<a href="https://blog.xhyeax.com/2019/09/18/qq-813-unrevoke-module-develop/">QQ8.1.3防撤回原理</a>，每次更新后，都需要适配被混淆的类名。</p>
+<p>今天更新了最新版QQ（<code>8.8.17</code>），发现使用到的类名都未被混淆，不过包结构有了一定变化（可能是重构了？），需要重新适配。</p>
+<p>于是尝试使用<code>objection</code>分析撤回提示的实现，并编写<code>Xposed</code>模块。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/08/03/arm-thumb-pc-address/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -786,71 +853,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/07/21/use-attribute-packed-to-disable-align/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/21/use-attribute-packed-to-disable-align/" class="post-title-link" itemprop="url">使用__attribute__配置结构体，禁用编译器自动对齐</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-21 09:06:50" itemprop="dateCreated datePublished" datetime="2020-07-21T09:06:50+08:00">2020-07-21</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>结构体声明中加上<code>__attribute__((packed))</code>，可以防止编译器对结构进行字节对齐优化。<br>使用<code>__attribute__((aligned(8)))</code>(8为对齐字节数)，可以强制编译器按指定字节对齐。</p>
-<h2 id="结构体定义"><a href="#结构体定义" class="headerlink" title="结构体定义"></a>结构体定义</h2><h3 id="使用-packed"><a href="#使用-packed" class="headerlink" title="使用 packed"></a>使用 packed</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">    <span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">&#125; __attribute__((packed));</span><br></pre></td></tr></table></figure>
-<p>使用sizeof获取结构体的大小，返回7</p>
-<h3 id="不使用-packed"><a href="#不使用-packed" class="headerlink" title="不使用 packed"></a>不使用 packed</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">	<span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>根据结构体中最长的类型(int)，进行对齐，获取到的结构体大小为8</p>
-<h3 id="指定对齐大小"><a href="#指定对齐大小" class="headerlink" title="指定对齐大小"></a>指定对齐大小</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">	<span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">    <span class="keyword">int</span> d;	 <span class="comment">//4</span></span><br><span class="line">&#125; __attribute__((<span class="built_in">aligned</span>(<span class="number">8</span>)));</span><br></pre></td></tr></table></figure>
-<p>不使用指定对齐字节时，结构体大小为3*4=12，指定后变为16</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zuiyinian/article/details/81174031">为什么要用 “ <strong>attribute</strong> ((<strong>packed</strong>)) ” 定义结构体</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/swj9099/article/details/96713277"><strong>attribute</strong> 用法</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -922,14 +924,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">102</span>
+          <span class="site-state-item-count">103</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

@@ -22,13 +22,13 @@
 
   <meta name="description" content="概述修改安卓内核源码来绕过State字段及TracePid字段反调试 目标文件打开内核源码目录，&#x2F;fs&#x2F;proc下的base.c和array.c 修改点base.cproc_pid_wchan函数最后一个else分支改成 123456else    &amp;#123;   &#x2F;&#x2F;修改部分        if(strstr(symname,&quot;trace&quot;))            ret">
 <meta property="og:type" content="article">
-<meta property="og:title" content="修改安卓内核源码 过State TracerPID反调试">
+<meta property="og:title" content="修改安卓内核源码 过State TracerPid wchan反调试">
 <meta property="og:url" content="https://blog.xhyeax.com/2019/09/13/android-source-mod-anti-antidebug/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="概述修改安卓内核源码来绕过State字段及TracePid字段反调试 目标文件打开内核源码目录，&#x2F;fs&#x2F;proc下的base.c和array.c 修改点base.cproc_pid_wchan函数最后一个else分支改成 123456else    &amp;#123;   &#x2F;&#x2F;修改部分        if(strstr(symname,&quot;trace&quot;))            ret">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-09-13T03:23:31.161Z">
-<meta property="article:modified_time" content="2021-09-05T02:52:52.758Z">
+<meta property="article:modified_time" content="2021-09-13T11:41:11.214Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
@@ -46,7 +46,7 @@
   };
 </script>
 
-  <title>修改安卓内核源码 过State TracerPID反调试 | Xhy's Blog</title>
+  <title>修改安卓内核源码 过State TracerPid wchan反调试 | Xhy's Blog</title>
   
 
 
@@ -207,7 +207,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          修改安卓内核源码 过State TracerPID反调试
+          修改安卓内核源码 过State TracerPid wchan反调试
         </h1>
 
         <div class="post-meta">
@@ -363,14 +363,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">102</span>
+          <span class="site-state-item-count">103</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

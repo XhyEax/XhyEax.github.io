@@ -191,6 +191,71 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/07/21/use-attribute-packed-to-disable-align/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/07/21/use-attribute-packed-to-disable-align/" class="post-title-link" itemprop="url">使用__attribute__配置结构体，禁用编译器自动对齐</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-21 09:06:50" itemprop="dateCreated datePublished" datetime="2020-07-21T09:06:50+08:00">2020-07-21</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>结构体声明中加上<code>__attribute__((packed))</code>，可以防止编译器对结构进行字节对齐优化。<br>使用<code>__attribute__((aligned(8)))</code>(8为对齐字节数)，可以强制编译器按指定字节对齐。</p>
+<h2 id="结构体定义"><a href="#结构体定义" class="headerlink" title="结构体定义"></a>结构体定义</h2><h3 id="使用-packed"><a href="#使用-packed" class="headerlink" title="使用 packed"></a>使用 packed</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">    <span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">&#125; __attribute__((packed));</span><br></pre></td></tr></table></figure>
+<p>使用sizeof获取结构体的大小，返回7</p>
+<h3 id="不使用-packed"><a href="#不使用-packed" class="headerlink" title="不使用 packed"></a>不使用 packed</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">	<span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>根据结构体中最长的类型(int)，进行对齐，获取到的结构体大小为8</p>
+<h3 id="指定对齐大小"><a href="#指定对齐大小" class="headerlink" title="指定对齐大小"></a>指定对齐大小</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">	<span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">    <span class="keyword">int</span> d;	 <span class="comment">//4</span></span><br><span class="line">&#125; __attribute__((<span class="built_in">aligned</span>(<span class="number">8</span>)));</span><br></pre></td></tr></table></figure>
+<p>不使用指定对齐字节时，结构体大小为3*4=12，指定后变为16</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zuiyinian/article/details/81174031">为什么要用 “ <strong>attribute</strong> ((<strong>packed</strong>)) ” 定义结构体</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/swj9099/article/details/96713277"><strong>attribute</strong> 用法</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/17/powershell-add-font/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -309,29 +374,14 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://xxxxxx.mirror.aliyuncs.com&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>重启docker</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service docker restart</span><br></pre></td></tr></table></figure>
-<h3 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h3><p>编译安卓5.0到6.0，则克隆<code>android-5</code>分支</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/XhyEax/docker-aosp -b android-5</span><br></pre></td></tr></table></figure>
-<p>7.0及以上直接克隆即可</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/XhyEax/docker-aosp</span><br></pre></td></tr></table></figure>
-<h3 id="配置源码保存路径（可选）"><a href="#配置源码保存路径（可选）" class="headerlink" title="配置源码保存路径（可选）"></a>配置源码保存路径（可选）</h3><p>默认保存到<code>~/aosp-root</code> (即<code>/root/aosp-root</code>)</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export AOSP_VOL=~/Android/</span><br></pre></td></tr></table></figure>
-<h3 id="手动配置镜像版本（可选）"><a href="#手动配置镜像版本（可选）" class="headerlink" title="手动配置镜像版本（可选）"></a>手动配置镜像版本（可选）</h3><p>以编译6.0系统为例，修改<code>aosp</code>的第十二行为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AOSP_IMAGE=$&#123;AOSP_IMAGE:-kylemanna/aosp:5.0-lolipop&#125;</span><br></pre></td></tr></table></figure>
-<p>所有tag：<a target="_blank" rel="noopener" href="https://hub.docker.com/r/kylemanna/aosp/tags">dockerhub kylemanna/aosp tags</a></p>
-<h3 id="启动容器-进入bash"><a href="#启动容器-进入bash" class="headerlink" title="启动容器 进入bash"></a>启动容器 进入bash</h3><p>用于测试文件夹映射是否正确</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./aosp</span><br></pre></td></tr></table></figure>
-<p><strong>注意：不要用exit退出，会关闭容器。使用<code>Ctrl+P+Q</code></strong></p>
-<h3 id="以root用户进入bash"><a href="#以root用户进入bash" class="headerlink" title="以root用户进入bash"></a>以root用户进入bash</h3><p>用于编译系统</p>
-<h4 id="查询容器id"><a href="#查询容器id" class="headerlink" title="查询容器id"></a>查询容器id</h4><p>启动docker容器后，复制容器id（用户名后面的字符）<br>也可以使用<code>docker ps</code>查询</p>
-<h4 id="root用户登录bash"><a href="#root用户登录bash" class="headerlink" title="root用户登录bash"></a>root用户登录bash</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec --privileged -u root -it 容器id bash</span><br></pre></td></tr></table></figure>
-<h3 id="已有源码：直接编译系统"><a href="#已有源码：直接编译系统" class="headerlink" title="已有源码：直接编译系统"></a>已有源码：直接编译系统</h3><p>进入容器的bash后，打开源码目录，执行以下命令：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">prebuilts/misc/linux-x86/ccache/ccache -M 100G</span><br><span class="line">source build/envsetup.sh</span><br><span class="line">lunch aosp_arm-eng</span><br><span class="line">cpus=$(grep ^processor /proc/cpuinfo | wc -l)</span><br><span class="line">make -j $[2*$cpus]</span><br></pre></td></tr></table></figure>
-<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>如果需要编译手机（如nexus5）使用的系统镜像，还需要下载驱动文件。<br>见：<a href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">Ubuntu 19.10 编译安卓6.0.0_r1源码</a><br>并修改脚本中的<code>aosp_arm-eng</code>为<code>aosp_hammerhead-userdebug</code></p>
-<h3 id="无源码：下载源码并编译"><a href="#无源码：下载源码并编译" class="headerlink" title="无源码：下载源码并编译"></a>无源码：下载源码并编译</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd tests</span><br><span class="line">bash ./build-aosp.sh</span><br></pre></td></tr></table></figure>
-<p>该脚本下载的是<code>android-6.0.0_r1</code>的代码，编译目标为<code>aosp_arm-eng</code>，如需更换请自行修改脚本</p>
-<h3 id="删除容器"><a href="#删除容器" class="headerlink" title="删除容器"></a>删除容器</h3><p><code>docker ps</code>找到容器id，执行<code>docker rm -f 容器id</code>删除</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://github.com/tiann/docker-aosp">tiann/docker-aosp</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/asminfo/p/6789258.html">使用docker创建aosp编译环境</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43569697/article/details/89279225">docker下载镜像太慢的解决方案</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/b1ce248d2a42">Docker退出容器不关闭容器的方法</a></p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/16/aosp-docker/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -654,7 +704,15 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod +x /etc/init.wsl</span><br></pre></td></tr></table></figure>
 <h4 id="Windows开机自启"><a href="#Windows开机自启" class="headerlink" title="Windows开机自启"></a>Windows开机自启</h4><p>win+r，<code>shell:startup</code>，在该目录下创建vbs脚本<br><code>linux-start.vbs</code></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Set ws = WScript.CreateObject(&quot;WScript.Shell&quot;)</span><br><span class="line">ws.run &quot;wsl -d ubuntu -u root /etc/init.wsl&quot;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/74489613">WSL 2中安装Docker</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/blog5277/p/12071400.html">WSL2（Ubuntu）安装Docker</a><br><a target="_blank" rel="noopener" href="https://www.xu.ci/2019/12/windowswsl2ubuntu.html">Windows开机启动WSL2（Ubuntu）的启动项</a></p>
+<h4 id="添加当前用户进docker组"><a href="#添加当前用户进docker组" class="headerlink" title="添加当前用户进docker组"></a>添加当前用户进docker组</h4><ol>
+<li>查看是否创建docker 组<br><code>cat /etc/group | grep docker</code></li>
+<li>创建docker组，第一步打印出东西证明以前建过，就直接跳过这一步。<br><code>sudo groupadd docker</code></li>
+<li>将用户添加到docker分组<br><code>sudo usermod -aG docker 用户名</code></li>
+<li>查看有没有生效<br><code>cat /etc/group</code></li>
+<li>重启docker<br><code>sudo systemctl restart docker</code></li>
+<li>给docker.sock添加权限<br><code>sudo chmod a+rw /var/run/docker.sock</code></li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/74489613">WSL 2中安装Docker</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/blog5277/p/12071400.html">WSL2（Ubuntu）安装Docker</a><br><a target="_blank" rel="noopener" href="https://www.xu.ci/2019/12/windowswsl2ubuntu.html">Windows开机启动WSL2（Ubuntu）的启动项</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/zyh1994/p/13688542.html">解决运行docker命令要用sudo的问题</a></p>
 
       
     </div>
@@ -796,75 +854,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/wsl-18-04-android-6-source/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/14/wsl-18-04-android-6-source/" class="post-title-link" itemprop="url">WSL(Ubuntu 18.04)编译安卓6.0.0_r1源码</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-14 09:54:23" itemprop="dateCreated datePublished" datetime="2020-04-14T09:54:23+08:00">2020-04-14</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="之前的尝试"><a href="#之前的尝试" class="headerlink" title="之前的尝试"></a>之前的尝试</h2><p>一开始使用wsl1进行编译，即使用了ccache，编译耗时仍难以接受（编译了很久都没结束）<br>之后又使用wsl2进行编译，编译还是需要很久<br>原因猜测：源码位于D盘，wsl访问文件可能需要经过转换，因此IO操作速度慢。<br>搜索发现<a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-ux-changes">WSL 1 与 WSL 2 之间的用户体验更改</a>中提到：</p>
-<blockquote>
-<p>请确保将你要使用 Linux 应用程序频繁访问的文件放在 Linux 根文件系统中，以享受文件性能优势。 这些文件必须位于 Linux 根文件系统内，以便较快地访问文件系统。<br>验证：使用wsl在d盘解压源码，速度远慢于直接在wsl文件系统中解压<br>由此确定最终方案</p>
-</blockquote>
-<h2 id="最终方案"><a href="#最终方案" class="headerlink" title="最终方案"></a>最终方案</h2><p>将源码压缩包移动到linux文件系统下，再解压<br>或者使用repo工具下载源码到linux文件系统</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/14/wsl-18-04-android-6-source/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -936,14 +925,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">102</span>
+          <span class="site-state-item-count">103</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
