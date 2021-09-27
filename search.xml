@@ -372,6 +372,9 @@
     <title>Android Studio 导入so</title>
     <url>/2019/08/02/android-studio-import-so/</url>
     <content><![CDATA[<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在<code>src/main</code>目录下新建<code>jniLibs</code>文件夹 ，添加cpu架构文件夹，如<code>armeabi-v7a</code>，把so文件复制进去即可。<br>编译时会自动打包。</p>
+<p>配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        ndk &#123;</span><br><span class="line">            abiFilters  &#x27;armeabi-v7a&#x27;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/anhenzhufeng/article/details/78913341">Android studio添加第三方库和so</a></p>
 ]]></content>
       <tags>
@@ -1105,7 +1108,7 @@
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，因此也就无法通过Magisk获取Root权限。<br>本文基于<a href="https://github.com/asLody/VirtualApp">VirtualApp框架</a>及<a href="https://github.com/frida/frida">Frida-Gadget</a>，实现不修改apk使用Frida。</p>
 <span id="more"></span>
 <h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><h3 id="修改框架源码"><a href="#修改框架源码" class="headerlink" title="修改框架源码"></a>修改框架源码</h3><p>阅读<code>VirtualApp</code>源码可知，在<a href="https://github.com/asLody/VirtualApp/blob/bd6f03cfd7cbf3ad63ec6198777a102c18112c2d/VirtualApp/lib/src/main/jni/Foundation/IOUniformer.cpp"><code>lib/src/main/jni/Foundation/IOUniformer.cpp</code></a>中hook了<code>dlopen</code>，并实现了<code>onSoLoaded</code>函数，可在该函数中通过传入的<code>filename</code>获取加载的动态库路径。</p>
-<p>由此，可以在<code>libart.so</code>加载后，手动调用<code>dlopen</code>加载<code>Frida-Gadget</code>（将arm版本的so文件及配置文件添加到<code>lib\src\main\jniLibs\armeabi-v7a</code>）。</p>
+<p>由此，可以在<code>libart.so</code>加载后，手动调用<code>dlopen</code>加载<code>Frida-Gadget</code>（将arm版本的so文件及配置文件添加到<code>lib\src\main\jniLibs\armeabi-v7a</code>，并配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code>）。</p>
 <h3 id="编写Xposed模块"><a href="#编写Xposed模块" class="headerlink" title="编写Xposed模块"></a>编写Xposed模块</h3><p>除了修改源码，也可以自己编写一个Xposed模块，实现<code>Frida-Gadget</code>的加载。</p>
 <p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，手动调用<code>System.load</code>加载<code>Frida-Gadget</code>（需手动拷贝相关文件到应用的libs文件夹）。</p>
 ]]></content>
@@ -2552,6 +2555,30 @@
         <tag>Android</tag>
         <tag>Linux</tag>
         <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>提取MIUI fastboot界面图片</title>
+    <url>/2021/09/25/extract-miui-fastboot-image/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在酷安看到一张表情包，素材是MIUI fastboot界面图片，但是不够清晰，于是考虑自己提取。</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><blockquote>
+<p>splash.img (or splash.bin or logo.img or logo.bin) is the raw file in which the boot logo (splash screen - the picture displayed when the device is booted) is stored.<br>It is stored under the partition: splash or logo in many Snapdragon devices (might vary for devices)</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="MTK"><a href="#MTK" class="headerlink" title="MTK"></a>MTK</h2><h3 id="导出logo分区"><a href="#导出logo分区" class="headerlink" title="导出logo分区"></a>导出logo分区</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">dd if=/dev/block/bootdevice/by-name/logo of=/sdcard/logo.bin</span><br></pre></td></tr></table></figure>
+<h3 id="提取图片"><a href="#提取图片" class="headerlink" title="提取图片"></a>提取图片</h3><p>使用<a href="https://sites.google.com/site/kadanutilities/home/logobuilder-en">LogoBuilder</a>提取。</p>
+<h2 id="高通"><a href="#高通" class="headerlink" title="高通"></a>高通</h2><h3 id="导出splash分区"><a href="#导出splash分区" class="headerlink" title="导出splash分区"></a>导出splash分区</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">dd if=/dev/block/bootdevice/by-name/splash of=/sdcard/splash.img</span><br></pre></td></tr></table></figure>
+<h3 id="提取图片-1"><a href="#提取图片-1" class="headerlink" title="提取图片"></a>提取图片</h3><p>使用<a href="https://github.com/ReFirmLabs/binwalk">binwalk</a>分析<code>splash.img</code> （建议使用Linux操作）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">binwalk -e splash.img</span><br></pre></td></tr></table></figure>
+<p>结果类似于：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">DECIMAL       HEXADECIMAL     DESCRIPTION</span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">16384         0x4000          PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br><span class="line">6237238       0x5F2C36        PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br><span class="line">12458092      0xBE186C        PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br><span class="line">18678946      0x11D04A2       PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br></pre></td></tr></table></figure>
+<p>然后使用dd命令或十六进制编辑器，提取BMP图片即可。</p>
+<h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><p>2040x1080：<br>![](<a href="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot.png">https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot.png</a> =100x100)<br>1920x1080：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot-1920-1080.bmp"></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://forum.xda-developers.com/t/guide-how-to-change-boot-logo-splash-screen-for-snapdragon-devices-splash-img.3470473/">[GUIDE] How to Change Boot Logo (Splash Screen) for Snapdragon Devices (splash.img)</a><br><a href="https://forum.xda-developers.com/t/changing-boot-logo-logo-bin-program.1953726/">Changing boot logo (logo.bin) program</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
       </tags>
   </entry>
 </search>
