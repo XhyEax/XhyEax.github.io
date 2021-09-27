@@ -2623,7 +2623,7 @@
 <td>Pie</td>
 <td>28</td>
 <td></td>
-<td><a href="https://developer.android.google.cn/preview/restrictions-non-sdk-interfaces">非 SDK 接口调用限制</a></td>
+<td><a href="https://developer.android.google.cn/guide/app-compatibility/restrictions-non-sdk-interfaces">非 SDK 接口限制</a></td>
 </tr>
 <tr>
 <td>Android 8.1</td>
@@ -2636,7 +2636,7 @@
 <td>Android 8.0</td>
 <td>Oreo</td>
 <td>26</td>
-<td>ART 功能改进</td>
+<td><a href="https://source.android.google.cn/devices/tech/dalvik/improvements">ART 功能改进</a></td>
 <td></td>
 </tr>
 <tr>
@@ -2650,8 +2650,8 @@
 <td>Android 7.0</td>
 <td>Nougat</td>
 <td>24</td>
-<td>AOT/JIT 混合编译</td>
-<td><a href="https://developer.android.google.cn/about/versions/nougat/android-7.0-changes">NDK 私有库链接限制</a></td>
+<td><a href="https://developer.android.com/about/versions/nougat/android-7.0?hl=zh#jit_aot">JIT/AOT 混合编译</a></td>
+<td><a href="https://developer.android.google.cn/about/versions/nougat/android-7.0-changes#ndk">NDK 私有库链接限制</a></td>
 </tr>
 <tr>
 <td>Android 6.0</td>
@@ -2671,7 +2671,7 @@
 <td>Android 5.0</td>
 <td>Lolipop</td>
 <td>21</td>
-<td>默认 ART</td>
+<td><a href="https://developer.android.google.cn/about/versions/android-5.0-changes#ART">默认 ART</a></td>
 <td></td>
 </tr>
 <tr>
