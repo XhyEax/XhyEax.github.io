@@ -191,6 +191,74 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/07/flipviewer-xpress-to-pdf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/07/flipviewer-xpress-to-pdf/" class="post-title-link" itemprop="url">FlipViewer Xpress在线文档转pdf</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-07 11:44:30" itemprop="dateCreated datePublished" datetime="2020-04-07T11:44:30+08:00">2020-04-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>python环境（已安装requests）</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="获取源地址"><a href="#获取源地址" class="headerlink" title="获取源地址"></a>获取源地址</h3><p>首先F12-Network，然后刷新一下页面。获取到当前文档页面的源地址，类似于<br><code>http://ebooks.crup.com.cn/t/xxxxx_output/web/xxxxx_opf_files/xxxxxxxxxxxxxxxxxxxx_1.swf</code><br>下划线后的数字对应页码。</p>
+<h3 id="安装程序包"><a href="#安装程序包" class="headerlink" title="安装程序包"></a>安装程序包</h3><p>需要安装requests用于请求文件，安装pillow用于合并pdf：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install requests pillow</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/07/flipviewer-xpress-to-pdf/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/03/30/cmd-java-class-file/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -764,68 +832,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/11/05/use-cmake-in-windows/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/11/05/use-cmake-in-windows/" class="post-title-link" itemprop="url">Windows安装Cmake</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-05 16:16:19" itemprop="dateCreated datePublished" datetime="2019-11-05T16:16:19+08:00">2019-11-05</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><p>已安装<code>MinGW64</code>，即具有<code>mingw32-make.exe</code>文件</p>
-<h2 id="下载CMake"><a href="#下载CMake" class="headerlink" title="下载CMake"></a>下载CMake</h2><p><a target="_blank" rel="noopener" href="https://cmake.org/download/">CMake下载页面</a><br>根据平台下载安装包<br>PS：下载<code>Binary distributions</code>，别下载成源码了</p>
-<h2 id="生成"><a href="#生成" class="headerlink" title="生成"></a>生成</h2><p>创建输出文件夹，指定生成类型</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir bulid</span><br><span class="line">cd bulid</span><br><span class="line">cmake -G &quot;MinGW Makefiles&quot; ../</span><br><span class="line">mingw32-make</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/JohnJim0/article/details/81842249">WINDOWS下CMake+MinGW64搭建C/C++编译环境</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -897,7 +903,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

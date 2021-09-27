@@ -27,13 +27,14 @@
 <meta property="og:site_name" content="Xhy&#39;s Blog">
 <meta property="og:description" content="概述在酷安看到一张表情包，素材是MIUI fastboot界面图片，但是不够清晰，于是考虑自己提取。 原理 splash.img (or splash.bin or logo.img or logo.bin) is the raw file in which the boot logo (splash screen - the picture displayed when the device i">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot.png">
 <meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot-1920-1080.bmp">
 <meta property="article:published_time" content="2021-09-25T04:43:10.000Z">
-<meta property="article:modified_time" content="2021-09-27T12:16:14.217Z">
+<meta property="article:modified_time" content="2021-09-27T12:18:59.908Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="经验">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot-1920-1080.bmp">
+<meta name="twitter:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot.png">
 
 <link rel="canonical" href="https://blog.xhyeax.com/2021/09/25/extract-miui-fastboot-image/">
 
@@ -254,7 +255,7 @@
 <p>结果类似于：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DECIMAL       HEXADECIMAL     DESCRIPTION</span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">16384         0x4000          PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br><span class="line">6237238       0x5F2C36        PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br><span class="line">12458092      0xBE186C        PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br><span class="line">18678946      0x11D04A2       PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br></pre></td></tr></table></figure>
 <p>然后使用dd命令或十六进制编辑器，提取BMP图片即可。</p>
-<h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><p>2040x1080：<br>![](<a target="_blank" rel="noopener" href="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot.png">https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot.png</a> =100x100)<br>1920x1080：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot-1920-1080.bmp"></p>
+<h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><p>2040x1080：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot.png"><br>1920x1080：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot-1920-1080.bmp"></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://forum.xda-developers.com/t/guide-how-to-change-boot-logo-splash-screen-for-snapdragon-devices-splash-img.3470473/">[GUIDE] How to Change Boot Logo (Splash Screen) for Snapdragon Devices (splash.img)</a><br><a target="_blank" rel="noopener" href="https://forum.xda-developers.com/t/changing-boot-logo-logo-bin-program.1953726/">Changing boot logo (logo.bin) program</a></p>
 
     </div>
@@ -292,7 +293,10 @@
     <a href="/2021/09/13/docker-compile-android-kernel/" rel="prev" title="使用docker编译安卓内核源码">
       <i class="fa fa-chevron-left"></i> 使用docker编译安卓内核源码
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2021/09/26/android-sdk-api-list/" rel="next" title="安卓版本-API级别对照表">
+      安卓版本-API级别对照表 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -367,7 +371,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

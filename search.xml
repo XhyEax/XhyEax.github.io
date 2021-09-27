@@ -2574,11 +2574,272 @@
 <p>结果类似于：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">DECIMAL       HEXADECIMAL     DESCRIPTION</span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">16384         0x4000          PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br><span class="line">6237238       0x5F2C36        PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br><span class="line">12458092      0xBE186C        PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br><span class="line">18678946      0x11D04A2       PC bitmap, Windows 3.x format,, 1080 x 1920 x 24</span><br></pre></td></tr></table></figure>
 <p>然后使用dd命令或十六进制编辑器，提取BMP图片即可。</p>
-<h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><p>2040x1080：<br>![](<a href="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot.png">https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot.png</a> =100x100)<br>1920x1080：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot-1920-1080.bmp"></p>
+<h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><p>2040x1080：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot.png"><br>1920x1080：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-fastboot-1920-1080.bmp"></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://forum.xda-developers.com/t/guide-how-to-change-boot-logo-splash-screen-for-snapdragon-devices-splash-img.3470473/">[GUIDE] How to Change Boot Logo (Splash Screen) for Snapdragon Devices (splash.img)</a><br><a href="https://forum.xda-developers.com/t/changing-boot-logo-logo-bin-program.1953726/">Changing boot logo (logo.bin) program</a></p>
 ]]></content>
       <tags>
         <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>安卓版本-API级别对照表</title>
+    <url>/2021/09/26/android-sdk-api-list/</url>
+    <content><![CDATA[<h2 id="SDK变化"><a href="#SDK变化" class="headerlink" title="SDK变化"></a>SDK变化</h2><p>详见<a href="https://developer.android.google.cn/about/versions">Android Releases | Android Developers</a></p>
+<h2 id="源码查看"><a href="#源码查看" class="headerlink" title="源码查看"></a>源码查看</h2><p><a href="https://cs.android.com/">Android Code Search</a> （AOSP官方）<br><a href="http://aosp.opersys.com/">Opersys AOSP Portal</a><br><a href="http://aospxref.com/">AOSPXref</a> （<code>7.1.2</code>-<code>12.0.0</code>）<br><a href="http://androidxref.com/">AndroidXref</a> （<code>2.3.6</code>-<code>9.0.0</code>）</p>
+<span id="more"></span>
+<h2 id="SDK列表"><a href="#SDK列表" class="headerlink" title="SDK列表"></a>SDK列表</h2><table>
+<thead>
+<tr>
+<th>安卓版本</th>
+<th>代号</th>
+<th>API级别</th>
+<th>虚拟机</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Android 12.0</td>
+<td>S</td>
+<td>31</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 11.0</td>
+<td>R</td>
+<td>30</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 10.0</td>
+<td>Q</td>
+<td>29</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 9</td>
+<td>Pie</td>
+<td>28</td>
+<td></td>
+<td><a href="https://developer.android.google.cn/preview/restrictions-non-sdk-interfaces">非 SDK 接口调用限制</a></td>
+</tr>
+<tr>
+<td>Android 8.1</td>
+<td>Oreo</td>
+<td>27</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 8.0</td>
+<td>Oreo</td>
+<td>26</td>
+<td>ART 功能改进</td>
+<td></td>
+</tr>
+<tr>
+<td>Android 7.1.1</td>
+<td>Nougat</td>
+<td>25</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 7.0</td>
+<td>Nougat</td>
+<td>24</td>
+<td>AOT/JIT 混合编译</td>
+<td><a href="https://developer.android.google.cn/about/versions/nougat/android-7.0-changes">NDK 私有库链接限制</a></td>
+</tr>
+<tr>
+<td>Android 6.0</td>
+<td>Marshmallow</td>
+<td>23</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 5.1</td>
+<td>Lolipop</td>
+<td>22</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 5.0</td>
+<td>Lolipop</td>
+<td>21</td>
+<td>默认 ART</td>
+<td></td>
+</tr>
+<tr>
+<td>Android 4.4W</td>
+<td>KitKat Wear</td>
+<td>20</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 4.4</td>
+<td>KitKat</td>
+<td>19</td>
+<td>引入 ART (AOT)</td>
+<td></td>
+</tr>
+<tr>
+<td>Android 4.3</td>
+<td>Jelly Bean</td>
+<td>18</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 4.2</td>
+<td>Jelly Bean</td>
+<td>17</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 4.1</td>
+<td>Jelly Bean</td>
+<td>16</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 4.0.3</td>
+<td>IceCreamSandwich</td>
+<td>15</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 4.0</td>
+<td>IceCreamSandwich</td>
+<td>14</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 3.2</td>
+<td>Honeycomb</td>
+<td>13</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 3.1</td>
+<td>Honeycomb</td>
+<td>12</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 3.0</td>
+<td>Honeycomb</td>
+<td>11</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 2.3.3</td>
+<td>Gingerbread</td>
+<td>10</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 2.3</td>
+<td>Gingerbread</td>
+<td>9</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 2.2</td>
+<td>Froyo</td>
+<td>8</td>
+<td>开始使用 JIT</td>
+<td></td>
+</tr>
+<tr>
+<td>Android 2.1</td>
+<td>Eclair</td>
+<td>7</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 2.0.1</td>
+<td>Eclair</td>
+<td>6</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 2.0</td>
+<td>Eclair</td>
+<td>5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 1.6</td>
+<td>Dout</td>
+<td>4</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 1.5</td>
+<td>Cupcake</td>
+<td>3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 1.1</td>
+<td>Base</td>
+<td>2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 1.0</td>
+<td>Base</td>
+<td>1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 1.5</td>
+<td>CUPCAKE</td>
+<td>3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 1.1</td>
+<td>BASE_1_1</td>
+<td>2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Android 1.0</td>
+<td>BASE</td>
+<td>1</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://source.android.google.cn/devices/tech/dalvik">Android Runtime (ART) 和 Dalvik</a><br><a href="https://weishu.me/2018/06/07/free-reflection-above-android-p/">一种绕过Android P对非SDK接口限制的简单方法</a><br><a href="https://www.52pojie.cn/thread-948942-1-1.html">Android7.0以上命名空间详解(dlopen限制)</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
       </tags>
   </entry>
 </search>

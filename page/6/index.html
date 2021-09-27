@@ -191,6 +191,68 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/11/05/use-cmake-in-windows/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/05/use-cmake-in-windows/" class="post-title-link" itemprop="url">Windows安装Cmake</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-05 16:16:19" itemprop="dateCreated datePublished" datetime="2019-11-05T16:16:19+08:00">2019-11-05</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><p>已安装<code>MinGW64</code>，即具有<code>mingw32-make.exe</code>文件</p>
+<h2 id="下载CMake"><a href="#下载CMake" class="headerlink" title="下载CMake"></a>下载CMake</h2><p><a target="_blank" rel="noopener" href="https://cmake.org/download/">CMake下载页面</a><br>根据平台下载安装包<br>PS：下载<code>Binary distributions</code>，别下载成源码了</p>
+<h2 id="生成"><a href="#生成" class="headerlink" title="生成"></a>生成</h2><p>创建输出文件夹，指定生成类型</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir bulid</span><br><span class="line">cd bulid</span><br><span class="line">cmake -G &quot;MinGW Makefiles&quot; ../</span><br><span class="line">mingw32-make</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/JohnJim0/article/details/81842249">WINDOWS下CMake+MinGW64搭建C/C++编译环境</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/11/05/two-stacks-to-implement-queue/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -773,81 +835,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/18/qq-813-unrevoke-module-develop/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/09/18/qq-813-unrevoke-module-develop/" class="post-title-link" itemprop="url">QQ8.1.3防撤回(Xposed模块)的原理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-09-18 07:55:19" itemprop="dateCreated datePublished" datetime="2019-09-18T07:55:19+08:00">2019-09-18</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>开发一个适配QQ 8.1.3的防撤回插件，并显示撤回通知。</p>
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h3 id="1-防撤回"><a href="#1-防撤回" class="headerlink" title="1. 防撤回"></a>1. 防撤回</h3><p>设置<code>com.tencent.mobileqq.app.message.QQMessageFacade.a(ArrayList.class, boolean.class)</code>方法的返回值为空即可</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//在beforeHookedMethod中执行</span><br><span class="line">param.setResult(null);</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-获取必要信息"><a href="#2-获取必要信息" class="headerlink" title="2. 获取必要信息"></a>2. 获取必要信息</h3><p>上一个方法的第一个参数(<code>ArrayList</code>)内容(<code>toString</code>)形如:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[RevokeMsgInfo[istroop= 1, shmsgseq= 356, frienduin= 1234568, fromuin= 12345678 msguid= 0, time= 1568796904, senduin= null, longmsgid= 0, longmsgcount=0 longmsgindex=0]</span><br></pre></td></tr></table></figure>
-<p>当<code>istroop</code>为1时，<code>frienduin</code>是群号，否则为好友qq。</p>
-<p>在某个版本后，<code>toString</code>的结果中<code>frienduin</code>被截断，所以解析字符串的方法行不通了。</p>
-<p>可以通过反射来获取需要的字段值。</p>
-<h3 id="3-显示撤回提示"><a href="#3-显示撤回提示" class="headerlink" title="3. 显示撤回提示"></a>3. 显示撤回提示</h3><p>这个功能的实现比较复杂，需要获取和生成一些类对象。</p>
-<p>首先通过反射获取到<code>QQAppInterface</code>实例（<code>QQMessageFacade</code>的字段）<br>然后调用<code>QQAppInterface.getCurrentAccountUin</code>方法获取自己的qq<br>再通过反射将<code>RevokeMsgInfo</code>字段取出，为构造撤回提示做准备。<br>然后通过<code>MessageRecordFactory</code>构造<code>MessageRecord</code>。<br>然后使用<code>ArrayList</code>将其打包。<br>最终调用<code>com.tencent.mobileqq.app.message.QQMessageFacade.a(ArrayList.class, int.class)</code>方法来显示撤回提示。</p>
-<p>具体可以参考<a target="_blank" rel="noopener" href="https://github.com/zpp0196/QQPurify/blob/master/app/src/main/java/me/zpp0196/qqpurify/hook/ExtensionHook.java">QQ净化的防撤回实现</a>。</p>
-<h3 id="4-进行一些操作"><a href="#4-进行一些操作" class="headerlink" title="4. 进行一些操作"></a>4. 进行一些操作</h3><h4 id="过滤"><a href="#过滤" class="headerlink" title="过滤"></a>过滤</h4><p>判断是否为自己撤回的信息，如果是则不做处理。</p>
-<h4 id="获取群成员名"><a href="#获取群成员名" class="headerlink" title="获取群成员名"></a>获取群成员名</h4><p>通过调用<code>ContactUtils</code>的函数来获得。</p>
-<h2 id="为什么要适配"><a href="#为什么要适配" class="headerlink" title="为什么要适配"></a>为什么要适配</h2><p>因为QQ版本不同，有些类名经过了混淆。<br>适配的关键在于找出混淆后的类名。<br>可反编译dex后，根据特征（字符串、函数参数、类结构等）查找smali。</p>
-<p>防撤回功能涉及以下两个被混淆的类：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String MessageRecordFactory = &quot;avay&quot;;</span><br><span class="line">String ContactUtils = &quot;azcx&quot;;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://github.com/langhun/QQUnrecalled">QQUnrecalled</a><br><a target="_blank" rel="noopener" href="https://github.com/zpp0196/QQPurify">QQPurify</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -919,7 +906,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-count">105</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
