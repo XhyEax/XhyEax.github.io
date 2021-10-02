@@ -1108,7 +1108,9 @@
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，因此也就无法通过Magisk获取Root权限。<br>本文基于<a href="https://github.com/asLody/VirtualApp">VirtualApp框架</a>及<a href="https://github.com/frida/frida">Frida-Gadget</a>，实现不修改apk使用Frida。</p>
 <span id="more"></span>
 <h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><h3 id="修改框架源码"><a href="#修改框架源码" class="headerlink" title="修改框架源码"></a>修改框架源码</h3><p>阅读<code>VirtualApp</code>源码可知，在<a href="https://github.com/asLody/VirtualApp/blob/bd6f03cfd7cbf3ad63ec6198777a102c18112c2d/VirtualApp/lib/src/main/jni/Foundation/IOUniformer.cpp"><code>lib/src/main/jni/Foundation/IOUniformer.cpp</code></a>中hook了<code>dlopen</code>，并实现了<code>onSoLoaded</code>函数，可在该函数中通过传入的<code>filename</code>获取加载的动态库路径。</p>
-<p>由此，可以在<code>libart.so</code>加载后，手动调用<code>dlopen</code>加载<code>Frida-Gadget</code>（将arm版本的so文件及配置文件添加到<code>lib\src\main\jniLibs\armeabi-v7a</code>，并配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code>）。</p>
+<p>由此，可以在<code>libart.so</code>加载后，手动调用<code>dlopen</code>加载<code>Frida-Gadget</code></p>
+<p>具体操作为：</p>
+<p>将arm版本的so文件及配置文件添加到<code>lib\src\main\jniLibs\armeabi-v7a</code>，并配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code></p>
 <h3 id="编写Xposed模块"><a href="#编写Xposed模块" class="headerlink" title="编写Xposed模块"></a>编写Xposed模块</h3><p>除了修改源码，也可以自己编写一个Xposed模块，实现<code>Frida-Gadget</code>的加载。</p>
 <p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，手动调用<code>System.load</code>加载<code>Frida-Gadget</code>。</p>
 <p>建议直接拷贝到<code>/system/lib</code>、<code>/system/lib64</code>，或打包为<code>Magisk</code>模块（权限设置为644）</p>
@@ -2950,14 +2952,24 @@
 <h3 id="获取usb-device-id（可选）"><a href="#获取usb-device-id（可选）" class="headerlink" title="获取usb device id（可选）"></a>获取usb device id（可选）</h3><p>执行<code>frida-ls-devices</code>，获取<code>usb device id</code><br>然后启动app：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">r2 frida://launch/usb/[设备id]/[包名]</span><br></pre></td></tr></table></figure>
 <p>设备id为空时，连接第一个usb设备</p>
-<h3 id="查询帮助"><a href="#查询帮助" class="headerlink" title="查询帮助"></a>查询帮助</h3><p>附加上app后，如果要使用<code>r2frida</code>的命令，需要在前面增加<code>=!</code>或<code>:</code></p>
-<blockquote>
-<p>r2frida commands are prefixed with <code>=!</code> or <code>:</code>.<br>如：<code>=!?</code>、<code>:?</code>（获取帮助）<br>在命令后加问号，可查询命令帮助，如<code>:/?</code>、<code>ps?</code></p>
+<h3 id="查询帮助"><a href="#查询帮助" class="headerlink" title="查询帮助"></a>查询帮助</h3><blockquote>
+<p>r2frida commands are prefixed with <code>=!</code> or <code>:</code>.</p>
 </blockquote>
-<h3 id="查看信息"><a href="#查看信息" class="headerlink" title="查看信息"></a>查看信息</h3><p>执行<code>:i?</code>查看帮助</p>
-<h3 id="搜索字符串"><a href="#搜索字符串" class="headerlink" title="搜索字符串"></a>搜索字符串</h3><p>执行<code>:/?</code>查看帮助</p>
-<h3 id="打印内存"><a href="#打印内存" class="headerlink" title="打印内存"></a>打印内存</h3><p>执行<code>:x?</code>查看帮助</p>
-<h3 id="动态调试"><a href="#动态调试" class="headerlink" title="动态调试"></a>动态调试</h3><p>执行<code>:d?</code>查看帮助</p>
+<p>附加上app后，如果要使用<code>r2frida</code>的命令，需要在前面增加<code>=!</code>或<code>:</code><br>如：<code>=!?</code>、<code>:?</code>（获取帮助）<br>在命令后加问号，可查询命令帮助，如<code>:/?</code>、<code>ps?</code></p>
+<h3 id="过滤输出"><a href="#过滤输出" class="headerlink" title="过滤输出"></a>过滤输出</h3><p>使用<code>~</code>过滤输出结果，类似于<code>grep</code><br>例如：<code>:il~libart.so</code> (仅输出<code>libart.so</code>地址)</p>
+<h3 id="查看信息"><a href="#查看信息" class="headerlink" title="查看信息"></a>查看信息</h3><p><code>:i?</code>: 查看帮助</p>
+<p><code>:i</code>: 查询信息<br><code>:ic</code>: 列出所有类<br><code>:icl</code>: 列出已加载的类<br><code>:icm</code>: 列出类方法<br><code>:il</code>: 列出模块<br><code>:iE 模块名</code>: 列出模块导出符号</p>
+<h3 id="搜索字符串"><a href="#搜索字符串" class="headerlink" title="搜索字符串"></a>搜索字符串</h3><p><code>:/?</code>：查看帮助</p>
+<p><code>:/ 关键字</code>: 在内存中搜索关键字</p>
+<h3 id="打印内存、反汇编"><a href="#打印内存、反汇编" class="headerlink" title="打印内存、反汇编"></a>打印内存、反汇编</h3><p><code>p?</code>：查看帮助 (这是r2的命令，不需要冒号)</p>
+<p><code>s 地址</code>: 设置当前地址</p>
+<p><code>x</code>: <code>hexdump</code>当前地址的内存<br><code>x @ 地址</code>: <code>hexdump</code>指定地址的内存（其他命令同理）<br><code>ps</code>: 打印字符串<br><code>pd</code>: 反汇编</p>
+<h3 id="动态调试"><a href="#动态调试" class="headerlink" title="动态调试"></a>动态调试</h3><p><code>:d?</code>: 查看帮助</p>
+<p><code>:dm</code>: 列出内存区域（类似于<code>maps</code>文件）<br><code>:dt</code>: 跟踪地址调用<br><code>:dtf</code>: 跟踪地址调用，并格式化输出</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Usage: dtf [format] || dtf [addr] [fmt]</span><br><span class="line">  ^  = trace onEnter instead of onExit</span><br><span class="line">  +  = show backtrace on trace</span><br><span class="line"> p/x = show pointer in hexadecimal</span><br><span class="line">  c  = show value as a string (char)</span><br><span class="line">  i  = show decimal argument</span><br><span class="line">  z  = show pointer to string</span><br><span class="line">  w  = show pointer to UTF-16 string</span><br><span class="line">  a  = show pointer to ANSI string</span><br><span class="line">  h  = hexdump from pointer (optional length, h16 to dump 16 bytes)</span><br><span class="line">  H  = hexdump from pointer (optional position of length argument, H1 to dump args[1] bytes)</span><br><span class="line">  s  = show string in place</span><br><span class="line">  O  = show pointer to ObjC object</span><br><span class="line">Undocumented: Z, S</span><br><span class="line"> dtf    trace format</span><br></pre></td></tr></table></figure>
+
+<h3 id="加载Frida脚本"><a href="#加载Frida脚本" class="headerlink" title="加载Frida脚本"></a>加载Frida脚本</h3><p><code>:.?</code>: 查看帮助</p>
+<p><code>:. 脚本路径</code>: 加载js脚本</p>
 <h3 id="其他命令"><a href="#其他命令" class="headerlink" title="其他命令"></a>其他命令</h3><p><code>cl</code>清屏</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://mabin004.github.io/2021/02/19/r2frida%E4%BD%BF%E7%94%A8/">r2frida使用</a><br><a href="https://bbs.pediy.com/thread-264161.htm">Android动态调试-R2frida和lldb</a><br><a href="https://bbs.pediy.com/thread-256858.htm">RADARE2+FRIDA=R2FRIDA Best Dynamic Debugging Tool</a><br><a href="https://blog.csdn.net/u013255206/article/details/75295209">vs编译 error C2001: 常量中有换行符</a></p>
 ]]></content>
