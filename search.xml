@@ -1110,7 +1110,9 @@
 <h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><h3 id="修改框架源码"><a href="#修改框架源码" class="headerlink" title="修改框架源码"></a>修改框架源码</h3><p>阅读<code>VirtualApp</code>源码可知，在<a href="https://github.com/asLody/VirtualApp/blob/bd6f03cfd7cbf3ad63ec6198777a102c18112c2d/VirtualApp/lib/src/main/jni/Foundation/IOUniformer.cpp"><code>lib/src/main/jni/Foundation/IOUniformer.cpp</code></a>中hook了<code>dlopen</code>，并实现了<code>onSoLoaded</code>函数，可在该函数中通过传入的<code>filename</code>获取加载的动态库路径。</p>
 <p>由此，可以在<code>libart.so</code>加载后，手动调用<code>dlopen</code>加载<code>Frida-Gadget</code>（将arm版本的so文件及配置文件添加到<code>lib\src\main\jniLibs\armeabi-v7a</code>，并配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code>）。</p>
 <h3 id="编写Xposed模块"><a href="#编写Xposed模块" class="headerlink" title="编写Xposed模块"></a>编写Xposed模块</h3><p>除了修改源码，也可以自己编写一个Xposed模块，实现<code>Frida-Gadget</code>的加载。</p>
-<p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，手动调用<code>System.load</code>加载<code>Frida-Gadget</code>（需手动拷贝相关文件到应用的libs文件夹）。</p>
+<p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，手动调用<code>System.load</code>加载<code>Frida-Gadget</code>。</p>
+<p>建议直接拷贝到<code>/system/lib</code>、<code>/system/lib64</code>，或打包为<code>Magisk</code>模块（权限设置为644）</p>
+<p>原因：如果hook系统应用（<code>PLATFORM_APP</code>），且未关闭<code>SELinux</code>，则无法从<code>data</code>目录下加载so文件</p>
 ]]></content>
       <tags>
         <tag>Android</tag>
@@ -1347,10 +1349,8 @@
 <span id="more"></span>
 <h1 id="经济上"><a href="#经济上" class="headerlink" title="经济上"></a>经济上</h1><p>我 博主 打钱 ( • ̀ω•́ )</p>
 <h2 id="支付宝"><a href="#支付宝" class="headerlink" title="支付宝"></a>支付宝</h2><img src="/assets/img/alipay.jpg" width = "300" height = "300"  align=center />
-## B站充电
-打开[我的B站主页](http://space.bilibili.com/23219232)，点击为TA充电
-（年度大会员每个月有5B币=50电池，9号过期，你懂我意思吧 ←_← ）
 
+<h2 id="B站充电"><a href="#B站充电" class="headerlink" title="B站充电"></a>B站充电</h2><p>打开<a href="http://space.bilibili.com/23219232">我的B站主页</a>，点击为TA充电<br>（年度大会员每个月有5B币=50电池，9号过期，你懂我意思吧 ←_← ）</p>
 <h1 id="精神上"><a href="#精神上" class="headerlink" title="精神上"></a>精神上</h1><p>用意念支持博主即可(´・ω・`)</p>
 ]]></content>
       <tags>
@@ -2840,6 +2840,126 @@
 ]]></content>
       <tags>
         <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用Frida绕过MIUI 12系统设置倒计时</title>
+    <url>/2021/10/02/miui-countdowntimer-bypass/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>每次修改系统设置（设置通知使用权、允许app安装未知应用、开启无障碍功能等），都会有10秒倒计时，使用起来很不方便。</p>
+<p>于是考虑使用<code>Frida</code>绕过倒计时，并开发<code>Xposed</code>模块。</p>
+<span id="more"></span>
+<h2 id="倒计时类型"><a href="#倒计时类型" class="headerlink" title="倒计时类型"></a>倒计时类型</h2><p>主要有以下两种：</p>
+<table>
+<thead>
+<tr>
+<th align="center"><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-dialog-1.jpg"></th>
+<th align="center"><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/miui-dialog-2.jpg"></th>
+</tr>
+</thead>
+</table>
+<p>查看前台Activity：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb shell dumpsys activity activities | findstr &quot;mFocused&quot;</span><br></pre></td></tr></table></figure>
+<p>可以发现两个对话框都来自手机管家，分别对应：<br><code>com.miui.permcenter.privacymanager.SpecialPermissionInterceptActivity</code><br><code>com.miui.permcenter.install.AdbInputApplyActivity</code></p>
+<p>后者已经有分析文章了，见<a href="https://www.52pojie.cn/thread-1274517-1-1.html">MIUI 12稳定版系统中的开发者选项限制解除</a>。<br>也可以直接改配置文件，见<a href="https://www.52pojie.cn/thread-1282827-1-1.html">需root，无需xp和frida，miui开发者选项限制解除</a></p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>提取手机管家apk（版本号<code>5.4.0</code>），使用JEB打开，定位到该Activity：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle bundle)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(bundle);</span><br><span class="line">        Window window = <span class="keyword">this</span>.getWindow();</span><br><span class="line">        window.setBackgroundDrawable(<span class="keyword">new</span> ColorDrawable(<span class="keyword">this</span>.getResources().getColor(<span class="number">0x7F060599</span>)));</span><br><span class="line">        window.setLayout(-<span class="number">1</span>, -<span class="number">1</span>);</span><br><span class="line">        window.addFlags(<span class="number">4</span>);</span><br><span class="line">        <span class="keyword">this</span>.a();</span><br><span class="line">        <span class="keyword">this</span>.b();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><code>a</code>方法反射调用<code>setNavigationBarColor</code>，设置导航栏颜色<br><code>b</code>方法根据<code>permName</code>的值，显示不同的窗口（-1则直接退出）：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">b</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> permName = c.a(<span class="keyword">this</span>.getIntent().getStringExtra(<span class="string">&quot;permName&quot;</span>));</span><br><span class="line">    <span class="keyword">if</span>(permName == -<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.finish();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    FragmentTransaction fragmentTransaction = <span class="keyword">this</span>.getFragmentManager().beginTransaction();</span><br><span class="line">    e fragment = c.gt5(permName) ? e.a(<span class="keyword">this</span>.getIntent()) : f.a(<span class="keyword">this</span>.getIntent());</span><br><span class="line">    fragmentTransaction.replace(<span class="number">0x1020002</span>, ((Fragment)fragment));</span><br><span class="line">    fragmentTransaction.commitAllowingStateLoss();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>查看<code>com.miui.permcenter.privacymanager.m.c</code>类，其中包含权限数组：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">c.d = Arrays.asList(<span class="keyword">new</span> String[]&#123;<span class="string">&quot;perm_notification&quot;</span>, <span class="string">&quot;perm_install_unknown&quot;</span>, <span class="string">&quot;perm_app_statistics&quot;</span>, <span class="string">&quot;perm_device_manager&quot;</span>, <span class="string">&quot;miui_open_debug&quot;</span>, <span class="string">&quot;miui_barrier_free&quot;</span>, <span class="string">&quot;miui_close_optimization&quot;</span>, <span class="string">&quot;oaid_close&quot;</span>&#125;);</span><br></pre></td></tr></table></figure>
+<p>可得到以下对应关系：</p>
+<table>
+<thead>
+<tr>
+<th>permName</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>通知使用权</td>
+</tr>
+<tr>
+<td>1</td>
+<td>安装未知应用</td>
+</tr>
+<tr>
+<td>2</td>
+<td>使用情况访问权限</td>
+</tr>
+<tr>
+<td>3</td>
+<td>设备管理应用</td>
+</tr>
+<tr>
+<td>4</td>
+<td>打开USB调试模式</td>
+</tr>
+<tr>
+<td>5</td>
+<td>无障碍功能</td>
+</tr>
+<tr>
+<td>6</td>
+<td>关闭MIUI优化</td>
+</tr>
+<tr>
+<td>7</td>
+<td>开启OEM解锁</td>
+</tr>
+</tbody></table>
+<p>查看<code>f.a</code>方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> f <span class="title">a</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">    f fragment = <span class="keyword">new</span> f();</span><br><span class="line">    Bundle bundle = <span class="keyword">new</span> Bundle();</span><br><span class="line">    <span class="keyword">if</span>(intent != <span class="keyword">null</span>) &#123;</span><br><span class="line">        bundle.putString(<span class="string">&quot;permName&quot;</span>, intent.getStringExtra(<span class="string">&quot;permName&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    fragment.setArguments(bundle);</span><br><span class="line">    <span class="keyword">return</span> fragment;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>f</code>类继承自<code>d</code>类，且在<code>c</code>方法中设置了按钮的<code>OnClickListener</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">protected</span> View.OnClickListener e;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">d</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.e = <span class="keyword">new</span> d.a(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">c</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Button btnConfirm = <span class="keyword">this</span>.b;</span><br><span class="line">    <span class="keyword">if</span>(btnConfirm != <span class="keyword">null</span>) &#123;</span><br><span class="line">        btnConfirm.setOnClickListener(<span class="keyword">this</span>.e);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Button btnCancel = <span class="keyword">this</span>.c;</span><br><span class="line">    <span class="keyword">if</span>(btnCancel != <span class="keyword">null</span>) &#123;</span><br><span class="line">        btnCancel.setOnClickListener(<span class="keyword">this</span>.e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>查看<code>com.miui.permcenter.privacymanager.d$a</code>的<code>onClick</code>方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View view)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> v0;</span><br><span class="line">    d fragment;</span><br><span class="line">    <span class="keyword">if</span>(view.getId() == <span class="number">0x7F0B03F9</span>) &#123;</span><br><span class="line">        fragment = <span class="keyword">this</span>.a;</span><br><span class="line">        v0 = <span class="keyword">true</span>;</span><br><span class="line">        fragment.a(v0);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(view.getId() == <span class="number">0x7F0B03FD</span>) &#123;</span><br><span class="line">        fragment = <span class="keyword">this</span>.a;</span><br><span class="line">        v0 = <span class="keyword">false</span>;</span><br><span class="line">        fragment.a(v0);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.a.b(view.getId());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>判断点击的按钮是确认还是取消，最终调用<code>a</code>方法，确认传入<code>true</code>，取消传入<code>false</code></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">a</span><span class="params">(<span class="keyword">boolean</span> flag)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.getActivity().setResult(flag ? -<span class="number">1</span> : <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">this</span>.getActivity().finish();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h2><p>Hook <code>com.miui.permcenter.privacymanager.d.c</code>方法，替换其实现，直接调用<code>a</code>方法，传入<code>true</code>即可</p>
+<h3 id="Frida"><a href="#Frida" class="headerlink" title="Frida"></a>Frida</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Java.perform(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    Java.use(<span class="string">&quot;com.miui.permcenter.privacymanager.d&quot;</span>).c.overload()</span><br><span class="line">        .implementation = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="built_in">this</span>.a(<span class="literal">true</span>);</span><br><span class="line">        &#125;;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="Xposed"><a href="#Xposed" class="headerlink" title="Xposed"></a>Xposed</h3><p>反射调用<code>a</code>方法即可</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">findAndHookMethod(<span class="string">&quot;com.miui.permcenter.privacymanager.d&quot;</span>, lpparam.classLoader, <span class="string">&quot;c&quot;</span>, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        Method mtdA = param.thisObject.getClass().getDeclaredMethod(<span class="string">&quot;a&quot;</span>, <span class="keyword">boolean</span>.class);</span><br><span class="line">        mtdA.invoke(param.thisObject, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>完整项目见<a href="https://github.com/XhyEax/MIUICustom">MIUICustom</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.52pojie.cn/thread-675777-1-1.html">MIUI9绕开联网和插卡打开未知来源</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>在Windows上安装r2frida</title>
+    <url>/2021/10/01/r2frida-install-windows/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>去年4月了解到<a href="https://github.com/nowsecure/r2frida">r2frida</a>这一工具，由于环境问题，并未安装成功。</p>
+<p>今年国庆翻出博客草稿，决定在<code>Windows</code>上安装<code>r2frida</code>。</p>
+<span id="more"></span>
+
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>系统：<code>Windows 10 20H2 x64</code><br>软件：<code>Visual Studio 2019</code>、<code>Node.js 14.17.4</code>、<code>Cygwin 3.2.0</code>(记得选择<code>wget</code>)、<code>Frida 15.1.2</code><br>（提前安装好以上环境，VS版本至少为2015）</p>
+<p>安装目标：<code>Radare2 5.4.2</code>、<code>r2frida 5.4.4</code></p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h3 id="radare2"><a href="#radare2" class="headerlink" title="radare2"></a>radare2</h3><p>前往<a href="https://github.com/radareorg/radare2/releases">Releases · radareorg/radare2</a>下载<code>radare2-5.4.2-w64.zip</code>，解压到任意目录。<br>将<code>..\radare2\bin</code>目录添加到<code>PATH</code>环境变量后，执行<code>r2 -v</code>查看版本号</p>
+<h3 id="r2frida"><a href="#r2frida" class="headerlink" title="r2frida"></a>r2frida</h3><h4 id="更换npm源（可选）"><a href="#更换npm源（可选）" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+<h4 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
+<h4 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h4><p>编辑<code>build.bat</code>，修改<code>frida_version</code>为frida安装版本，修改<code>R2_BASE</code>为<code>radare2</code>安装目录（不需要<code>bin</code>）</p>
+<p>将<code>..\radare2\include\libr\r_cons.h</code>以<code>UTF-8 with BOM</code>编码重新保存（防止编译出错）</p>
+<h4 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h4><p>在<code>cmd</code>中打开该目录，使用<code>vcvarsall.bat</code>初始化环境，然后执行安装脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;[Visual Studio安装位置]\VC\Auxiliary\Build\vcvarsall.bat&quot; x64</span><br><span class="line">.\build.bat install</span><br></pre></td></tr></table></figure>
+<p>安装成功将提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Installing...</span><br><span class="line">Copying &#x27;io_frida.dll&#x27; to C:\Users\xhy\.local\share\radare2\plugins</span><br><span class="line">        1 file(s) copied.</span><br></pre></td></tr></table></figure>
+
+<p>运行<code>r2 frida://?</code>显示帮助，测试插件是否安装成功。<br>结果如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">r2 frida://[action]/[link]/[device]/[target]</span><br><span class="line">* action = list | apps | attach | spawn | launch</span><br><span class="line">* link   = local | usb | remote host:port</span><br><span class="line">* device = &#x27;&#x27; | host:port | device-id</span><br><span class="line">* target = pid | appname | process-name | program-in-path | abspath</span><br><span class="line">Local:</span><br><span class="line">* frida://?                        # show this help</span><br><span class="line">* frida://                         # list local processes</span><br><span class="line">* frida://0                        # attach to frida-helper (no spawn needed)</span><br><span class="line">* frida:///usr/local/bin/rax2      # abspath to spawn</span><br><span class="line">* frida://rax2                     # same as above, considering local/bin is in PATH</span><br><span class="line">* frida://spawn/$(program)         # spawn a new process in the current system</span><br><span class="line">* frida://attach/(target)          # attach to target PID in current host</span><br><span class="line">USB:</span><br><span class="line">* frida://list/usb//               # list processes in the first usb device</span><br><span class="line">* frida://apps/usb//               # list apps in the first usb device</span><br><span class="line">* frida://attach/usb//12345        # attach to given pid in the first usb device</span><br><span class="line">* frida://spawn/usb//appname       # spawn an app in the first resolved usb device</span><br><span class="line">* frida://launch/usb//appname      # spawn+resume an app in the first usb device</span><br><span class="line">Remote:</span><br><span class="line">* frida://attach/remote/10.0.0.3:9999/558 # attach to pid 558 on tcp remote frida-server</span><br><span class="line">Environment:</span><br><span class="line">  R2FRIDA_SAFE_IO                  # Workaround a Frida bug on Android/thumb</span><br><span class="line">  R2FRIDA_DEBUG                    # Used to debug argument parsing behaviour</span><br><span class="line">  R2FRIDA_AGENT_SCRIPT             # path to file of the r2frida agent</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>（连接帮助见上文）</p>
+<h3 id="获取usb-device-id（可选）"><a href="#获取usb-device-id（可选）" class="headerlink" title="获取usb device id（可选）"></a>获取usb device id（可选）</h3><p>执行<code>frida-ls-devices</code>，获取<code>usb device id</code><br>然后启动app：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">r2 frida://launch/usb/[设备id]/[包名]</span><br></pre></td></tr></table></figure>
+<p>设备id为空时，连接第一个usb设备</p>
+<h3 id="查询帮助"><a href="#查询帮助" class="headerlink" title="查询帮助"></a>查询帮助</h3><p>附加上app后，如果要使用<code>r2frida</code>的命令，需要在前面增加<code>=!</code>或<code>:</code></p>
+<blockquote>
+<p>r2frida commands are prefixed with <code>=!</code> or <code>:</code>.<br>如：<code>=!?</code>、<code>:?</code>（获取帮助）<br>在命令后加问号，可查询命令帮助，如<code>:/?</code>、<code>ps?</code></p>
+</blockquote>
+<h3 id="动态调试"><a href="#动态调试" class="headerlink" title="动态调试"></a>动态调试</h3><p>执行<code>:d?</code>查看帮助</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://mabin004.github.io/2021/02/19/r2frida%E4%BD%BF%E7%94%A8/">r2frida使用</a><br><a href="https://bbs.pediy.com/thread-264161.htm">Android动态调试-R2frida和lldb</a><br><a href="https://bbs.pediy.com/thread-256858.htm">RADARE2+FRIDA=R2FRIDA Best Dynamic Debugging Tool</a><br><a href="https://blog.csdn.net/u013255206/article/details/75295209">vs编译 error C2001: 常量中有换行符</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>经验</tag>
       </tags>
   </entry>
 </search>
