@@ -191,6 +191,415 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/wsl-18-04-android-6-source/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/14/wsl-18-04-android-6-source/" class="post-title-link" itemprop="url">WSL(Ubuntu 18.04)编译安卓6.0.0_r1源码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-14 09:54:23" itemprop="dateCreated datePublished" datetime="2020-04-14T09:54:23+08:00">2020-04-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="之前的尝试"><a href="#之前的尝试" class="headerlink" title="之前的尝试"></a>之前的尝试</h2><p>一开始使用wsl1进行编译，即使用了ccache，编译耗时仍难以接受（编译了很久都没结束）<br>之后又使用wsl2进行编译，编译还是需要很久<br>原因猜测：源码位于D盘，wsl访问文件可能需要经过转换，因此IO操作速度慢。<br>搜索发现<a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-ux-changes">WSL 1 与 WSL 2 之间的用户体验更改</a>中提到：</p>
+<blockquote>
+<p>请确保将你要使用 Linux 应用程序频繁访问的文件放在 Linux 根文件系统中，以享受文件性能优势。 这些文件必须位于 Linux 根文件系统内，以便较快地访问文件系统。<br>验证：使用wsl在d盘解压源码，速度远慢于直接在wsl文件系统中解压<br>由此确定最终方案</p>
+</blockquote>
+<h2 id="最终方案"><a href="#最终方案" class="headerlink" title="最终方案"></a>最终方案</h2><p>将源码压缩包移动到linux文件系统下，再解压<br>或者使用repo工具下载源码到linux文件系统</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/14/wsl-18-04-android-6-source/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/wsl-adb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/14/wsl-adb/" class="post-title-link" itemprop="url">WSL中使用adb</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-14 09:34:07" itemprop="dateCreated datePublished" datetime="2020-04-14T09:34:07+08:00">2020-04-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>尝试在wsl中使用adb，发现找不到设备。搜索一番发现是因为adb版本不统一导致的。<br>注意：wsl2中adb无法查询到usb设备，可以通过使用ip地址连接(需要root权限)，或降级到wsl1</p>
+<blockquote>
+<p>在 WSL 2 的初始版本中，将会限制硬件访问支持，例如：你将无法访问 GPU、串行或 USB 设备。<br><a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-faq">WSL2 - 常见问题</a></p>
+</blockquote>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h3 id="Linux安装adb"><a href="#Linux安装adb" class="headerlink" title="Linux安装adb"></a>Linux安装adb</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install android-tools-adb</span><br></pre></td></tr></table></figure>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="查询adb版本"><a href="#查询adb版本" class="headerlink" title="查询adb版本"></a>查询adb版本</h3><p>使用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb version</span><br></pre></td></tr></table></figure>
+<p>查看adb版本，发现windows是<code>1.0.41</code>，而WSL下是<code>1.0.39</code></p>
+<h3 id="停用adb服务"><a href="#停用adb服务" class="headerlink" title="停用adb服务"></a>停用adb服务</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb kill-server</span><br></pre></td></tr></table></figure>
+<h3 id="统一版本"><a href="#统一版本" class="headerlink" title="统一版本"></a>统一版本</h3><p>个人是把windows的adb文件替换为<code>1.0.39</code>版本，从而实现内外都可使用adb命令。</p>
+<h2 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h2><p><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA">https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA</a> 提取码: 2333</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42600072/article/details/103129441"></a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/csharp-run-as-admin/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/14/csharp-run-as-admin/" class="post-title-link" itemprop="url">VS设置C#默认以管理员身份调试及启动</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-14 06:58:43" itemprop="dateCreated datePublished" datetime="2020-04-14T06:58:43+08:00">2020-04-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="默认以管理员身份调试"><a href="#默认以管理员身份调试" class="headerlink" title="默认以管理员身份调试"></a>默认以管理员身份调试</h2><p>右键项目，添加应用程序清单文件。<br>将<code>&lt;requestedExecutionLevel level=&quot;asInvoker&quot; uiAccess=&quot;false&quot; /&gt;</code><br><code>asInvoker</code>修改为<code>requireAdministrator</code><br>保存后再次点击运行，将提示使用其他凭据重新启动。</p>
+<h2 id="程序自动请求管理员权限"><a href="#程序自动请求管理员权限" class="headerlink" title="程序自动请求管理员权限"></a>程序自动请求管理员权限</h2><p>修改<code>Program.cs</code>的<code>Main</code>方法:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="built_in">string</span>[] Args</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 当前用户是管理员的时候，直接启动应用程序</span></span><br><span class="line"><span class="comment">     * 如果不是管理员，则使用启动对象启动程序，以确保使用管理员身份运行</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="comment">//获得当前登录的Windows用户标示</span></span><br><span class="line">    System.Security.Principal.WindowsIdentity identity = System.Security.Principal.WindowsIdentity.GetCurrent();</span><br><span class="line">    <span class="comment">//创建Windows用户主题</span></span><br><span class="line">    Application.EnableVisualStyles();</span><br><span class="line"></span><br><span class="line">    System.Security.Principal.WindowsPrincipal principal = <span class="keyword">new</span> System.Security.Principal.WindowsPrincipal(identity);</span><br><span class="line">    <span class="comment">//判断当前登录用户是否为管理员</span></span><br><span class="line">    <span class="keyword">if</span> (principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//如果是管理员，则直接运行</span></span><br><span class="line"></span><br><span class="line">        Application.EnableVisualStyles();</span><br><span class="line">        Application.Run(<span class="keyword">new</span> Form1());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//创建启动对象</span></span><br><span class="line">        System.Diagnostics.ProcessStartInfo startInfo = <span class="keyword">new</span> System.Diagnostics.ProcessStartInfo();</span><br><span class="line">        <span class="comment">//设置运行文件</span></span><br><span class="line">        startInfo.FileName = System.Windows.Forms.Application.ExecutablePath;</span><br><span class="line">        <span class="comment">//设置启动参数</span></span><br><span class="line">        startInfo.Arguments = String.Join(<span class="string">&quot; &quot;</span>, Args);</span><br><span class="line">        <span class="comment">//设置启动动作,确保以管理员身份运行</span></span><br><span class="line">        startInfo.Verb = <span class="string">&quot;runas&quot;</span>;</span><br><span class="line">        <span class="comment">//如果不是管理员，则启动UAC</span></span><br><span class="line">        System.Diagnostics.Process.Start(startInfo);</span><br><span class="line">        <span class="comment">//退出</span></span><br><span class="line">        System.Windows.Forms.Application.Exit();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/testcs_dn/article/details/9903727">C#默认以管理员身份运行程序</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/13/draw-bintree-by-graphviz/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/13/draw-bintree-by-graphviz/" class="post-title-link" itemprop="url">使用Graphviz画一颗二叉树</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-13 08:16:40" itemprop="dateCreated datePublished" datetime="2020-04-13T08:16:40+08:00">2020-04-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>发现有一个工具叫<code>Graphviz</code>，类似于<code>markdown</code>，它使用dot标记语言来编写，能将其转换为图形。</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>（非必需，文末有精简版下载地址）<br>下载并安装<a target="_blank" rel="noopener" href="https://graphviz.gitlab.io/download/">Graphviz</a><br>将<code>安装目录/bin</code>添加到环境变量</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/13/draw-bintree-by-graphviz/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/13/stone-game/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/13/stone-game/" class="post-title-link" itemprop="url">取石头游戏</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-13 05:06:46" itemprop="dateCreated datePublished" datetime="2020-04-13T05:06:46+08:00">2020-04-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>两个足够聪明的人玩轮流取石头的游戏，谁取到最后一个石头谁就赢了，他们一次只能取1个、3个、7个或8个石头，写一程序判断n个石头时先取的人是输还是赢。</p>
+<h3 id="输入格式"><a href="#输入格式" class="headerlink" title="输入格式:"></a>输入格式:</h3><p>一个整数n，其值不超过10000000。</p>
+<h3 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式:"></a>输出格式:</h3><p>如果先取的人赢，请以单独一行输出1，否则输出0。</p>
+<h3 id="输入样例"><a href="#输入样例" class="headerlink" title="输入样例:"></a>输入样例:</h3><p>这里是3组输入。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1</span><br><span class="line">10</span><br><span class="line">300</span><br></pre></td></tr></table></figure>
+<h3 id="输出样例"><a href="#输出样例" class="headerlink" title="输出样例:"></a>输出样例:</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1</span><br><span class="line">1</span><br><span class="line">0</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/13/stone-game/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/13/vscode-git-by-ssh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/13/vscode-git-by-ssh/" class="post-title-link" itemprop="url">VSCode中配置git使用ssh连接</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-13 03:18:16" itemprop="dateCreated datePublished" datetime="2020-04-13T03:18:16+08:00">2020-04-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用HTTPS协议时需要输入账号密码，比较麻烦，虽然可以配置自动保存密码，但明文保存可能导致安全性的降低。<br>在部署博客时也收到了github的邮件提醒：</p>
+<blockquote>
+<p>On July 1st, 2020, basic authentication using password to this endpoint will no longer work</p>
+</blockquote>
+<p>故决定使用ssh密钥连接git</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="安装git-bash"><a href="#安装git-bash" class="headerlink" title="安装git bash"></a>安装git bash</h3><p><a target="_blank" rel="noopener" href="https://gitforwindows.org/">https://gitforwindows.org/</a></p>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>打开<code>git bash</code>，配置用户名和邮箱：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name author</span><br><span class="line">git config --global user.email author@gmail.com</span><br></pre></td></tr></table></figure>
+<h3 id="生成ssh-key"><a href="#生成ssh-key" class="headerlink" title="生成ssh key"></a>生成ssh key</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;author@gmail.com&quot;</span><br></pre></td></tr></table></figure>
+<p>回车设置为默认路径，然后输入两次密码（直接回车则密码为空）</p>
+<h3 id="在github中添加ssh-key"><a href="#在github中添加ssh-key" class="headerlink" title="在github中添加ssh key"></a>在github中添加ssh key</h3><p>打开<a target="_blank" rel="noopener" href="https://github.com/settings/keys">https://github.com/settings/keys</a><br>将<code>id_rsa.pub</code>内容填入即可</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>执行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
+<p>输入密码验证，返回正确则说明配置完成。</p>
+<h2 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h2><p>之后都使用git协议来克隆仓库<br>如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github.com:XhyEax/LeetCode.git</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/eliot2877/article/details/77841226">vscode中利用git通过ssh连接github</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39669916/article/details/82974970">git-ssh-config.md</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/13/vscode-git-save-pwd/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -448,394 +857,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/03/28/mips-bubble-sort/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/03/28/mips-bubble-sort/" class="post-title-link" itemprop="url">MIPS冒泡排序 计算机组成原理与设计（第五版）</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-28 01:00:01" itemprop="dateCreated datePublished" datetime="2020-03-28T01:00:01+08:00">2020-03-28</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="代码如下"><a href="#代码如下" class="headerlink" title="代码如下"></a>代码如下</h2><p>（非递减排序）</p>
-<figure class="highlight mips"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">sort:</span><span class="keyword">addi </span>$<span class="built_in">sp</span>,$<span class="built_in">sp</span>,-<span class="number">20</span></span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">ra</span>,<span class="number">16</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s3</span>,<span class="number">12</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s2</span>,<span class="number">8</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s1</span>,<span class="number">4</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s0</span>,<span class="number">0</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">s2</span>,$<span class="built_in">a0</span></span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">s3</span>,$<span class="built_in">a1</span></span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">s0</span>,$<span class="built_in">zero</span></span><br><span class="line"><span class="symbol">for1tst:</span><span class="keyword">slt </span>$<span class="built_in">t0</span>,$<span class="built_in">s0</span>,$<span class="built_in">s3</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="built_in">t0</span>,$<span class="built_in">zero</span>,exit1</span><br><span class="line"><span class="keyword">addi </span>$<span class="built_in">s1</span>,$<span class="built_in">s0</span>,-<span class="number">1</span></span><br><span class="line"><span class="symbol">for2tst:</span><span class="keyword">slti </span>$<span class="built_in">t0</span>,$<span class="built_in">s1</span>,<span class="number">0</span></span><br><span class="line"><span class="keyword">bne </span>$<span class="built_in">t0</span>,$<span class="built_in">zero</span>,exit2</span><br><span class="line"><span class="keyword">sll </span>$<span class="built_in">t1</span>,$<span class="built_in">s1</span>,<span class="number">2</span></span><br><span class="line"><span class="keyword">add </span>$<span class="built_in">t2</span>,$<span class="built_in">s2</span>,$<span class="built_in">t1</span></span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t3</span>,<span class="number">0</span>($<span class="built_in">t2</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t4</span>,<span class="number">4</span>($<span class="built_in">t2</span>)</span><br><span class="line"><span class="keyword">slt </span>$<span class="built_in">t0</span>,$<span class="built_in">t4</span>,$<span class="built_in">t3</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="built_in">t0</span>,$<span class="built_in">zero</span>,exit2</span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">a0</span>,$<span class="built_in">s2</span></span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">a1</span>,$<span class="built_in">s1</span></span><br><span class="line"><span class="keyword">jal </span><span class="keyword">swap</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">addi </span>$<span class="built_in">s1</span>,$<span class="built_in">s1</span>,-<span class="number">1</span></span><br><span class="line"><span class="keyword">j </span>for2tst</span><br><span class="line"><span class="symbol">exit2:</span><span class="keyword">addi </span>$<span class="built_in">s0</span>,$<span class="built_in">s0</span>,<span class="number">1</span></span><br><span class="line"><span class="keyword">j </span>for1tst</span><br><span class="line"><span class="symbol">exit1:</span><span class="keyword">lw </span>$<span class="built_in">s0</span>,<span class="number">0</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">s1</span>,<span class="number">4</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">s2</span>,<span class="number">8</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">s3</span>,<span class="number">12</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">ra</span>,<span class="number">16</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">addi </span>$<span class="built_in">sp</span>,$<span class="built_in">sp</span>,<span class="number">20</span></span><br><span class="line"><span class="keyword">jr </span>$<span class="built_in">ra</span></span><br><span class="line"><span class="keyword">swap: </span><span class="keyword">sll </span>$<span class="built_in">t1</span>,$<span class="built_in">a1</span>,<span class="number">2</span></span><br><span class="line"><span class="keyword">add </span>$<span class="built_in">t1</span>,$<span class="built_in">a0</span>,$<span class="built_in">t1</span></span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t0</span>,<span class="number">0</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t2</span>,<span class="number">4</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">t2</span>,<span class="number">0</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">t0</span>,<span class="number">4</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">jr </span>$<span class="built_in">ra</span></span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>计算机组成原理与设计（第五版） 机械工业出版社 第94页</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/03/25/linux-set-swapfile/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/03/25/linux-set-swapfile/" class="post-title-link" itemprop="url">Linux配置虚拟内存文件</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-25 03:51:56" itemprop="dateCreated datePublished" datetime="2020-03-25T03:51:56+08:00">2020-03-25</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="查询当前内存"><a href="#查询当前内存" class="headerlink" title="查询当前内存"></a>查询当前内存</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">free -h</span><br></pre></td></tr></table></figure>
-<h3 id="创建交换文件"><a href="#创建交换文件" class="headerlink" title="创建交换文件"></a>创建交换文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">touch /root/swapfile</span><br><span class="line">dd if=/dev/zero of=/root/swapfile bs=1M count=4096</span><br></pre></td></tr></table></figure>
-<h3 id="格式化交换文件"><a href="#格式化交换文件" class="headerlink" title="格式化交换文件"></a>格式化交换文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkswap /root/swapfile</span><br></pre></td></tr></table></figure>
-<h3 id="启用交换文件"><a href="#启用交换文件" class="headerlink" title="启用交换文件"></a>启用交换文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">swapon /root/swapfile</span><br></pre></td></tr></table></figure>
-<h3 id="配置开机自动加载"><a href="#配置开机自动加载" class="headerlink" title="配置开机自动加载"></a>配置开机自动加载</h3><p>在<code>/etc/fstab</code>文件中添加：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/root/swapfile swap swap defaults 0 0</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/fae46241ba0c">Linux设置虚拟内存</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/03/03/ark-server-linux/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/03/03/ark-server-linux/" class="post-title-link" itemprop="url">方舟生存进化 Linux(CentOS) 开服、mod安装</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-03 04:14:15" itemprop="dateCreated datePublished" datetime="2020-03-03T04:14:15+08:00">2020-03-03</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>阿里云服务器，CentOS 7.7 64位， 2核CPU，4G内存，4G交换空间</p>
-<h3 id="交换空间配置"><a href="#交换空间配置" class="headerlink" title="交换空间配置"></a>交换空间配置</h3><p>见<a href="https://blog.xhyeax.com/2020/03/25/linux-set-swapfile/">Linux配置虚拟内存文件</a></p>
-<h2 id="开服准备"><a href="#开服准备" class="headerlink" title="开服准备"></a>开服准备</h2><h3 id="创建用户并设置密码"><a href="#创建用户并设置密码" class="headerlink" title="创建用户并设置密码"></a>创建用户并设置密码</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adduser arkserver</span><br><span class="line">passwd arkserver</span><br></pre></td></tr></table></figure>
-<h3 id="开放以下端口"><a href="#开放以下端口" class="headerlink" title="开放以下端口"></a>开放以下端口</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">7777/udp</span><br><span class="line">27015/udp</span><br></pre></td></tr></table></figure>
-<p>PS：云服务器一般是在安全组规则中设置放行<br>同时关闭系统自带的防火墙（root用户执行<code>service firewalld stop</code>）</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/03/03/ark-server-linux/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/01/29/52pojie-2020-red-packet/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/01/29/52pojie-2020-red-packet/" class="post-title-link" itemprop="url">2020吾爱破解论坛春节红包前三题 Writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-01-29 16:00:00" itemprop="dateCreated datePublished" datetime="2020-01-29T16:00:00+08:00">2020-01-29</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>解题方法并不唯一，仅供参考。</p>
-<h2 id="题目打包下载地址"><a href="#题目打包下载地址" class="headerlink" title="题目打包下载地址"></a>题目打包下载地址</h2><p><a target="_blank" rel="noopener" href="https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar">https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar</a></p>
-<h2 id="第一题-送分题"><a href="#第一题-送分题" class="headerlink" title="第一题 送分题"></a>第一题 送分题</h2><p>关注“吾爱破解论坛”微信公众号，回复指定字符串即可获得本题正确口令。</p>
-<h2 id="第二题-Windows-初级题"><a href="#第二题-Windows-初级题" class="headerlink" title="第二题 Windows 初级题"></a>第二题 Windows 初级题</h2><p>使用<code>PEiD</code>查壳，得知该程序是<code>UPX</code>壳，并修改了区段名。于是使用<code>OD</code>脱壳，再用<code>ImportREConstructor</code>修复IAT。<br>再次查壳，得到<code>Borland Delphi v3.0 *</code>。故使用<code>IDR</code>（<a target="_blank" rel="noopener" href="https://down.52pojie.cn/Tools/Disassemblers/IDR%20(Interactive%20Delphi%20Reconstructor).rar">爱盘下载地址</a>）进行分析。<br>查看窗体，定位到关键函数<code>TForm1.edtPwdChange</code>：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-1.png"><br>其中对输入字符串进行切片，然后分别进行md5计算，并与以下字符比较：<br><code>E7EE5F4653E31955CACC7CD68E2A7839</code><br><code>ea6b2efbdd4255a9f1b3bbc6399b58f4</code><br><code>c8d46d341bea4fd5bff866a65ff8aea9</code><br>反查md5并拼接即可得到<code>52pojie2019game</code><br>输入进行校验，得到提示：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-2.png"><br>将该字符串回复到公众号即可获得本题正确口令。</p>
-<h2 id="第三题-Android-初级题"><a href="#第三题-Android-初级题" class="headerlink" title="第三题 Android 初级题"></a>第三题 Android 初级题</h2><p>使用<code>AndroidKiller</code>反编译，打开<code>MainActivity.smali</code>，发现<code>checkFlag</code>和<code>onClick</code>方法被nativie化了。<br>于是使用<code>IDA</code>打开<code>libcrack_j2c.so</code>，定位到<code>onClick</code>方法，可以发现是通过JNI反射调用Java方法。由此可以大致分析出程序流程：<br>首先获取输入框文本，对长度进行判断，为30则调用<code>checkFlag</code>方法进行检查<br>在<code>checkFlag</code>方法中，定位到关键位置：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-3.png"><br>由此可知，安装并打开该APP后，输入30位长度的字符串，点击确定就会调用<code>equals</code>方法<br>于是使用<code>Frida</code>进行hook，打印出调用该方法的参数和实例内容，从而得到真码：<br><code>ed61f6308c74bcf35c71729d4db24c</code><br>将该字符串回复到公众号即可获得本题正确口令。<br>Frida脚本如下：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(Java.available)</span><br><span class="line">&#123;</span><br><span class="line">    Java.perform(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">       <span class="keyword">var</span> <span class="built_in">String</span>= Java.use(<span class="string">&#x27;java.lang.String&#x27;</span>);</span><br><span class="line">		<span class="built_in">String</span>.equals.overload(<span class="string">&quot;java.lang.Object&quot;</span>).implementation=<span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="built_in">this</span>.toString());</span><br><span class="line">        <span class="built_in">console</span>.log(obj);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.equals(obj);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="此处应有分割线"><a href="#此处应有分割线" class="headerlink" title="此处应有分割线"></a>此处应有分割线</h2><p>祝各位身体健康，心想事成！</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/12/29/ubuntu-1910-android-6-source/" class="post-title-link" itemprop="url">Ubuntu 19.10 编译安卓6.0.0_r1源码</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-12-29 10:57:59" itemprop="dateCreated datePublished" datetime="2019-12-29T10:57:59+08:00">2019-12-29</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="提示"><a href="#提示" class="headerlink" title="提示"></a>提示</h2><p>[2020/04/16更新]<br>建议使用<code>docker</code>进行编译，省心省力<br>见：<a href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">在WSL2中使用docker编译安卓源码</a></p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前编译了AOSP 5.1.1源码，没有写文章记录。这次记录一下编译安卓6.0.0_r1的过程，流程跟编译5.1.1大致一样</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/12/29/ubuntu-1910-android-6-source/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/11/20/fix_error_log_qseecomd_aosp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/11/20/fix_error_log_qseecomd_aosp/" class="post-title-link" itemprop="url">修复 AOSP QSEECOMD 错误日志</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-20 10:05:12" itemprop="dateCreated datePublished" datetime="2019-11-20T10:05:12+08:00">2019-11-20</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>刷入自己编译的AOSP系统，一直有日志输出，TAG为<code>QSEECOMD</code>，日志内容如下</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">11-20 17:34:14.924 30350-30350/? D/QSEECOMD:: qseecom listener services process entry PPID = 1</span><br><span class="line">11-20 17:34:14.924 30350-30350/? E/QSEECOMD:: Listener: index = 0, hierarchy = 0</span><br><span class="line">11-20 17:34:14.925 30350-30350/? E/QSEECOMD:: Init dlopen(librpmb.so, RLTD_NOW) is failed....</span><br><span class="line">11-20 17:34:14.925 30350-30350/? E/QSEECOMD:: ERROR: RPMB_INIT failed, shall not start listener services</span><br></pre></td></tr></table></figure>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>百度得知是<code>librpmb.so</code>以及<code>libssd.so</code>文件缺失，到<a target="_blank" rel="noopener" href="https://developers.google.com/android/images">官网</a>下载原版镜像（可根据系统代号查找）<br>提取出这两个文件，导入<code>/system/lib/</code>后重启即可（注意权限设置）<br>也可打包成magisk模块刷入（下载地址：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1AcnT-D9x8EE0Z6Jzuxgscw">https://pan.baidu.com/s/1AcnT-D9x8EE0Z6Jzuxgscw</a> 提取码: hqh5）<br>为了让下次编译系统时自动包含这两个文件，把它们复制到<code>out/target/product/hammerhead/system/lib/</code></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="http://ju.outofmemory.cn/entry/264142">How to solve QSEECOMD on AOSP</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -903,7 +928,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">107</span>
+          <span class="site-state-item-count">113</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

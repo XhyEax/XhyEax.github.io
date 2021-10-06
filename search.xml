@@ -461,10 +461,11 @@
 <p>所有tag：<a href="https://hub.docker.com/r/kylemanna/aosp/tags">dockerhub kylemanna/aosp tags</a></p>
 <h3 id="启动容器-进入bash"><a href="#启动容器-进入bash" class="headerlink" title="启动容器 进入bash"></a>启动容器 进入bash</h3><p>用于测试文件夹映射是否正确，进入后执行<code>ls</code></p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">./aosp</span><br></pre></td></tr></table></figure>
-<p><strong>注意：不要用<code>exit</code>退出，会关闭容器。使用<code>Ctrl+P+Q</code></strong></p>
+<p><strong>注意：不要执行<code>exit</code>，会关闭容器。使用<code>Ctrl+P+Q</code>从容器中Detach即可</strong></p>
 <h3 id="以root用户进入bash"><a href="#以root用户进入bash" class="headerlink" title="以root用户进入bash"></a>以root用户进入bash</h3><p>用于编译系统</p>
-<h4 id="查询容器id"><a href="#查询容器id" class="headerlink" title="查询容器id"></a>查询容器id</h4><p>启动docker容器后，复制容器id（用户名后面的字符）<br>也可以使用<code>docker ps</code>查询<br>（下面是使用命令提取出第一个容器id）</p>
-<h4 id="root用户登录bash"><a href="#root用户登录bash" class="headerlink" title="root用户登录bash"></a>root用户登录bash</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cid=$(docker ps | grep aosp | cut -d&quot; &quot; -f1) &amp;&amp; echo $cid</span><br><span class="line">docker exec --privileged -u root -it $cid bash</span><br></pre></td></tr></table></figure>
+<h4 id="使用VSCode-Docker插件（推荐）"><a href="#使用VSCode-Docker插件（推荐）" class="headerlink" title="使用VSCode Docker插件（推荐）"></a>使用VSCode Docker插件（推荐）</h4><p>在<code>VSCode</code>中安装<code>Docker</code>插件后，在<code>Containers</code>中右键打开的<code>aosp</code>容器，<code>Attach Shell</code></p>
+<h4 id="使用命令行"><a href="#使用命令行" class="headerlink" title="使用命令行"></a>使用命令行</h4><h5 id="查询容器id"><a href="#查询容器id" class="headerlink" title="查询容器id"></a>查询容器id</h5><p>启动docker容器后，复制容器id（用户名后面的字符）<br>也可以使用<code>docker ps</code>查询<br>（下面是使用命令提取出第一个容器id）</p>
+<h5 id="登录bash"><a href="#登录bash" class="headerlink" title="登录bash"></a>登录bash</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cid=$(docker ps | grep aosp | cut -d&quot; &quot; -f1) &amp;&amp; echo $cid</span><br><span class="line">docker exec --privileged -u root -it $cid bash</span><br></pre></td></tr></table></figure>
 <h3 id="已有源码：直接编译系统"><a href="#已有源码：直接编译系统" class="headerlink" title="已有源码：直接编译系统"></a>已有源码：直接编译系统</h3><p>进入容器的bash后，打开源码目录，执行以下命令：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">prebuilts/misc/linux-x86/ccache/ccache -M 100G</span><br><span class="line">source build/envsetup.sh</span><br><span class="line">lunch aosp_arm-eng</span><br><span class="line">cpus=$(grep ^processor /proc/cpuinfo | wc -l)</span><br><span class="line">make -j $[2*$cpus]</span><br></pre></td></tr></table></figure>
 <h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>如果需要编译手机（如nexus5）使用的系统镜像，还需要下载驱动文件。<br>见：<a href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">Ubuntu 19.10 编译安卓6.0.0_r1源码</a><br>并修改脚本中的<code>aosp_arm-eng</code>为<code>aosp_hammerhead-userdebug</code></p>
@@ -794,7 +795,8 @@
   <entry>
     <title>Linux通过环境变量设置curl代理</title>
     <url>/2020/04/16/curl-set-proxy-by-pathvar/</url>
-    <content><![CDATA[<h2 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export http_proxy=http://your-ip-address:port/</span><br><span class="line">export http_proxy=http://user:password@your-proxy-ip-address:port</span><br></pre></td></tr></table></figure>
+    <content><![CDATA[<h2 id="Docker、Git代理配置"><a href="#Docker、Git代理配置" class="headerlink" title="Docker、Git代理配置"></a>Docker、Git代理配置</h2><p>见<a href="https://blog.xhyeax.com/2021/10/03/set-proxy-of-docker-git-and-others/">在Linux下设置代理</a></p>
+<h2 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export http_proxy=http://your-ip-address:port/</span><br><span class="line">export http_proxy=http://user:password@your-proxy-ip-address:port</span><br></pre></td></tr></table></figure>
 <p>代理格式：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">http://[user:password@]proxyhost[:port]/</span><br><span class="line">https://[user:password@]proxyhost[:port]/</span><br><span class="line">socks5://[user:password@]proxyhost[:port]/</span><br></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/zafu/p/10000188.html">如何让 curl 命令通过代理访问</a></p>
@@ -1112,9 +1114,8 @@
 <p>具体操作为：</p>
 <p>将arm版本的so文件及配置文件添加到<code>lib\src\main\jniLibs\armeabi-v7a</code>，并配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code></p>
 <h3 id="编写Xposed模块"><a href="#编写Xposed模块" class="headerlink" title="编写Xposed模块"></a>编写Xposed模块</h3><p>除了修改源码，也可以自己编写一个Xposed模块，实现<code>Frida-Gadget</code>的加载。</p>
-<p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，手动调用<code>System.load</code>加载<code>Frida-Gadget</code>。</p>
-<p>建议直接拷贝到<code>/system/lib</code>、<code>/system/lib64</code>，或打包为<code>Magisk</code>模块（权限设置为644）</p>
-<p>原因：如果hook系统应用（<code>PLATFORM_APP</code>），且未关闭<code>SELinux</code>，则无法从<code>data</code>目录下加载so文件</p>
+<p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，调用<code>System.load</code>或<code>System.loadLibrary</code>加载<code>Frida-Gadget</code>。</p>
+<p>注意：如果hook系统应用（<code>PLATFORM_APP</code>），且未关闭<code>SELinux</code>，则无法从<code>data</code>目录下加载so文件。</p>
 ]]></content>
       <tags>
         <tag>Android</tag>
@@ -1596,13 +1597,23 @@
 <p>PS： 个人觉得不配置反而方便一点，不用考虑每个分区的容量</p>
 <h2 id="系统软件"><a href="#系统软件" class="headerlink" title="系统软件"></a>系统软件</h2><p>按照默认配置安装桌面环境和工具，之后等待系统安装完成即可</p>
 <h2 id="启动系统"><a href="#启动系统" class="headerlink" title="启动系统"></a>启动系统</h2><p>系统安装完成后会提示拔出安装介质，此时拔出U盘，重启后，选择第一个选项进入<code>Kali</code>系统</p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h3><p><a href="https://zhuanlan.zhihu.com/p/82361096">kali安装docker环境</a><br>建议配置镜像下载加速，见<a href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">在WSL2中使用docker编译安卓源码 </a></p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="更改SSH秘钥和root密码"><a href="#更改SSH秘钥和root密码" class="headerlink" title="更改SSH秘钥和root密码"></a>更改SSH秘钥和root密码</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /etc/ssh/</span><br><span class="line">sudo dpkg-reconfigure openssh-server</span><br></pre></td></tr></table></figure>
+<p>（默认密码为toor）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo passwd root</span><br></pre></td></tr></table></figure>
+<h3 id="查看shell"><a href="#查看shell" class="headerlink" title="查看shell"></a>查看shell</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">env | grep SHELL</span><br></pre></td></tr></table></figure>
+<p>默认为<code>zsh</code></p>
+<h3 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h3><p>可在<code>.zshrc</code>末尾增加环境变量</p>
+<h3 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h3><p><a href="https://zhuanlan.zhihu.com/p/82361096">kali安装docker环境</a><br>建议配置镜像下载加速，见<a href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">在WSL2中使用docker编译安卓源码 </a></p>
 <h3 id="搜狗输入法"><a href="#搜狗输入法" class="headerlink" title="搜狗输入法"></a>搜狗输入法</h3><p><a href="https://pinyin.sogou.com/linux/help.php">搜狗输入法 安装指南</a><br>安装完成后，需要重启系统</p>
 <p><code>设置</code>-<code>Fcitx配置</code>，增加一个<code>键盘 - 英语</code>输入法。（方便<code>Ctrl+Shift</code>切换输入法）</p>
 <p>可在<code>全局配置</code>中设置快捷键和外观（需要<code>显示高级选项</code>，可关闭<code>切换输入法时显示输入法提示</code>）</p>
-<h3 id="VS-Code"><a href="#VS-Code" class="headerlink" title="VS Code"></a>VS Code</h3><p><a href="https://code.visualstudio.com/">VS Code官网</a>下载<code>.deb</code>后，</p>
-<p>运行<code>sudo dpkg -i code_xxxx.deb</code>安装即可</p>
+<h3 id="VS-Code"><a href="#VS-Code" class="headerlink" title="VS Code"></a>VS Code</h3><h4 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h4><p><a href="https://code.visualstudio.com/">VS Code官网</a>下载<code>.deb</code>，<code>sudo dpkg -i code_xxxx.deb</code>安装即可</p>
+<h4 id="更换终端字体"><a href="#更换终端字体" class="headerlink" title="更换终端字体"></a>更换终端字体</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /usr/share/fonts/truetype/</span><br><span class="line">sudo git clone https://github.com/abertsch/Menlo-for-Powerline.git</span><br><span class="line">sudo fc-cache -f -v</span><br></pre></td></tr></table></figure>
+<p>在<code>setting.json</code>中增加以下内容，或直接在设置中搜索<code>terminal.integrated.fontFamily</code></p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;terminal.integrated.fontFamily&quot;</span>: <span class="string">&quot;Menlo for Powerline&quot;</span>,</span><br></pre></td></tr></table></figure>
+<h3 id="换源"><a href="#换源" class="headerlink" title="换源"></a>换源</h3><p>自行百度</p>
 <h3 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h3><p>其他软件的安装方式请自行搜索。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://howiezhao.github.io/2019/02/25/after-kali/">安装 Kali Linux 后要做的 10 件事 </a><br><a href="https://blog.csdn.net/study_in/article/details/104389345">Linux下配置vscode(终端字体篇)</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -2309,7 +2320,16 @@
     <url>/2020/04/15/wsl2-docker/</url>
     <content><![CDATA[<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl -fsSL https://get.docker.com -o get-docker.sh</span><br><span class="line">sudo sh get-docker.sh</span><br></pre></td></tr></table></figure>
 <h3 id="启动docker并配置权限"><a href="#启动docker并配置权限" class="headerlink" title="启动docker并配置权限"></a>启动docker并配置权限</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo service docker start</span><br><span class="line">sudo usermod -aG docker $USER</span><br></pre></td></tr></table></figure>
-<p>重新登录wsl<br>执行以下命令进行测试</p>
+<span id="more"></span>
+<h3 id="添加当前用户进docker组"><a href="#添加当前用户进docker组" class="headerlink" title="添加当前用户进docker组"></a>添加当前用户进docker组</h3><ol>
+<li>查看是否创建docker 组<br><code>cat /etc/group | grep docker</code></li>
+<li>创建docker组，第一步打印出东西证明以前建过，就直接跳过这一步。<br><code>sudo groupadd docker</code></li>
+<li>将用户添加到docker分组<br><code>sudo usermod -aG docker 用户名</code></li>
+<li>查看有没有生效<br><code>cat /etc/group | grep docker</code></li>
+<li>重启docker<br><code>sudo systemctl restart docker</code></li>
+<li>给docker.sock添加权限<br><code>sudo chmod a+rw /var/run/docker.sock</code></li>
+</ol>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>重新登录wsl<br>执行以下命令进行测试</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run hello-world</span><br></pre></td></tr></table></figure>
 
 <h3 id="配置自启动"><a href="#配置自启动" class="headerlink" title="配置自启动"></a>配置自启动</h3><h4 id="wsl脚本"><a href="#wsl脚本" class="headerlink" title="wsl脚本"></a>wsl脚本</h4><p>将以下内容添加至<code>/etc/init.wsl</code></p>
@@ -2318,14 +2338,7 @@
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo chmod +x /etc/init.wsl</span><br></pre></td></tr></table></figure>
 <h4 id="Windows开机自启"><a href="#Windows开机自启" class="headerlink" title="Windows开机自启"></a>Windows开机自启</h4><p>win+r，<code>shell:startup</code>，在该目录下创建vbs脚本<br><code>linux-start.vbs</code></p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Set ws = WScript.CreateObject(&quot;WScript.Shell&quot;)</span><br><span class="line">ws.run &quot;wsl -d ubuntu -u root /etc/init.wsl&quot;</span><br></pre></td></tr></table></figure>
-<h4 id="添加当前用户进docker组"><a href="#添加当前用户进docker组" class="headerlink" title="添加当前用户进docker组"></a>添加当前用户进docker组</h4><ol>
-<li>查看是否创建docker 组<br><code>cat /etc/group | grep docker</code></li>
-<li>创建docker组，第一步打印出东西证明以前建过，就直接跳过这一步。<br><code>sudo groupadd docker</code></li>
-<li>将用户添加到docker分组<br><code>sudo usermod -aG docker 用户名</code></li>
-<li>查看有没有生效<br><code>cat /etc/group</code></li>
-<li>重启docker<br><code>sudo systemctl restart docker</code></li>
-<li>给docker.sock添加权限<br><code>sudo chmod a+rw /var/run/docker.sock</code></li>
-</ol>
+
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://zhuanlan.zhihu.com/p/74489613">WSL 2中安装Docker</a><br><a href="https://www.cnblogs.com/blog5277/p/12071400.html">WSL2（Ubuntu）安装Docker</a><br><a href="https://www.xu.ci/2019/12/windowswsl2ubuntu.html">Windows开机启动WSL2（Ubuntu）的启动项</a><br><a href="https://www.cnblogs.com/zyh1994/p/13688542.html">解决运行docker命令要用sudo的问题</a></p>
 ]]></content>
       <tags>
@@ -2519,7 +2532,7 @@
   <entry>
     <title>使用docker编译安卓内核源码</title>
     <url>/2021/09/13/docker-compile-android-kernel/</url>
-    <content><![CDATA[<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>PC：<code>Kali 2021.2</code><br>手机：<code>Nexus 5</code>、<code>Android 6.0.1</code><br>内核版本：<code>3.4</code></p>
+    <content><![CDATA[<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>PC：<code>Kali 2021.2</code><br>手机：<code>Nexus 5</code>、<code>Android 6.0.1</code><br>GCC：<code>4.8</code><br>内核版本：<code>3.4.0</code></p>
 <span id="more"></span>
 <h2 id="Docker相关"><a href="#Docker相关" class="headerlink" title="Docker相关"></a>Docker相关</h2><p>详见<a href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">在WSL2中使用docker编译安卓源码</a></p>
 <h2 id="下载内核源码"><a href="#下载内核源码" class="headerlink" title="下载内核源码"></a>下载内核源码</h2><h3 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://aosp.tuna.tsinghua.edu.cn/kernel/msm.git</span><br></pre></td></tr></table></figure>
@@ -2530,7 +2543,8 @@
 <h3 id="检出分支"><a href="#检出分支" class="headerlink" title="检出分支"></a>检出分支</h3><p>注意：mr3版本有bug，无法查询Wifi，最后使用的是<code>android-msm-hammerhead-3.4-marshmallow</code>分支</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git checkout -b android-msm-hammerhead-3.4-marshmallow origin/android-msm-hammerhead-3.4-marshmallow</span><br></pre></td></tr></table></figure>
 
-<h2 id="使用root用户进入容器bash"><a href="#使用root用户进入容器bash" class="headerlink" title="使用root用户进入容器bash"></a>使用root用户进入容器bash</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cid=$(docker ps | grep aosp | cut -d&quot; &quot; -f1) &amp;&amp; echo $cid</span><br><span class="line">docker exec --privileged -u root -it $cid bash</span><br></pre></td></tr></table></figure>
+<h2 id="使用root用户进入容器bash"><a href="#使用root用户进入容器bash" class="headerlink" title="使用root用户进入容器bash"></a>使用root用户进入容器bash</h2><p>直接使用<code>VSCode</code>的<code>Docker</code>插件附加，或执行以下命令</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cid=$(docker ps | grep aosp | cut -d&quot; &quot; -f1) &amp;&amp; echo $cid</span><br><span class="line">docker exec --privileged -u root -it $cid bash</span><br></pre></td></tr></table></figure>
 
 <h2 id="配置GCC"><a href="#配置GCC" class="headerlink" title="配置GCC"></a>配置GCC</h2><h3 id="已有安卓源码：直接配置环境变量"><a href="#已有安卓源码：直接配置环境变量" class="headerlink" title="已有安卓源码：直接配置环境变量"></a>已有安卓源码：直接配置环境变量</h3><p>找到源码中gcc编译器位置，添加进PATH即可：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export PATH=/aosp/android-6.0.0_r1/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin:$PATH</span><br></pre></td></tr></table></figure>
@@ -2542,6 +2556,13 @@
 <h2 id="编译内核"><a href="#编译内核" class="headerlink" title="编译内核"></a>编译内核</h2><p>切换到内核目录，执行以下命令即可：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export ARCH=arm</span><br><span class="line">export SUBARCH=arm</span><br><span class="line">export CROSS_COMPILE=arm-eabi-</span><br><span class="line">make hammerhead_defconfig</span><br><span class="line">cpus=$(grep ^processor /proc/cpuinfo | wc -l)</span><br><span class="line">make -j$[2*$cpus]</span><br></pre></td></tr></table></figure>
 
+<h2 id="使用其他编译器"><a href="#使用其他编译器" class="headerlink" title="使用其他编译器"></a>使用其他编译器</h2><p>暂时没有使用高版本编译器编译内核的需要，待测试…</p>
+<h3 id="使用GCC4-9（未测试）"><a href="#使用GCC4-9（未测试）" class="headerlink" title="使用GCC4.9（未测试）"></a>使用GCC4.9（未测试）</h3><p>同理，添加到<code>PATH</code>后编译即可</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export ARCH=arm</span><br><span class="line">export SUBARCH=arm</span><br><span class="line">export CROSS_COMPILE=arm-linux-androideabi-</span><br><span class="line">make hammerhead_defconfig</span><br><span class="line">cpus=$(grep ^processor /proc/cpuinfo | wc -l)</span><br><span class="line">make -j$[2*$cpus]</span><br></pre></td></tr></table></figure>
+<h3 id="使用Clang（未测试）"><a href="#使用Clang（未测试）" class="headerlink" title="使用Clang（未测试）"></a>使用Clang（未测试）</h3><blockquote>
+<p>Android’s GCC 4.9 has been deprecated in favor of Clang, and will be removed from Android in January 2020 as per the below timeline.</p>
+</blockquote>
+<p>安卓的GCC 4.9已被弃用，使用Clang替换</p>
 <h2 id="打包镜像"><a href="#打包镜像" class="headerlink" title="打包镜像"></a>打包镜像</h2><h3 id="已有安卓源码：直接编译生成"><a href="#已有安卓源码：直接编译生成" class="headerlink" title="已有安卓源码：直接编译生成"></a>已有安卓源码：直接编译生成</h3><p>打开源码目录，执行以下操作：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">source ./build/envsetup.sh</span><br><span class="line">lunch aosp_hammerhead-userdebug</span><br></pre></td></tr></table></figure>
 <p>然后设置内核文件位置（默认使用<code>/aosp/android-6.0.0_r1/device/lge/zImage-dtb</code>）</p>
@@ -2923,24 +2944,125 @@
 <h3 id="Xposed"><a href="#Xposed" class="headerlink" title="Xposed"></a>Xposed</h3><p>反射调用<code>a</code>方法即可</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">findAndHookMethod(<span class="string">&quot;com.miui.permcenter.privacymanager.d&quot;</span>, lpparam.classLoader, <span class="string">&quot;c&quot;</span>, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        Method mtdA = param.thisObject.getClass().getDeclaredMethod(<span class="string">&quot;a&quot;</span>, <span class="keyword">boolean</span>.class);</span><br><span class="line">        mtdA.invoke(param.thisObject, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 <p>完整项目见<a href="https://github.com/XhyEax/MIUICustom">MIUICustom</a></p>
+<p>注意：该模块仅测试于手机管家 <code>5.4.0</code>，其他版本未测试。</p>
+<p>如果模块未生效，可自行反编译apk，查找Hook类，替换代码后编译Xposed模块。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.52pojie.cn/thread-675777-1-1.html">MIUI9绕开联网和插卡打开未知来源</a></p>
 ]]></content>
   </entry>
   <entry>
-    <title>在Windows上安装r2frida</title>
-    <url>/2021/10/01/r2frida-install-windows/</url>
+    <title>构建自己的Docker镜像（用于编译Lineage 18.1）</title>
+    <url>/2021/10/04/docker-lineage-18.1/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://github.com.cnpmjs.org/lineageos4microg/docker-lineage-cicd">docker-lineage-cicd</a>启动后会自动同步代码并编译，需要指定的参数也比较多，于是考虑制作自己的<code>Docker</code>镜像，用于编译<code>Lineage 18.1</code>。</p>
+<p>项目见<a href="https://github.com/XhyEax/docker-lineage">docker-lineage</a></p>
+<span id="more"></span>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h3><p>参考<a href="https://github.com/lineageos4microg/docker-lineage-cicd/blob/master/Dockerfile">docker-lineage-cicd/Dockerfile</a><br>仅保留<code>source</code>和<code>ccache</code>两个目录映射，精简不必要的依赖，替换<code>cron</code>为<code>vim</code>，使用<code>TUNA</code>的<code>repo</code>，最后执行<code>entrypoint</code>设置的脚本</p>
+<h3 id="docker-entrypoint-sh"><a href="#docker-entrypoint-sh" class="headerlink" title="docker_entrypoint.sh"></a>docker_entrypoint.sh</h3><p>设置<code>ccache</code>大小和<code>git</code>帐号，最后进入<code>bash</code></p>
+<h3 id="build"><a href="#build" class="headerlink" title="build"></a>build</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker build --network=host \</span><br><span class="line">-t xhyeax/docker-lineage:v18.1 .</span><br></pre></td></tr></table></figure>
+<p>为使用本地的http代理安装依赖，网络选择<code>host</code>模式</p>
+<h3 id="run"><a href="#run" class="headerlink" title="run"></a>run</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export ANDROID_VOL=/media/xhy/a5d37cc9-d3a3-43c8-909d-178d70a6598c/Android</span><br><span class="line">docker run --privileged -it \</span><br><span class="line">-v &quot;$ANDROID_VOL/source:/srv/src&quot; \</span><br><span class="line">-v &quot;$ANDROID_VOL/ccache:/srv/ccache&quot; \</span><br><span class="line">xhyeax/docker-lineage:v18.1</span><br></pre></td></tr></table></figure>
+<h3 id="push"><a href="#push" class="headerlink" title="push"></a>push</h3><p>可以使用<code>VSCode</code>的<code>Docker</code>插件，将镜像上传到<code>Docker Hub</code></p>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><h3 id="build-卡在-tzdata-Geographic-area"><a href="#build-卡在-tzdata-Geographic-area" class="headerlink" title="build 卡在 tzdata Geographic area:"></a>build 卡在 tzdata Geographic area:</h3><p>在<code>Dockerfile</code>中设置环境变量：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ENV DEBIAN_FRONTEND=noninteractive</span><br></pre></td></tr></table></figure>
+<h3 id="docker-entrypoint-sh-Permission-denied"><a href="#docker-entrypoint-sh-Permission-denied" class="headerlink" title="docker_entrypoint.sh Permission denied"></a>docker_entrypoint.sh Permission denied</h3><p>给脚本增加可执行权限，重新<code>build</code></p>
+<h3 id="编译时permission-denied"><a href="#编译时permission-denied" class="headerlink" title="编译时permission denied"></a>编译时permission denied</h3><p>启动容器时增加<code>--privileged</code></p>
+<h3 id="docker-entrypoint-sh执行后退出"><a href="#docker-entrypoint-sh执行后退出" class="headerlink" title="docker_entrypoint.sh执行后退出"></a>docker_entrypoint.sh执行后退出</h3><p>原因：未运行前台应用，容器自动关闭<br>可增加<code>-d</code>参数启动容器<br>或在<code>docker_entrypoint.sh</code>脚本末尾增加进入<code>Shell</code>的命令</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">args=&quot;$@&quot;</span><br><span class="line">if [ -z &quot;$args&quot; ]; then</span><br><span class="line">  args=&quot;bash&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">exec sudo -E args</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://techoverflow.net/2019/05/18/how-to-fix-configuring-tzdata-interactive-input-when-building-docker-images/">How to fix ‘Configuring tzdata’ interactive input when building Docker images</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>编译 Lineage 18.1 (Android 11.0) for Nexus 5</title>
+    <url>/2021/10/06/lineage-compile-for-nexus5/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>AOSP官方源码，对<code>Nexus 5</code>仅支持到<code>Android 6.0</code>，而第三方系统支持<code>Android 11.0</code>。</p>
+<p>由于需要定制系统和内核，故考虑克隆源码，手动编译。</p>
+<h2 id="ROM下载地址"><a href="#ROM下载地址" class="headerlink" title="ROM下载地址"></a>ROM下载地址</h2><p><a href="https://forum.xda-developers.com/t/rom-unofficial-lineageos-18-1-for-nexus-5-hammerhead-discontinued.4214367/">[ROM][UNOFFICIAL] LineageOS 18.1 for Nexus 5 (hammerhead) [DISCONTINUED] | XDA Forums</a></p>
+<span id="more"></span>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h3 id="Repo"><a href="#Repo" class="headerlink" title="Repo"></a>Repo</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo</span><br><span class="line">chmod +x repo</span><br><span class="line">sudo mv repo /usr/local/bin/</span><br><span class="line">export REPO_URL=&#x27;https://mirrors.tuna.tsinghua.edu.cn/git/git-repo&#x27;</span><br></pre></td></tr></table></figure>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir lineage</span><br><span class="line">cd lineage</span><br><span class="line">repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/lineageOS/LineageOS/android.git -b lineage-18.1</span><br></pre></td></tr></table></figure>
+<h3 id="修改xml以使用TUNA镜像"><a href="#修改xml以使用TUNA镜像" class="headerlink" title="修改xml以使用TUNA镜像"></a>修改xml以使用TUNA镜像</h3><p>打开<code>.repo/manifests/default.xml</code>，具体修改见<a href="https://mirrors.tuna.tsinghua.edu.cn/help/lineageOS/">lineageOS 源代码镜像使用帮助</a></p>
+<h3 id="同步源码"><a href="#同步源码" class="headerlink" title="同步源码"></a>同步源码</h3><p>使用<code>repo</code>同步<code>lineage-18.1</code>源码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">repo sync -c -j4 --force-sync</span><br></pre></td></tr></table></figure>
+
+<h3 id="Patches"><a href="#Patches" class="headerlink" title="Patches"></a>Patches</h3><p>设置环境变量<code>$LINEAGE_DIR</code>为源码目录后，执行以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export LINEAGE_DIR=/media/xhy/a5d37cc9-d3a3-43c8-909d-178d70a6598c/Android/source/lineage</span><br><span class="line"></span><br><span class="line">echo &quot;Patch SurfaceFlinger&quot;</span><br><span class="line">cd $LINEAGE_DIR/frameworks/native</span><br><span class="line">git fetch &quot;https://github.com/LineageOS/android_frameworks_native&quot; refs/changes/15/310715/1 &amp;&amp; git cherry-pick FETCH_HEAD</span><br><span class="line">cd $LINEAGE_DIR/vendor/lineage</span><br><span class="line">git fetch &quot;https://github.com/LineageOS/android_vendor_lineage&quot; refs/changes/16/310716/1 &amp;&amp; git cherry-pick FETCH_HEAD</span><br><span class="line"></span><br><span class="line">echo &quot;Patch QCOM display&quot;</span><br><span class="line">cd $LINEAGE_DIR/hardware/qcom/display</span><br><span class="line">git fetch https://github.com/z3DD3r/android_hardware_qcom_display lineage-18.1 &amp;&amp; git cherry-pick 6efcc49e6a81fdc1e248f5002633f8cad6e6395b^..064cec4d219aa3e4c26f0a281d93f064b9372832</span><br><span class="line"></span><br><span class="line">echo &quot;Patch Vold (USB OTG)&quot;</span><br><span class="line">cd $LINEAGE_DIR/system/vold</span><br><span class="line">git fetch https://github.com/z3DD3r/android_system_vold lineage-18.1 &amp;&amp; git cherry-pick eca4855b992868e05f3be34ea9f7c41b565b4e1a^..f5730f872ed7e58a064529346d3e371b9cd4d73f</span><br><span class="line"></span><br><span class="line">echo &quot;Patch AOSP Keyboard&quot;</span><br><span class="line">cd $LINEAGE_DIR/packages/inputmethods/LatinIME</span><br><span class="line">git fetch https://github.com/z3DD3r/android_packages_inputmethods_LatinIME lineage-18.1 &amp;&amp; git cherry-pick 7e55f8c6b7257af03891934da329e2f6aea72c67^..6b0819b6373ee18766d8b1846dcf512dd527dc13</span><br><span class="line"></span><br><span class="line">echo &quot;Back to LINEAGE_DIR&quot;</span><br><span class="line">cd $LINEAGE_DIR</span><br></pre></td></tr></table></figure>
+<h3 id="下载设备相关文件"><a href="#下载设备相关文件" class="headerlink" title="下载设备相关文件"></a>下载设备相关文件</h3><h4 id="使用Local-Manifests（推荐）"><a href="#使用Local-Manifests（推荐）" class="headerlink" title="使用Local Manifests（推荐）"></a>使用Local Manifests（推荐）</h4><p>创建<code>.repo/local_manifests/hammerhead.xml</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;manifest&gt;</span><br><span class="line">  &lt;project name=&quot;z3DD3r/android_device_lge_hammerhead&quot; path=&quot;device/lge/hammerhead&quot; remote=&quot;github&quot; /&gt;</span><br><span class="line">  &lt;project name=&quot;z3DD3r/android_kernel_lge_hammerhead&quot; path=&quot;kernel/lge/hammerhead&quot; remote=&quot;github&quot; /&gt;</span><br><span class="line">  &lt;project name=&quot;z3DD3r/android_vendor_lge&quot; path=&quot;vendor/lge&quot; remote=&quot;github&quot; /&gt;</span><br><span class="line">&lt;/manifest&gt;</span><br></pre></td></tr></table></figure>
+<p>然后<code>repo sync -c -j4 --force-sync</code>即可</p>
+<p>PS：<code>proprietary</code>文件已在<code>android_vendor_lge</code>中，不需要手动导出</p>
+<h4 id="手动克隆"><a href="#手动克隆" class="headerlink" title="手动克隆"></a>手动克隆</h4><h5 id="device"><a href="#device" class="headerlink" title="device"></a>device</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir device/lge</span><br><span class="line">git clone https://github.com/z3DD3r/android_device_lge_hammerhead -b lineage-18.1 device/lge/hammerhead</span><br></pre></td></tr></table></figure>
+<h5 id="kernel"><a href="#kernel" class="headerlink" title="kernel"></a>kernel</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir kernel/lge</span><br><span class="line">git clone https://github.com/z3DD3r/android_kernel_lge_hammerhead -b lineage-18.1 device/lge/hammerhead</span><br></pre></td></tr></table></figure>
+<h5 id="vendor"><a href="#vendor" class="headerlink" title="vendor"></a>vendor</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/z3DD3r/android_vendor_lge -b lineage-18.1 vendor/lge</span><br></pre></td></tr></table></figure>
+
+<h2 id="编译环境选择"><a href="#编译环境选择" class="headerlink" title="编译环境选择"></a>编译环境选择</h2><h3 id="使用Docker容器（推荐）"><a href="#使用Docker容器（推荐）" class="headerlink" title="使用Docker容器（推荐）"></a>使用Docker容器（推荐）</h3><p>使用已安装好依赖的镜像，不需要自己配置编译环境</p>
+<h4 id="使用docker-lineage-v18-1（推荐）"><a href="#使用docker-lineage-v18-1（推荐）" class="headerlink" title="使用docker-lineage:v18.1（推荐）"></a>使用docker-lineage:v18.1（推荐）</h4><p>设置<code>ANDROID_VOL</code>为源码父目录后，创建容器：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export ANDROID_VOL=/media/xhy/a5d37cc9-d3a3-43c8-909d-178d70a6598c/Android</span><br><span class="line">docker run --privileged -it \</span><br><span class="line">-v &quot;$ANDROID_VOL/source:/srv/src&quot; \</span><br><span class="line">-v &quot;$ANDROID_VOL/ccache:/srv/ccache&quot; \</span><br><span class="line">xhyeax/docker-lineage:v18.1</span><br></pre></td></tr></table></figure>
+<h4 id="使用docker-lineage-cicd"><a href="#使用docker-lineage-cicd" class="headerlink" title="使用docker-lineage-cicd"></a>使用docker-lineage-cicd</h4><p><a href="https://github.com.cnpmjs.org/lineageos4microg/docker-lineage-cicd">docker-lineage-cicd</a><br>设置<code>ANDROID_VOL</code>为源码父目录后，创建容器：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export ANDROID_VOL=/media/xhy/a5d37cc9-d3a3-43c8-909d-178d70a6598c/Android</span><br><span class="line">docker run --privileged -it \</span><br><span class="line">-e &quot;BRANCH_NAME=lineage-18.1&quot; \</span><br><span class="line">-e &quot;DEVICE_LIST=hammerhead&quot; \</span><br><span class="line">-e &quot;INCLUDE_PROPRIETARY=false&quot; \</span><br><span class="line">-e &quot;CRONTAB_TIME=notnow&quot; \</span><br><span class="line">-v &quot;$ANDROID_VOL/source:/srv/src&quot; \</span><br><span class="line">-v &quot;$ANDROID_VOL/zips:/srv/zips&quot; \</span><br><span class="line">-v &quot;$ANDROID_VOL/logs:/srv/logs&quot; \</span><br><span class="line">-v &quot;$ANDROID_VOL/ccache:/srv/ccache&quot; \</span><br><span class="line">lineageos4microg/docker-lineage-cicd</span><br></pre></td></tr></table></figure>
+<p>使用错误的定时任务格式，阻止脚本自动编译，输出如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">lineageos4microg/docker-lineage-cicd</span><br><span class="line">Set cache size limit to 50.0 GB</span><br><span class="line">&quot;/tmp/buildcron&quot;:45: bad minute</span><br><span class="line">errors in crontab file, can&#x27;t install.</span><br></pre></td></tr></table></figure>
+<p>此时使用<code>VSCode</code>的<code>Docker</code>插件，附加容器即可（也可按下<code>Ctrl+C</code>退出后，重启容器后附加）</p>
+<p>PS:还可以将<code>CRONTAB_TIME</code>设置为<code>0 0 0 1 1</code>（每年的1月一日），再删除定时任务</p>
+<h3 id="本地编译"><a href="#本地编译" class="headerlink" title="本地编译"></a>本地编译</h3><p><a href="https://wiki.lineageos.org/devices/hammerhead/build">Build for hammerhead | LineageOS Wiki</a></p>
+<h4 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apt-get install -y bc bison bsdmainutils build-essential ccache cgpt clang \</span><br><span class="line">    curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick \</span><br><span class="line">    kmod lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool \</span><br><span class="line">    libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 \</span><br><span class="line">    libxml2-utils lsof lzop maven openjdk-8-jdk pngcrush procps \</span><br><span class="line">    python rsync schedtool squashfs-tools wget xdelta3 xsltproc yasm zip \</span><br><span class="line">    zlib1g-dev</span><br></pre></td></tr></table></figure>
+<h4 id="配置ccache"><a href="#配置ccache" class="headerlink" title="配置ccache"></a>配置ccache</h4><p>启用<code>ccache</code>并设置路径和大小：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export USE_CCACHE=1</span><br><span class="line">export CCACHE_DIR=/media/xhy/a5d37cc9-d3a3-43c8-909d-178d70a6598c/Android/ccache</span><br><span class="line">ccache -M 50G</span><br></pre></td></tr></table></figure>
+<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><h2 id="开始编译"><a href="#开始编译" class="headerlink" title="开始编译"></a>开始编译</h2><p>打开系统源码目录，执行以下命令编译：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">source build/envsetup.sh</span><br><span class="line">brunch hammerhead</span><br></pre></td></tr></table></figure>
+
+<h2 id="碰到的问题"><a href="#碰到的问题" class="headerlink" title="碰到的问题"></a>碰到的问题</h2><h3 id="LOCAL-COPY-HEADERS-is-obsolete"><a href="#LOCAL-COPY-HEADERS-is-obsolete" class="headerlink" title="LOCAL_COPY_HEADERS is obsolete"></a>LOCAL_COPY_HEADERS is obsolete</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hardware/qcom/display/msm8974/libgralloc/Android.mk: error: gralloc.msm8974: LOCAL_COPY_HEADERS is obsolete</span><br></pre></td></tr></table></figure>
+<p>原因：<code>hardware/qcom/display</code>未<code>Patch</code><br>解决方案：执行前文<code>Patch</code>部分的<code>Patch QCOM display</code></p>
+<h3 id="No-rule-to-make-target-“-hz-h”-needed-by-‘kernel-hz-bc’"><a href="#No-rule-to-make-target-“-hz-h”-needed-by-‘kernel-hz-bc’" class="headerlink" title="No rule to make target  “/hz.h”, needed by ‘kernel/hz.bc’"></a>No rule to make target  “/hz.h”, needed by ‘kernel/hz.bc’</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">No rule to make target &#x27;lineage/out/target/product/hammerhead/obj/KERNEL_OBJ/include/config/hz.h&#x27;, needed by &#x27;kernel/hz.bc&#x27;</span><br></pre></td></tr></table></figure>
+<p>原因：可能是文件缺失<br>解决方案：<code>repo sync -c -j4 --force-sync</code>，重新同步源码，从头再来</p>
+<h2 id="刷机"><a href="#刷机" class="headerlink" title="刷机"></a>刷机</h2><h3 id="刷入TWRP"><a href="#刷入TWRP" class="headerlink" title="刷入TWRP"></a>刷入TWRP</h3><p>前往<a href="https://sourceforge.net/projects/hammerhead-twrp/files/beta/">hammerhead-twrp</a>下载最新的<code>TWRP</code>镜像，并刷入设备</p>
+<h3 id="清除数据"><a href="#清除数据" class="headerlink" title="清除数据"></a>清除数据</h3><p>如果之前的系统不是<code>LineageOS 18.1</code>，建议清除数据后刷入，具体操作：<br>进入<code>TWRP</code>，选择<code>Wipe</code>-<code>Advanced Wipe</code>，清除<code>System</code>、<code>Data</code>、<code>Cache</code>分区数据</p>
+<h3 id="刷入系统"><a href="#刷入系统" class="headerlink" title="刷入系统"></a>刷入系统</h3><p>将生成的刷机包发送到手机后，使用<code>TWRP</code>刷入即可</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/luoyesiqiu/p/10701419.html">自己动手编译Android(LineageOS)源码 </a><br><a href="https://github.com/huataihuang/cloud-atlas-draft/blob/master/develop/android/lineageos/build_lineageos_for_hammerhead.md">huataihuang/cloud-atlas-draft build_lineageos_for_hammerhead</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用9008模式、LGE FlashTool救砖（Nexus 5）</title>
+    <url>/2021/09/07/nexus5-9008/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前买来调试用的<code>Nexus 5</code>坏了，雪花屏并且无限重启。记录一下刷机的过程。</p>
+<p>PS：刷机后仍雪花屏，怀疑是硬件问题。</p>
+<h2 id="9008"><a href="#9008" class="headerlink" title="9008"></a>9008</h2><p><a href="https://forum.xda-developers.com/t/fix-unbrick-nexus-5-stucked-in-qualcomm-hs-usb-qdloader-9008-mode.3043301/">Unbrick Nexus 5 stucked in Qualcomm HS-USB QDLoader 9008 mode</a></p>
+<h2 id="LGE-FlashTool"><a href="#LGE-FlashTool" class="headerlink" title="LGE FlashTool"></a>LGE FlashTool</h2><p><a href="https://forum.xda-developers.com/t/tutorial-how-to-flash-factory-images-with-lg-flashtool.2713833/">[Tutorial] How to flash factory images with LG Flashtool</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在Linux和Windows上安装r2frida</title>
+    <url>/2021/10/01/r2frida-install-on-linux-and-win/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>去年4月了解到<a href="https://github.com/nowsecure/r2frida">r2frida</a>这一工具，由于环境问题，并未安装成功。</p>
-<p>今年国庆翻出博客草稿，决定在<code>Windows</code>上安装<code>r2frida</code>。</p>
+<p>今年国庆翻出博客草稿，决定在<code>Kali Linux</code>和<code>Windows</code>上安装<code>r2frida</code>。</p>
 <span id="more"></span>
 
-<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>系统：<code>Windows 10 20H2 x64</code><br>软件：<code>Visual Studio 2019</code>、<code>Node.js 14.17.4</code>、<code>Cygwin 3.2.0</code>(记得选择<code>wget</code>)、<code>Frida 15.1.2</code><br>（提前安装好以上环境，VS版本至少为2015）</p>
+<h2 id="Linux安装"><a href="#Linux安装" class="headerlink" title="Linux安装"></a>Linux安装</h2><h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p>系统：<code>Kali Linux 2021.2</code><br>软件：<code>Node.js 12.22.5</code>、<code>Frida 15.1.3</code><br>安装目标：<code>Radare2 5.4.2</code>、<code>r2frida 5.4.4</code></p>
+<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><h4 id="radare2"><a href="#radare2" class="headerlink" title="radare2"></a>radare2</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/radareorg/radare2</span><br><span class="line">radare2/sys/install.sh</span><br></pre></td></tr></table></figure>
+<h4 id="r2frida"><a href="#r2frida" class="headerlink" title="r2frida"></a>r2frida</h4><h5 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt install -y make gcc libzip-dev nodejs npm curl pkg-config git</span><br></pre></td></tr></table></figure>
+<h5 id="更换npm源（可选）"><a href="#更换npm源（可选）" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+<h5 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
+<h5 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h5><p>编辑<code>Makefile</code>，修改<code>frida_version</code>为frida安装版本</p>
+<h5 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<p>安装成功将提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p &quot;//usr/local/lib/radare2/5.4.3&quot;</span><br><span class="line">cp -f io_frida.so* /&quot;/usr/local/lib/radare2/5.4.3&quot;</span><br></pre></td></tr></table></figure>
+
+<p>运行<code>r2 frida://?</code>显示帮助，测试插件是否安装成功。</p>
+<h2 id="Windows安装"><a href="#Windows安装" class="headerlink" title="Windows安装"></a>Windows安装</h2><h2 id="环境-1"><a href="#环境-1" class="headerlink" title="环境"></a>环境</h2><p>系统：<code>Windows 10 20H2 x64</code><br>软件：<code>Visual Studio 2019</code>、<code>Node.js 14.17.4</code>、<code>Cygwin 3.2.0</code>(记得选择<code>wget</code>)、<code>Frida 15.1.2</code><br>（提前安装好以上环境，VS版本至少为2015）</p>
 <p>安装目标：<code>Radare2 5.4.2</code>、<code>r2frida 5.4.4</code></p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h3 id="radare2"><a href="#radare2" class="headerlink" title="radare2"></a>radare2</h3><p>前往<a href="https://github.com/radareorg/radare2/releases">Releases · radareorg/radare2</a>下载<code>radare2-5.4.2-w64.zip</code>，解压到任意目录。<br>将<code>..\radare2\bin</code>目录添加到<code>PATH</code>环境变量后，执行<code>r2 -v</code>查看版本号</p>
-<h3 id="r2frida"><a href="#r2frida" class="headerlink" title="r2frida"></a>r2frida</h3><h4 id="更换npm源（可选）"><a href="#更换npm源（可选）" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
-<h4 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
-<h4 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h4><p>编辑<code>build.bat</code>，修改<code>frida_version</code>为frida安装版本，修改<code>R2_BASE</code>为<code>radare2</code>安装目录（不需要<code>bin</code>）</p>
+<h2 id="准备-1"><a href="#准备-1" class="headerlink" title="准备"></a>准备</h2><h3 id="radare2-1"><a href="#radare2-1" class="headerlink" title="radare2"></a>radare2</h3><p>前往<a href="https://github.com/radareorg/radare2/releases">Releases · radareorg/radare2</a>下载<code>radare2-5.4.2-w64.zip</code>，解压到任意目录。<br>将<code>..\radare2\bin</code>目录添加到<code>PATH</code>环境变量后，执行<code>r2 -v</code>查看版本号</p>
+<h3 id="r2frida-1"><a href="#r2frida-1" class="headerlink" title="r2frida"></a>r2frida</h3><h4 id="更换npm源（可选）-1"><a href="#更换npm源（可选）-1" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+<h4 id="克隆仓库-1"><a href="#克隆仓库-1" class="headerlink" title="克隆仓库"></a>克隆仓库</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
+<h4 id="修改-1"><a href="#修改-1" class="headerlink" title="修改"></a>修改</h4><p>编辑<code>build.bat</code>，修改<code>frida_version</code>为frida安装版本，修改<code>R2_BASE</code>为<code>radare2</code>安装目录（不需要<code>bin</code>）</p>
 <p>将<code>..\radare2\include\libr\r_cons.h</code>以<code>UTF-8 with BOM</code>编码重新保存（防止编译出错）</p>
-<h4 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h4><p>在<code>cmd</code>中打开该目录，使用<code>vcvarsall.bat</code>初始化环境，然后执行安装脚本</p>
+<h4 id="编译-1"><a href="#编译-1" class="headerlink" title="编译"></a>编译</h4><p>在<code>cmd</code>中打开该目录，使用<code>vcvarsall.bat</code>初始化环境，然后执行安装脚本</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;[Visual Studio安装位置]\VC\Auxiliary\Build\vcvarsall.bat&quot; x64</span><br><span class="line">.\build.bat install</span><br></pre></td></tr></table></figure>
 <p>安装成功将提示：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Installing...</span><br><span class="line">Copying &#x27;io_frida.dll&#x27; to C:\Users\xhy\.local\share\radare2\plugins</span><br><span class="line">        1 file(s) copied.</span><br></pre></td></tr></table></figure>
@@ -2975,6 +3097,130 @@
 ]]></content>
       <tags>
         <tag>Android</tag>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在Linux和Windows上安装r2frida</title>
+    <url>/2021/10/01/r2frida-install-on-windows-linux/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>去年4月了解到<a href="https://github.com/nowsecure/r2frida">r2frida</a>这一工具，由于环境问题，并未安装成功。</p>
+<p>今年国庆翻出博客草稿，决定在<code>Kali Linux</code>和<code>Windows</code>上安装<code>r2frida</code>。</p>
+<span id="more"></span>
+
+<h2 id="Linux安装"><a href="#Linux安装" class="headerlink" title="Linux安装"></a>Linux安装</h2><h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p>系统：<code>Kali Linux 2021.2</code><br>软件：<code>Node.js 12.22.5</code>、<code>Frida 15.1.3</code><br>安装目标：<code>Radare2 5.4.2</code>、<code>r2frida 5.4.4</code></p>
+<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><h4 id="radare2"><a href="#radare2" class="headerlink" title="radare2"></a>radare2</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/radareorg/radare2</span><br><span class="line">radare2/sys/install.sh</span><br></pre></td></tr></table></figure>
+<h4 id="r2frida"><a href="#r2frida" class="headerlink" title="r2frida"></a>r2frida</h4><h5 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt install -y make gcc libzip-dev nodejs npm curl pkg-config git</span><br></pre></td></tr></table></figure>
+<h5 id="更换npm源（可选）"><a href="#更换npm源（可选）" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+<h5 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
+<h5 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h5><p>编辑<code>Makefile</code>，修改<code>frida_version</code>为frida安装版本</p>
+<h5 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<p>安装成功将提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p &quot;//usr/local/lib/radare2/5.4.3&quot;</span><br><span class="line">cp -f io_frida.so* /&quot;/usr/local/lib/radare2/5.4.3&quot;</span><br></pre></td></tr></table></figure>
+
+<p>运行<code>r2 frida://?</code>显示帮助，测试插件是否安装成功。</p>
+<h2 id="Windows安装"><a href="#Windows安装" class="headerlink" title="Windows安装"></a>Windows安装</h2><h2 id="环境-1"><a href="#环境-1" class="headerlink" title="环境"></a>环境</h2><p>系统：<code>Windows 10 20H2 x64</code><br>软件：<code>Visual Studio 2019</code>、<code>Node.js 14.17.4</code>、<code>Cygwin 3.2.0</code>(记得选择<code>wget</code>)、<code>Frida 15.1.2</code><br>（提前安装好以上环境，VS版本至少为2015）</p>
+<p>安装目标：<code>Radare2 5.4.2</code>、<code>r2frida 5.4.4</code></p>
+<h2 id="准备-1"><a href="#准备-1" class="headerlink" title="准备"></a>准备</h2><h3 id="radare2-1"><a href="#radare2-1" class="headerlink" title="radare2"></a>radare2</h3><p>前往<a href="https://github.com/radareorg/radare2/releases">Releases · radareorg/radare2</a>下载<code>radare2-5.4.2-w64.zip</code>，解压到任意目录。<br>将<code>..\radare2\bin</code>目录添加到<code>PATH</code>环境变量后，执行<code>r2 -v</code>查看版本号</p>
+<h3 id="r2frida-1"><a href="#r2frida-1" class="headerlink" title="r2frida"></a>r2frida</h3><h4 id="更换npm源（可选）-1"><a href="#更换npm源（可选）-1" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+<h4 id="克隆仓库-1"><a href="#克隆仓库-1" class="headerlink" title="克隆仓库"></a>克隆仓库</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
+<h4 id="修改-1"><a href="#修改-1" class="headerlink" title="修改"></a>修改</h4><p>编辑<code>build.bat</code>，修改<code>frida_version</code>为frida安装版本，修改<code>R2_BASE</code>为<code>radare2</code>安装目录（不需要<code>bin</code>）</p>
+<p>将<code>..\radare2\include\libr\r_cons.h</code>以<code>UTF-8 with BOM</code>编码重新保存（防止编译出错）</p>
+<h4 id="编译-1"><a href="#编译-1" class="headerlink" title="编译"></a>编译</h4><p>在<code>cmd</code>中打开该目录，使用<code>vcvarsall.bat</code>初始化环境，然后执行安装脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;[Visual Studio安装位置]\VC\Auxiliary\Build\vcvarsall.bat&quot; x64</span><br><span class="line">.\build.bat install</span><br></pre></td></tr></table></figure>
+<p>安装成功将提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Installing...</span><br><span class="line">Copying &#x27;io_frida.dll&#x27; to C:\Users\xhy\.local\share\radare2\plugins</span><br><span class="line">        1 file(s) copied.</span><br></pre></td></tr></table></figure>
+
+<p>运行<code>r2 frida://?</code>显示帮助，测试插件是否安装成功。<br>结果如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">r2 frida://[action]/[link]/[device]/[target]</span><br><span class="line">* action = list | apps | attach | spawn | launch</span><br><span class="line">* link   = local | usb | remote host:port</span><br><span class="line">* device = &#x27;&#x27; | host:port | device-id</span><br><span class="line">* target = pid | appname | process-name | program-in-path | abspath</span><br><span class="line">Local:</span><br><span class="line">* frida://?                        # show this help</span><br><span class="line">* frida://                         # list local processes</span><br><span class="line">* frida://0                        # attach to frida-helper (no spawn needed)</span><br><span class="line">* frida:///usr/local/bin/rax2      # abspath to spawn</span><br><span class="line">* frida://rax2                     # same as above, considering local/bin is in PATH</span><br><span class="line">* frida://spawn/$(program)         # spawn a new process in the current system</span><br><span class="line">* frida://attach/(target)          # attach to target PID in current host</span><br><span class="line">USB:</span><br><span class="line">* frida://list/usb//               # list processes in the first usb device</span><br><span class="line">* frida://apps/usb//               # list apps in the first usb device</span><br><span class="line">* frida://attach/usb//12345        # attach to given pid in the first usb device</span><br><span class="line">* frida://spawn/usb//appname       # spawn an app in the first resolved usb device</span><br><span class="line">* frida://launch/usb//appname      # spawn+resume an app in the first usb device</span><br><span class="line">Remote:</span><br><span class="line">* frida://attach/remote/10.0.0.3:9999/558 # attach to pid 558 on tcp remote frida-server</span><br><span class="line">Environment:</span><br><span class="line">  R2FRIDA_SAFE_IO                  # Workaround a Frida bug on Android/thumb</span><br><span class="line">  R2FRIDA_DEBUG                    # Used to debug argument parsing behaviour</span><br><span class="line">  R2FRIDA_AGENT_SCRIPT             # path to file of the r2frida agent</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>（连接帮助见上文）</p>
+<h3 id="获取usb-device-id（可选）"><a href="#获取usb-device-id（可选）" class="headerlink" title="获取usb device id（可选）"></a>获取usb device id（可选）</h3><p>执行<code>frida-ls-devices</code>，获取<code>usb device id</code><br>然后启动app：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">r2 frida://launch/usb/[设备id]/[包名]</span><br></pre></td></tr></table></figure>
+<p>设备id为空时，连接第一个usb设备</p>
+<h3 id="查询帮助"><a href="#查询帮助" class="headerlink" title="查询帮助"></a>查询帮助</h3><blockquote>
+<p>r2frida commands are prefixed with <code>=!</code> or <code>:</code>.</p>
+</blockquote>
+<p>附加上app后，如果要使用<code>r2frida</code>的命令，需要在前面增加<code>=!</code>或<code>:</code><br>如：<code>=!?</code>、<code>:?</code>（获取帮助）<br>在命令后加问号，可查询命令帮助，如<code>:/?</code>、<code>ps?</code></p>
+<h3 id="过滤输出"><a href="#过滤输出" class="headerlink" title="过滤输出"></a>过滤输出</h3><p>使用<code>~</code>过滤输出结果，类似于<code>grep</code><br>例如：<code>:il~libart.so</code> (仅输出<code>libart.so</code>地址)</p>
+<h3 id="查看信息"><a href="#查看信息" class="headerlink" title="查看信息"></a>查看信息</h3><p><code>:i?</code>: 查看帮助</p>
+<p><code>:i</code>: 查询信息<br><code>:ic</code>: 列出所有类<br><code>:icl</code>: 列出已加载的类<br><code>:icm</code>: 列出类方法<br><code>:il</code>: 列出模块<br><code>:iE 模块名</code>: 列出模块导出符号</p>
+<h3 id="搜索字符串"><a href="#搜索字符串" class="headerlink" title="搜索字符串"></a>搜索字符串</h3><p><code>:/?</code>：查看帮助</p>
+<p><code>:/ 关键字</code>: 在内存中搜索关键字</p>
+<h3 id="打印内存、反汇编"><a href="#打印内存、反汇编" class="headerlink" title="打印内存、反汇编"></a>打印内存、反汇编</h3><p><code>p?</code>：查看帮助 (这是r2的命令，不需要冒号)</p>
+<p><code>s 地址</code>: 设置当前地址</p>
+<p><code>x</code>: <code>hexdump</code>当前地址的内存<br><code>x @ 地址</code>: <code>hexdump</code>指定地址的内存（其他命令同理）<br><code>ps</code>: 打印字符串<br><code>pd</code>: 反汇编</p>
+<h3 id="动态调试"><a href="#动态调试" class="headerlink" title="动态调试"></a>动态调试</h3><p><code>:d?</code>: 查看帮助</p>
+<p><code>:dm</code>: 列出内存区域（类似于<code>maps</code>文件）<br><code>:dt</code>: 跟踪地址调用<br><code>:dtf</code>: 跟踪地址调用，并格式化输出</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Usage: dtf [format] || dtf [addr] [fmt]</span><br><span class="line">  ^  = trace onEnter instead of onExit</span><br><span class="line">  +  = show backtrace on trace</span><br><span class="line"> p/x = show pointer in hexadecimal</span><br><span class="line">  c  = show value as a string (char)</span><br><span class="line">  i  = show decimal argument</span><br><span class="line">  z  = show pointer to string</span><br><span class="line">  w  = show pointer to UTF-16 string</span><br><span class="line">  a  = show pointer to ANSI string</span><br><span class="line">  h  = hexdump from pointer (optional length, h16 to dump 16 bytes)</span><br><span class="line">  H  = hexdump from pointer (optional position of length argument, H1 to dump args[1] bytes)</span><br><span class="line">  s  = show string in place</span><br><span class="line">  O  = show pointer to ObjC object</span><br><span class="line">Undocumented: Z, S</span><br><span class="line"> dtf    trace format</span><br></pre></td></tr></table></figure>
+
+<h3 id="加载Frida脚本"><a href="#加载Frida脚本" class="headerlink" title="加载Frida脚本"></a>加载Frida脚本</h3><p><code>:.?</code>: 查看帮助</p>
+<p><code>:. 脚本路径</code>: 加载js脚本</p>
+<h3 id="其他命令"><a href="#其他命令" class="headerlink" title="其他命令"></a>其他命令</h3><p><code>cl</code>清屏</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://mabin004.github.io/2021/02/19/r2frida%E4%BD%BF%E7%94%A8/">r2frida使用</a><br><a href="https://bbs.pediy.com/thread-264161.htm">Android动态调试-R2frida和lldb</a><br><a href="https://bbs.pediy.com/thread-256858.htm">RADARE2+FRIDA=R2FRIDA Best Dynamic Debugging Tool</a><br><a href="https://blog.csdn.net/u013255206/article/details/75295209">vs编译 error C2001: 常量中有换行符</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>基于aosp-lastest.tar同步AOSP源码</title>
+    <url>/2021/10/05/repo-init-with-aosp-latest/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用TUNA AOSP初始包同步AOSP最新源码。</p>
+<span id="more"></span>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="Repo"><a href="#Repo" class="headerlink" title="Repo"></a>Repo</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo</span><br><span class="line">chmod +x repo</span><br><span class="line">sudo mv repo /usr/local/bin/</span><br><span class="line">export REPO_URL=&#x27;https://mirrors.tuna.tsinghua.edu.cn/git/git-repo&#x27;</span><br></pre></td></tr></table></figure>
+<h3 id="下载、校验、解压"><a href="#下载、校验、解压" class="headerlink" title="下载、校验、解压"></a>下载、校验、解压</h3><p>下载<a href="https://mirrors.tuna.tsinghua.edu.cn/aosp-monthly/aosp-latest.tar">aosp-latest.tar</a>后,<code>md5sum aosp-latest.tar</code>计算并对比校验和，无误则执行<code>tar xf aosp-latest.tar</code>解压</p>
+<h3 id="设置分支（可选）"><a href="#设置分支（可选）" class="headerlink" title="设置分支（可选）"></a>设置分支（可选）</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest -b android-12.0.0_r2</span><br></pre></td></tr></table></figure>
+<p>不设置则默认下载主分支源码</p>
+<h3 id="同步源码"><a href="#同步源码" class="headerlink" title="同步源码"></a>同步源码</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">repo sync -j4</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>此后，每次只需运行<code>repo sync</code>即可保持同步。 我们强烈建议您保持每天同步，并尽量选择凌晨等低峰时间</p>
+</blockquote>
+<h4 id="使用Local-Manifests克隆设备代码"><a href="#使用Local-Manifests克隆设备代码" class="headerlink" title="使用Local Manifests克隆设备代码"></a>使用Local Manifests克隆设备代码</h4><p>打开<code>.repo/manifests/default.xml</code>，增加以下内容（已有则不需要添加）：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;remote  name=&quot;github&quot;</span><br><span class="line">           fetch=&quot;https://github.com/&quot; /&gt;</span><br></pre></td></tr></table></figure>
+
+<p>创建<code>.repo/local_manifests/hammerhead.xml</code>（使用<code>revision</code>指定版本）：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;manifest&gt;</span><br><span class="line">  &lt;project name=&quot;z3DD3r/android_device_lge_hammerhead&quot; revision=&quot;lineage-18.1&quot; path=&quot;device/lge/hammerhead&quot; remote=&quot;github&quot; /&gt;</span><br><span class="line">  &lt;project name=&quot;z3DD3r/android_kernel_lge_hammerhead&quot; revision=&quot;lineage-18.1&quot; path=&quot;kernel/lge/hammerhead&quot; remote=&quot;github&quot; /&gt;</span><br><span class="line">  &lt;project name=&quot;z3DD3r/android_vendor_lge&quot; revision=&quot;lineage-18.1&quot; path=&quot;vendor/lge&quot; remote=&quot;github&quot; /&gt;</span><br><span class="line">&lt;/manifest&gt;</span><br></pre></td></tr></table></figure>
+
+<p>之后<code>repo sync -c -j4 --force-sync</code>即可</p>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><h3 id="error-RPC-failed-curl-56-GnuTLS-recv-error-9"><a href="#error-RPC-failed-curl-56-GnuTLS-recv-error-9" class="headerlink" title="error: RPC failed; curl 56 GnuTLS recv error (-9)"></a>error: RPC failed; curl 56 GnuTLS recv error (-9)</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apt-get install gnutls-bin</span><br><span class="line">git config --global http.sslVerify false</span><br><span class="line">git config --global http.postBuffer 1048576000</span><br></pre></td></tr></table></figure>
+<p>关闭SSL校验，并设置缓冲区大小</p>
+<h3 id="curl-56-GnuTLS-recv-error-110-The-TLS-connection-was-non-properly-terminated"><a href="#curl-56-GnuTLS-recv-error-110-The-TLS-connection-was-non-properly-terminated" class="headerlink" title="curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated."></a>curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated.</h3><p><code>gnutls_handshake</code>错误，建议取消代理后再同步代码</p>
+<p>也可以使用<code>openssl</code>代替<code>gnutls</code>，重新编译git（未测试）<br>详见<a href="https://blog.csdn.net/FJDJFKDJFKDJFKD/article/details/92636451">error RPC failed; curl 56 GnuTLS recv error (-110) The TLS connection was non-properly terminated</a></p>
+<p>如果编译时提示依赖未安装，<code>sudo apt install</code>安装依赖即可</p>
+<h3 id="fatal-Could-not-reset-index-file-to-revision"><a href="#fatal-Could-not-reset-index-file-to-revision" class="headerlink" title="fatal: Could not reset index file to revision"></a>fatal: Could not reset index file to revision</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">warning: repo is not tracking a remote branch, so it will not receive updates</span><br><span class="line">repo reset: error: Entry &#x27;git_superproject.py&#x27; not uptodate. Cannot merge.</span><br><span class="line">fatal: Could not reset index file to revision &#x27;vx.x.x^0&#x27;</span><br></pre></td></tr></table></figure>
+<p>解决：</p>
+<blockquote>
+<p>cd 到.repo/repo<br>git reset –hard 倒数第二个commit<br>git pull<br>最后再repo sync</p>
+</blockquote>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.jianshu.com/p/6fed8af8d11e">Android 8.1.0 AOSP源码下载及编译</a><br><a href="https://www.it610.com/article/1289249767666294784.htm">解决git clone 完成后提示’error: RPC failed; curl 56 GnuTLS recv error (-9)’</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在Linux下设置代理（docker、git、repo、wget等）</title>
+    <url>/2021/10/03/set-proxy-of-docker-git-and-others/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>记录一下<code>Docker</code>、<code>Git</code>和其他命令（如<code>repo</code>）的代理配置。</p>
+<span id="more"></span>
+
+<h2 id="Docker-版本-gt-17-07"><a href="#Docker-版本-gt-17-07" class="headerlink" title="Docker (版本&gt;=17.07)"></a>Docker (版本&gt;=17.07)</h2><h3 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h3><p>打开<code>~/.docker/config.json</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line"> &quot;proxies&quot;:</span><br><span class="line"> &#123;</span><br><span class="line">   &quot;default&quot;:</span><br><span class="line">   &#123;</span><br><span class="line">     &quot;httpProxy&quot;: &quot;http://localhost:8080&quot;,</span><br><span class="line">     &quot;httpsProxy&quot;: &quot;http://localhost:8080&quot;,</span><br><span class="line">     &quot;noProxy&quot;: &quot;localhost,127.0.0.1&quot;</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行<code>docker run</code>和<code>docker build</code>时增加<code>--network=host</code>参数</p>
+<p>注意：apt只支持http代理</p>
+<h3 id="取消"><a href="#取消" class="headerlink" title="取消"></a>取消</h3><p>删除配置即可</p>
+<h2 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h2><h3 id="设置-1"><a href="#设置-1" class="headerlink" title="设置"></a>设置</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export PROXY_URL=http://localhost:8080</span><br><span class="line">git config --global http.proxy $PROXY_URL</span><br><span class="line">git config --global https.proxy $PROXY_URL</span><br></pre></td></tr></table></figure>
+<h3 id="取消-1"><a href="#取消-1" class="headerlink" title="取消"></a>取消</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">unset PROXY_URL</span><br><span class="line">git config --global --unset http.proxy</span><br><span class="line">git config --global --unset https.proxy</span><br></pre></td></tr></table></figure>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p><code>repo</code> <code>wget</code> <code>curl</code>等</p>
+<h3 id="设置-2"><a href="#设置-2" class="headerlink" title="设置"></a>设置</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export PROXY_URL=http://localhost:8080</span><br><span class="line">export https_proxy=$PROXY_URL</span><br><span class="line">export http_proxy=$PROXY_URL</span><br></pre></td></tr></table></figure>
+<p>查询ip地址，检测代理是否连接成功：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl cip.cc</span><br></pre></td></tr></table></figure>
+<h3 id="取消-2"><a href="#取消-2" class="headerlink" title="取消"></a>取消</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">unset PROXY_URL</span><br><span class="line">unset https_proxy</span><br><span class="line">unset http_proxy</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>Linux</tag>
         <tag>经验</tag>
       </tags>
   </entry>

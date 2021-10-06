@@ -28,7 +28,7 @@
 <meta property="og:description" content="概述大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，因此也就无法通过Magisk获取Root权限。本文基于VirtualApp框架及Frida-Gadget，实现不修改apk使用Frida。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-08-06T06:03:48.000Z">
-<meta property="article:modified_time" content="2021-10-02T10:05:16.488Z">
+<meta property="article:modified_time" content="2021-10-06T07:49:40.281Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
@@ -245,9 +245,8 @@
 <p>具体操作为：</p>
 <p>将arm版本的so文件及配置文件添加到<code>lib\src\main\jniLibs\armeabi-v7a</code>，并配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code></p>
 <h3 id="编写Xposed模块"><a href="#编写Xposed模块" class="headerlink" title="编写Xposed模块"></a>编写Xposed模块</h3><p>除了修改源码，也可以自己编写一个Xposed模块，实现<code>Frida-Gadget</code>的加载。</p>
-<p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，手动调用<code>System.load</code>加载<code>Frida-Gadget</code>。</p>
-<p>建议直接拷贝到<code>/system/lib</code>、<code>/system/lib64</code>，或打包为<code>Magisk</code>模块（权限设置为644）</p>
-<p>原因：如果hook系统应用（<code>PLATFORM_APP</code>），且未关闭<code>SELinux</code>，则无法从<code>data</code>目录下加载so文件</p>
+<p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，调用<code>System.load</code>或<code>System.loadLibrary</code>加载<code>Frida-Gadget</code>。</p>
+<p>注意：如果hook系统应用（<code>PLATFORM_APP</code>），且未关闭<code>SELinux</code>，则无法从<code>data</code>目录下加载so文件。</p>
 
     </div>
 
@@ -362,7 +361,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">107</span>
+          <span class="site-state-item-count">113</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

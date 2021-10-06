@@ -191,6 +191,407 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/05/07/cpp-template-class-cout-overload/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/05/07/cpp-template-class-cout-overload/" class="post-title-link" itemprop="url">C++中模板类的输出流重载</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-05-07 15:05:54" itemprop="dateCreated datePublished" datetime="2019-05-07T15:05:54+08:00">2019-05-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在模板类中使用输出流重载发现报错，g++提示</p>
+<blockquote>
+<p>warning: friend declaration ‘std::ostream&amp; operator&lt;&lt;(std::ostream&amp;, const A<T>&amp;)’ declares a non-template function<br>note: (if this is not what you intended, make sure the function template has already been declared and add &lt;&gt; after the function name here)<br>增加&lt;&gt;后依旧报错，遂百度之，解决。</p>
+</blockquote>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><blockquote>
+<p>定义的友元函数还是一个模版，要实例化为参数变元后才能使用。也就是说，即使上面的友元看起来像函数定义，但是若没有经过参数化，编译器就不会生成该函数的代码<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/autosar/archive/2011/10/29/2228674.html">关于操作符的友元模版函数重载</a><br>个人理解是由于友元函数还没有给出声明（或者说是定义），编译器识别不出来。所以可以在类之前预先声明，而又因为该函数使用了类名，所以类名也要预先声明。</p>
+</blockquote>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h3 id="1-在类内部加上友元函数体（不推荐）"><a href="#1-在类内部加上友元函数体（不推荐）" class="headerlink" title="1.在类内部加上友元函数体（不推荐）"></a>1.在类内部加上友元函数体（不推荐）</h3><h3 id="2-在类的定义之前对类和友元函数进行预声明，并在内部加上-lt-gt"><a href="#2-在类的定义之前对类和友元函数进行预声明，并在内部加上-lt-gt" class="headerlink" title="2.在类的定义之前对类和友元函数进行预声明，并在内部加上&lt;&gt;"></a>2.在类的定义之前对类和友元函数进行预声明，并在内部加上&lt;&gt;</h3><p>即在类定义前加上如下代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="class"><span class="keyword">class</span> <span class="title">A</span>;</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; ostream &amp;<span class="keyword">operator</span>&lt;&lt; (ostream &amp;out, <span class="keyword">const</span> A&lt;T&gt; &amp;a);</span><br></pre></td></tr></table></figure>
+<p>在类定义中给输出流重载函数加上&lt;&gt;：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">friend</span> ostream &amp;<span class="keyword">operator</span>&lt;&lt; &lt;&gt;(ostream &amp;, <span class="keyword">const</span> A&lt;T&gt; &amp;);</span><br></pre></td></tr></table></figure>
+<h4 id="注意：重载函数定义时不需要加上-lt-gt"><a href="#注意：重载函数定义时不需要加上-lt-gt" class="headerlink" title="注意：重载函数定义时不需要加上&lt;&gt;"></a>注意：重载函数定义时不需要加上&lt;&gt;</h4><p>与其他友元函数定义类似：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">ostream &amp;<span class="keyword">operator</span>&lt;&lt; (ostream &amp;out, <span class="keyword">const</span> A&lt;T&gt; &amp;a)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		out &lt;&lt; a[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> out;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="3-在类中再使用一次模板（自用）"><a href="#3-在类中再使用一次模板（自用）" class="headerlink" title="3.在类中再使用一次模板（自用）"></a>3.在类中再使用一次模板（自用）</h3><p>参考<a target="_blank" rel="noopener" href="https://www.cnblogs.com/autosar/archive/2011/10/29/2228674.html">关于操作符的友元模版函数重载</a><br>直接修改类定义中的输出流重载函数为：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1&gt;</span><br><span class="line">    <span class="keyword">friend</span> ostream &amp;<span class="keyword">operator</span>&lt;&lt;(ostream &amp;, <span class="keyword">const</span> A&lt;T1&gt; &amp;);</span><br></pre></td></tr></table></figure>
+<p>重载函数定义不需要修改为T1（当然改也行）</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/larryzeal/p/5664418.html">C++ 模板类友元之输出流操作符重载</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/autosar/archive/2011/10/29/2228674.html">关于操作符的友元模版函数重载</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/05/01/cpp-class-member-func-ptr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/05/01/cpp-class-member-func-ptr/" class="post-title-link" itemprop="url">C++中类的成员函数的函数指针</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-05-01 06:38:44" itemprop="dateCreated datePublished" datetime="2019-05-01T06:38:44+08:00">2019-05-01</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="获取指针"><a href="#获取指针" class="headerlink" title="获取指针"></a>获取指针</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">staticmember</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;static&quot;</span> &lt;&lt; endl; &#125;	 <span class="comment">//static member</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">nonstatic</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;nonstatic&quot;</span> &lt;&lt; endl; &#125;			 <span class="comment">//nonstatic member</span></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">virtualmember</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;virtual&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">//virtual member</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	A a;</span><br><span class="line">	<span class="comment">//static成员函数,取得的是该函数在内存中的实际地址，而且因为static成员是全局的，所以不能用A::限定符</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (*ptrstatic)() = &amp;A::staticmember;</span><br><span class="line">	<span class="comment">//nonstatic成员函数 取得的是该函数在内存中的实际地址</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (A::*ptrnonstatic)() = &amp;A::nonstatic;</span><br><span class="line">	<span class="comment">//虚函数取得的是虚函数表中的偏移值，这样可以保证能过指针调用时同样的多态效果</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (A::*ptrvirtual)() = &amp;A::virtualmember;</span><br><span class="line">	<span class="comment">//函数指针的使用方式</span></span><br><span class="line">	<span class="built_in">ptrstatic</span>();</span><br><span class="line">	(a.*ptrnonstatic)();</span><br><span class="line">	(a.*ptrvirtual)();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="在map中使用指针"><a href="#在map中使用指针" class="headerlink" title="在map中使用指针"></a>在map中使用指针</h2><p>直接使用对应类型也是可以的，比如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">map&lt;string, <span class="keyword">void</span> (A::*)()&gt; zeroParmsFuns;</span><br></pre></td></tr></table></figure>
+<p>不过为了方便起见，还是自定义类型吧</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(A::*func)</span><span class="params">()</span></span>;</span><br><span class="line">map&lt;string, func&gt; zeroParmsFuns;</span><br></pre></td></tr></table></figure>
+<p>使用迭代器来遍历map，funcName是函数名，对应map的key</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">map&lt;string, func&gt;::iterator iter = zeroParmsFuns.<span class="built_in">find</span>(funcName);</span><br><span class="line">       <span class="keyword">if</span> (iter != zeroParmsFuns.<span class="built_in">end</span>())</span><br><span class="line">       &#123;</span><br><span class="line">           (<span class="keyword">this</span>-&gt;*(iter-&gt;second))();</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lidabo/p/3597559.html">C++中怎么获取类的成员函数的函数指针？</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/limedia/p/cxx_class_inner_poiner.html">C++ 类内函数指针的使用的使用</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/30/vscode-cpp-exe-encoding/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/04/30/vscode-cpp-exe-encoding/" class="post-title-link" itemprop="url">VSCode设置输出exe文件的编码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-30 12:44:36" itemprop="dateCreated datePublished" datetime="2019-04-30T12:44:36+08:00">2019-04-30</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>中文字符串在编辑界面正常显示，编译生成的exe中文乱码。源文件编码为UTF-8，设置输出的可执行文件编码为GB2312后正常显示。<br>解决方案：添加编译参数<code>-fexec-charset=GB2312</code></p>
+<h2 id="修改方法"><a href="#修改方法" class="headerlink" title="修改方法"></a>修改方法</h2><h3 id="1-tasks-json中直接使用g-的情况"><a href="#1-tasks-json中直接使用g-的情况" class="headerlink" title="1. tasks.json中直接使用g++的情况"></a>1. tasks.json中直接使用g++的情况</h3><p>具体方法：<br>在tasks[args]中添加<code>&quot;-fexec-charset=GB2312&quot;</code></p>
+<h3 id="1-tasks-json中使用make的情况"><a href="#1-tasks-json中使用make的情况" class="headerlink" title="1. tasks.json中使用make的情况"></a>1. tasks.json中使用make的情况</h3><p>在makefile中添加<code>-fexec-charset=GB2312</code><br>比如<a href="https://blog.xhyeax.com/2019/04/13/vscode-cpp-multiplefile/">上一篇博文</a>中的makefile，则在<code>CCOBJFLAG</code>后添加该参数，变为</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CCOBJFLAG := <span class="variable">$(CCFLAG)</span> -c -fexec-charset=GB2312</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/13/vscode-cpp-multiplefile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/04/13/vscode-cpp-multiplefile/" class="post-title-link" itemprop="url">VSCode配置C++多文件环境</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-13 14:52:07" itemprop="dateCreated datePublished" datetime="2019-04-13T14:52:07+08:00">2019-04-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="修正"><a href="#修正" class="headerlink" title="修正"></a>修正</h2><p>发现makefile存在问题，仅会编译比main.cpp更新的依赖文件，导致每次都要make两次才能正常调试。已修改<code>$?</code>为<code>$^</code></p>
+<blockquote>
+<p>$@ –代表目标文件(target)<br>$^  –代表所有的依赖文件(components)<br>$&lt;  –代表第一个依赖文件(components中最左边的那个)<br>$?  –代表比目标还要新的依赖文件列表</p>
+</blockquote>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前从知乎抄的配置只能编译单文件源文件，编译多文件的话需要手动修改g++编译参数（不能忍啊→_→），于是搜索之，找到解决方案。<br>关键词：makefile</p>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>原本使用VSCode就可以正常进行编译调试等操作。<br>已安装make工具并添加到环境变量，我自己用的是<code>mingw32-make</code><br>（也可使用msys提供的工具包，度盘链接: <a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1zJBcS6tjfXlwg1kP6VnLSg">https://pan.baidu.com/s/1zJBcS6tjfXlwg1kP6VnLSg</a> 提取码: f9ya）</p>
+<h2 id="具体方案"><a href="#具体方案" class="headerlink" title="具体方案"></a>具体方案</h2><h3 id="构建makefile模板"><a href="#构建makefile模板" class="headerlink" title="构建makefile模板"></a>构建makefile模板</h3><p>我基本是直接复制参考博文里的模板(修改标准库为17)，内容如下</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># originating https://github.com/TheNetAdmin/Makefile-Templates</span></span><br><span class="line"><span class="comment"># tool marcros</span></span><br><span class="line">CC := g++</span><br><span class="line">CCFLAG := -std=c++17</span><br><span class="line">DBGFLAG := -g</span><br><span class="line">CCOBJFLAG := <span class="variable">$(CCFLAG)</span> -c</span><br><span class="line"></span><br><span class="line"><span class="comment"># path marcros</span></span><br><span class="line">BIN_PATH := bin</span><br><span class="line">OBJ_PATH := obj</span><br><span class="line">SRC_PATH := src</span><br><span class="line">DBG_PATH := debug</span><br><span class="line"></span><br><span class="line"><span class="comment"># compile marcros</span></span><br><span class="line">TARGET_NAME := main</span><br><span class="line"><span class="keyword">ifeq</span> (<span class="variable">$(OS)</span>,Windows_NT)</span><br><span class="line">	TARGET_NAME := <span class="variable">$(<span class="built_in">addsuffix</span> .exe,<span class="variable">$(TARGET_NAME)</span>)</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line">TARGET := <span class="variable">$(BIN_PATH)</span>/<span class="variable">$(TARGET_NAME)</span></span><br><span class="line">TARGET_DEBUG := <span class="variable">$(DBG_PATH)</span>/<span class="variable">$(TARGET_NAME)</span></span><br><span class="line">MAIN_SRC := src/main.cpp</span><br><span class="line"></span><br><span class="line"><span class="comment"># src files &amp; obj files</span></span><br><span class="line">SRC := <span class="variable">$(<span class="built_in">foreach</span> x, <span class="variable">$(SRC_PATH)</span>, $(<span class="built_in">wildcard</span> $(<span class="built_in">addprefix</span> <span class="variable">$(x)</span>/*,.c*)</span>))</span><br><span class="line">OBJ := <span class="variable">$(<span class="built_in">addprefix</span> <span class="variable">$(OBJ_PATH)</span>/, $(<span class="built_in">addsuffix</span> .o, $(<span class="built_in">notdir</span> $(<span class="built_in">basename</span> <span class="variable">$(SRC)</span>)</span>)))</span><br><span class="line">OBJ_DEBUG := <span class="variable">$(<span class="built_in">addprefix</span> <span class="variable">$(DBG_PATH)</span>/, $(<span class="built_in">addsuffix</span> .o, $(<span class="built_in">notdir</span> $(<span class="built_in">basename</span> <span class="variable">$(SRC)</span>)</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment"># clean files list</span></span><br><span class="line">DISTCLEAN_LIST := <span class="variable">$(OBJ)</span> \</span><br><span class="line">                  <span class="variable">$(OBJ_DEBUG)</span></span><br><span class="line">CLEAN_LIST := <span class="variable">$(TARGET)</span> \</span><br><span class="line">			  <span class="variable">$(TARGET_DEBUG)</span> \</span><br><span class="line">			  <span class="variable">$(DISTCLEAN_LIST)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># default rule</span></span><br><span class="line"><span class="section">default: all</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># non-phony targets</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(OBJ)</span></span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$^</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(OBJ_PATH)</span>/%.o: <span class="variable">$(SRC_PATH)</span>/%.c*</span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCOBJFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(DBG_PATH)</span>/%.o: <span class="variable">$(SRC_PATH)</span>/%.c*</span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCOBJFLAG)</span> <span class="variable">$(DBGFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(TARGET_DEBUG)</span>: <span class="variable">$(OBJ_DEBUG)</span></span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCFLAG)</span> <span class="variable">$(DBGFLAG)</span> <span class="variable">$^</span> -o <span class="variable">$@</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># phony rules</span></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: all</span></span><br><span class="line"><span class="section">all: <span class="variable">$(TARGET)</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: debug</span></span><br><span class="line"><span class="section">debug: <span class="variable">$(TARGET_DEBUG)</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: clean</span></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	@echo CLEAN <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line">	@rm -f <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: distclean</span></span><br><span class="line"><span class="section">distclean:</span></span><br><span class="line">	@echo CLEAN <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line">	@rm -f <span class="variable">$(DISTCLEAN_LIST)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h3><p>src文件夹下放源文件以及头文件，后面还要需要修改<code>.vscode</code>中的<code>task.json</code>和<code>launch.json</code><br>注意：如果使用本文中的makefle，包含主函数的源文件名必须为<code>main.cpp</code><br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/VSCode-cpp-mf.png"></p>
+<h3 id="task-json"><a href="#task-json" class="headerlink" title="task.json"></a>task.json</h3><p>如果你使用的是msys的工具包，那command就写make<br>按快捷键<code>Ctrl+Shift+B</code>可以执行仅生成命令（build）<br>（在微软输入法中文模式时会出现表情窗口←_←）</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;2.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;tasks&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;default&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;group&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;kind&quot;</span>: <span class="string">&quot;build&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;isDefault&quot;</span>: <span class="literal">true</span></span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build-debug&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;debug&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;clean&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;clean&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="launch-json"><a href="#launch-json" class="headerlink" title="launch.json"></a>launch.json</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// https://github.com/Microsoft/vscode-cpptools/blob/master/launch.md</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;0.2.0&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;configurations&quot;</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;(gdb) Launch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;cppdbg&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;request&quot;</span>: <span class="string">&quot;launch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;program&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/debug/main.exe&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;args&quot;</span>: [],</span><br><span class="line">            <span class="attr">&quot;stopAtEntry&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">&quot;cwd&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/debug/&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;environment&quot;</span>: [],</span><br><span class="line">            <span class="attr">&quot;externalConsole&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">&quot;internalConsoleOptions&quot;</span>: <span class="string">&quot;neverOpen&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;MIMode&quot;</span>: <span class="string">&quot;gdb&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;miDebuggerPath&quot;</span>: <span class="string">&quot;gdb.exe&quot;</span>, <span class="comment">// 调试器路径，Windows下后缀不能省略，Linux下则去掉</span></span><br><span class="line">            <span class="attr">&quot;setupCommands&quot;</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">&quot;description&quot;</span>: <span class="string">&quot;Enable pretty-printing for gdb&quot;</span>,</span><br><span class="line">                    <span class="attr">&quot;text&quot;</span>: <span class="string">&quot;-enable-pretty-printing&quot;</span>,</span><br><span class="line">                    <span class="attr">&quot;ignoreFailures&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">&quot;preLaunchTask&quot;</span>: <span class="string">&quot;build-debug&quot;</span> <span class="comment">// 调试会话开始前执行的任务，一般为编译程序。与tasks.json的label相对应</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="配置完成"><a href="#配置完成" class="headerlink" title="配置完成"></a>配置完成</h3><p>enjoy it!<br>😉</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wzxlovesy/article/details/76708151">VS Code 配置 C/C++ 环境</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/07/2019-hzwas-wp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/04/07/2019-hzwas-wp/" class="post-title-link" itemprop="url">2019中国杭州网络安全技能大赛 预选赛 哈夫曼之谜 & EasyCpp Writeup</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-07 12:03:45" itemprop="dateCreated datePublished" datetime="2019-04-07T12:03:45+08:00">2019-04-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Reverse-EasyCpp"><a href="#Reverse-EasyCpp" class="headerlink" title="Reverse EasyCpp"></a>Reverse EasyCpp</h2><p>[2019/10/25更新]<br>首先读入16个数字，然后生成一个斐波那契数组，长度也为16<br>然后对输入数组进行操作，从第二位开始，都加上第一位的值（<code>transform</code>）<br>动态调试可知<code>accumulate</code>的匿名函数对运算完的数组做反转操作<br>然后与斐波那契数组比较，相同则输出flag<br>也就是说输入的第一个数字是不会变的，所以就是987<br>后面的数字直接脚本跑一下就可以得到结果了</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/04/07/2019-hzwas-wp/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/02/emui9-magisk-install/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/04/02/emui9-magisk-install/" class="post-title-link" itemprop="url">emui9安装Magisk框架</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-02 04:49:28" itemprop="dateCreated datePublished" datetime="2019-04-02T04:49:28+08:00">2019-04-02</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="准备条件"><a href="#准备条件" class="headerlink" title="准备条件"></a>准备条件</h2><p>(设备已解锁BL，电脑fastboot环境正常是前提条件)<br>已下载magisk框架rec安装包（<a target="_blank" rel="noopener" href="https://github.com/topjohnwu/Magisk/releases/">github下载</a>），有sd卡（<code>adb sideload</code>未测试是否可安装，建议用内存卡），并已安装第三方recovery（以下简称rec）<br>或<br>已安装magisk框架app，且有原厂<code>recovery_ramdisk</code>镜像</p>
+<h2 id="安装方式"><a href="#安装方式" class="headerlink" title="安装方式"></a>安装方式</h2><p>fastboot刷入命令（华为没有boot分区，所以rec也是通过这个指令刷入）<br>(BOOT.img请自行替换为对应镜像名)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastboot flash recovery_ramdisk BOOT.img</span><br></pre></td></tr></table></figure>
+<h3 id="rec安装法"><a href="#rec安装法" class="headerlink" title="rec安装法"></a>rec安装法</h3><p>启动至第三方rec，从sd卡选择magisk卡刷包，安装。<br>安装完成后选择重启到rec模式，即可进入带面具的系统</p>
+<h3 id="修补镜像直接刷入法"><a href="#修补镜像直接刷入法" class="headerlink" title="修补镜像直接刷入法"></a>修补镜像直接刷入法</h3><p>参考<a target="_blank" rel="noopener" href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a>，个人未测试，应该可行<br>提取出原厂<code>recovery_ramdisk</code>镜像（从官方线刷包或其他地方获得），并发送到手机（模拟器应该也行）<br>使用magisk框架app，选择安装，修补boot镜像，选择提取出的原厂镜像<br>修补完成后传回电脑，手机进入fastboot模式，刷入即可</p>
+<h2 id="启动方式"><a href="#启动方式" class="headerlink" title="启动方式"></a>启动方式</h2><p>由于修补的镜像其实是rec分区，所以要按照进入rec的方式进入带面具的系统。<br>（个人测试，在带magisk的系统下重启仍然是有root的，等价于启动到rec）<br>具体操作如图（图源自参考帖）<br><img src="https://clubimg.club.vmall.com/data/attachment/forum/201902/11/221928oai3dhzxzbbrd42d.jpg"></p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>如果安装了不适配的模块，还是需要刷入第三方rec，进入后删除<code>/data/adb</code>文件夹，然后即可正常开机（magisk要重刷）。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/03/15/android-floatview/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -459,444 +860,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/16/ida-call-analysis-fail/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/02/16/ida-call-analysis-fail/" class="post-title-link" itemprop="url">IDA不能F5查看伪代码的解决方法(call analysis failed)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-02-16 14:17:04" itemprop="dateCreated datePublished" datetime="2019-02-16T14:17:04+08:00">2019-02-16</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>定位到报错的代码位置，双击函数，进入以后按一次F5，再返回就可以F5了。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiangshangbashaonian/article/details/82889924">解决IDA出现Decompilation failure: call analysis failed不可以F5的问题</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/16/fix-linux-time/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/02/16/fix-linux-time/" class="post-title-link" itemprop="url">修复双系统（Win+Linux）时间不同步问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-02-16 13:54:29" itemprop="dateCreated datePublished" datetime="2019-02-16T13:54:29+08:00">2019-02-16</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>笔记本装了win10+Ubuntu18.04双系统，但是两个系统的时间并不同步，相差8小时（正好是时区数）。于是搜索之，找到解决方案</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>Windows 与 Mac/Linux 看待系统硬件时间（Hardware Ttime，或称实时时间，即RTC，Real_Time Clock）的方式不同。<br>Windows把计算机硬件时间当作本地时间(local time)，所以在Windows系统中显示的时间跟BIOS中显示的时间是一样的。<br>而Linux/Unix/Mac把计算机硬件时间当作UTC（Universal Time Coordinated，世界统一时间）， 所以在Linux/Unix/Mac系统启动后在该时间的基础上，加上电脑设置的时区数。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>所以只需要使两个系统对待硬件时间的方式一致即可。<br>自然，有两种方法。</p>
-<h3 id="方法1-修改Linux系统"><a href="#方法1-修改Linux系统" class="headerlink" title="方法1 修改Linux系统"></a>方法1 修改Linux系统</h3><p>打开终端，执行<br><code>timedatectl set-local-rtc 1</code><br>禁用Linux系统的UTC时间，重启即可生效（不需要管理员权限）</p>
-<blockquote>
-<p>提示： 在 Ubuntu 16.04 版本以前，关闭UTC的方法是编辑/etc/default/rcS，将UTC=yes改成UTC=no， 但在Ubuntu 16.04使用systemd启动之后，时间改成了由timedatectl来管理</p>
-</blockquote>
-<p>如果时间还是不对，就先在设置里修改系统时间为当前时间（北京时间），然后执行<br><code>timedatectl set-local-rtc 1</code><br>再<br><code>sudo hwclock -w</code><br>写入当前时间到硬件</p>
-<h3 id="方法2-修改Windows系统（不建议）"><a href="#方法2-修改Windows系统（不建议）" class="headerlink" title="方法2 修改Windows系统（不建议）"></a>方法2 修改Windows系统（不建议）</h3><p>Win+X，打开<code>Powershell</code>（管理员），执行<br><code>Reg add HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v RealTimeIsUniversal /t REG_DWORD /d 1</code><br>解释：设置<code>RealTimeIsUniversal</code>键值为1，也就是把RTC当作UTC<br>然而我用这种方法，切换几次系统以后时间往后推了16小时= =<br>所以个人不推荐使用这种方法</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zyqblog/article/details/79318955?utm_source=copy">解决Windows10与Ubuntu16.04双系统时间不一样问题！</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/03/friend-ctf/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/02/03/friend-ctf/" class="post-title-link" itemprop="url">一道同学出的CTF题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-02-03 06:53:40" itemprop="dateCreated datePublished" datetime="2019-02-03T06:53:40+08:00">2019-02-03</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="来自中老年的表情包"><a href="#来自中老年的表情包" class="headerlink" title="来自中老年的表情包"></a>来自中老年的表情包</h2><p>图片如下（可以自己尝试分析）<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/friend_ctf_1.gif"></p>
-<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>只有一个gif，惯例<code>010Editor</code>打开，文件尾有个压缩包<br>提取之，不出意外的有密码，而且并不是伪加密</p>
-<h3 id="尝试"><a href="#尝试" class="headerlink" title="尝试"></a>尝试</h3><p>输入新年快乐，密码错误<br>输入happy，密码错误<br>输入happy2019，密码错误<br>难道隐藏在图片里？于是PS提取之，得到6张png<br>一番尝试后没有任何收获（陷入僵局.jpg<br>甚至怀疑是否在网页中含有密码，询问作者，得到回复：</p>
-<blockquote>
-<p>暴力出奇迹</p>
-</blockquote>
-<h3 id="得到最终的神秘数字"><a href="#得到最终的神秘数字" class="headerlink" title="得到最终的神秘数字"></a>得到最终的神秘数字</h3><p>然后，爆破得到了密码，89ms= =<br>解压后得到一个wav文件，播放，发现是电话拨号音<br>使用AU打开并显示频谱（Shift+D），对照DTMF表得到对应数字<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/friend_ctf_2.png"></p>
-<h3 id="DTMF对照表"><a href="#DTMF对照表" class="headerlink" title="DTMF对照表"></a>DTMF对照表</h3><table>
-<thead>
-<tr>
-<th>低频 \ 高频(Hz)</th>
-<th align="center">1209</th>
-<th align="center">1336</th>
-<th align="center">1477</th>
-<th align="center">1633</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>697</td>
-<td align="center">1</td>
-<td align="center">2</td>
-<td align="center">3</td>
-<td align="center">A</td>
-</tr>
-<tr>
-<td>770</td>
-<td align="center">4</td>
-<td align="center">5</td>
-<td align="center">6</td>
-<td align="center">B</td>
-</tr>
-<tr>
-<td>852</td>
-<td align="center">7</td>
-<td align="center">8</td>
-<td align="center">9</td>
-<td align="center">C</td>
-</tr>
-<tr>
-<td>941</td>
-<td align="center">*</td>
-<td align="center">0</td>
-<td align="center">#</td>
-<td align="center">D</td>
-</tr>
-</tbody></table>
-<h2 id="—-华丽（并不）的分割线—"><a href="#—-华丽（并不）的分割线—" class="headerlink" title="—-华丽（并不）的分割线—-"></a>—-华丽（并不）的分割线—-</h2><p>最后祝大家新年快乐！</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/01/26/shanghai-3rd-classic/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/01/26/shanghai-3rd-classic/" class="post-title-link" itemprop="url">第三届上海市大学生网络安全大赛 Classical Writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-01-26 14:07:53" itemprop="dateCreated datePublished" datetime="2019-01-26T14:07:53+08:00">2019-01-26</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>cipher.txt内容如下</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Ld hcrakewcfaxr, f hofjjlhfo hlaxuc lj f krau ev hlaxuc kxfk zfj tjui xljkeclhfoor gtk dez xfj vfooud, vec kxu pejk afck, ldke iljtju. Ld hedkcfjk ke peiucd hcrakewcfaxlh foweclkxpj, pejk hofjjlhfo hlaxucj hfd gu acfhklhfoor hepatkui fdi jeoyui gr xfdi. Xezuyuc, OrmkO3vydJCoe2qyNLmcN2qlpJXnM3SxM2Xke3q9 kxur fcu foje tjtfoor yucr jlpaou ke gcufn zlkx peiucd kuhxdeoewr. Kxu kucp ldhotiuj kxu jlpaou jrjkupj tjui jldhu Wcuun fdi Cepfd klpuj, kxu uofgecfku Cudfljjfdhu hlaxucj, Zecoi Zfc LL hcrakewcfaxr jthx fj kxu Udlwpf pfhxldu fdi guredi. F btlhn gcezd veq mtpa eyuc kxu ofsr iew.</span><br></pre></td></tr></table></figure>
-<p>推测是移位的密码，使用<code>WinCrypto</code>分析得到（也可以使用<a target="_blank" rel="noopener" href="https://quipqiup.com/">quip</a>在线分析并修复）</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">In cryptography, a classical cipher is a type of cipher that was used historically but now has fallen, for the most part, into disuse. In contrast to modern cryptographic algorithms, most classical ciphers can be practically computed and solved by hand. However, LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9 they are also usually very simple to break with modern technology. The term includes the simple systems used since Greek and Roman times, the elaborate Renaissance ciphers, World War II cryptography such as the Enigma machine and beyond. A quick brown fox jump over the lazy dog.</span><br></pre></td></tr></table></figure>
-<p>发现该句子其实来源于英文维基百科的经典加密（Classical cipher）<br>发现最后一句话其实就是<code>A quick brown fox jumps over the lazy dog.</code><br>（包含26个字母的最短句子）并去掉s<br>由此可以得到对照表然后恢复（当然使用<code>WinCrypto</code>就直接是这个字符串了）<br>所以可以得到原本的字符是<code>LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9</code></p>
-<h2 id="解密"><a href="#解密" class="headerlink" title="解密"></a>解密</h2><p>直接解base64发现行不通<br>移位爆破<br>得到<code>ZmxhZ3tjbGFzc2ljYWxfY2lwaGVyX3NvX2Vhc3l9</code>是可以解的</p>
-<h2 id="爆破代码"><a href="#爆破代码" class="headerlink" title="爆破代码"></a>爆破代码</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">toAlpha</span>(<span class="params">c,i</span>):</span></span><br><span class="line">    num = <span class="built_in">ord</span>(c)</span><br><span class="line">    <span class="keyword">if</span> num &gt;= <span class="number">65</span> <span class="keyword">and</span> num &lt;= <span class="number">90</span>:</span><br><span class="line">        num = <span class="number">65</span> + ((num - <span class="number">65</span>) + i) % <span class="number">26</span></span><br><span class="line">    <span class="keyword">elif</span> num &gt;= <span class="number">97</span> <span class="keyword">and</span> num &lt;= <span class="number">122</span>:</span><br><span class="line">        num = <span class="number">97</span> + ((num - <span class="number">97</span>) + i) % <span class="number">26</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">chr</span>(num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encrypt</span>(<span class="params">string,i</span>):</span></span><br><span class="line">    string_new = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">for</span> s <span class="keyword">in</span> string:</span><br><span class="line">        string_new += <span class="built_in">str</span>(toAlpha(s,i))</span><br><span class="line">    <span class="built_in">print</span>(string_new)</span><br><span class="line">    <span class="keyword">return</span> string_new</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decrypt</span>(<span class="params">string</span>):</span></span><br><span class="line">     <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">26</span>):</span><br><span class="line">         encrypt(string, -i)</span><br><span class="line">encode = <span class="string">&quot;LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9&quot;</span></span><br><span class="line">decrypt(encode)</span><br></pre></td></tr></table></figure>
-<p>在<code>encrypt</code>函数中加上base64解密代码即可爆破</p>
-<h3 id="增加代码"><a href="#增加代码" class="headerlink" title="增加代码"></a>增加代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">s = <span class="built_in">str</span>(base64.b64decode(string_new))</span><br><span class="line"><span class="keyword">if</span> <span class="string">&quot;flag&quot;</span> <span class="keyword">in</span> s:</span><br><span class="line">    <span class="built_in">print</span>(s)</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Erice_s/article/details/79732499">凯撒密码与python实现</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/01/26/icq-2nd-happy-rsa256/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/01/26/icq-2nd-happy-rsa256/" class="post-title-link" itemprop="url">i春秋 第二届春秋欢乐赛 RSA256 Writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-01-26 11:59:21" itemprop="dateCreated datePublished" datetime="2019-01-26T11:59:21+08:00">2019-01-26</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="解压"><a href="#解压" class="headerlink" title="解压"></a>解压</h2><p>解压得到四个文件，有一个<code>public.key</code>和三个加密过的文件，于是先把p和q解出来</p>
-<h2 id="得到e和n"><a href="#得到e和n" class="headerlink" title="得到e和n"></a>得到e和n</h2><p><code>openssl rsa -pubin -text -modulus -in warmup -in public.key</code><br>得到</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Exponent: 65537 (0x10001)</span><br><span class="line">Modulus=D99E952296A6D960DFC2504ABA545B9442D60A7B9E930AFF451C78EC55D555EB</span><br></pre></td></tr></table></figure>
-<h2 id="使用yafu分解，得到p和q"><a href="#使用yafu分解，得到p和q" class="headerlink" title="使用yafu分解，得到p和q"></a>使用yafu分解，得到p和q</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p = 302825536744096741518546212761194311477</span><br><span class="line">q = 325045504186436346209877301320131277983</span><br></pre></td></tr></table></figure>
-<h2 id="求出d"><a href="#求出d" class="headerlink" title="求出d"></a>求出d</h2><p>使用gmpy</p>
-<h2 id="解密并打印出flag"><a href="#解密并打印出flag" class="headerlink" title="解密并打印出flag"></a>解密并打印出flag</h2><h3 id="使用rsa模块"><a href="#使用rsa模块" class="headerlink" title="使用rsa模块"></a>使用rsa模块</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> rsa</span><br><span class="line"></span><br><span class="line">n = <span class="number">0xD99E952296A6D960DFC2504ABA545B9442D60A7B9E930AFF451C78EC55D555EB</span></span><br><span class="line">e = <span class="number">0x10001</span></span><br><span class="line">p = <span class="number">302825536744096741518546212761194311477</span></span><br><span class="line">q = <span class="number">325045504186436346209877301320131277983</span></span><br><span class="line">d = <span class="number">0x4547B732CBC3527104CB57C4728D6899B44C4994FAE2713D6B594BC0F522A41</span></span><br><span class="line">ret = <span class="string">&quot;&quot;</span></span><br><span class="line">privatekey = rsa.PrivateKey(n , e , d , p , q)</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message1&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message2&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message3&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="built_in">print</span>(ret)</span><br></pre></td></tr></table></figure>
-<p>得到</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flag&#123;3b6d3806-4b2b</span><br><span class="line">-11e7-95a0-</span><br><span class="line">000c29d7e93d&#125;</span><br></pre></td></tr></table></figure>
-<p>去掉回车得到最终flag</p>
-<h3 id="不使用rsa模块"><a href="#不使用rsa模块" class="headerlink" title="不使用rsa模块"></a>不使用rsa模块</h3><p>其实就是自己实现<code>rsa.decrypt</code>中的转换16进制操作<br>以第一个文件为例，解密出来转化为16进制：<br><code>25a8007e9ad2809abbf5a00666c61677b33623664333830362d346232620a</code><br>位数为奇数，所以左边补0，得到<br><code>025a8007e9ad2809abbf5a00666c61677b33623664333830362d346232620a</code><br>转换为ascii码得到<br><code>Z��(    ��Z�flag&#123;3b6d3806-4b2b</code></p>
-<p>剩下文件同理</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiangshangbashaonian/article/details/79575062">i春秋第二届春秋欢乐赛RSA256writeup</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/01/26/icq-2nd-happy-rec/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/01/26/icq-2nd-happy-rec/" class="post-title-link" itemprop="url">i春秋 第二届春秋欢乐赛 ReCreators&Hello World Writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-01-26 10:26:40" itemprop="dateCreated datePublished" datetime="2019-01-26T10:26:40+08:00">2019-01-26</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h2><h3 id="观察"><a href="#观察" class="headerlink" title="观察"></a>观察</h3><p>浏览器打开，只有一个<code>Hello, World!</code><br>查看源代码看到有个</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;flag.xmas.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>结果没有该文件，尝试打开<code>flag.js</code>，看到混淆过的js，全选复制，放到控制台运行，得到</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Key = <span class="string">&quot;7a57a5a743894a0e&quot;</span>;</span><br><span class="line">CryptoJS.pad.Iso10126 = &#123;</span><br><span class="line">    <span class="attr">pad</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data, blockSize</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> blockSizeBytes = blockSize * <span class="number">4</span>;</span><br><span class="line">        <span class="keyword">var</span> nPaddingBytes = blockSizeBytes - data.sigBytes % blockSizeBytes;</span><br><span class="line">        data.concat(CryptoJS.lib.WordArray.random(nPaddingBytes - <span class="number">1</span>)).concat(CryptoJS.lib.WordArray.create([nPaddingBytes &lt;&lt; <span class="number">24</span>], <span class="number">1</span>))</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">unpad</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> nPaddingBytes = data.words[(data.sigBytes - <span class="number">1</span>) &gt;&gt;&gt; <span class="number">2</span>] &amp; <span class="number">0xff</span>;</span><br><span class="line">        data.sigBytes -= nPaddingBytes</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> aesEncrypt = <span class="function"><span class="keyword">function</span>(<span class="params">data, keyStr, ivStr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> sendData = CryptoJS.enc.Utf8.parse(data);</span><br><span class="line">    <span class="keyword">var</span> key = CryptoJS.enc.Utf8.parse(keyStr);</span><br><span class="line">    <span class="keyword">var</span> iv = CryptoJS.enc.Utf8.parse(ivStr);</span><br><span class="line">    <span class="keyword">var</span> encrypted = CryptoJS.AES.encrypt(sendData, key, &#123;</span><br><span class="line">        <span class="attr">iv</span>: iv,</span><br><span class="line">        <span class="attr">mode</span>: CryptoJS.mode.CBC,</span><br><span class="line">        <span class="attr">padding</span>: CryptoJS.pad.Iso10126</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> CryptoJS.enc.Base64.stringify(encrypted.ciphertext)</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> aesDecrypt = <span class="function"><span class="keyword">function</span>(<span class="params">data, keyStr, ivStr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> key = CryptoJS.enc.Utf8.parse(keyStr);</span><br><span class="line">    <span class="keyword">var</span> iv = CryptoJS.enc.Utf8.parse(ivStr);</span><br><span class="line">    <span class="keyword">var</span> decrypted = CryptoJS.AES.decrypt(data, key, &#123;</span><br><span class="line">        <span class="attr">iv</span>: iv,</span><br><span class="line">        <span class="attr">mode</span>: CryptoJS.mode.CBC,</span><br><span class="line">        <span class="attr">padding</span>: CryptoJS.pad.Iso10126</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> decrypted.toString(CryptoJS.enc.Utf8)</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> hint = <span class="string">&quot;SSNRTPIuHLUxqtJmq8mDDPtexRU7RTjNO34tLqz+Tpw=&quot;</span>;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/01/26/icq-2nd-happy-rec/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -964,7 +931,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">107</span>
+          <span class="site-state-item-count">113</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
