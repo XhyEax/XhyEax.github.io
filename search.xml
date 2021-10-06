@@ -3101,69 +3101,6 @@
       </tags>
   </entry>
   <entry>
-    <title>在Linux和Windows上安装r2frida</title>
-    <url>/2021/10/01/r2frida-install-on-windows-linux/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>去年4月了解到<a href="https://github.com/nowsecure/r2frida">r2frida</a>这一工具，由于环境问题，并未安装成功。</p>
-<p>今年国庆翻出博客草稿，决定在<code>Kali Linux</code>和<code>Windows</code>上安装<code>r2frida</code>。</p>
-<span id="more"></span>
-
-<h2 id="Linux安装"><a href="#Linux安装" class="headerlink" title="Linux安装"></a>Linux安装</h2><h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p>系统：<code>Kali Linux 2021.2</code><br>软件：<code>Node.js 12.22.5</code>、<code>Frida 15.1.3</code><br>安装目标：<code>Radare2 5.4.2</code>、<code>r2frida 5.4.4</code></p>
-<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><h4 id="radare2"><a href="#radare2" class="headerlink" title="radare2"></a>radare2</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/radareorg/radare2</span><br><span class="line">radare2/sys/install.sh</span><br></pre></td></tr></table></figure>
-<h4 id="r2frida"><a href="#r2frida" class="headerlink" title="r2frida"></a>r2frida</h4><h5 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt install -y make gcc libzip-dev nodejs npm curl pkg-config git</span><br></pre></td></tr></table></figure>
-<h5 id="更换npm源（可选）"><a href="#更换npm源（可选）" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
-<h5 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
-<h5 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h5><p>编辑<code>Makefile</code>，修改<code>frida_version</code>为frida安装版本</p>
-<h5 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
-<p>安装成功将提示：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p &quot;//usr/local/lib/radare2/5.4.3&quot;</span><br><span class="line">cp -f io_frida.so* /&quot;/usr/local/lib/radare2/5.4.3&quot;</span><br></pre></td></tr></table></figure>
-
-<p>运行<code>r2 frida://?</code>显示帮助，测试插件是否安装成功。</p>
-<h2 id="Windows安装"><a href="#Windows安装" class="headerlink" title="Windows安装"></a>Windows安装</h2><h2 id="环境-1"><a href="#环境-1" class="headerlink" title="环境"></a>环境</h2><p>系统：<code>Windows 10 20H2 x64</code><br>软件：<code>Visual Studio 2019</code>、<code>Node.js 14.17.4</code>、<code>Cygwin 3.2.0</code>(记得选择<code>wget</code>)、<code>Frida 15.1.2</code><br>（提前安装好以上环境，VS版本至少为2015）</p>
-<p>安装目标：<code>Radare2 5.4.2</code>、<code>r2frida 5.4.4</code></p>
-<h2 id="准备-1"><a href="#准备-1" class="headerlink" title="准备"></a>准备</h2><h3 id="radare2-1"><a href="#radare2-1" class="headerlink" title="radare2"></a>radare2</h3><p>前往<a href="https://github.com/radareorg/radare2/releases">Releases · radareorg/radare2</a>下载<code>radare2-5.4.2-w64.zip</code>，解压到任意目录。<br>将<code>..\radare2\bin</code>目录添加到<code>PATH</code>环境变量后，执行<code>r2 -v</code>查看版本号</p>
-<h3 id="r2frida-1"><a href="#r2frida-1" class="headerlink" title="r2frida"></a>r2frida</h3><h4 id="更换npm源（可选）-1"><a href="#更换npm源（可选）-1" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
-<h4 id="克隆仓库-1"><a href="#克隆仓库-1" class="headerlink" title="克隆仓库"></a>克隆仓库</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
-<h4 id="修改-1"><a href="#修改-1" class="headerlink" title="修改"></a>修改</h4><p>编辑<code>build.bat</code>，修改<code>frida_version</code>为frida安装版本，修改<code>R2_BASE</code>为<code>radare2</code>安装目录（不需要<code>bin</code>）</p>
-<p>将<code>..\radare2\include\libr\r_cons.h</code>以<code>UTF-8 with BOM</code>编码重新保存（防止编译出错）</p>
-<h4 id="编译-1"><a href="#编译-1" class="headerlink" title="编译"></a>编译</h4><p>在<code>cmd</code>中打开该目录，使用<code>vcvarsall.bat</code>初始化环境，然后执行安装脚本</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;[Visual Studio安装位置]\VC\Auxiliary\Build\vcvarsall.bat&quot; x64</span><br><span class="line">.\build.bat install</span><br></pre></td></tr></table></figure>
-<p>安装成功将提示：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Installing...</span><br><span class="line">Copying &#x27;io_frida.dll&#x27; to C:\Users\xhy\.local\share\radare2\plugins</span><br><span class="line">        1 file(s) copied.</span><br></pre></td></tr></table></figure>
-
-<p>运行<code>r2 frida://?</code>显示帮助，测试插件是否安装成功。<br>结果如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">r2 frida://[action]/[link]/[device]/[target]</span><br><span class="line">* action = list | apps | attach | spawn | launch</span><br><span class="line">* link   = local | usb | remote host:port</span><br><span class="line">* device = &#x27;&#x27; | host:port | device-id</span><br><span class="line">* target = pid | appname | process-name | program-in-path | abspath</span><br><span class="line">Local:</span><br><span class="line">* frida://?                        # show this help</span><br><span class="line">* frida://                         # list local processes</span><br><span class="line">* frida://0                        # attach to frida-helper (no spawn needed)</span><br><span class="line">* frida:///usr/local/bin/rax2      # abspath to spawn</span><br><span class="line">* frida://rax2                     # same as above, considering local/bin is in PATH</span><br><span class="line">* frida://spawn/$(program)         # spawn a new process in the current system</span><br><span class="line">* frida://attach/(target)          # attach to target PID in current host</span><br><span class="line">USB:</span><br><span class="line">* frida://list/usb//               # list processes in the first usb device</span><br><span class="line">* frida://apps/usb//               # list apps in the first usb device</span><br><span class="line">* frida://attach/usb//12345        # attach to given pid in the first usb device</span><br><span class="line">* frida://spawn/usb//appname       # spawn an app in the first resolved usb device</span><br><span class="line">* frida://launch/usb//appname      # spawn+resume an app in the first usb device</span><br><span class="line">Remote:</span><br><span class="line">* frida://attach/remote/10.0.0.3:9999/558 # attach to pid 558 on tcp remote frida-server</span><br><span class="line">Environment:</span><br><span class="line">  R2FRIDA_SAFE_IO                  # Workaround a Frida bug on Android/thumb</span><br><span class="line">  R2FRIDA_DEBUG                    # Used to debug argument parsing behaviour</span><br><span class="line">  R2FRIDA_AGENT_SCRIPT             # path to file of the r2frida agent</span><br></pre></td></tr></table></figure>
-
-<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>（连接帮助见上文）</p>
-<h3 id="获取usb-device-id（可选）"><a href="#获取usb-device-id（可选）" class="headerlink" title="获取usb device id（可选）"></a>获取usb device id（可选）</h3><p>执行<code>frida-ls-devices</code>，获取<code>usb device id</code><br>然后启动app：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">r2 frida://launch/usb/[设备id]/[包名]</span><br></pre></td></tr></table></figure>
-<p>设备id为空时，连接第一个usb设备</p>
-<h3 id="查询帮助"><a href="#查询帮助" class="headerlink" title="查询帮助"></a>查询帮助</h3><blockquote>
-<p>r2frida commands are prefixed with <code>=!</code> or <code>:</code>.</p>
-</blockquote>
-<p>附加上app后，如果要使用<code>r2frida</code>的命令，需要在前面增加<code>=!</code>或<code>:</code><br>如：<code>=!?</code>、<code>:?</code>（获取帮助）<br>在命令后加问号，可查询命令帮助，如<code>:/?</code>、<code>ps?</code></p>
-<h3 id="过滤输出"><a href="#过滤输出" class="headerlink" title="过滤输出"></a>过滤输出</h3><p>使用<code>~</code>过滤输出结果，类似于<code>grep</code><br>例如：<code>:il~libart.so</code> (仅输出<code>libart.so</code>地址)</p>
-<h3 id="查看信息"><a href="#查看信息" class="headerlink" title="查看信息"></a>查看信息</h3><p><code>:i?</code>: 查看帮助</p>
-<p><code>:i</code>: 查询信息<br><code>:ic</code>: 列出所有类<br><code>:icl</code>: 列出已加载的类<br><code>:icm</code>: 列出类方法<br><code>:il</code>: 列出模块<br><code>:iE 模块名</code>: 列出模块导出符号</p>
-<h3 id="搜索字符串"><a href="#搜索字符串" class="headerlink" title="搜索字符串"></a>搜索字符串</h3><p><code>:/?</code>：查看帮助</p>
-<p><code>:/ 关键字</code>: 在内存中搜索关键字</p>
-<h3 id="打印内存、反汇编"><a href="#打印内存、反汇编" class="headerlink" title="打印内存、反汇编"></a>打印内存、反汇编</h3><p><code>p?</code>：查看帮助 (这是r2的命令，不需要冒号)</p>
-<p><code>s 地址</code>: 设置当前地址</p>
-<p><code>x</code>: <code>hexdump</code>当前地址的内存<br><code>x @ 地址</code>: <code>hexdump</code>指定地址的内存（其他命令同理）<br><code>ps</code>: 打印字符串<br><code>pd</code>: 反汇编</p>
-<h3 id="动态调试"><a href="#动态调试" class="headerlink" title="动态调试"></a>动态调试</h3><p><code>:d?</code>: 查看帮助</p>
-<p><code>:dm</code>: 列出内存区域（类似于<code>maps</code>文件）<br><code>:dt</code>: 跟踪地址调用<br><code>:dtf</code>: 跟踪地址调用，并格式化输出</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Usage: dtf [format] || dtf [addr] [fmt]</span><br><span class="line">  ^  = trace onEnter instead of onExit</span><br><span class="line">  +  = show backtrace on trace</span><br><span class="line"> p/x = show pointer in hexadecimal</span><br><span class="line">  c  = show value as a string (char)</span><br><span class="line">  i  = show decimal argument</span><br><span class="line">  z  = show pointer to string</span><br><span class="line">  w  = show pointer to UTF-16 string</span><br><span class="line">  a  = show pointer to ANSI string</span><br><span class="line">  h  = hexdump from pointer (optional length, h16 to dump 16 bytes)</span><br><span class="line">  H  = hexdump from pointer (optional position of length argument, H1 to dump args[1] bytes)</span><br><span class="line">  s  = show string in place</span><br><span class="line">  O  = show pointer to ObjC object</span><br><span class="line">Undocumented: Z, S</span><br><span class="line"> dtf    trace format</span><br></pre></td></tr></table></figure>
-
-<h3 id="加载Frida脚本"><a href="#加载Frida脚本" class="headerlink" title="加载Frida脚本"></a>加载Frida脚本</h3><p><code>:.?</code>: 查看帮助</p>
-<p><code>:. 脚本路径</code>: 加载js脚本</p>
-<h3 id="其他命令"><a href="#其他命令" class="headerlink" title="其他命令"></a>其他命令</h3><p><code>cl</code>清屏</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://mabin004.github.io/2021/02/19/r2frida%E4%BD%BF%E7%94%A8/">r2frida使用</a><br><a href="https://bbs.pediy.com/thread-264161.htm">Android动态调试-R2frida和lldb</a><br><a href="https://bbs.pediy.com/thread-256858.htm">RADARE2+FRIDA=R2FRIDA Best Dynamic Debugging Tool</a><br><a href="https://blog.csdn.net/u013255206/article/details/75295209">vs编译 error C2001: 常量中有换行符</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>基于aosp-lastest.tar同步AOSP源码</title>
     <url>/2021/10/05/repo-init-with-aosp-latest/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用TUNA AOSP初始包同步AOSP最新源码。</p>

@@ -191,80 +191,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/05/07/cpp-template-class-cout-overload/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/05/07/cpp-template-class-cout-overload/" class="post-title-link" itemprop="url">C++中模板类的输出流重载</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-05-07 15:05:54" itemprop="dateCreated datePublished" datetime="2019-05-07T15:05:54+08:00">2019-05-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在模板类中使用输出流重载发现报错，g++提示</p>
-<blockquote>
-<p>warning: friend declaration ‘std::ostream&amp; operator&lt;&lt;(std::ostream&amp;, const A<T>&amp;)’ declares a non-template function<br>note: (if this is not what you intended, make sure the function template has already been declared and add &lt;&gt; after the function name here)<br>增加&lt;&gt;后依旧报错，遂百度之，解决。</p>
-</blockquote>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><blockquote>
-<p>定义的友元函数还是一个模版，要实例化为参数变元后才能使用。也就是说，即使上面的友元看起来像函数定义，但是若没有经过参数化，编译器就不会生成该函数的代码<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/autosar/archive/2011/10/29/2228674.html">关于操作符的友元模版函数重载</a><br>个人理解是由于友元函数还没有给出声明（或者说是定义），编译器识别不出来。所以可以在类之前预先声明，而又因为该函数使用了类名，所以类名也要预先声明。</p>
-</blockquote>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h3 id="1-在类内部加上友元函数体（不推荐）"><a href="#1-在类内部加上友元函数体（不推荐）" class="headerlink" title="1.在类内部加上友元函数体（不推荐）"></a>1.在类内部加上友元函数体（不推荐）</h3><h3 id="2-在类的定义之前对类和友元函数进行预声明，并在内部加上-lt-gt"><a href="#2-在类的定义之前对类和友元函数进行预声明，并在内部加上-lt-gt" class="headerlink" title="2.在类的定义之前对类和友元函数进行预声明，并在内部加上&lt;&gt;"></a>2.在类的定义之前对类和友元函数进行预声明，并在内部加上&lt;&gt;</h3><p>即在类定义前加上如下代码：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="class"><span class="keyword">class</span> <span class="title">A</span>;</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; ostream &amp;<span class="keyword">operator</span>&lt;&lt; (ostream &amp;out, <span class="keyword">const</span> A&lt;T&gt; &amp;a);</span><br></pre></td></tr></table></figure>
-<p>在类定义中给输出流重载函数加上&lt;&gt;：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">friend</span> ostream &amp;<span class="keyword">operator</span>&lt;&lt; &lt;&gt;(ostream &amp;, <span class="keyword">const</span> A&lt;T&gt; &amp;);</span><br></pre></td></tr></table></figure>
-<h4 id="注意：重载函数定义时不需要加上-lt-gt"><a href="#注意：重载函数定义时不需要加上-lt-gt" class="headerlink" title="注意：重载函数定义时不需要加上&lt;&gt;"></a>注意：重载函数定义时不需要加上&lt;&gt;</h4><p>与其他友元函数定义类似：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">ostream &amp;<span class="keyword">operator</span>&lt;&lt; (ostream &amp;out, <span class="keyword">const</span> A&lt;T&gt; &amp;a)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		out &lt;&lt; a[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> out;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h3 id="3-在类中再使用一次模板（自用）"><a href="#3-在类中再使用一次模板（自用）" class="headerlink" title="3.在类中再使用一次模板（自用）"></a>3.在类中再使用一次模板（自用）</h3><p>参考<a target="_blank" rel="noopener" href="https://www.cnblogs.com/autosar/archive/2011/10/29/2228674.html">关于操作符的友元模版函数重载</a><br>直接修改类定义中的输出流重载函数为：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1&gt;</span><br><span class="line">    <span class="keyword">friend</span> ostream &amp;<span class="keyword">operator</span>&lt;&lt;(ostream &amp;, <span class="keyword">const</span> A&lt;T1&gt; &amp;);</span><br></pre></td></tr></table></figure>
-<p>重载函数定义不需要修改为T1（当然改也行）</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/larryzeal/p/5664418.html">C++ 模板类友元之输出流操作符重载</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/autosar/archive/2011/10/29/2228674.html">关于操作符的友元模版函数重载</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/05/01/cpp-class-member-func-ptr/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -860,6 +786,65 @@
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/16/ida-call-analysis-fail/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/02/16/ida-call-analysis-fail/" class="post-title-link" itemprop="url">IDA不能F5查看伪代码的解决方法(call analysis failed)</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-02-16 14:17:04" itemprop="dateCreated datePublished" datetime="2019-02-16T14:17:04+08:00">2019-02-16</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>定位到报错的代码位置，双击函数，进入以后按一次F5，再返回就可以F5了。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiangshangbashaonian/article/details/82889924">解决IDA出现Decompilation failure: call analysis failed不可以F5的问题</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
   <nav class="pagination">
@@ -931,7 +916,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">113</span>
+          <span class="site-state-item-count">112</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

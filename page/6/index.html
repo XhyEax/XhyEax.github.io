@@ -191,66 +191,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/03/28/mips-bubble-sort/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/03/28/mips-bubble-sort/" class="post-title-link" itemprop="url">MIPS冒泡排序 计算机组成原理与设计（第五版）</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-28 01:00:01" itemprop="dateCreated datePublished" datetime="2020-03-28T01:00:01+08:00">2020-03-28</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="代码如下"><a href="#代码如下" class="headerlink" title="代码如下"></a>代码如下</h2><p>（非递减排序）</p>
-<figure class="highlight mips"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">sort:</span><span class="keyword">addi </span>$<span class="built_in">sp</span>,$<span class="built_in">sp</span>,-<span class="number">20</span></span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">ra</span>,<span class="number">16</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s3</span>,<span class="number">12</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s2</span>,<span class="number">8</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s1</span>,<span class="number">4</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s0</span>,<span class="number">0</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">s2</span>,$<span class="built_in">a0</span></span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">s3</span>,$<span class="built_in">a1</span></span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">s0</span>,$<span class="built_in">zero</span></span><br><span class="line"><span class="symbol">for1tst:</span><span class="keyword">slt </span>$<span class="built_in">t0</span>,$<span class="built_in">s0</span>,$<span class="built_in">s3</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="built_in">t0</span>,$<span class="built_in">zero</span>,exit1</span><br><span class="line"><span class="keyword">addi </span>$<span class="built_in">s1</span>,$<span class="built_in">s0</span>,-<span class="number">1</span></span><br><span class="line"><span class="symbol">for2tst:</span><span class="keyword">slti </span>$<span class="built_in">t0</span>,$<span class="built_in">s1</span>,<span class="number">0</span></span><br><span class="line"><span class="keyword">bne </span>$<span class="built_in">t0</span>,$<span class="built_in">zero</span>,exit2</span><br><span class="line"><span class="keyword">sll </span>$<span class="built_in">t1</span>,$<span class="built_in">s1</span>,<span class="number">2</span></span><br><span class="line"><span class="keyword">add </span>$<span class="built_in">t2</span>,$<span class="built_in">s2</span>,$<span class="built_in">t1</span></span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t3</span>,<span class="number">0</span>($<span class="built_in">t2</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t4</span>,<span class="number">4</span>($<span class="built_in">t2</span>)</span><br><span class="line"><span class="keyword">slt </span>$<span class="built_in">t0</span>,$<span class="built_in">t4</span>,$<span class="built_in">t3</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="built_in">t0</span>,$<span class="built_in">zero</span>,exit2</span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">a0</span>,$<span class="built_in">s2</span></span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">a1</span>,$<span class="built_in">s1</span></span><br><span class="line"><span class="keyword">jal </span><span class="keyword">swap</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">addi </span>$<span class="built_in">s1</span>,$<span class="built_in">s1</span>,-<span class="number">1</span></span><br><span class="line"><span class="keyword">j </span>for2tst</span><br><span class="line"><span class="symbol">exit2:</span><span class="keyword">addi </span>$<span class="built_in">s0</span>,$<span class="built_in">s0</span>,<span class="number">1</span></span><br><span class="line"><span class="keyword">j </span>for1tst</span><br><span class="line"><span class="symbol">exit1:</span><span class="keyword">lw </span>$<span class="built_in">s0</span>,<span class="number">0</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">s1</span>,<span class="number">4</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">s2</span>,<span class="number">8</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">s3</span>,<span class="number">12</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">ra</span>,<span class="number">16</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">addi </span>$<span class="built_in">sp</span>,$<span class="built_in">sp</span>,<span class="number">20</span></span><br><span class="line"><span class="keyword">jr </span>$<span class="built_in">ra</span></span><br><span class="line"><span class="keyword">swap: </span><span class="keyword">sll </span>$<span class="built_in">t1</span>,$<span class="built_in">a1</span>,<span class="number">2</span></span><br><span class="line"><span class="keyword">add </span>$<span class="built_in">t1</span>,$<span class="built_in">a0</span>,$<span class="built_in">t1</span></span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t0</span>,<span class="number">0</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t2</span>,<span class="number">4</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">t2</span>,<span class="number">0</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">t0</span>,<span class="number">4</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">jr </span>$<span class="built_in">ra</span></span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>计算机组成原理与设计（第五版） 机械工业出版社 第94页</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/03/25/linux-set-swapfile/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -828,6 +768,74 @@
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/11/04/wsl-install-mysql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/04/wsl-install-mysql/" class="post-title-link" itemprop="url">WSL安装并运行MySQL Server</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-04 15:23:22" itemprop="dateCreated datePublished" datetime="2019-11-04T15:23:22+08:00">2019-11-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install mysql-server</span><br><span class="line">apt-get install mariadb-client</span><br><span class="line">sudo apt-get install libmysqlclient-dev</span><br></pre></td></tr></table></figure>
+<h2 id="默认配置"><a href="#默认配置" class="headerlink" title="默认配置"></a>默认配置</h2><p><code>sudo service mysql start</code>启动服务<br>然后执行<code>ps -aux | grep mysql</code>可以得到：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/sbin/mysqld --basedir=/usr --datadir=/var/lib/mysql --plugin-dir=/usr/lib/mysql/plugin --log-error=/var/log/mysql/error.log --pid-file=/var/run/mysqld/mysqld.pid --socket=/var/run/mysqld/mysqld.sock --port=3306 --log-syslog=1 --log-syslog-facility=daemon --log-syslog-tag=</span><br></pre></td></tr></table></figure>
+<p>启动服务时可能会报错：<code>No directory, logging in with HOME=/</code><br>需要设置一下权限，再重新启动：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo service mysql stop</span><br><span class="line">sudo usermod -d /var/lib/mysql/ mysql</span><br><span class="line">sudo service mysql start</span><br></pre></td></tr></table></figure>
+<h2 id="允许windows访问数据库"><a href="#允许windows访问数据库" class="headerlink" title="允许windows访问数据库"></a>允许windows访问数据库</h2><p>设置root账户密码并登录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysqladmin -u root password root</span><br><span class="line">mysql -u root -p</span><br></pre></td></tr></table></figure>
+<p>给予admin用户访问权限</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mysql</span><br><span class="line">grant all on *.* to admin@&#x27;%&#x27; identified by &#x27;123456&#x27; with grant option;</span><br><span class="line">flush privileges;</span><br><span class="line">exit;</span><br></pre></td></tr></table></figure>
+<p>执行<code>sudo service mysql restart</code>即可使用<code>admin@localhost</code>登陆服务器</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/fu-yong/p/9025576.html">Linux上安装MySQL及其基础配置</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
   <nav class="pagination">
@@ -899,7 +907,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">113</span>
+          <span class="site-state-item-count">112</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
