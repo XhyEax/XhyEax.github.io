@@ -191,6 +191,136 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/09/13/docker-compile-android-kernel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/09/13/docker-compile-android-kernel/" class="post-title-link" itemprop="url">使用docker编译安卓内核源码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-13 11:36:05" itemprop="dateCreated datePublished" datetime="2021-09-13T11:36:05+08:00">2021-09-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>PC：<code>Kali 2021.2</code><br>手机：<code>Nexus 5</code>、<code>Android 6.0.1</code><br>GCC：<code>4.8</code><br>内核版本：<code>3.4.0</code></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/09/13/docker-compile-android-kernel/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/09/07/nexus5-9008/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/09/07/nexus5-9008/" class="post-title-link" itemprop="url">使用9008模式、LG FlashTool救砖（Nexus 5）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-07 07:20:05" itemprop="dateCreated datePublished" datetime="2021-09-07T07:20:05+08:00">2021-09-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前买来调试用的<code>Nexus 5</code>坏了，雪花屏并且无限重启。记录一下刷机的过程。</p>
+<p>PS：刷机后仍雪花屏，怀疑是硬件问题。</p>
+<h2 id="禁用驱动程序强制签名"><a href="#禁用驱动程序强制签名" class="headerlink" title="禁用驱动程序强制签名"></a>禁用驱动程序强制签名</h2><p>安装完驱动后，需要禁用驱动程序强制签名（刷机完成后记得恢复）</p>
+<h2 id="9008"><a href="#9008" class="headerlink" title="9008"></a>9008</h2><p><a target="_blank" rel="noopener" href="https://forum.xda-developers.com/t/fix-unbrick-nexus-5-stucked-in-qualcomm-hs-usb-qdloader-9008-mode.3043301/">Unbrick Nexus 5 stucked in Qualcomm HS-USB QDLoader 9008 mode</a></p>
+<h3 id="BoardDiag黑屏"><a href="#BoardDiag黑屏" class="headerlink" title="BoardDiag黑屏"></a>BoardDiag黑屏</h3><blockquote>
+<p>Hold down SHIFT key and right click on a running program icon on the taskbar, a popup menu should appear, click on Move then use the Left/Right Arrow key to move it.<br>Do the same for the rest of the running programs.<br><a target="_blank" rel="noopener" href="https://forum.xda-developers.com/t/boarddiag-v2-99a-by-willthecracker-opened-once-crashed-opens-but-only-in-taskbar.3407996/post-82425715">https://forum.xda-developers.com/t/boarddiag-v2-99a-by-willthecracker-opened-once-crashed-opens-but-only-in-taskbar.3407996/post-82425715</a><br>右键任务栏的<code>BoardDiag</code>图标，选择移动，然后按方向键移动窗口</p>
+</blockquote>
+<h2 id="LG-FlashTool"><a href="#LG-FlashTool" class="headerlink" title="LG FlashTool"></a>LG FlashTool</h2><p><a target="_blank" rel="noopener" href="https://forum.xda-developers.com/t/tutorial-how-to-flash-factory-images-with-lg-flashtool.2713833/">[Tutorial] How to flash factory images with LG Flashtool</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/09/06/kali-install-with-win10/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -708,138 +838,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/08/06/frida-no-root/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/08/06/frida-no-root/" class="post-title-link" itemprop="url">Frida在无Root机器上的使用方案 (基于VirtualApp)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-08-06 14:03:48" itemprop="dateCreated datePublished" datetime="2021-08-06T14:03:48+08:00">2021-08-06</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，因此也就无法通过Magisk获取Root权限。<br>本文基于<a target="_blank" rel="noopener" href="https://github.com/asLody/VirtualApp">VirtualApp框架</a>及<a target="_blank" rel="noopener" href="https://github.com/frida/frida">Frida-Gadget</a>，实现不修改apk使用Frida。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/08/06/frida-no-root/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/" class="post-title-link" itemprop="url">QQ 8.8.17 防撤回、无限打开闪照</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-08-04 08:33:08" itemprop="dateCreated datePublished" datetime="2021-08-04T08:33:08+08:00">2021-08-04</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前写过一篇<a href="https://blog.xhyeax.com/2019/09/18/qq-813-unrevoke-module-develop/">QQ8.1.3防撤回原理</a>，每次更新后，都需要适配被混淆的类名。</p>
-<p>今天更新了最新版QQ（<code>8.8.17</code>），发现使用到的类名都未被混淆，不过包结构有了一定变化（可能是重构了？），需要重新适配。</p>
-<p>于是尝试使用<code>objection</code>分析撤回提示的实现，并编写<code>Xposed</code>模块。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/08/04/qq-8817-unrevoke-and-infinite-flashpic/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -911,7 +909,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">112</span>
+          <span class="site-state-item-count">114</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

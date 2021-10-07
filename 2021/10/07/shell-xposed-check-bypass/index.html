@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="概述更新某营业厅app（版本号7.4.0）后，发现加载Xposed模块会导致app crash。 通过分析Tombstone日志找到检测点，编写Xposed模块绕过堆栈检测。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Xposed绕过某加固的Xposed堆栈检测">
+<meta property="og:url" content="https://blog.xhyeax.com/2021/10/07/shell-xposed-check-bypass/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="概述更新某营业厅app（版本号7.4.0）后，发现加载Xposed模块会导致app crash。 通过分析Tombstone日志找到检测点，编写Xposed模块绕过堆栈检测。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-10-07T02:21:11.000Z">
+<meta property="article:modified_time" content="2021-10-07T10:20:24.237Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="Android">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2021/10/07/shell-xposed-check-bypass/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用Xposed绕过某加固的Xposed堆栈检测 | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Show me the code.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/10/07/shell-xposed-check-bypass/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用Xposed绕过某加固的Xposed堆栈检测
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-10-07 10:21:11" itemprop="dateCreated datePublished" datetime="2021-10-07T10:21:11+08:00">2021-10-07</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>更新某营业厅app（版本号<code>7.4.0</code>）后，发现加载<code>Xposed</code>模块会导致app crash。</p>
+<p>通过分析<code>Tombstone</code>日志找到检测点，编写<code>Xposed</code>模块绕过堆栈检测。</p>
+<span id="more"></span>
+<h2 id="日志分析"><a href="#日志分析" class="headerlink" title="日志分析"></a>日志分析</h2><p>过滤<code>Error</code>级别的日志，得到以下信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">A/libc: Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x78c in tid 20120 (c10086.activity), pid 20120 (c10086.activity)</span><br><span class="line">A/DEBUG: pid: 20120, tid: 20120, name: c10086.activity  &gt;&gt;&gt; com.greenpoint.android.mc10086.activity &lt;&lt;&lt;</span><br><span class="line">A/DEBUG: uid: 10480</span><br><span class="line">A/DEBUG: signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x78c</span><br><span class="line">A/DEBUG: Cause: null pointer dereference</span><br><span class="line">A/DEBUG:     r0  00000000  r1  ffb273e6  r2  0000078c  r3  b6a287de</span><br><span class="line">A/DEBUG:     r4  c6049d88  r5  00000000  r6  00000000  r7  c6049d88</span><br><span class="line">A/DEBUG:     r8  b6a287de  r9  0000078c  r10 f72255a0  r11 ffb284d0</span><br><span class="line">A/DEBUG:     ip  f4c7d0a4  sp  00000000  lr  00000000  pc  0000078c</span><br><span class="line">A/DEBUG: backtrace:</span><br><span class="line">A/DEBUG:       #00 pc 0000078c  &lt;unknown&gt;</span><br><span class="line">A/DEBUG:       #01 pc 00000000  &lt;unknown&gt;</span><br><span class="line">E/tombstoned: Tombstone written to: /data/tombstones/tombstone_18</span><br></pre></td></tr></table></figure>
+<p>导出<code>/data/tombstones/tombstone_18</code>到电脑，查看内存（方法栈）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">memory near r1 ([stack]):</span><br><span class="line">    ffb273c4 00000305 00000017 000002f1 00000581  ................</span><br><span class="line">    ffb273d4 f4c8125c 00000000 00000000 736f7078  \...........xpos</span><br><span class="line">    ffb273e4 1d006465 00000000 43746567 7373616c  ed......getClass</span><br><span class="line">    ffb273f4 656d614e 0000e400 72727563 54746e65  Name....currentT</span><br><span class="line">    ffb27404 61657268 00f00064 53746567 6b636174  hread...getStack</span><br><span class="line">    ffb27414 63617254 00000065 6176616a 6e616c2f  Trace...java/lan</span><br><span class="line">    ffb27424 68542f67 64616572 0000f200 6a4c2928  g/Thread....()Lj</span><br><span class="line">    ffb27434 2f617661 676e616c 7268542f 3b646165  ava/lang/Thread;</span><br><span class="line">    ffb27444 00009d00 6a4c2928 2f617661 676e616c  ....()Ljava/lang</span><br><span class="line">    ffb27454 7274532f 3b676e69 00004100 6176616a  /String;.A..java</span><br><span class="line">    ffb27464 6e616c2f 74532f67 546b6361 65636172  /lang/StackTrace</span><br><span class="line">    ffb27474 6d656c45 00746e65 000000ef 4c5b2928  Element.....()[L</span><br><span class="line">    ffb27484 6176616a 6e616c2f 74532f67 546b6361  java/lang/StackT</span><br><span class="line">    ffb27494 65636172 6d656c45 3b746e65 00005100  raceElement;.Q..</span><br><span class="line">    ffb274a4 14765802 00000000 c6049d88 f4c8125c  .Xv.........\...</span><br><span class="line">    ffb274b4 00000000 f72255a0 c6001aa5 31362f64  .....U&quot;.....d/61</span><br></pre></td></tr></table></figure>
+
+<p>首先通过<code>java.lang.Thread.currentThread</code>获得当前线程对象，然后调用<code>getStackTrace</code>获得<code>StackTraceElement</code>数组，遍历该数组，调用<code>getClassName</code>，判断是否包含<code>xposed</code></p>
+<h2 id="定位"><a href="#定位" class="headerlink" title="定位"></a>定位</h2><p><code>Xposed</code>Hook<code>Thread.getStackTrace</code>，打印调用栈（函数返回值）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">findAndHookMethod(Thread.class, <span class="string">&quot;getStackTrace&quot;</span>, <span class="keyword">new</span> XC_MethodHook() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">afterHookedMethod</span><span class="params">(MethodHookParam param)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        StackTraceElement[] st = (StackTraceElement[]) param.getResult();</span><br><span class="line">        String sts = <span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">for</span> (StackTraceElement ste : st) &#123;</span><br><span class="line">            sts += ste.toString() + <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Log.e(<span class="string">&quot;StackTrace&quot;</span>, sts);</span><br><span class="line">        <span class="keyword">super</span>.afterHookedMethod(param);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>（如果要Hook<code>StackTraceElement.getClassName</code>，打印返回值即可）</p>
+<p>日志如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">dalvik.system.VMStack.getThreadStackTrace(Native Method)</span><br><span class="line">java.lang.Thread.getStackTrace(Thread.java:1736)</span><br><span class="line">java.lang.reflect.Method.invoke(Native Method)</span><br><span class="line">de.robv.android.xposed.LspHooker.handleHookedMethod(Unknown Source:107)</span><br><span class="line">LspHooker_.getStackTrace(Unknown Source:8)</span><br><span class="line">java.lang.Runtime.nativeLoad(Native Method)</span><br><span class="line">java.lang.Runtime.nativeLoad(Runtime.java:1131)</span><br><span class="line">java.lang.Runtime.loadLibrary0(Runtime.java:1085)</span><br><span class="line">java.lang.Runtime.loadLibrary0(Runtime.java:1008)</span><br><span class="line">java.lang.System.loadLibrary(System.java:1664)</span><br><span class="line">com.secneo.apkwrapper.AW.attachBaseContext(Unknown Source:17)</span><br></pre></td></tr></table></figure>
+<p>可以看到调用者是<code>java.lang.Runtime.nativeLoad</code>，即so加载时调用（在<code>Native</code>层通过<code>JNI</code>调用<code>getStackTrace</code>）</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>使用<code>JEB</code>反编译<code>classes.dex</code>，定位到<code>com.secneo.apkwrapper.AW.attachBaseContext</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span>  <span class="comment">// android.content.ContextWrapper</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">attachBaseContext</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    AW.mC = context;</span><br><span class="line">    System.loadLibrary(<span class="string">&quot;DexHelper&quot;</span>);</span><br><span class="line">    H.i();</span><br><span class="line">    AW.ᵢ = <span class="keyword">this</span>;</span><br><span class="line">    <span class="keyword">super</span>.attachBaseContext(context);</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到加载的是<code>libDexHelper.so</code>（旧版本是在<code>&lt;clinit&gt;</code>加载，现在改到<code>attachBaseContext</code>了）</p>
+<p>由so的加载流程可知，检测函数的调用要么是在<code>JNI_OnLoad</code>，要么是在<code>.init</code>或<code>.init_array</code>段</p>
+<p>使用<code>IDA</code>动态调试，发现该加固是在<code>JNI_OnLoad</code>中调用检测函数（并非本文重点，就不详细介绍了）</p>
+<p>由于最终还是要调用<code>Java</code>层的<code>getClassName</code>方法，考虑到通用性，决定编写<code>Xposed</code>模块，绕过堆栈检测</p>
+<h2 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h2><p><code>Xposed</code>Hook<code>StackTraceElement.getClassName</code>方法，判断是否包含<code>xposed</code>，如果包含则替换返回值为<code>android.os.Handler</code></p>
+<p>注意：需要在<code>DexHelper</code>加载前Hook</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">findAndHookMethod(StackTraceElement.class, <span class="string">&quot;getClassName&quot;</span>, <span class="keyword">new</span> XC_MethodHook() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">afterHookedMethod</span><span class="params">(MethodHookParam param)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        String className = (String) param.getResult();</span><br><span class="line">        <span class="keyword">if</span> (className != <span class="keyword">null</span> &amp;&amp; className.contains(<span class="string">&quot;xposed&quot;</span>)) &#123;</span><br><span class="line">            param.setResult(<span class="string">&quot;android.os.Handler&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">super</span>.afterHookedMethod(param);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"># Android</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/10/07/gradle-auto-version-code/" rel="prev" title="Gradle配置版本号自动增加">
+      <i class="fa fa-chevron-left"></i> Gradle配置版本号自动增加
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">日志分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%BD%8D"><span class="nav-number">3.</span> <span class="nav-text">定位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%95%E8%BF%87"><span class="nav-number">5.</span> <span class="nav-text">绕过</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">Blog of XhyEax</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">114</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
