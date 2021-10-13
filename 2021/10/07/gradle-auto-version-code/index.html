@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="概述Xposed模块重新编译并安装后，由于versionCode并未改变，框架管理器并不会提示Xposed 模块已更新。 有时会忘记重启被注入的应用，导致功能不生效（其实可以用adb重启，或者Frida的Spawn功能） 通过搜索引擎，学习一下怎么自动增加版本号。">
+  <meta name="description" content="概述Xposed模块重新编译并安装后，由于versionCode并未改变，框架管理器并不会提示Xposed 模块已更新。 有时会忘记重启被注入的应用，导致功能不生效（其实可以用adb重启，或者Frida的Spawn功能） 通过搜索引擎，学习一下如何配置版本号自增。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Gradle配置版本号自动增加">
 <meta property="og:url" content="https://blog.xhyeax.com/2021/10/07/gradle-auto-version-code/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="概述Xposed模块重新编译并安装后，由于versionCode并未改变，框架管理器并不会提示Xposed 模块已更新。 有时会忘记重启被注入的应用，导致功能不生效（其实可以用adb重启，或者Frida的Spawn功能） 通过搜索引擎，学习一下怎么自动增加版本号。">
+<meta property="og:description" content="概述Xposed模块重新编译并安装后，由于versionCode并未改变，框架管理器并不会提示Xposed 模块已更新。 有时会忘记重启被注入的应用，导致功能不生效（其实可以用adb重启，或者Frida的Spawn功能） 通过搜索引擎，学习一下如何配置版本号自增。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-07T00:33:24.000Z">
-<meta property="article:modified_time" content="2021-10-07T09:04:09.548Z">
+<meta property="article:modified_time" content="2021-10-13T04:22:40.590Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
@@ -240,7 +240,7 @@
       
         <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><code>Xposed</code>模块重新编译并安装后，由于<code>versionCode</code>并未改变，框架管理器并不会提示<code>Xposed 模块已更新</code>。</p>
 <p>有时会忘记重启被注入的应用，导致功能不生效（其实可以用<code>adb</code>重启，或者<code>Frida</code>的<code>Spawn</code>功能）</p>
-<p>通过搜索引擎，学习一下怎么自动增加版本号。</p>
+<p>通过搜索引擎，学习一下如何配置版本号自增。</p>
 <span id="more"></span>
 <h2 id="增加函数"><a href="#增加函数" class="headerlink" title="增加函数"></a>增加函数</h2><p>修改<code>app</code>模块的<code>build.gradle</code>，增加<code>getVersionCode</code>函数</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">def <span class="title">getVersionCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    def versionFile = file(<span class="string">&#x27;version.properties&#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> (!versionFile.exists()) &#123;</span><br><span class="line">        Properties versionProps = <span class="keyword">new</span> Properties()</span><br><span class="line">        versionProps.setProperty(<span class="string">&quot;VERSION_CODE&quot;</span>, <span class="string">&quot;1&quot;</span>)</span><br><span class="line">        versionFile.createNewFile();</span><br><span class="line">        versionProps.store(versionFile.newWriter(), <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (versionFile.canRead()) &#123;</span><br><span class="line">        Properties versionProps = <span class="keyword">new</span> Properties()</span><br><span class="line">        versionProps.load(<span class="keyword">new</span> FileInputStream(versionFile))</span><br><span class="line">        def versionCode = versionProps[<span class="string">&#x27;VERSION_CODE&#x27;</span>].toInteger()</span><br><span class="line">        def runTasks = gradle.startParameter.<span class="function">taskNames</span></span><br><span class="line"><span class="function">        <span class="title">println</span><span class="params">(<span class="string">&quot;runTasks:&quot;</span> + runTasks)</span></span></span><br><span class="line"><span class="function">        def isDebug </span>= <span class="string">&#x27;:app:assembleDebug&#x27;</span> in runTasks</span><br><span class="line">        def isRelease = <span class="string">&#x27;:app:assembleRelease&#x27;</span> <span class="function">in runTasks</span></span><br><span class="line"><span class="function">        <span class="title">if</span> <span class="params">(isRelease || isDebug)</span> </span>&#123;</span><br><span class="line">            versionProps[<span class="string">&#x27;VERSION_CODE&#x27;</span>] = (++versionCode).toString()</span><br><span class="line">            versionProps.store(versionFile.newWriter(), <span class="keyword">null</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> versionCode</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -362,7 +362,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">114</span>
+          <span class="site-state-item-count">115</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
