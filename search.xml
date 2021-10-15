@@ -1412,8 +1412,13 @@
   <entry>
     <title>IDA不能F5查看伪代码的解决方法(call analysis failed)</title>
     <url>/2019/02/16/ida-call-analysis-fail/</url>
-    <content><![CDATA[<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>定位到报错的代码位置，双击函数，进入以后按一次F5，再返回就可以F5了。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/xiangshangbashaonian/article/details/82889924">解决IDA出现Decompilation failure: call analysis failed不可以F5的问题</a></p>
+    <content><![CDATA[<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><blockquote>
+<p>原因有可能分两种：<br>1、IDA无法识别出正确的调用约定(calling convention)；<br>2、IDA无法识别出正确的参数个数。</p>
+</blockquote>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="方法1-IDA自动分析"><a href="#方法1-IDA自动分析" class="headerlink" title="方法1 - IDA自动分析"></a>方法1 - IDA自动分析</h3><p>定位到报错的代码位置，双击调用的函数，进入后按一次F5，再返回就可以F5了。</p>
+<h3 id="方法2-修改参数个数"><a href="#方法2-修改参数个数" class="headerlink" title="方法2 - 修改参数个数"></a>方法2 - 修改参数个数</h3><p>定位到报错的代码位置，鼠标点击调用的函数，按下Y键，修改参数个数。<br>比如将<code>(_JNIEnv *, int, int, int, int, int, int, int);</code>改为<code>(_JNIEnv *, int, int, int);</code></p>
+<p>具体参数个数，需要根据函数调用约定及汇编代码确定（看它传入了几个参数）。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/xiangshangbashaonian/article/details/82889924">解决IDA出现Decompilation failure: call analysis failed不可以F5的问题</a><br><a href="https://www.cnblogs.com/echo579/p/6564433.html">IDA反编译失败-call analysis failed</a></p>
 ]]></content>
       <tags>
         <tag>IDA</tag>

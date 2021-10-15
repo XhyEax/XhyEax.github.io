@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="解决方案定位到报错的代码位置，双击函数，进入以后按一次F5，再返回就可以F5了。 参考解决IDA出现Decompilation failure: call analysis failed不可以F5的问题">
+  <meta name="description" content="原因 原因有可能分两种：1、IDA无法识别出正确的调用约定(calling convention)；2、IDA无法识别出正确的参数个数。  解决方案方法1 - IDA自动分析定位到报错的代码位置，双击调用的函数，进入后按一次F5，再返回就可以F5了。 方法2 - 修改参数个数定位到报错的代码位置，鼠标点击调用的函数，按下Y键，修改参数个数。比如将(_JNIEnv *, int, int, int,">
 <meta property="og:type" content="article">
 <meta property="og:title" content="IDA不能F5查看伪代码的解决方法(call analysis failed)">
 <meta property="og:url" content="https://blog.xhyeax.com/2019/02/16/ida-call-analysis-fail/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="解决方案定位到报错的代码位置，双击函数，进入以后按一次F5，再返回就可以F5了。 参考解决IDA出现Decompilation failure: call analysis failed不可以F5的问题">
+<meta property="og:description" content="原因 原因有可能分两种：1、IDA无法识别出正确的调用约定(calling convention)；2、IDA无法识别出正确的参数个数。  解决方案方法1 - IDA自动分析定位到报错的代码位置，双击调用的函数，进入后按一次F5，再返回就可以F5了。 方法2 - 修改参数个数定位到报错的代码位置，鼠标点击调用的函数，按下Y键，修改参数个数。比如将(_JNIEnv *, int, int, int,">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-02-16T06:17:04.695Z">
-<meta property="article:modified_time" content="2021-08-01T03:47:14.112Z">
+<meta property="article:modified_time" content="2021-10-15T08:27:02.692Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="IDA">
 <meta name="twitter:card" content="summary">
@@ -238,8 +238,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>定位到报错的代码位置，双击函数，进入以后按一次F5，再返回就可以F5了。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiangshangbashaonian/article/details/82889924">解决IDA出现Decompilation failure: call analysis failed不可以F5的问题</a></p>
+        <h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><blockquote>
+<p>原因有可能分两种：<br>1、IDA无法识别出正确的调用约定(calling convention)；<br>2、IDA无法识别出正确的参数个数。</p>
+</blockquote>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="方法1-IDA自动分析"><a href="#方法1-IDA自动分析" class="headerlink" title="方法1 - IDA自动分析"></a>方法1 - IDA自动分析</h3><p>定位到报错的代码位置，双击调用的函数，进入后按一次F5，再返回就可以F5了。</p>
+<h3 id="方法2-修改参数个数"><a href="#方法2-修改参数个数" class="headerlink" title="方法2 - 修改参数个数"></a>方法2 - 修改参数个数</h3><p>定位到报错的代码位置，鼠标点击调用的函数，按下Y键，修改参数个数。<br>比如将<code>(_JNIEnv *, int, int, int, int, int, int, int);</code>改为<code>(_JNIEnv *, int, int, int);</code></p>
+<p>具体参数个数，需要根据函数调用约定及汇编代码确定（看它传入了几个参数）。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiangshangbashaonian/article/details/82889924">解决IDA出现Decompilation failure: call analysis failed不可以F5的问题</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/echo579/p/6564433.html">IDA反编译失败-call analysis failed</a></p>
 
     </div>
 
@@ -338,7 +343,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">2.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-IDA%E8%87%AA%E5%8A%A8%E5%88%86%E6%9E%90"><span class="nav-number">2.1.</span> <span class="nav-text">方法1 - IDA自动分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-%E4%BF%AE%E6%94%B9%E5%8F%82%E6%95%B0%E4%B8%AA%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">方法2 - 修改参数个数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
