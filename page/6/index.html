@@ -191,6 +191,72 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/11/caddy-reverse-proxy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/11/caddy-reverse-proxy/" class="post-title-link" itemprop="url">caddy配置反向代理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-11 02:49:43" itemprop="dateCreated datePublished" datetime="2020-04-11T02:49:43+08:00">2020-04-11</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h2 id="解析域名"><a href="#解析域名" class="headerlink" title="解析域名"></a>解析域名</h2><blockquote>
+<p>申请SSL证书前，请务必提前解析好域名记录(解析后最好等一会，以全球生效)</p>
+</blockquote>
+<h3 id="申请证书"><a href="#申请证书" class="headerlink" title="申请证书"></a>申请证书</h3><p>此处可使用<code>Caddy</code>自动申请的<code>Let&#39;s Encrypt</code>证书，个人使用的是<code>CloudFlare</code>的免费证书</p>
+<h3 id="编辑CaddyFile"><a href="#编辑CaddyFile" class="headerlink" title="编辑CaddyFile"></a>编辑CaddyFile</h3><h4 id="使用其他证书"><a href="#使用其他证书" class="headerlink" title="使用其他证书"></a>使用其他证书</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">https://bd.xxx.com &#123;</span><br><span class="line">gzip</span><br><span class="line">tls /root/xxx.crt /root/xxx.key</span><br><span class="line">proxy / https://www.baidu.com</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="使用自动申请的证书"><a href="#使用自动申请的证书" class="headerlink" title="使用自动申请的证书"></a>使用自动申请的证书</h4><p>把tls选项改为邮箱（似乎不加也行）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">https://bd.xxx.com &#123;</span><br><span class="line">gzip</span><br><span class="line">tls xxx@xxx.xx</span><br><span class="line">proxy / https://www.baidu.com</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="重启Caddy"><a href="#重启Caddy" class="headerlink" title="重启Caddy"></a>重启Caddy</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service caddy restart</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://51.ruyo.net/3461.html">利用 Caddy 轻松实现反向代理/镜像（支持自签SSL证书）</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/07/flipviewer-xpress-to-pdf/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -767,71 +833,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/11/06/assemble-own-riru-module/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/11/06/assemble-own-riru-module/" class="post-title-link" itemprop="url">编译自己的Riru模块</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-06 09:15:22" itemprop="dateCreated datePublished" datetime="2019-11-06T09:15:22+08:00">2019-11-06</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a target="_blank" rel="noopener" href="https://github.com/RikkaApps/Riru">Riru</a> + <a target="_blank" rel="noopener" href="https://github.com/ElderDrivers/EdXposed">EdXposed</a>是目前Android P及以上的一种Xposed解决方案。<br>Riru通过替换<code>libmemtrack.so</code>（会被Zygote加载的一个共享库）从而实现Zygote注入。<br>本文记录了笔者编译Riru模块的过程。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/11/06/assemble-own-riru-module/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -903,7 +904,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-count">116</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
