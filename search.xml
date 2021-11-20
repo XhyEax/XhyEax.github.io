@@ -741,7 +741,7 @@
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/lidabo/p/3597559.html">C++中怎么获取类的成员函数的函数指针？</a><br><a href="https://www.cnblogs.com/limedia/p/cxx_class_inner_poiner.html">C++ 类内函数指针的使用的使用</a></p>
 ]]></content>
       <tags>
-        <tag>C++</tag>
+        <tag>CPP</tag>
       </tags>
   </entry>
   <entry>
@@ -766,7 +766,7 @@
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/larryzeal/p/5664418.html">C++ 模板类友元之输出流操作符重载</a><br><a href="https://www.cnblogs.com/autosar/archive/2011/10/29/2228674.html">关于操作符的友元模版函数重载</a></p>
 ]]></content>
       <tags>
-        <tag>C++</tag>
+        <tag>CPP</tag>
       </tags>
   </entry>
   <entry>
@@ -776,8 +776,8 @@
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/kangyupl/article/details/90723526">VSCODE调试时在cygwin.S中发生段错误</a></p>
 ]]></content>
       <tags>
-        <tag>C++</tag>
         <tag>VSCode</tag>
+        <tag>CPP</tag>
       </tags>
   </entry>
   <entry>
@@ -789,7 +789,7 @@
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/testcs_dn/article/details/9903727">C#默认以管理员身份运行程序</a></p>
 ]]></content>
       <tags>
-        <tag>C#</tag>
+        <tag>CSharp</tag>
       </tags>
   </entry>
   <entry>
@@ -874,7 +874,7 @@
 <h3 id="查看日志"><a href="#查看日志" class="headerlink" title="查看日志"></a>查看日志</h3><p>点击游戏左下角<code>Logs</code>打开日志目录（Windows：<code>C:\Users\用户名\AppData\LocalLow\Acureus\Draw_Guess</code>）<br>其中<code>LastRoom.json</code>和<code>DAGHistory.log</code>即注入模块生成的日志文件。<br>前者保存上次游玩的房间数据（用于复制代码及快速加入），后者保存历史记录。</p>
 ]]></content>
       <tags>
-        <tag>游戏逆向</tag>
+        <tag>Mono</tag>
       </tags>
   </entry>
   <entry>
@@ -1851,7 +1851,6 @@
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/qq_44378358/article/details/103166981">取石头游戏</a></p>
 ]]></content>
       <tags>
-        <tag>动态规划</tag>
         <tag>OJ</tag>
       </tags>
   </entry>
@@ -1880,7 +1879,7 @@
 <h2 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h2><h3 id="stl-stack"><a href="#stl-stack" class="headerlink" title="stl stack"></a>stl stack</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stack&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> E&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Queue</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    stack&lt;E&gt; inbox;</span><br><span class="line">    stack&lt;E&gt; outbox;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">int</span> size = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">push_back</span><span class="params">(E it)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        inbox.<span class="built_in">push</span>(it);</span><br><span class="line">        size++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">E <span class="title">pop_front</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (outbox.<span class="built_in">empty</span>())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">while</span> (!inbox.<span class="built_in">empty</span>())</span><br><span class="line">            &#123;</span><br><span class="line">                E tmp = inbox.<span class="built_in">top</span>();</span><br><span class="line">                outbox.<span class="built_in">push</span>(tmp);</span><br><span class="line">                inbox.<span class="built_in">pop</span>();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        size--;</span><br><span class="line">        E tmp = outbox.<span class="built_in">top</span>();</span><br><span class="line">        outbox.<span class="built_in">pop</span>();</span><br><span class="line">        <span class="keyword">return</span> tmp;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Queue&lt;<span class="keyword">int</span>&gt; que;</span><br><span class="line">    <span class="comment">//push 01234</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        que.<span class="built_in">push_back</span>(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//pop 012</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; que.<span class="built_in">pop_front</span>() &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//push 78</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">7</span>; i &lt; <span class="number">9</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        que.<span class="built_in">push_back</span>(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//pop all left elements (3478)</span></span><br><span class="line">    <span class="keyword">int</span> len = que.size;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; que.<span class="built_in">pop_front</span>() &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="自实现Stack版本"><a href="#自实现Stack版本" class="headerlink" title="自实现Stack版本"></a>自实现Stack版本</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Linked Node</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> E&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	E data;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">Node</span>&lt;</span>E&gt; *next;</span><br><span class="line">	Node&lt;E&gt;()</span><br><span class="line">	&#123;</span><br><span class="line">		next = <span class="literal">NULL</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">Node</span>(E it, Node&lt;E&gt; *_next)</span><br><span class="line">	&#123;</span><br><span class="line">		data = it;</span><br><span class="line">		next = _next;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Linked Based Stack</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> E&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Stack</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Node&lt;E&gt; *head;</span><br><span class="line">	<span class="keyword">int</span> size;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		head = <span class="keyword">new</span> Node&lt;E&gt;;</span><br><span class="line">		size = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">Stack</span>()</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">init</span>();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> size == <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function">E <span class="title">top</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> head-&gt;data;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(E it)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		head = <span class="keyword">new</span> Node&lt;E&gt;(it, head);</span><br><span class="line">		size++;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function">E <span class="title">pop</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		E tmp = <span class="built_in">top</span>();</span><br><span class="line">		size--;</span><br><span class="line">		Node&lt;E&gt; *temphead = head;</span><br><span class="line">		head = head-&gt;next;</span><br><span class="line">		<span class="keyword">delete</span> temphead;</span><br><span class="line">		<span class="keyword">return</span> tmp;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Queue implement</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> E&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Queue</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Stack&lt;E&gt; inbox;</span><br><span class="line">	Stack&lt;E&gt; outbox;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">int</span> size = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">push_back</span><span class="params">(E it)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		inbox.<span class="built_in">push</span>(it);</span><br><span class="line">		size++;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function">E <span class="title">pop_front</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (outbox.<span class="built_in">empty</span>())</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">while</span> (!inbox.<span class="built_in">empty</span>())</span><br><span class="line">			&#123;</span><br><span class="line">				outbox.<span class="built_in">push</span>(inbox.<span class="built_in">pop</span>());</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		size--;</span><br><span class="line">		<span class="keyword">return</span> outbox.<span class="built_in">pop</span>();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Queue&lt;<span class="keyword">int</span>&gt; que;</span><br><span class="line">	<span class="comment">//push 01234</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		que.<span class="built_in">push_back</span>(i);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//pop 012</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; que.<span class="built_in">pop_front</span>() &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//push 78</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">7</span>; i &lt; <span class="number">9</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		que.<span class="built_in">push_back</span>(i);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//pop all left elements (3478)</span></span><br><span class="line">	<span class="keyword">int</span> len = que.size;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; que.<span class="built_in">pop_front</span>() &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
-        <tag>C++</tag>
+        <tag>CPP</tag>
       </tags>
   </entry>
   <entry>
@@ -1984,7 +1983,7 @@
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/zuiyinian/article/details/81174031">为什么要用 “ <strong>attribute</strong> ((<strong>packed</strong>)) ” 定义结构体</a><br><a href="https://blog.csdn.net/swj9099/article/details/96713277"><strong>attribute</strong> 用法</a></p>
 ]]></content>
       <tags>
-        <tag>C++</tag>
+        <tag>CPP</tag>
       </tags>
   </entry>
   <entry>
@@ -2023,8 +2022,8 @@
 <h3 id="1-tasks-json中使用make的情况"><a href="#1-tasks-json中使用make的情况" class="headerlink" title="1. tasks.json中使用make的情况"></a>1. tasks.json中使用make的情况</h3><p>在makefile中添加<code>-fexec-charset=GB2312</code><br>比如<a href="https://blog.xhyeax.com/2019/04/13/vscode-cpp-multiplefile/">上一篇博文</a>中的makefile，则在<code>CCOBJFLAG</code>后添加该参数，变为</p>
 <figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">CCOBJFLAG := <span class="variable">$(CCFLAG)</span> -c -fexec-charset=GB2312</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
-        <tag>C++</tag>
         <tag>VSCode</tag>
+        <tag>CPP</tag>
       </tags>
   </entry>
   <entry>
@@ -2047,8 +2046,8 @@
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/wzxlovesy/article/details/76708151">VS Code 配置 C/C++ 环境</a></p>
 ]]></content>
       <tags>
-        <tag>C++</tag>
         <tag>VSCode</tag>
+        <tag>CPP</tag>
       </tags>
   </entry>
   <entry>
