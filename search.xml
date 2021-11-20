@@ -3238,7 +3238,7 @@
   <entry>
     <title>Python gzip模块设置xfl和os标志</title>
     <url>/2021/11/12/python-gzip-os-mark/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用<code>gzip</code>模块，发现<code>Python 3.6</code>生成的<code>gzip Header</code>与<code>Java</code>不一致。查阅<code>gzip</code>结构及<code>Python 3.6</code>源码（<code>Lib/gzip.py</code>），发现不能设置<code>XFL</code>和<code>OS</code>标识。<br>查看<code>Python 3.9</code>源码，发现虽然加了<code>XFL</code>，但<code>OS</code>标识仍硬编码为<code>0xff</code>。最后只能自己手动patch了。</p>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用<code>gzip</code>模块，发现<code>Python 3.6</code>生成的<code>gzip Header</code>与<code>Java</code>不一致。查阅<code>gzip</code>结构及<code>Python 3.6</code>源码（<code>Lib/gzip.py</code>），发现不能设置<code>XFL</code>和<code>OS</code>标识。<br>查看<code>Python 3.9</code>源码，发现虽然加了<code>XFL</code>，但<code>OS</code>标识仍硬编码为<code>0xff</code>。最后还是得手动patch。</p>
 <span id="more"></span>
 <h2 id="Header格式"><a href="#Header格式" class="headerlink" title="Header格式"></a>Header格式</h2><p>详见<a href="https://www.rfc-editor.org/rfc/rfc1952.txt">RFC1952</a></p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">+---+---+---+---+---+---+---+---+---+---+</span><br><span class="line">|ID1|ID2|CM |FLG|     MTIME     |XFL|OS | (more--&gt;)</span><br><span class="line">+---+---+---+---+---+---+---+---+---+---+</span><br><span class="line"></span><br><span class="line">XFL (eXtra FLags)</span><br><span class="line">These flags are available for use by specific compression</span><br><span class="line">methods.  The &quot;deflate&quot; method (CM = 8) sets these flags as</span><br><span class="line">follows:</span><br><span class="line"></span><br><span class="line">XFL = 2 - compressor used maximum compression,</span><br><span class="line">        slowest algorithm</span><br><span class="line">XFL = 4 - compressor used fastest algorithm</span><br><span class="line"></span><br><span class="line">OS (Operating System)</span><br><span class="line">This identifies the type of file system on which compression</span><br><span class="line">took place.  This may be useful in determining end-of-line</span><br><span class="line">convention for text files.  The currently defined values are</span><br><span class="line">as follows:</span><br><span class="line">0 - FAT filesystem (MS-DOS, OS/2, NT/Win32)</span><br><span class="line">1 - Amiga</span><br><span class="line">2 - VMS (or OpenVMS)</span><br><span class="line">3 - Unix</span><br><span class="line">4 - VM/CMS</span><br><span class="line">5 - Atari TOS</span><br><span class="line">6 - HPFS filesystem (OS/2, NT)</span><br><span class="line">7 - Macintosh</span><br><span class="line">8 - Z-System</span><br><span class="line">9 - CP/M</span><br><span class="line">10 - TOPS-20</span><br><span class="line">11 - NTFS filesystem (NT)</span><br><span class="line">12 - QDOS</span><br><span class="line">13 - Acorn RISCOS</span><br><span class="line">255 - unknown</span><br></pre></td></tr></table></figure>
@@ -3250,6 +3250,61 @@
 ]]></content>
       <tags>
         <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Frida js调试环境搭建（VSCode + DevTools）</title>
+    <url>/2021/11/20/frida-script-debug-env-setup-vscode-devtools/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Why：兼容<code>JavaScript</code>、语法提示、调试功能</p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>系统：<code>Windows 10 20H2 x64</code><br>软件：<code>VS Code</code>、<code>Chrome Stable 96.0.4664.45</code>、<code>Node.js 14.17.4</code>、<code>Frida 15.1.11</code></p>
+<span id="more"></span>
+
+<h2 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h2><h3 id="克隆仓库并安装"><a href="#克隆仓库并安装" class="headerlink" title="克隆仓库并安装"></a>克隆仓库并安装</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/oleavr/frida-agent-example</span><br><span class="line">cd frida-agent-example/</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+<h3 id="编写脚本"><a href="#编写脚本" class="headerlink" title="编写脚本"></a>编写脚本</h3><p>编辑<code>index.ts</code>，改为：</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; log &#125; <span class="keyword">from</span> <span class="string">&quot;./logger&quot;</span>;</span><br><span class="line"></span><br><span class="line">rpc.exports = &#123;</span><br><span class="line">    <span class="attr">main</span>: main</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    log(<span class="string">&quot;Hello Frida Agent&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="开启实时编译"><a href="#开启实时编译" class="headerlink" title="开启实时编译"></a>开启实时编译</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm run watch</span><br></pre></td></tr></table></figure>
+<p>监听文件变化，自动编译到<code>_agent.js</code></p>
+<h3 id="代码提示"><a href="#代码提示" class="headerlink" title="代码提示"></a>代码提示</h3><p><code>VSCode</code>安装相关拓展即可</p>
+<p>PS：在<code>frida-agent-example</code>目录下直接创建js文件，也有代码提示</p>
+<h2 id="更新"><a href="#更新" class="headerlink" title="*更新"></a>*<strong>更新</strong></h2><p>建议使用<code>PyCharm</code>，见<a href="https://blog.xhyeax.com/2021/11/21/frida-script-debug-env-setup-pycharm/">Frida ts环境搭建（PyCharm）</a></p>
+<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><p>使用<code>spawn</code>或<code>attach</code>模式附加app，设置引擎为<code>v8</code>并开启调试模式</p>
+<h4 id="spawn"><a href="#spawn" class="headerlink" title="spawn"></a>spawn</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">frida -U --no-pause -f PackageName --debug --runtime=v8 -l _agent.js</span><br></pre></td></tr></table></figure>
+<h4 id="attach"><a href="#attach" class="headerlink" title="attach"></a>attach</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">frida -U AppName --debug --runtime=v8 -l _agent.js</span><br></pre></td></tr></table></figure>
+
+<p>开启成功会输出：<code>Chrome Inspector server listening on port 9229</code></p>
+<h3 id="DevTools附加"><a href="#DevTools附加" class="headerlink" title="DevTools附加"></a>DevTools附加</h3><p>使用谷歌内核浏览器打开<code>chrome://inspect</code>，点击<code>Open dedicated DevTools for Node</code>（或在任意页面，按下<code>F12</code>打开<code>DevTools</code>，点击左上角的<code>Node.js</code>图标）</p>
+<p>然后按下<code>Ctrl + P</code>，切换源文件。（或点击<code>来源</code>-<code>节点</code>，打开<code>Node.js</code>下的文件）</p>
+<p>PS：按<code>Esc</code>可切换抽屉栏控制台的显示</p>
+<h3 id="主动调用方法"><a href="#主动调用方法" class="headerlink" title="主动调用方法"></a>主动调用方法</h3><h4 id="TypeScript编译后"><a href="#TypeScript编译后" class="headerlink" title="TypeScript编译后"></a>TypeScript编译后</h4><p>如果是使用<code>frida-compile</code>生成的js文件，则需要将方法使用<code>rpc.exports</code>导出，然后使用<code>rpc.exports.方法名</code>，在<code>DevTools</code>的控制台中调用</p>
+<p>注意：在<code>Frida CLI</code>中无法调用</p>
+<h4 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h4><p>如果是自己编写的js脚本，只需要加上<code>--debug --runtime=v8</code>参数启动，在<code>DevTools</code>和<code>Frida CLI</code>中都可以直接调用方法</p>
+<h3 id="断点调试"><a href="#断点调试" class="headerlink" title="断点调试"></a>断点调试</h3><p>在<code>DevTools</code>中，给生成的最终文件<code>_agent.js</code>下断点即可，可配合主动调用触发断点</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://bbs.pediy.com/thread-265160.htm">FRIDA 使用经验交流分享-Android安全-看雪论坛-安全社区|安全招聘|bbs.pediy.com</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>VSCode</tag>
+        <tag>Frida</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Frida ts环境搭建（PyCharm）</title>
+    <url>/2021/11/20/frida-script-debug-env-setup-pycharm/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://blog.xhyeax.com/2021/11/20/frida-script-debug-env-setup-vscode-devtools/">前文</a>使用的是<code>VSCode</code>和<code>DevTools</code>，需要在两个应用间切换，且需要查找最终位置再下断点，比较麻烦。</p>
+<p>于是搭建<code>PyCharm</code>调试环境，可直接在原始文件（ts和js）下断点</p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>系统：<code>Windows 10 20H2 x64</code><br>软件：<code>PyCharm Professional 2021.2.3</code>、<code>Node.js 14.17.4</code>、<code>Frida 15.1.11</code></p>
+<span id="more"></span>
+
+<h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><p>准备步骤同<a href="https://blog.xhyeax.com/2021/11/20/frida-script-debug-env-setup-vscode-devtools/">前文</a></p>
+<h3 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h3><p>按<code>Ctrl+Alt+S</code>打开插件页面，搜索并安装 <code>Node.js</code> 插件</p>
+<h3 id="添加配置"><a href="#添加配置" class="headerlink" title="添加配置"></a>添加配置</h3><p>添加调试器配置<code>Attaching to Node.js/Chrome</code>，配置默认即可，勾选自动重连</p>
+<p>PS：旧版本<code>Frida</code>可能需要选择<code>Node.js &lt; 8 started with --debug</code></p>
+<h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><p>添加<code>--debug --runtime=v8</code>启动参数，附加到app</p>
+<h3 id="下断点附加调试"><a href="#下断点附加调试" class="headerlink" title="下断点附加调试"></a>下断点附加调试</h3><p>在原始文件下断点调试即可，主动调用同理，使用<code>rpc.exports</code></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>Frida</tag>
       </tags>
   </entry>
 </search>
