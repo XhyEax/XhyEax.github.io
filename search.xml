@@ -3265,19 +3265,19 @@
 <p>监听文件变化，自动编译到<code>_agent.js</code></p>
 <h3 id="代码提示"><a href="#代码提示" class="headerlink" title="代码提示"></a>代码提示</h3><p><code>VSCode</code>安装相关拓展即可</p>
 <p>PS：在<code>frida-agent-example</code>目录下直接创建js文件，也有代码提示</p>
-<h2 id="更新"><a href="#更新" class="headerlink" title="*更新"></a>*<strong>更新</strong></h2><p>建议使用<code>PyCharm</code>，见<a href="https://blog.xhyeax.com/2021/11/21/frida-script-debug-env-setup-pycharm/">Frida ts环境搭建（PyCharm）</a></p>
+<h2 id="更新"><a href="#更新" class="headerlink" title="*更新"></a>*<strong>更新</strong></h2><p>建议使用<code>PyCharm</code>，可直接在源文件下断点，见<a href="https://blog.xhyeax.com/2021/11/21/frida-script-debug-env-setup-pycharm/">Frida ts环境搭建（PyCharm）</a></p>
 <h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><p>使用<code>spawn</code>或<code>attach</code>模式附加app，设置引擎为<code>v8</code>并开启调试模式</p>
 <h4 id="spawn"><a href="#spawn" class="headerlink" title="spawn"></a>spawn</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">frida -U --no-pause -f PackageName --debug --runtime=v8 -l _agent.js</span><br></pre></td></tr></table></figure>
 <h4 id="attach"><a href="#attach" class="headerlink" title="attach"></a>attach</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">frida -U AppName --debug --runtime=v8 -l _agent.js</span><br></pre></td></tr></table></figure>
 
 <p>开启成功会输出：<code>Chrome Inspector server listening on port 9229</code></p>
-<h3 id="DevTools附加"><a href="#DevTools附加" class="headerlink" title="DevTools附加"></a>DevTools附加</h3><p>使用谷歌内核浏览器打开<code>chrome://inspect</code>，点击<code>Open dedicated DevTools for Node</code>（或在任意页面，按下<code>F12</code>打开<code>DevTools</code>，点击左上角的<code>Node.js</code>图标）</p>
+<h3 id="DevTools附加"><a href="#DevTools附加" class="headerlink" title="DevTools附加"></a>DevTools附加</h3><p>使用谷歌内核浏览器，在任意页面，按下<code>F12</code>打开<code>DevTools</code>，点击左上角的<code>Node.js</code>图标（或打开<code>chrome://inspect</code>，点击<code>Open dedicated DevTools for Node</code>）</p>
 <p>然后按下<code>Ctrl + P</code>，切换源文件。（或点击<code>来源</code>-<code>节点</code>，打开<code>Node.js</code>下的文件）</p>
 <p>PS：按<code>Esc</code>可切换抽屉栏控制台的显示</p>
-<h3 id="主动调用方法"><a href="#主动调用方法" class="headerlink" title="主动调用方法"></a>主动调用方法</h3><h4 id="TypeScript编译后"><a href="#TypeScript编译后" class="headerlink" title="TypeScript编译后"></a>TypeScript编译后</h4><p>如果是使用<code>frida-compile</code>生成的js文件，则需要将方法使用<code>rpc.exports</code>导出，然后使用<code>rpc.exports.方法名</code>，在<code>DevTools</code>的控制台中调用</p>
-<p>注意：在<code>Frida CLI</code>中无法调用</p>
-<h4 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h4><p>如果是自己编写的js脚本，只需要加上<code>--debug --runtime=v8</code>参数启动，在<code>DevTools</code>和<code>Frida CLI</code>中都可以直接调用方法</p>
-<h3 id="断点调试"><a href="#断点调试" class="headerlink" title="断点调试"></a>断点调试</h3><p>在<code>DevTools</code>中，给生成的最终文件<code>_agent.js</code>下断点即可，可配合主动调用触发断点</p>
+<h3 id="主动调用方法"><a href="#主动调用方法" class="headerlink" title="主动调用方法"></a>主动调用方法</h3><h4 id="TypeScript"><a href="#TypeScript" class="headerlink" title="TypeScript"></a>TypeScript</h4><p>如果是使用<code>frida-compile</code>生成的js文件，则需要使用<code>rpc.exports</code>将方法导出，然后通过<code>rpc.exports.方法名</code>调用</p>
+<p>注意：必须在<code>DevTools</code>的控制台中执行，在<code>Frida CLI</code>中找不到方法（可能是bug）</p>
+<h4 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h4><p>如果使用原始的js脚本，只需要加上<code>--debug --runtime=v8</code>参数启动，在<code>DevTools</code>和<code>Frida CLI</code>中都可以直接通过函数名调用（默认导出）</p>
+<h3 id="断点调试"><a href="#断点调试" class="headerlink" title="断点调试"></a>断点调试</h3><p>打开<code>DevTools</code>，在<strong>最终文件</strong>（如<code>_agent.js</code>）下断点即可，可配合主动调用触发断点</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://bbs.pediy.com/thread-265160.htm">FRIDA 使用经验交流分享-Android安全-看雪论坛-安全社区|安全招聘|bbs.pediy.com</a></p>
 ]]></content>
       <tags>
@@ -3299,7 +3299,8 @@
 <h3 id="添加配置"><a href="#添加配置" class="headerlink" title="添加配置"></a>添加配置</h3><p>添加调试器配置<code>Attaching to Node.js/Chrome</code>，配置默认即可，勾选自动重连</p>
 <p>PS：旧版本<code>Frida</code>可能需要选择<code>Node.js &lt; 8 started with --debug</code></p>
 <h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><p>添加<code>--debug --runtime=v8</code>启动参数，附加到app</p>
-<h3 id="下断点附加调试"><a href="#下断点附加调试" class="headerlink" title="下断点附加调试"></a>下断点附加调试</h3><p>在原始文件下断点调试即可，主动调用同理，使用<code>rpc.exports</code></p>
+<h3 id="断点调试"><a href="#断点调试" class="headerlink" title="断点调试"></a>断点调试</h3><p>在<strong>原始文件</strong>下断点调试即可，主动调用同理，使用<code>rpc.exports</code></p>
+<p>注意：如果js脚本并未使用<code>frida-compile</code>编译成目标文件，则需要使用<code>DevTools</code>调试，无法使用<code>PyCharm</code>。</p>
 ]]></content>
       <tags>
         <tag>Android</tag>
