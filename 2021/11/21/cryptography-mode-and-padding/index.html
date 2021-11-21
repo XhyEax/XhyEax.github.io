@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="概述通过维基百科和博客，学习了对称加密的工作模式和填充方式，记录一下。 图源：一文搞懂对称加密：加密算法、工作模式、填充方式、代码实现 工作模式ECB最简单的加密模式即为电子密码本（Electronic codebook，ECB）模式。需要加密的消息按照块密码的块大小被分为数个块，并对每个块进行独立加密。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对称加密 工作模式 填充方式">
+<meta property="og:url" content="https://blog.xhyeax.com/2021/11/21/cryptography-mode-and-padding/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="概述通过维基百科和博客，学习了对称加密的工作模式和填充方式，记录一下。 图源：一文搞懂对称加密：加密算法、工作模式、填充方式、代码实现 工作模式ECB最简单的加密模式即为电子密码本（Electronic codebook，ECB）模式。需要加密的消息按照块密码的块大小被分为数个块，并对每个块进行独立加密。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-ecb.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-cbc.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-cfb.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-ofb.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-ctr.png">
+<meta property="article:published_time" content="2021-11-21T03:08:59.000Z">
+<meta property="article:modified_time" content="2021-11-21T15:08:50.066Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="Cryptography">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-ecb.png">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2021/11/21/cryptography-mode-and-padding/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>对称加密 工作模式 填充方式 | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/11/21/cryptography-mode-and-padding/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          对称加密 工作模式 填充方式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-21 11:08:59" itemprop="dateCreated datePublished" datetime="2021-11-21T11:08:59+08:00">2021-11-21</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通过维基百科和博客，学习了对称加密的工作模式和填充方式，记录一下。</p>
+<p>图源：<a target="_blank" rel="noopener" href="https://blog.csdn.net/gozhuyinglong/article/details/121200733">一文搞懂对称加密：加密算法、工作模式、填充方式、代码实现</a></p>
+<h2 id="工作模式"><a href="#工作模式" class="headerlink" title="工作模式"></a>工作模式</h2><h3 id="ECB"><a href="#ECB" class="headerlink" title="ECB"></a>ECB</h3><p>最简单的加密模式即为电子密码本（Electronic codebook，ECB）模式。需要加密的消息按照块密码的块大小被分为数个块，并对每个块进行独立加密。</p>
+<span id="more"></span>
+<p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-ecb.png"><br>本方法的缺点在于同样的明文块会被加密成相同的密文块；因此，它不能很好的隐藏数据模式。</p>
+<h3 id="CBC"><a href="#CBC" class="headerlink" title="CBC"></a>CBC</h3><p>1976年，IBM发明了密码分组链接（CBC，Cipher-block chaining）模式。在CBC模式中，每个明文块先与前一个密文块进行异或后，再进行加密。在这种方法中，每个密文块都依赖于它前面的所有明文块。同时，为了保证每条消息的唯一性，在第一个块中需要使用初始化向量。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-cbc.png"><br>CBC是最为常用的工作模式。它的主要缺点在于加密过程是串行的，无法被并行化，而且消息必须被填充到块大小的整数倍。解决后一个问题的一种方法是利用密文窃取。</p>
+<p>注意在加密时，明文中的微小改变会导致其后的全部密文块发生改变，而在解密时，从两个邻接的密文块中即可得到一个明文块。因此，解密过程可以被并行化，而解密时，密文中一位的改变只会导致其对应的明文块完全改变和下一个明文块中对应位发生改变，不会影响到其它明文的内容。</p>
+<h2 id="PCBC"><a href="#PCBC" class="headerlink" title="PCBC"></a>PCBC</h2><p>填充密码块链接（PCBC，Propagating cipher-block chaining）或称为明文密码块链接（Plaintext cipher-block chaining，是一种可以使密文中的微小更改在解密时导致明文大部分错误的模式，并在加密的时候也具有同样的特性。</p>
+<p>PCBC主要用于Kerberos v4和WASTE中，而在其它场合的应用较少。对于使用PCBC加密的消息，互换两个邻接的密文块不会对后续块的解密造成影响。正因为这个特性，Kerberos v5没有使用PCBC。</p>
+<h2 id="CFB"><a href="#CFB" class="headerlink" title="CFB"></a>CFB</h2><p>密文反馈（CFB，Cipher feedback）模式类似于CBC，可以将块密码变为自同步的流密码；工作过程亦非常相似。该模式首先将前一个密文分组进行加密，再与当前明文分组进行XOR运算，来生成密文分组。同样CFB模式也需要一个IV。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-cfb.png"></p>
+<h2 id="OFB"><a href="#OFB" class="headerlink" title="OFB"></a>OFB</h2><p>输出反馈模式（Output feedback, OFB）可以将块密码变成同步的流密码。它产生密钥流的块，然后将其与明文块进行异或，得到密文。与其它流密码一样，密文中一个位的翻转会使明文中同样位置的位也产生翻转。这种特性使得许多错误校正码，例如奇偶校验位，即使在加密前计算，而在加密后进行校验也可以得出正确结果。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-ofb.png"></p>
+<h2 id="CTR"><a href="#CTR" class="headerlink" title="CTR"></a>CTR</h2><p>注意：CTR模式（Counter mode，CM）也被称为ICM模式（Integer Counter Mode，整数计数模式）和SIC模式（Segmented Integer Counter）。<br>与OFB相似，CTR将块密码变为流密码。它通过递增一个加密计数器以产生连续的密钥流，其中，计数器可以是任意保证长时间不产生重复输出的函数，但使用一个普通的计数器是最简单和最常见的做法。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-ctr.png"></p>
+<p>使用简单的、定义好的输入函数是有争议的：批评者认为它“有意的将密码系统暴露在已知的、系统的输入会造成不必要的风险”。目前，CTR已经被广泛的使用了，由输入函数造成的问题被认为是使用的块密码的缺陷，而非CTR模式本身的弱点。</p>
+<h2 id="填充"><a href="#填充" class="headerlink" title="填充"></a>填充</h2><h2 id="为什么需要填充"><a href="#为什么需要填充" class="headerlink" title="为什么需要填充"></a>为什么需要填充</h2><p>块密码只能对确定长度的数据块进行处理，而消息的长度通常是可变的。因此部分模式（即ECB和CBC）需要最后一块在加密前进行填充。</p>
+<p>CFB，OFB和CTR模式不需要对长度不为密码块大小整数倍的消息进行特别的处理。因为这些模式是通过对块密码的输出与明文进行异或工作的。最后一个明文块（可能是不完整的）与密钥流块的前几个字节异或后，产生了与该明文块大小相同的密文块。流密码的这个特性使得它们可以应用在需要密文和明文数据长度严格相等的场合，也可以应用在以流形式传输数据而不便于进行填充的场合。</p>
+<h3 id="位填充（Bit-padding）"><a href="#位填充（Bit-padding）" class="headerlink" title="位填充（Bit padding）"></a>位填充（Bit padding）</h3><p>第一位为<code>1</code>，补<code>0</code>至块大小。</p>
+<h3 id="字节填充（Byte-padding）"><a href="#字节填充（Byte-padding）" class="headerlink" title="字节填充（Byte padding）"></a>字节填充（Byte padding）</h3><h4 id="ANSI-X9-23"><a href="#ANSI-X9-23" class="headerlink" title="ANSI X9.23"></a>ANSI X9.23</h4><p>最后一个字节为<code>需要填充的字节长度值</code>，其余位填充随机数（通常填充<code>00</code>）</p>
+<p>例：下例中，块大小为 8 字节，需要填充 4 字节（以十六进制表示）。</p>
+<blockquote>
+<p>… | DD DD DD DD DD DD DD DD | DD DD DD DD 00 00 00 04 |</p>
+</blockquote>
+<h4 id="ISO-10126"><a href="#ISO-10126" class="headerlink" title="ISO 10126"></a>ISO 10126</h4><p>最后一个字节为<code>需要填充的字节长度值</code>，其余位填充随机数：</p>
+<blockquote>
+<p>… | DD DD DD DD DD DD DD DD | DD DD DD DD 81 A6 23 04 |</p>
+</blockquote>
+<h4 id="PKCS-5-和-PKCS-7"><a href="#PKCS-5-和-PKCS-7" class="headerlink" title="PKCS#5 和 PKCS#7"></a>PKCS#5 和 PKCS#7</h4><p><code>PKCS#7</code>并未规定块大小。<code>PKCS#5</code>是<code>PKCS#7</code>的子集，其块大小固定为8字节（64位）</p>
+<p>所有字节均为<code>需要填充的字节长度值</code>：</p>
+<blockquote>
+<p>… | DD DD DD DD DD DD DD DD | DD DD DD DD 04 04 04 04 |</p>
+</blockquote>
+<p>PS：由于AES的块大小是128，所以虽然在Java中是<code>AES/CBC/PKCS5Padding</code>，但用的实际上是<code>PKCS#7</code></p>
+<h5 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h5><p>输入数据本身已对齐时，也需要填充一块长度为块大小的数据。保证解密时能够区分边界（识别出padding并去除）。</p>
+<h4 id="ISO-IEC-7816-4"><a href="#ISO-IEC-7816-4" class="headerlink" title="ISO/IEC 7816-4"></a>ISO/IEC 7816-4</h4><p>类似于位填充，第一个字节是<code>80</code>，补<code>00</code>至块大小。</p>
+<p>ISO/IEC 7816-4 是包含文件系统的智能卡的通信标准，本身不包含任何密码规范。</p>
+<h4 id="Zero-padding"><a href="#Zero-padding" class="headerlink" title="Zero padding"></a>Zero padding</h4><p>未对齐填充<code>00</code>，对齐则不填充</p>
+<h4 id="None"><a href="#None" class="headerlink" title="None"></a>None</h4><p>不填充</p>
+<p>适合C语言中的字符串（末尾有<code>00</code>），可以区分边界。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-hans/%E5%88%86%E7%BB%84%E5%AF%86%E7%A0%81%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F">分组密码工作模式</a><br><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-hans/%E5%A1%AB%E5%85%85_(%E5%AF%86%E7%A0%81%E5%AD%A6)">填充_(密码学)</a><br><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Padding_(cryptography)">Padding (cryptography)</a></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Cryptography/" rel="tag"># Cryptography</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/11/21/npm-package-json-scripts-args/" rel="prev" title="npm package.json scripts 传递参数">
+      <i class="fa fa-chevron-left"></i> npm package.json scripts 传递参数
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">工作模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ECB"><span class="nav-number">2.1.</span> <span class="nav-text">ECB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CBC"><span class="nav-number">2.2.</span> <span class="nav-text">CBC</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PCBC"><span class="nav-number">3.</span> <span class="nav-text">PCBC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CFB"><span class="nav-number">4.</span> <span class="nav-text">CFB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OFB"><span class="nav-number">5.</span> <span class="nav-text">OFB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CTR"><span class="nav-number">6.</span> <span class="nav-text">CTR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A1%AB%E5%85%85"><span class="nav-number">7.</span> <span class="nav-text">填充</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%A1%AB%E5%85%85"><span class="nav-number">8.</span> <span class="nav-text">为什么需要填充</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%8D%E5%A1%AB%E5%85%85%EF%BC%88Bit-padding%EF%BC%89"><span class="nav-number">8.1.</span> <span class="nav-text">位填充（Bit padding）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E5%A1%AB%E5%85%85%EF%BC%88Byte-padding%EF%BC%89"><span class="nav-number">8.2.</span> <span class="nav-text">字节填充（Byte padding）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ANSI-X9-23"><span class="nav-number">8.2.1.</span> <span class="nav-text">ANSI X9.23</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ISO-10126"><span class="nav-number">8.2.2.</span> <span class="nav-text">ISO 10126</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PKCS-5-%E5%92%8C-PKCS-7"><span class="nav-number">8.2.3.</span> <span class="nav-text">PKCS#5 和 PKCS#7</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">8.2.3.1.</span> <span class="nav-text">注意</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ISO-IEC-7816-4"><span class="nav-number">8.2.4.</span> <span class="nav-text">ISO&#x2F;IEC 7816-4</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Zero-padding"><span class="nav-number">8.2.5.</span> <span class="nav-text">Zero padding</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#None"><span class="nav-number">8.2.6.</span> <span class="nav-text">None</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">9.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">Blog of XhyEax</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">120</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

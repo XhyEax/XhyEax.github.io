@@ -1499,17 +1499,26 @@
     <title>Frida ts环境搭建（PyCharm）</title>
     <url>/2021/11/20/frida-script-debug-env-setup-pycharm/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://blog.xhyeax.com/2021/11/20/frida-script-debug-env-setup-vscode-devtools/">前文</a>使用的是<code>VSCode</code>和<code>DevTools</code>，需要在两个应用间切换，且需要查找最终位置再下断点，比较麻烦。</p>
-<p>于是搭建<code>PyCharm</code>调试环境，可直接在原始文件（ts和js）下断点</p>
+<p>于是搭建<code>PyCharm</code>调试环境，可直接在源文件（ts和js）下断点</p>
 <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>系统：<code>Windows 10 20H2 x64</code><br>软件：<code>PyCharm Professional 2021.2.3</code>、<code>Node.js 14.17.4</code>、<code>Frida 15.1.11</code></p>
 <span id="more"></span>
 
-<h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><p>准备步骤同<a href="https://blog.xhyeax.com/2021/11/20/frida-script-debug-env-setup-vscode-devtools/">前文</a></p>
+<h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><h3 id="克隆仓库并安装"><a href="#克隆仓库并安装" class="headerlink" title="克隆仓库并安装"></a>克隆仓库并安装</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/XhyEax/frida-script-agent</span><br><span class="line"><span class="built_in">cd</span> frida-script-agent/</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+<p>使用<code>PyCharm</code>打开该目录</p>
 <h3 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h3><p>按<code>Ctrl+Alt+S</code>打开插件页面，搜索并安装 <code>Node.js</code> 插件</p>
-<h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><p>添加<code>--debug --runtime=v8</code>启动参数，附加到app</p>
+<h3 id="编写脚本"><a href="#编写脚本" class="headerlink" title="编写脚本"></a>编写脚本</h3><p>编辑<code>index.ts</code>，可使用<code>import</code>引入其他模块</p>
+<h3 id="开启实时编译（推荐）"><a href="#开启实时编译（推荐）" class="headerlink" title="开启实时编译（推荐）"></a>开启实时编译（推荐）</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run watch</span><br></pre></td></tr></table></figure>
+<p>监听文件变化，自动编译到<code>_agent.js</code></p>
+<h3 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h3><h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><h4 id="方法一-npm-scripts（推荐）"><a href="#方法一-npm-scripts（推荐）" class="headerlink" title="方法一 npm scripts（推荐）"></a>方法一 npm scripts（推荐）</h4><h5 id="spawn"><a href="#spawn" class="headerlink" title="spawn"></a>spawn</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run spawn --pkgname=com.android.settings</span><br></pre></td></tr></table></figure>
+<h5 id="attach"><a href="#attach" class="headerlink" title="attach"></a>attach</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run attach --appname=设置</span><br></pre></td></tr></table></figure>
+
+<p>也可添加为<code>PyCharm</code>启动配置，指定<code>Arguments</code></p>
+<h4 id="方法二-命令行"><a href="#方法二-命令行" class="headerlink" title="方法二 命令行"></a>方法二 命令行</h4><p>添加<code>--debug --runtime=v8</code>启动参数，附加到app</p>
+<p>成功后会在<code>Frida CLI</code>中输出：<code>Chrome Inspector server listening on port 9229</code></p>
 <h3 id="添加配置"><a href="#添加配置" class="headerlink" title="添加配置"></a>添加配置</h3><p>添加调试器配置<code>Attaching to Node.js/Chrome</code>，配置默认即可，可勾选自动重连</p>
 <p>PS：旧版本<code>Frida</code>可能需要选择<code>Node.js &lt; 8 started with --debug</code></p>
-<h3 id="附加"><a href="#附加" class="headerlink" title="附加"></a>附加</h3><p>运行新增的调试器配置，成功的话可以在<code>Scripts</code>看到相应的脚本文件</p>
-<h3 id="断点调试"><a href="#断点调试" class="headerlink" title="断点调试"></a>断点调试</h3><p>在<strong>原始文件</strong>下断点调试即可，主动调用同理，使用<code>rpc.exports</code></p>
+<h3 id="附加"><a href="#附加" class="headerlink" title="附加"></a>附加</h3><p>运行新增的调试器配置，连接成功后，可以在<code>Scripts</code>看到相应的脚本文件</p>
+<h3 id="断点调试"><a href="#断点调试" class="headerlink" title="断点调试"></a>断点调试</h3><p>在<strong>源文件</strong>下断点调试即可，主动调用同前文，使用<code>rpc.exports</code>导出函数</p>
 <p>注意：如果js脚本并未使用<code>frida-compile</code>编译成目标文件，则需要使用<code>DevTools</code>调试，无法使用<code>PyCharm</code>。</p>
 ]]></content>
       <tags>
@@ -1525,19 +1534,21 @@
 <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>系统：<code>Windows 10 20H2 x64</code><br>软件：<code>VS Code</code>、<code>Chrome Stable 96.0.4664.45</code>、<code>Node.js 14.17.4</code>、<code>Frida 15.1.11</code></p>
 <span id="more"></span>
 
-<h2 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h2><h3 id="克隆仓库并安装"><a href="#克隆仓库并安装" class="headerlink" title="克隆仓库并安装"></a>克隆仓库并安装</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/oleavr/frida-agent-example</span><br><span class="line">cd frida-agent-example/</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
-<h3 id="编写脚本"><a href="#编写脚本" class="headerlink" title="编写脚本"></a>编写脚本</h3><p>编辑<code>index.ts</code>，改为：</p>
-<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123;log&#125; <span class="keyword">from</span> <span class="string">&quot;./logger&quot;</span>;</span><br><span class="line"></span><br><span class="line">rpc.exports = &#123;</span><br><span class="line">    <span class="attr">main</span>: main</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    log(<span class="string">&quot;Hello Frida Agent&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<h2 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h2><h3 id="克隆仓库并安装"><a href="#克隆仓库并安装" class="headerlink" title="克隆仓库并安装"></a>克隆仓库并安装</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/XhyEax/frida-script-agent</span><br><span class="line"><span class="built_in">cd</span> frida-script-agent/</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+<h3 id="编写脚本"><a href="#编写脚本" class="headerlink" title="编写脚本"></a>编写脚本</h3><p>编辑<code>index.ts</code>，可使用<code>import</code>引入其他模块</p>
 <p>注意：日志都是在<code>Frida CLI</code>中输出，可通过<code>-o</code>参数指定日志文件</p>
-<h3 id="开启实时编译"><a href="#开启实时编译" class="headerlink" title="开启实时编译"></a>开启实时编译</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm run watch</span><br></pre></td></tr></table></figure>
+<h3 id="开启实时编译（推荐）"><a href="#开启实时编译（推荐）" class="headerlink" title="开启实时编译（推荐）"></a>开启实时编译（推荐）</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run watch</span><br></pre></td></tr></table></figure>
 <p>监听文件变化，自动编译到<code>_agent.js</code></p>
-<h3 id="代码提示"><a href="#代码提示" class="headerlink" title="代码提示"></a>代码提示</h3><p><code>VSCode</code>安装相关拓展即可</p>
-<p>PS：在<code>frida-agent-example</code>目录下直接创建js文件，也有代码提示</p>
+<h3 id="代码提示"><a href="#代码提示" class="headerlink" title="代码提示"></a>代码提示</h3><p><code>VSCode</code>安装<code>Node.js</code>和<code>TypeScript</code>相关拓展即可</p>
+<p>PS：在<code>frida-script-agent</code>目录下直接创建js文件，也有代码提示</p>
 <h2 id="更新"><a href="#更新" class="headerlink" title="*更新"></a>*<strong>更新</strong></h2><p>建议使用<code>PyCharm</code>，可直接在源文件下断点，见<a href="https://blog.xhyeax.com/2021/11/21/frida-script-debug-env-setup-pycharm/">Frida ts环境搭建（PyCharm）</a></p>
-<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><p>使用<code>spawn</code>或<code>attach</code>模式附加app，设置引擎为<code>v8</code>并开启调试模式</p>
-<h4 id="spawn"><a href="#spawn" class="headerlink" title="spawn"></a>spawn</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">frida -U --debug --runtime=v8 -l _agent.js -o out.log --no-pause -f pkgname</span><br></pre></td></tr></table></figure>
-<h4 id="attach"><a href="#attach" class="headerlink" title="attach"></a>attach</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">frida -U --debug --runtime=v8 -l _agent.js -o out.log appname</span><br></pre></td></tr></table></figure>
+<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><p>使用<code>spawn</code>或<code>attach</code>模式附加app，设置引擎为<code>v8</code>并开启调试模式。</p>
+<h4 id="方法一-使用npm-scripts（推荐）"><a href="#方法一-使用npm-scripts（推荐）" class="headerlink" title="方法一 使用npm scripts（推荐）"></a>方法一 使用npm scripts（推荐）</h4><h5 id="spawn"><a href="#spawn" class="headerlink" title="spawn"></a>spawn</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run spawn --pkgname=com.android.settings</span><br></pre></td></tr></table></figure>
+<h5 id="attach"><a href="#attach" class="headerlink" title="attach"></a>attach</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run attach --appname=设置</span><br></pre></td></tr></table></figure>
+
+<p>也可将上述命令添加到<code>VSCode</code>启动配置</p>
+<h4 id="方法二-命令行"><a href="#方法二-命令行" class="headerlink" title="方法二 命令行"></a>方法二 命令行</h4><h5 id="spawn-1"><a href="#spawn-1" class="headerlink" title="spawn"></a>spawn</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">frida -U --debug --runtime=v8 -l _agent.js -o out.log --no-pause -f pkgname</span><br></pre></td></tr></table></figure>
+<h5 id="attach-1"><a href="#attach-1" class="headerlink" title="attach"></a>attach</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">frida -U --debug --runtime=v8 -l _agent.js -o out.log appname</span><br></pre></td></tr></table></figure>
 
 <p>成功后会在<code>Frida CLI</code>中输出：<code>Chrome Inspector server listening on port 9229</code></p>
 <h3 id="DevTools附加"><a href="#DevTools附加" class="headerlink" title="DevTools附加"></a>DevTools附加</h3><p>使用谷歌内核浏览器，在任意页面，按下<code>F12</code>打开<code>DevTools</code>，点击左上角的<code>Node.js</code>图标（或打开<code>chrome://inspect</code>，点击<code>Open dedicated DevTools for Node</code>）</p>
@@ -3335,6 +3346,52 @@
 ]]></content>
       <tags>
         <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>对称加密 工作模式 填充方式</title>
+    <url>/2021/11/21/cryptography-mode-and-padding/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通过维基百科和博客，学习了对称加密的工作模式和填充方式，记录一下。</p>
+<p>图源：<a href="https://blog.csdn.net/gozhuyinglong/article/details/121200733">一文搞懂对称加密：加密算法、工作模式、填充方式、代码实现</a></p>
+<h2 id="工作模式"><a href="#工作模式" class="headerlink" title="工作模式"></a>工作模式</h2><h3 id="ECB"><a href="#ECB" class="headerlink" title="ECB"></a>ECB</h3><p>最简单的加密模式即为电子密码本（Electronic codebook，ECB）模式。需要加密的消息按照块密码的块大小被分为数个块，并对每个块进行独立加密。</p>
+<span id="more"></span>
+<p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-ecb.png"><br>本方法的缺点在于同样的明文块会被加密成相同的密文块；因此，它不能很好的隐藏数据模式。</p>
+<h3 id="CBC"><a href="#CBC" class="headerlink" title="CBC"></a>CBC</h3><p>1976年，IBM发明了密码分组链接（CBC，Cipher-block chaining）模式。在CBC模式中，每个明文块先与前一个密文块进行异或后，再进行加密。在这种方法中，每个密文块都依赖于它前面的所有明文块。同时，为了保证每条消息的唯一性，在第一个块中需要使用初始化向量。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-cbc.png"><br>CBC是最为常用的工作模式。它的主要缺点在于加密过程是串行的，无法被并行化，而且消息必须被填充到块大小的整数倍。解决后一个问题的一种方法是利用密文窃取。</p>
+<p>注意在加密时，明文中的微小改变会导致其后的全部密文块发生改变，而在解密时，从两个邻接的密文块中即可得到一个明文块。因此，解密过程可以被并行化，而解密时，密文中一位的改变只会导致其对应的明文块完全改变和下一个明文块中对应位发生改变，不会影响到其它明文的内容。</p>
+<h2 id="PCBC"><a href="#PCBC" class="headerlink" title="PCBC"></a>PCBC</h2><p>填充密码块链接（PCBC，Propagating cipher-block chaining）或称为明文密码块链接（Plaintext cipher-block chaining，是一种可以使密文中的微小更改在解密时导致明文大部分错误的模式，并在加密的时候也具有同样的特性。</p>
+<p>PCBC主要用于Kerberos v4和WASTE中，而在其它场合的应用较少。对于使用PCBC加密的消息，互换两个邻接的密文块不会对后续块的解密造成影响。正因为这个特性，Kerberos v5没有使用PCBC。</p>
+<h2 id="CFB"><a href="#CFB" class="headerlink" title="CFB"></a>CFB</h2><p>密文反馈（CFB，Cipher feedback）模式类似于CBC，可以将块密码变为自同步的流密码；工作过程亦非常相似。该模式首先将前一个密文分组进行加密，再与当前明文分组进行XOR运算，来生成密文分组。同样CFB模式也需要一个IV。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-cfb.png"></p>
+<h2 id="OFB"><a href="#OFB" class="headerlink" title="OFB"></a>OFB</h2><p>输出反馈模式（Output feedback, OFB）可以将块密码变成同步的流密码。它产生密钥流的块，然后将其与明文块进行异或，得到密文。与其它流密码一样，密文中一个位的翻转会使明文中同样位置的位也产生翻转。这种特性使得许多错误校正码，例如奇偶校验位，即使在加密前计算，而在加密后进行校验也可以得出正确结果。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-ofb.png"></p>
+<h2 id="CTR"><a href="#CTR" class="headerlink" title="CTR"></a>CTR</h2><p>注意：CTR模式（Counter mode，CM）也被称为ICM模式（Integer Counter Mode，整数计数模式）和SIC模式（Segmented Integer Counter）。<br>与OFB相似，CTR将块密码变为流密码。它通过递增一个加密计数器以产生连续的密钥流，其中，计数器可以是任意保证长时间不产生重复输出的函数，但使用一个普通的计数器是最简单和最常见的做法。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/crypto-mode-ctr.png"></p>
+<p>使用简单的、定义好的输入函数是有争议的：批评者认为它“有意的将密码系统暴露在已知的、系统的输入会造成不必要的风险”。目前，CTR已经被广泛的使用了，由输入函数造成的问题被认为是使用的块密码的缺陷，而非CTR模式本身的弱点。</p>
+<h2 id="填充"><a href="#填充" class="headerlink" title="填充"></a>填充</h2><h2 id="为什么需要填充"><a href="#为什么需要填充" class="headerlink" title="为什么需要填充"></a>为什么需要填充</h2><p>块密码只能对确定长度的数据块进行处理，而消息的长度通常是可变的。因此部分模式（即ECB和CBC）需要最后一块在加密前进行填充。</p>
+<p>CFB，OFB和CTR模式不需要对长度不为密码块大小整数倍的消息进行特别的处理。因为这些模式是通过对块密码的输出与明文进行异或工作的。最后一个明文块（可能是不完整的）与密钥流块的前几个字节异或后，产生了与该明文块大小相同的密文块。流密码的这个特性使得它们可以应用在需要密文和明文数据长度严格相等的场合，也可以应用在以流形式传输数据而不便于进行填充的场合。</p>
+<h3 id="位填充（Bit-padding）"><a href="#位填充（Bit-padding）" class="headerlink" title="位填充（Bit padding）"></a>位填充（Bit padding）</h3><p>第一位为<code>1</code>，补<code>0</code>至块大小。</p>
+<h3 id="字节填充（Byte-padding）"><a href="#字节填充（Byte-padding）" class="headerlink" title="字节填充（Byte padding）"></a>字节填充（Byte padding）</h3><h4 id="ANSI-X9-23"><a href="#ANSI-X9-23" class="headerlink" title="ANSI X9.23"></a>ANSI X9.23</h4><p>最后一个字节为<code>需要填充的字节长度值</code>，其余位填充随机数（通常填充<code>00</code>）</p>
+<p>例：下例中，块大小为 8 字节，需要填充 4 字节（以十六进制表示）。</p>
+<blockquote>
+<p>… | DD DD DD DD DD DD DD DD | DD DD DD DD 00 00 00 04 |</p>
+</blockquote>
+<h4 id="ISO-10126"><a href="#ISO-10126" class="headerlink" title="ISO 10126"></a>ISO 10126</h4><p>最后一个字节为<code>需要填充的字节长度值</code>，其余位填充随机数：</p>
+<blockquote>
+<p>… | DD DD DD DD DD DD DD DD | DD DD DD DD 81 A6 23 04 |</p>
+</blockquote>
+<h4 id="PKCS-5-和-PKCS-7"><a href="#PKCS-5-和-PKCS-7" class="headerlink" title="PKCS#5 和 PKCS#7"></a>PKCS#5 和 PKCS#7</h4><p><code>PKCS#7</code>并未规定块大小。<code>PKCS#5</code>是<code>PKCS#7</code>的子集，其块大小固定为8字节（64位）</p>
+<p>所有字节均为<code>需要填充的字节长度值</code>：</p>
+<blockquote>
+<p>… | DD DD DD DD DD DD DD DD | DD DD DD DD 04 04 04 04 |</p>
+</blockquote>
+<p>PS：由于AES的块大小是128，所以虽然在Java中是<code>AES/CBC/PKCS5Padding</code>，但用的实际上是<code>PKCS#7</code></p>
+<h5 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h5><p>输入数据本身已对齐时，也需要填充一块长度为块大小的数据。保证解密时能够区分边界（识别出padding并去除）。</p>
+<h4 id="ISO-IEC-7816-4"><a href="#ISO-IEC-7816-4" class="headerlink" title="ISO/IEC 7816-4"></a>ISO/IEC 7816-4</h4><p>类似于位填充，第一个字节是<code>80</code>，补<code>00</code>至块大小。</p>
+<p>ISO/IEC 7816-4 是包含文件系统的智能卡的通信标准，本身不包含任何密码规范。</p>
+<h4 id="Zero-padding"><a href="#Zero-padding" class="headerlink" title="Zero padding"></a>Zero padding</h4><p>未对齐填充<code>00</code>，对齐则不填充</p>
+<h4 id="None"><a href="#None" class="headerlink" title="None"></a>None</h4><p>不填充</p>
+<p>适合C语言中的字符串（末尾有<code>00</code>），可以区分边界。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://zh.wikipedia.org/zh-hans/%E5%88%86%E7%BB%84%E5%AF%86%E7%A0%81%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F">分组密码工作模式</a><br><a href="https://zh.wikipedia.org/zh-hans/%E5%A1%AB%E5%85%85_(%E5%AF%86%E7%A0%81%E5%AD%A6)">填充_(密码学)</a><br><a href="https://en.wikipedia.org/wiki/Padding_(cryptography)">Padding (cryptography)</a></p>
+]]></content>
+      <tags>
+        <tag>Cryptography</tag>
       </tags>
   </entry>
 </search>
