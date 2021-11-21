@@ -107,7 +107,7 @@
       <h1 class="site-title">Xhy's Blog</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">Show me the code.</p>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
   </div>
 
   <div class="site-nav-right">
@@ -135,6 +135,11 @@
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -187,6 +192,66 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/13/ida-as-port-reverse/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/09/13/ida-as-port-reverse/" class="post-title-link" itemprop="url">修改IDA android_server默认端口</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-13 12:00:49" itemprop="dateCreated datePublished" datetime="2019-09-13T12:00:49+08:00">2019-09-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>也许有的反调试会检测23946端口是否占用，所以保险起见不妨使用别的端口。<br>可以使用<code>./android_server -p12345</code>指定端口，但是不如直接逆向修改默认端口。</p>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>ida载入android_server，进入main函数，按F5查看伪代码，定位到23946（0x5dba）位置，直接修改即可。<br>可以把<code>5D BA</code>改为<code>39 30</code>，即12345端口</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jiaoxiake/p/6801093.html">浅谈android反调试之 转发端口</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -781,71 +846,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/07/2019-hzwas-wp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/04/07/2019-hzwas-wp/" class="post-title-link" itemprop="url">2019中国杭州网络安全技能大赛 预选赛 哈夫曼之谜 & EasyCpp Writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-04-07 12:03:45" itemprop="dateCreated datePublished" datetime="2019-04-07T12:03:45+08:00">2019-04-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Reverse-EasyCpp"><a href="#Reverse-EasyCpp" class="headerlink" title="Reverse EasyCpp"></a>Reverse EasyCpp</h2><p>[2019/10/25更新]<br>首先读入16个数字，然后生成一个斐波那契数组，长度也为16<br>然后对输入数组进行操作，从第二位开始，都加上第一位的值（<code>transform</code>）<br>动态调试可知<code>accumulate</code>的匿名函数对运算完的数组做反转操作<br>然后与斐波那契数组比较，相同则输出flag<br>也就是说输入的第一个数字是不会变的，所以就是987<br>后面的数字直接脚本跑一下就可以得到结果了</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/04/07/2019-hzwas-wp/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -917,14 +917,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">118</span>
+          <span class="site-state-item-count">119</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

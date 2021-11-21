@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="DocsCTF Wikisyscall tableIDA操作知识记录 文件结构Dalvik 字节码ELF文件结构详解深入浅出Mach-O 源码Linux source code - BootlinlinuxAndroid Code Search Online Tools汇编Online ARM to HEX ConverterOnline Assembler and Disassembler 编码">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tools">
+<meta property="og:url" content="https://blog.xhyeax.com/tools/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="DocsCTF Wikisyscall tableIDA操作知识记录 文件结构Dalvik 字节码ELF文件结构详解深入浅出Mach-O 源码Linux source code - BootlinlinuxAndroid Code Search Online Tools汇编Online ARM to HEX ConverterOnline Assembler and Disassembler 编码">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-11-21T02:00:00.000Z">
+<meta property="article:modified_time" content="2021-11-21T10:36:34.799Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="XhyEax&#39;s Blog">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.xhyeax.com/tools/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : false,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Tools | Xhy's Blog
+</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+  
+  
+
+          <div class="content page posts-expand">
+            
+
+    
+    
+    
+    <div class="post-block" lang="zh-CN">
+      <header class="post-header">
+
+<h1 class="post-title" itemprop="name headline">Tools
+</h1>
+
+<div class="post-meta">
+  
+
+</div>
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+          <h2 id="Docs"><a href="#Docs" class="headerlink" title="Docs"></a>Docs</h2><p><a target="_blank" rel="noopener" href="https://ctf-wiki.org/">CTF Wiki</a><br><a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md#cross_arch-numbers">syscall table</a><br><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903536245866509">IDA操作知识记录</a></p>
+<h3 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h3><p><a target="_blank" rel="noopener" href="https://source.android.google.cn/devices/tech/dalvik/dalvik-bytecode">Dalvik 字节码</a><br><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-255670.htm">ELF文件结构详解</a><br><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-261877.htm">深入浅出Mach-O</a></p>
+<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3><p><a target="_blank" rel="noopener" href="https://elixir.bootlin.com/linux/latest/source">Linux source code - Bootlin</a><br><a target="_blank" rel="noopener" href="https://github.com/torvalds/linux">linux</a><br><a target="_blank" rel="noopener" href="https://cs.android.com/">Android Code Search</a></p>
+<h2 id="Online-Tools"><a href="#Online-Tools" class="headerlink" title="Online Tools"></a>Online Tools</h2><h3 id="汇编"><a href="#汇编" class="headerlink" title="汇编"></a>汇编</h3><p><a target="_blank" rel="noopener" href="https://armconverter.com/">Online ARM to HEX Converter</a><br><a target="_blank" rel="noopener" href="http://shell-storm.org/online/Online-Assembler-and-Disassembler/">Online Assembler and Disassembler</a></p>
+<h3 id="编码与加解密"><a href="#编码与加解密" class="headerlink" title="编码与加解密"></a>编码与加解密</h3><p><a target="_blank" rel="noopener" href="http://www.hiencode.com/">CTF编码</a><br><a target="_blank" rel="noopener" href="https://www.tools4noobs.com/online_tools/">Online tools</a><br><a target="_blank" rel="noopener" href="https://www.cmd5.com/">md5在线解密</a></p>
+<h3 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h3><p><a target="_blank" rel="noopener" href="https://www.bejson.com/jsonviewernew/">JSON在线视图查看器(Online JSON Viewer)</a></p>
+<h3 id="JWT"><a href="#JWT" class="headerlink" title="JWT"></a>JWT</h3><p><a target="_blank" rel="noopener" href="https://jwt.io/">JSON Web Tokens</a></p>
+<h3 id="表格"><a href="#表格" class="headerlink" title="表格"></a>表格</h3><p><a target="_blank" rel="noopener" href="https://www.tablesgenerator.com/">Tables Generator</a><br><a target="_blank" rel="noopener" href="https://tableconvert.com/csv-to-markdown">Table Convert Online</a></p>
+<h3 id="手写识别"><a href="#手写识别" class="headerlink" title="手写识别"></a>手写识别</h3><p><a target="_blank" rel="noopener" href="http://detexify.kirelabs.org/classify.html">Detexify LaTeX handwritten symbol recognition</a><br><a target="_blank" rel="noopener" href="https://hanzi.unihan.com.cn/Qpen">手写巧笔</a></p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p><a target="_blank" rel="noopener" href="https://carbon.now.sh/">Carbon | Create and share beautiful images of your source code</a></p>
+<h2 id="Tools"><a href="#Tools" class="headerlink" title="Tools"></a>Tools</h2><h3 id="文件查看与解析"><a href="#文件查看与解析" class="headerlink" title="文件查看与解析"></a>文件查看与解析</h3><p><code>010Editor</code><br><a target="_blank" rel="noopener" href="https://github.com/lief-project/LIEF">LIEF</a><br><a target="_blank" rel="noopener" href="https://www.scootersoftware.com/">Beyond Compare</a></p>
+<h3 id="布局分析"><a href="#布局分析" class="headerlink" title="布局分析"></a>布局分析</h3><p><code>DDMS</code><br><a target="_blank" rel="noopener" href="https://revealapp.com/">Reveal</a><br><a target="_blank" rel="noopener" href="http://www.cycript.org/">CyCript</a></p>
+<h3 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h3><p><code>JEB</code><br><a target="_blank" rel="noopener" href="https://github.com/skylot/jadx">jadx</a><br><code>IDA</code><br><a target="_blank" rel="noopener" href="https://github.com/NationalSecurityAgency/ghidra">Ghidra</a><br><a target="_blank" rel="noopener" href="https://www.hopperapp.com/">Hopper</a><br><a target="_blank" rel="noopener" href="https://github.com/radareorg/radare2">radare2</a></p>
+<h3 id="注入"><a href="#注入" class="headerlink" title="注入"></a>注入</h3><p><a target="_blank" rel="noopener" href="https://frida.re/">Frida</a><br><a target="_blank" rel="noopener" href="https://github.com/sensepost/objection">objection</a><br><a target="_blank" rel="noopener" href="https://github.com/LSPosed/LSPosed">Xposed</a><br><a target="_blank" rel="noopener" href="https://github.com/jmpews/Dobby">Dobby</a><br><a target="_blank" rel="noopener" href="https://github.com/RikkaApps/Riru">Riru</a><br><a target="_blank" rel="noopener" href="https://github.com/theos/theos">theos</a><br><a target="_blank" rel="noopener" href="https://github.com/AloneMonkey/MonkeyDev">MonkeyDev</a></p>
+<h3 id="Dump"><a href="#Dump" class="headerlink" title="Dump"></a>Dump</h3><p><a target="_blank" rel="noopener" href="https://github.com/hanbinglengyue/FART">FART</a><br><a target="_blank" rel="noopener" href="https://github.com/Perfare/Riru-Il2CppDumper">Riru-Il2CppDumper</a><br><a target="_blank" rel="noopener" href="https://github.com/AloneMonkey/frida-ios-dump">frida-ios-dump</a><br><a target="_blank" rel="noopener" href="https://github.com/nygard/class-dump">class-dump</a></p>
+<h2 id="Credits"><a href="#Credits" class="headerlink" title="Credits"></a>Credits</h2><p><a target="_blank" rel="noopener" href="https://mabin004.github.io/hint/">Tools</a></p>
+
+      </div>
+      
+      
+      
+    </div>
+    
+
+    
+    
+    
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Docs"><span class="nav-number">1.</span> <span class="nav-text">Docs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.</span> <span class="nav-text">文件结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81"><span class="nav-number">1.2.</span> <span class="nav-text">源码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Online-Tools"><span class="nav-number">2.</span> <span class="nav-text">Online Tools</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B1%87%E7%BC%96"><span class="nav-number">2.1.</span> <span class="nav-text">汇编</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E4%B8%8E%E5%8A%A0%E8%A7%A3%E5%AF%86"><span class="nav-number">2.2.</span> <span class="nav-text">编码与加解密</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JSON"><span class="nav-number">2.3.</span> <span class="nav-text">JSON</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JWT"><span class="nav-number">2.4.</span> <span class="nav-text">JWT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A8%E6%A0%BC"><span class="nav-number">2.5.</span> <span class="nav-text">表格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%86%99%E8%AF%86%E5%88%AB"><span class="nav-number">2.6.</span> <span class="nav-text">手写识别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">2.7.</span> <span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tools"><span class="nav-number">3.</span> <span class="nav-text">Tools</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E4%B8%8E%E8%A7%A3%E6%9E%90"><span class="nav-number">3.1.</span> <span class="nav-text">文件查看与解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%83%E5%B1%80%E5%88%86%E6%9E%90"><span class="nav-number">3.2.</span> <span class="nav-text">布局分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E7%BC%96%E8%AF%91"><span class="nav-number">3.3.</span> <span class="nav-text">反编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5"><span class="nav-number">3.4.</span> <span class="nav-text">注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dump"><span class="nav-number">3.5.</span> <span class="nav-text">Dump</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Credits"><span class="nav-number">4.</span> <span class="nav-text">Credits</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">Blog of XhyEax</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">119</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

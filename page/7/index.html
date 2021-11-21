@@ -107,7 +107,7 @@
       <h1 class="site-title">Xhy's Blog</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">Show me the code.</p>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
   </div>
 
   <div class="site-nav-right">
@@ -135,6 +135,11 @@
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -187,6 +192,72 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/12/29/ubuntu-1910-android-6-source/" class="post-title-link" itemprop="url">Ubuntu 19.10 编译安卓6.0.0_r1源码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-29 10:57:59" itemprop="dateCreated datePublished" datetime="2019-12-29T10:57:59+08:00">2019-12-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="提示"><a href="#提示" class="headerlink" title="提示"></a>提示</h2><p>[2020/04/16更新]<br>建议使用<code>docker</code>进行编译，省心省力<br>见：<a href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">使用docker编译安卓源码</a></p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前编译了AOSP 5.1.1源码，没有写文章记录。这次记录一下编译安卓6.0.0_r1的过程，流程跟编译5.1.1大致一样</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/12/29/ubuntu-1910-android-6-source/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -762,70 +833,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/10/07/vivado-custom-ip-and-instantiation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/10/07/vivado-custom-ip-and-instantiation/" class="post-title-link" itemprop="url">Vivado 自定义IP核并实例化调用</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-10-07 02:38:24" itemprop="dateCreated datePublished" datetime="2019-10-07T02:38:24+08:00">2019-10-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>作业：将四选一数据选择器封装成IP，用以实现八选一数据选择器。</p>
-<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><h3 id="将项目封装成IP"><a href="#将项目封装成IP" class="headerlink" title="将项目封装成IP"></a>将项目封装成IP</h3><p>打开要封装的项目，然后点击工具栏<br><code>Tools</code>-<code>Create and Package New IP</code>-<code>Next</code><br>打包当前项目即可（选择完<code>Package your current project</code>后一路Next）<br>（当然，这里也可以手动选择路径进行打包）<br>然后会出现<code>Packaging Steps</code>窗口<br>如果不想修改配置的话，可以直接选择最后一步，<code>Review and Package</code>-<code>Package IP</code></p>
-<h3 id="在其他项目中导入"><a href="#在其他项目中导入" class="headerlink" title="在其他项目中导入"></a>在其他项目中导入</h3><p>打开需要调用IP的项目，点击左侧<br><code>Flow Navigator</code>-<code>IP Catalog</code><br>在空白处右键，<code>Add Repository</code>，选择之前打包的文件夹<br>(如果之前打包的是项目的话，则对应<code>.srcs</code>文件夹，如<code>D:\source\Vivado\mux_8_1\mux_8_1.srcs</code>)<br>然后双击导入的IP，导入并生成<br>导入成功后，在<code>Sources</code>-<code>IP Sources</code>中可以看到IP<br>其中<code>Instantiation Template</code>即为实例化模板</p>
-<h3 id="实例化调用"><a href="#实例化调用" class="headerlink" title="实例化调用"></a>实例化调用</h3><p>最简单的方法，把实例化代码复制出来，修改一下实例名称以及参数即可<br>如：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">mux_4_1_0 <span class="title">m2</span> <span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  .d1(d5),    <span class="comment">// input wire [1 : 0] d1</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .d2(d6),    <span class="comment">// input wire [1 : 0] d2</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .d3(d7),    <span class="comment">// input wire [1 : 0] d3</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .d4(d8),    <span class="comment">// input wire [1 : 0] d4</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .s1(s1),    <span class="comment">// input wire s1</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .s0(s0),    <span class="comment">// input wire s0</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .out(out2)  <span class="comment">// output wire [1 : 0] out</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>注意，实例化时，output只能是wire类型，不然语法错误</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/kenjianqi1647/article/details/79199054">vivado学习之自定义IP和调用自定义IP的步骤</a><br><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/36687767/unknown-error-during-synthesis-of-axi-ips">Unknown Error during synthesis of AXI IPs</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -897,14 +904,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">118</span>
+          <span class="site-state-item-count">119</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
