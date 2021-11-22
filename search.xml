@@ -1509,7 +1509,8 @@
 <h3 id="编写脚本"><a href="#编写脚本" class="headerlink" title="编写脚本"></a>编写脚本</h3><p>编辑<code>index.ts</code>，可使用<code>import</code>引入其他模块</p>
 <h3 id="开启实时编译（推荐）"><a href="#开启实时编译（推荐）" class="headerlink" title="开启实时编译（推荐）"></a>开启实时编译（推荐）</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run watch</span><br></pre></td></tr></table></figure>
 <p>监听文件变化，自动编译到<code>_agent.js</code></p>
-<h3 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h3><h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><h4 id="方法一-npm-scripts（推荐）"><a href="#方法一-npm-scripts（推荐）" class="headerlink" title="方法一 npm scripts（推荐）"></a>方法一 npm scripts（推荐）</h4><h5 id="spawn"><a href="#spawn" class="headerlink" title="spawn"></a>spawn</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run spawn --pkgname=com.android.settings</span><br></pre></td></tr></table></figure>
+<h3 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h3><h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><p>注意：运行前确保已开启实时编译，不然修改不生效</p>
+<h4 id="方法一-npm-scripts（推荐）"><a href="#方法一-npm-scripts（推荐）" class="headerlink" title="方法一 npm scripts（推荐）"></a>方法一 npm scripts（推荐）</h4><h5 id="spawn"><a href="#spawn" class="headerlink" title="spawn"></a>spawn</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run spawn --pkgname=com.android.settings</span><br></pre></td></tr></table></figure>
 <h5 id="attach"><a href="#attach" class="headerlink" title="attach"></a>attach</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run attach --appname=设置</span><br></pre></td></tr></table></figure>
 
 <p>也可添加为<code>PyCharm</code>启动配置，指定<code>Arguments</code></p>
@@ -1542,7 +1543,8 @@
 <h3 id="代码提示"><a href="#代码提示" class="headerlink" title="代码提示"></a>代码提示</h3><p><code>VSCode</code>安装<code>Node.js</code>和<code>TypeScript</code>相关拓展即可</p>
 <p>PS：在<code>frida-script-agent</code>目录下直接创建js文件，也有代码提示</p>
 <h2 id="更新"><a href="#更新" class="headerlink" title="*更新"></a>*<strong>更新</strong></h2><p>建议使用<code>PyCharm</code>，可直接在源文件下断点，见<a href="https://blog.xhyeax.com/2021/11/21/frida-script-debug-env-setup-pycharm/">Frida ts环境搭建（PyCharm）</a></p>
-<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><p>使用<code>spawn</code>或<code>attach</code>模式附加app，设置引擎为<code>v8</code>并开启调试模式。</p>
+<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><p>注意：运行前确保已开启实时编译，不然修改不生效</p>
+<p>使用<code>spawn</code>或<code>attach</code>模式附加app，设置引擎为<code>v8</code>并开启调试模式。</p>
 <h4 id="方法一-使用npm-scripts（推荐）"><a href="#方法一-使用npm-scripts（推荐）" class="headerlink" title="方法一 使用npm scripts（推荐）"></a>方法一 使用npm scripts（推荐）</h4><h5 id="spawn"><a href="#spawn" class="headerlink" title="spawn"></a>spawn</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run spawn --pkgname=com.android.settings</span><br></pre></td></tr></table></figure>
 <h5 id="attach"><a href="#attach" class="headerlink" title="attach"></a>attach</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">npm run attach --appname=设置</span><br></pre></td></tr></table></figure>
 

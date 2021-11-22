@@ -28,7 +28,7 @@
 <meta property="og:description" content="概述前文使用的是VSCode和DevTools，需要在两个应用间切换，且需要查找最终位置再下断点，比较麻烦。 于是搭建PyCharm调试环境，可直接在源文件（ts和js）下断点 环境系统：Windows 10 20H2 x64软件：PyCharm Professional 2021.2.3、Node.js 14.17.4、Frida 15.1.11">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-11-20T10:00:00.000Z">
-<meta property="article:modified_time" content="2021-11-21T16:07:30.209Z">
+<meta property="article:modified_time" content="2021-11-22T16:41:38.947Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="Frida">
@@ -256,7 +256,8 @@
 <h3 id="编写脚本"><a href="#编写脚本" class="headerlink" title="编写脚本"></a>编写脚本</h3><p>编辑<code>index.ts</code>，可使用<code>import</code>引入其他模块</p>
 <h3 id="开启实时编译（推荐）"><a href="#开启实时编译（推荐）" class="headerlink" title="开启实时编译（推荐）"></a>开启实时编译（推荐）</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run watch</span><br></pre></td></tr></table></figure>
 <p>监听文件变化，自动编译到<code>_agent.js</code></p>
-<h3 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h3><h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><h4 id="方法一-npm-scripts（推荐）"><a href="#方法一-npm-scripts（推荐）" class="headerlink" title="方法一 npm scripts（推荐）"></a>方法一 npm scripts（推荐）</h4><h5 id="spawn"><a href="#spawn" class="headerlink" title="spawn"></a>spawn</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run spawn --pkgname=com.android.settings</span><br></pre></td></tr></table></figure>
+<h3 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h3><h3 id="启动Server"><a href="#启动Server" class="headerlink" title="启动Server"></a>启动Server</h3><p>注意：运行前确保已开启实时编译，不然修改不生效</p>
+<h4 id="方法一-npm-scripts（推荐）"><a href="#方法一-npm-scripts（推荐）" class="headerlink" title="方法一 npm scripts（推荐）"></a>方法一 npm scripts（推荐）</h4><h5 id="spawn"><a href="#spawn" class="headerlink" title="spawn"></a>spawn</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run spawn --pkgname=com.android.settings</span><br></pre></td></tr></table></figure>
 <h5 id="attach"><a href="#attach" class="headerlink" title="attach"></a>attach</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run attach --appname=设置</span><br></pre></td></tr></table></figure>
 
 <p>也可添加为<code>PyCharm</code>启动配置，指定<code>Arguments</code></p>
