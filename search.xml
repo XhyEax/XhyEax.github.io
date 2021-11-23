@@ -1557,8 +1557,7 @@
 <p>然后按下<code>Ctrl + P</code>，切换源文件。（或点击<code>来源</code>-<code>节点</code>，打开<code>Node.js</code>下的文件）</p>
 <p>PS：按<code>Esc</code>可切换抽屉栏控制台的显示</p>
 <p>（也可以使用<code>VSCode</code>附加，但是无法下断点，控制台有时也连接不上。不推荐）</p>
-<h3 id="主动调用方法"><a href="#主动调用方法" class="headerlink" title="主动调用方法"></a>主动调用方法</h3><h4 id="TypeScript"><a href="#TypeScript" class="headerlink" title="TypeScript"></a>TypeScript</h4><p>如果是使用<code>frida-compile</code>生成的js文件，则需要使用<code>rpc.exports</code>将方法导出，然后通过<code>rpc.exports.方法名</code>调用</p>
-<p>注意：必须在<code>DevTools</code>的控制台中执行，在<code>Frida CLI</code>中找不到方法（可能是bug）</p>
+<h3 id="主动调用方法"><a href="#主动调用方法" class="headerlink" title="主动调用方法"></a>主动调用方法</h3><h4 id="TypeScript"><a href="#TypeScript" class="headerlink" title="TypeScript"></a>TypeScript</h4><p>如果是使用<code>frida-compile</code>生成的js文件，则需要使用<code>rpc.exports</code>将方法导出，然后通过<code>rpc.exports.方法名</code>调用（附加调试的控制台和<code>Frida CLI</code>均可）</p>
 <h4 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h4><p>如果使用原始的js脚本，只需要加上<code>--debug --runtime=v8</code>参数启动，在<code>DevTools</code>和<code>Frida CLI</code>中都可以直接通过函数名调用（默认导出）</p>
 <h3 id="断点调试"><a href="#断点调试" class="headerlink" title="断点调试"></a>断点调试</h3><p>打开<code>DevTools</code>，在<strong>最终文件</strong>（如<code>_agent.js</code>）下断点即可，可配合主动调用触发断点</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://bbs.pediy.com/thread-265160.htm">FRIDA 使用经验交流分享-Android安全-看雪论坛-安全社区|安全招聘|bbs.pediy.com</a></p>
