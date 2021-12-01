@@ -196,6 +196,263 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/01/2022-autumn-mobile-security-interview-experience/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/01/2022-autumn-mobile-security-interview-experience/" class="post-title-link" itemprop="url">2022秋招 安全工程师（安卓方向）面经</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-01 14:00:00" itemprop="dateCreated datePublished" datetime="2021-12-01T14:00:00+08:00">2021-12-01</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="认清形势，放弃幻想"><a href="#认清形势，放弃幻想" class="headerlink" title="认清形势，放弃幻想"></a>认清形势，放弃幻想</h2><p>末流985本，计算机科学与技术专业，无国奖，无实习经历。<br>15年开始搞安卓逆向，目前技术一般。</p>
+<p>8.16第一次投简历，8.18第一次面试，9.10第一个意向书，10.15第一个正式offer。</p>
+<p>PS：没有实习经历还是比较吃亏的，建议大三下学期春招找个实习，然后秋招投提前批。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/12/01/2022-autumn-mobile-security-interview-experience/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/01/android-studio-install-old-apk-on-android-11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/01/android-studio-install-old-apk-on-android-11/" class="post-title-link" itemprop="url">修复Android Studio代码修改不生效</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-01 13:47:05" itemprop="dateCreated datePublished" datetime="2021-12-01T13:47:05+08:00">2021-12-01</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>重新编译<code>Xposed</code>模块并点击<code>Run</code>安装后，修改不生效。卸载重装后才生效。</p>
+<h2 id="尝试"><a href="#尝试" class="headerlink" title="尝试"></a>尝试</h2><p>尝试修改<code>build.gradle</code>中的<code>versionCode</code>，发现修改代码生效了，于是有了这篇<a href="https://blog.xhyeax.com/2021/10/07/gradle-auto-version-code/">Gradle配置版本号自动增加</a>。（不符合编译习惯，<del>喜欢刷版本号的除外</del>）</p>
+<p>今天发现手动<code>Generate Signed APK</code>，然后使用<code>adb install</code>安装，修改也生效了。（太麻烦）</p>
+<p>猜测是因为<code>versionCode</code>没变，ART运行了<code>dex2oat</code>优化后的旧代码。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>修改启动配置，设置使用<code>package manager</code>安装：</p>
+<p><code>Run / Debug Configurations</code> - <code>General</code> - <code>Always install with package manager (disable deploy optimization on Android 11 and later)</code></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/11/28/arm-v7-a-r-m/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/11/28/arm-v7-a-r-m/" class="post-title-link" itemprop="url">armv7 A R M版本区别</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-28 08:25:38" itemprop="dateCreated datePublished" datetime="2021-11-28T08:25:38+08:00">2021-11-28</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h2><p><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/ddi0406/latest/">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+<p><code>A1.3 Architecture versions, profiles, and variants</code></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/11/28/arm-v7-a-r-m/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/11/28/arm-instruction-set/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/11/28/arm-instruction-set/" class="post-title-link" itemprop="url">ARM & ARM64 指令集</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-28 08:10:33" itemprop="dateCreated datePublished" datetime="2021-11-28T08:10:33+08:00">2021-11-28</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h2><p><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/ddi0406/latest/">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+<p><code>8.8 Alphabetical list of instructions</code></p>
+<h2 id="ARM64"><a href="#ARM64" class="headerlink" title="ARM64"></a>ARM64</h2><p><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/ddi0557/latest/">ARM Architecture Reference Manual Supplement ARMv8.1, for ARMv8-A architecture profile</a></p>
+<p><code>B11.1 Alphabetical list of instructions</code></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/11/21/cryptography-mode-and-padding/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -593,275 +850,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/10/07/shell-xposed-check-bypass/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/10/07/shell-xposed-check-bypass/" class="post-title-link" itemprop="url">使用Xposed绕过某加固的Xposed堆栈检测</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-10-07 10:21:11" itemprop="dateCreated datePublished" datetime="2021-10-07T10:21:11+08:00">2021-10-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>更新某营业厅app（版本号<code>7.4.0</code>）后，发现加载<code>Xposed</code>模块会导致app crash。</p>
-<p>通过分析<code>Tombstone</code>日志找到检测点，编写<code>Xposed</code>模块绕过堆栈检测。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/10/07/shell-xposed-check-bypass/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/10/07/gradle-auto-version-code/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/10/07/gradle-auto-version-code/" class="post-title-link" itemprop="url">Gradle配置版本号自动增加</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-10-07 08:33:24" itemprop="dateCreated datePublished" datetime="2021-10-07T08:33:24+08:00">2021-10-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><code>Xposed</code>模块重新编译并安装后，由于<code>versionCode</code>并未改变，框架管理器并不会提示<code>Xposed 模块已更新</code>。</p>
-<p>有时会忘记重启被注入的应用，导致功能不生效（其实可以用<code>adb</code>重启，或者<code>Frida</code>的<code>Spawn</code>功能）</p>
-<p>通过搜索引擎，学习一下如何配置版本号自增。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/10/07/gradle-auto-version-code/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/10/06/lineage-compile-for-nexus5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/10/06/lineage-compile-for-nexus5/" class="post-title-link" itemprop="url">编译 Lineage 18.1 (Android 11.0) for Nexus 5</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-10-06 04:50:00" itemprop="dateCreated datePublished" datetime="2021-10-06T04:50:00+08:00">2021-10-06</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>AOSP官方源码，对<code>Nexus 5</code>仅支持到<code>Android 6.0</code>，而第三方系统支持<code>Android 11.0</code>。</p>
-<p>由于需要定制系统和内核，故考虑克隆源码，手动编译。</p>
-<h2 id="ROM下载地址"><a href="#ROM下载地址" class="headerlink" title="ROM下载地址"></a>ROM下载地址</h2><p><a target="_blank" rel="noopener" href="https://forum.xda-developers.com/t/rom-unofficial-lineageos-18-1-for-nexus-5-hammerhead-discontinued.4214367/">[ROM][UNOFFICIAL] LineageOS 18.1 for Nexus 5 (hammerhead) [DISCONTINUED] | XDA Forums</a></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/10/06/lineage-compile-for-nexus5/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/10/05/repo-init-with-aosp-latest/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/10/05/repo-init-with-aosp-latest/" class="post-title-link" itemprop="url">基于aosp-lastest.tar同步AOSP源码</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-10-05 15:50:00" itemprop="dateCreated datePublished" datetime="2021-10-05T15:50:00+08:00">2021-10-05</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用TUNA AOSP初始包(<code>aosp-lastest.tar</code>)同步AOSP最新源码。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/10/05/repo-init-with-aosp-latest/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -929,14 +921,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">120</span>
+          <span class="site-state-item-count">124</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

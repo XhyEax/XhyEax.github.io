@@ -1638,11 +1638,10 @@
   <entry>
     <title>Gradle配置版本号自动增加</title>
     <url>/2021/10/07/gradle-auto-version-code/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><code>Xposed</code>模块重新编译并安装后，由于<code>versionCode</code>并未改变，框架管理器并不会提示<code>Xposed 模块已更新</code>。</p>
-<p>有时会忘记重启被注入的应用，导致功能不生效（其实可以用<code>adb</code>重启，或者<code>Frida</code>的<code>Spawn</code>功能）</p>
-<p>通过搜索引擎，学习一下如何配置版本号自增。</p>
-<span id="more"></span>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通过搜索引擎，学习一下如何配置版本号自增。</p>
 <h2 id="增加函数"><a href="#增加函数" class="headerlink" title="增加函数"></a>增加函数</h2><p>修改<code>app</code>模块的<code>build.gradle</code>，增加<code>getVersionCode</code>函数</p>
+<span id="more"></span>
+
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function">def <span class="title">getVersionCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    def versionFile = file(<span class="string">&#x27;version.properties&#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> (!versionFile.exists()) &#123;</span><br><span class="line">        Properties versionProps = <span class="keyword">new</span> Properties()</span><br><span class="line">        versionProps.setProperty(<span class="string">&quot;VERSION_CODE&quot;</span>, <span class="string">&quot;1&quot;</span>)</span><br><span class="line">        versionFile.createNewFile();</span><br><span class="line">        versionProps.store(versionFile.newWriter(), <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (versionFile.canRead()) &#123;</span><br><span class="line">        Properties versionProps = <span class="keyword">new</span> Properties()</span><br><span class="line">        versionProps.load(<span class="keyword">new</span> FileInputStream(versionFile))</span><br><span class="line">        def versionCode = versionProps[<span class="string">&#x27;VERSION_CODE&#x27;</span>].toInteger()</span><br><span class="line">        def runTasks = gradle.startParameter.<span class="function">taskNames</span></span><br><span class="line"><span class="function">        <span class="title">println</span><span class="params">(<span class="string">&quot;runTasks:&quot;</span> + runTasks)</span></span></span><br><span class="line"><span class="function">        def isDebug </span>= <span class="string">&#x27;:app:assembleDebug&#x27;</span> in runTasks</span><br><span class="line">        def isRelease = <span class="string">&#x27;:app:assembleRelease&#x27;</span> <span class="function">in runTasks</span></span><br><span class="line"><span class="function">        <span class="title">if</span> <span class="params">(isRelease || isDebug)</span> </span>&#123;</span><br><span class="line">            versionProps[<span class="string">&#x27;VERSION_CODE&#x27;</span>] = (++versionCode).toString()</span><br><span class="line">            versionProps.store(versionFile.newWriter(), <span class="keyword">null</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> versionCode</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="调用"><a href="#调用" class="headerlink" title="调用"></a>调用</h2><p>修改<code>android</code>以及<code>android.defaultConfig</code></p>
 <figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    def curVersionCode = getVersionCode()</span><br><span class="line"></span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        versionCode curVersionCode</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
@@ -3394,6 +3393,62 @@
 ]]></content>
       <tags>
         <tag>Cryptography</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>修复Android Studio代码修改不生效</title>
+    <url>/2021/12/01/android-studio-install-old-apk-on-android-11/</url>
+    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>重新编译<code>Xposed</code>模块并点击<code>Run</code>安装后，修改不生效。卸载重装后才生效。</p>
+<h2 id="尝试"><a href="#尝试" class="headerlink" title="尝试"></a>尝试</h2><p>尝试修改<code>build.gradle</code>中的<code>versionCode</code>，发现修改代码生效了，于是有了这篇<a href="https://blog.xhyeax.com/2021/10/07/gradle-auto-version-code/">Gradle配置版本号自动增加</a>。（不符合编译习惯，<del>喜欢刷版本号的除外</del>）</p>
+<p>今天发现手动<code>Generate Signed APK</code>，然后使用<code>adb install</code>安装，修改也生效了。（太麻烦）</p>
+<p>猜测是因为<code>versionCode</code>没变，ART运行了<code>dex2oat</code>优化后的旧代码。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>修改启动配置，设置使用<code>package manager</code>安装：</p>
+<p><code>Run / Debug Configurations</code> - <code>General</code> - <code>Always install with package manager (disable deploy optimization on Android 11 and later)</code></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ARM &amp; ARM64 指令集</title>
+    <url>/2021/11/28/arm-instruction-set/</url>
+    <content><![CDATA[<h2 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h2><p><a href="https://developer.arm.com/documentation/ddi0406/latest/">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+<p><code>8.8 Alphabetical list of instructions</code></p>
+<h2 id="ARM64"><a href="#ARM64" class="headerlink" title="ARM64"></a>ARM64</h2><p><a href="https://developer.arm.com/documentation/ddi0557/latest/">ARM Architecture Reference Manual Supplement ARMv8.1, for ARMv8-A architecture profile</a></p>
+<p><code>B11.1 Alphabetical list of instructions</code></p>
+]]></content>
+      <tags>
+        <tag>ARM</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>armv7 A R M版本区别</title>
+    <url>/2021/11/28/arm-v7-a-r-m/</url>
+    <content><![CDATA[<h2 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h2><p><a href="https://developer.arm.com/documentation/ddi0406/latest/">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+<p><code>A1.3 Architecture versions, profiles, and variants</code></p>
+<span id="more"></span>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">The ARM architecture has evolved significantly since its introduction, and ARM continues to develop it. Seven </span><br><span class="line">major versions of the architecture have been defined to date, denoted by the version numbers 1 to 7. Of these, the </span><br><span class="line">first three versions are now obsolete.</span><br><span class="line">ARMv7 provides three profiles:</span><br><span class="line">ARMv7-A Application profile, described in this manual:</span><br><span class="line">• Implements a traditional ARM architecture with multiple modes.</span><br><span class="line">• Supports a Virtual Memory System Architecture (VMSA) based on a Memory Management </span><br><span class="line">Unit (MMU). An ARMv7-A implementation can be called a VMSAv7 implementation.</span><br><span class="line">• Supports the ARM and Thumb instruction sets.</span><br><span class="line">ARMv7-R Real-time profile, described in this manual:</span><br><span class="line">• Implements a traditional ARM architecture with multiple modes.</span><br><span class="line">• Supports a Protected Memory System Architecture (PMSA) based on a Memory Protection </span><br><span class="line">Unit (MPU). An ARMv7-R implementation can be called a PMSAv7 implementation.</span><br><span class="line">• Supports the ARM and Thumb instruction sets.</span><br><span class="line">ARMv7-M Microcontroller profile, described in the ARMv7-M Architecture Reference Manual:</span><br><span class="line">• Implements a programmers&#x27; model designed for low-latency interrupt processing, with </span><br><span class="line">hardware stacking of registers and support for writing interrupt handlers in high-level </span><br><span class="line">languages.</span><br><span class="line">• Implements a variant of the ARMv7 PMSA.</span><br><span class="line">• Supports a variant of the Thumb instruction set. </span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>ARM</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>2022秋招 安全工程师（安卓方向）面经</title>
+    <url>/2021/12/01/2022-autumn-mobile-security-interview-experience/</url>
+    <content><![CDATA[<h2 id="认清形势，放弃幻想"><a href="#认清形势，放弃幻想" class="headerlink" title="认清形势，放弃幻想"></a>认清形势，放弃幻想</h2><p>末流985本，计算机科学与技术专业，无国奖，无实习经历。<br>15年开始搞安卓逆向，目前技术一般。</p>
+<p>8.16第一次投简历，8.18第一次面试，9.10第一个意向书，10.15第一个正式offer。</p>
+<p>PS：没有实习经历还是比较吃亏的，建议大三下学期春招找个实习，然后秋招投提前批。</p>
+<span id="more"></span>
+<h2 id="面试及offer情况"><a href="#面试及offer情况" class="headerlink" title="面试及offer情况"></a>面试及offer情况</h2><p>阿里：安全工程师 <strong>（已offer）</strong><br>腾讯：安全技术-IEG-客户端安全 （GM面挂）<br>字节：客户端软件安全工程师-安全与风控 <strong>（已offer）</strong><br>美团：安全工程师 <strong>（已offer）</strong><br>拼多多：安全工程师 <strong>（已offer）</strong><br>网易互娱：逆向分析工程师 <strong>（已offer）</strong><br>猿辅导：Android逆向开发工程师 （被毁意向）<br>360：信息安全工程师-Android方向 （二面挂）</p>
+<h2 id="一面、二面"><a href="#一面、二面" class="headerlink" title="一面、二面"></a>一面、二面</h2><p>自我介绍（重要）<br>项目经历（重要）<br>实习经历（重要）<br>项目最大的难点<br>网络协议逆向思路<br>有没有开发相关的项目<br>有没有大厂app逆向经验<br>有没有研究过iOS逆向<br>说几个安卓漏洞</p>
+<h3 id="安卓相关（重要）"><a href="#安卓相关（重要）" class="headerlink" title="安卓相关（重要）"></a>安卓相关（重要）</h3><p>Frida、Xposed原理<br>inline hook、got hook、exception hook原理<br>ARM汇编：寄存器，调用约定（包括其他CPU架构），跳转指令<br>DEX结构、ELF结构、反编译过程<br>Java反射、静态代理和动态代理、类加载机制（双亲委派）<br>反调试和反反调试、ollvm（反混淆）<br>加固与脱壳（整体加固、指令抽取、指令转换/vmp、java2c）<br>Unicorn框架原理、VirtualApp框架原理<br>安卓虚拟机（Davilk和ART）、JIT和AOT<br>HTTPS证书校验（单向、双向校验）、中间人攻击<br>对常见算法的了解（编码、哈希、对称、非对称）<br>对设备指纹的了解、对安卓源码的了解<br>安卓系统安全机制（权限控制、签名校验）、so加载流程（linker）<br>安卓系统启动流程、Zygote启动流程、APP启动流程<br>Activity和Service的生命周期、Binder通信机制</p>
+<h3 id="计算机基础"><a href="#计算机基础" class="headerlink" title="计算机基础"></a>计算机基础</h3><p>操作系统：进程和线程（安卓如何获取）、进程调度策略、进程的状态及转换、虚拟地址和物理地址<br>计网：OSI七层模型（协议举例）、TCP和UDP、DNS、HTTPS过程、Get和Post区别<br>C++：指针和引用、变量的区别（static、全局局部）、编译过程（哪个阶段处理include）、动态链接和静态链接、const char*, char const*, char* const的区别<br>Java：面向对象语言三大特征、多态的体现（与C++模板类的区别）、内部类和静态内部类、HashMap和ConcurrentHashMap、快速失败和安全失败、GC机制、多线程的实现方式、线程池、synchronized</p>
+<h3 id="算法题"><a href="#算法题" class="headerlink" title="算法题"></a>算法题</h3><p>最小栈、计数排序、反转链表、螺旋矩阵、后缀表达式、最大正方形、旋转数组找最小值、两个栈实现队列、求根节点到叶节点数字之和</p>
+<h2 id="三面、HR面"><a href="#三面、HR面" class="headerlink" title="三面、HR面"></a>三面、HR面</h2><p>自我介绍<br>职业规划<br>实习/项目相关<br>升学打算及原因<br>能不能提前实习<br>前几轮面试体验如何<br>对其他安全领域的了解<br>为什么选择逆向这一领域<br>最有技术深度的文章<br>遇到过的最大挑战<br>最有成就感的事<br>三个词形容自己的优/缺点<br>身边的人怎么评价你<br>家庭情况/感情生活<br>平时的兴趣爱好<br>最近看了什么书<br>其他公司投递情况及进度<br>对工作的要求（城市、岗位职责、薪资、时间等）</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://blog.lc4t.me/2021/02/03/%E6%A0%A1%E6%8B%9B%E6%94%BB%E7%95%A5DLC/">校招攻略DLC</a><br><a href="https://coolshell.cn/articles/8790.html">程序算法与人生选择</a><br><a href="https://github.com/SecYouth/sec-jobs">SecYouth/sec-jobs</a><br><a href="https://github.com/cckenny/2020_autumn_mobile_security_interview">cckenny/2020_autumn_mobile_security_interview</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
       </tags>
   </entry>
 </search>

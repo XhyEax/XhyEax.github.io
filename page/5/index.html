@@ -196,6 +196,284 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/08/18/dst-server-linux/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/08/18/dst-server-linux/" class="post-title-link" itemprop="url">饥荒联机版 Linux(CentOS) 开服、mod安装</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-18 16:14:15" itemprop="dateCreated datePublished" datetime="2020-08-18T16:14:15+08:00">2020-08-18</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>腾讯云服务器，CentOS 7.7 64位， 1核CPU，1G内存，1G交换空间</p>
+<h3 id="交换空间配置"><a href="#交换空间配置" class="headerlink" title="交换空间配置"></a>交换空间配置</h3><p>见<a href="https://blog.xhyeax.com/2020/03/25/linux-set-swapfile/">Linux配置虚拟内存文件</a></p>
+<h2 id="获取cluster-token"><a href="#获取cluster-token" class="headerlink" title="获取cluster_token"></a>获取cluster_token</h2><p>打开饥荒，控制台输入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TheNet:GenerateClusterToken()</span><br></pre></td></tr></table></figure>
+<p>然后使用资源管理器定位到<code>...\文档\Klei\DoNotStarveTogether\用户id</code>，下面有一个刚生成的<code>cluster_token.txt</code>，把内容保存下来，之后要用</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/08/18/dst-server-linux/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/07/21/use-attribute-packed-to-disable-align/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/07/21/use-attribute-packed-to-disable-align/" class="post-title-link" itemprop="url">使用__attribute__配置结构体，禁用编译器自动对齐</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-21 09:06:50" itemprop="dateCreated datePublished" datetime="2020-07-21T09:06:50+08:00">2020-07-21</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>结构体声明中加上<code>__attribute__((packed))</code>，可以防止编译器对结构进行字节对齐优化。<br>使用<code>__attribute__((aligned(8)))</code>(8为对齐字节数)，可以强制编译器按指定字节对齐。</p>
+<h2 id="结构体定义"><a href="#结构体定义" class="headerlink" title="结构体定义"></a>结构体定义</h2><h3 id="使用-packed"><a href="#使用-packed" class="headerlink" title="使用 packed"></a>使用 packed</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">    <span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">&#125; __attribute__((packed));</span><br></pre></td></tr></table></figure>
+<p>使用sizeof获取结构体的大小，返回7</p>
+<h3 id="不使用-packed"><a href="#不使用-packed" class="headerlink" title="不使用 packed"></a>不使用 packed</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">	<span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>根据结构体中最长的类型(int)，进行对齐，获取到的结构体大小为8</p>
+<h3 id="指定对齐大小"><a href="#指定对齐大小" class="headerlink" title="指定对齐大小"></a>指定对齐大小</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">	<span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">    <span class="keyword">int</span> d;	 <span class="comment">//4</span></span><br><span class="line">&#125; __attribute__((<span class="built_in">aligned</span>(<span class="number">8</span>)));</span><br></pre></td></tr></table></figure>
+<p>不使用指定对齐字节时，结构体大小为3*4=12，指定后变为16</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zuiyinian/article/details/81174031">为什么要用 “ <strong>attribute</strong> ((<strong>packed</strong>)) ” 定义结构体</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/swj9099/article/details/96713277"><strong>attribute</strong> 用法</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/17/powershell-add-font/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/17/powershell-add-font/" class="post-title-link" itemprop="url">PowerShell配置主题、字体</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-17 02:15:27" itemprop="dateCreated datePublished" datetime="2020-04-17T02:15:27+08:00">2020-04-17</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="主题安装"><a href="#主题安装" class="headerlink" title="主题安装"></a>主题安装</h2><h3 id="安装模块"><a href="#安装模块" class="headerlink" title="安装模块"></a>安装模块</h3><p>win+x, PowerShell(管理员)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Install-Module posh-git -Force -SkipPublisherCheck</span><br><span class="line">Install-Module oh-my-posh -Force -SkipPublisherCheck</span><br></pre></td></tr></table></figure>
+<h3 id="允许执行脚本"><a href="#允许执行脚本" class="headerlink" title="允许执行脚本"></a>允许执行脚本</h3><p>win+x, PowerShell(管理员)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set-ExecutionPolicy RemoteSigned</span><br></pre></td></tr></table></figure>
+<h3 id="编辑配置文件"><a href="#编辑配置文件" class="headerlink" title="编辑配置文件"></a>编辑配置文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">if (!(Test-Path -Path $PROFILE )) &#123; New-Item -Type File -Path $PROFILE -Force &#125;</span><br><span class="line">notepad $PROFILE</span><br></pre></td></tr></table></figure>
+<p>写入以下内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">chcp 65001</span><br><span class="line">Import-Module posh-git</span><br><span class="line">Import-Module oh-my-posh</span><br><span class="line">Set-PoshPrompt -Theme Paradox</span><br></pre></td></tr></table></figure>
+<p>注意：旧版本<code>oh-my-posh</code>设置主题命令为<code>Set-Theme Paradox</code><br>全部主题见：<a target="_blank" rel="noopener" href="https://github.com/JanDeDobbeleer/oh-my-posh/tree/master/Themes">JanDeDobbeleer/oh-my-posh/Themes</a></p>
+<h2 id="字体安装及切换"><a href="#字体安装及切换" class="headerlink" title="字体安装及切换"></a>字体安装及切换</h2><h3 id="下载字体"><a href="#下载字体" class="headerlink" title="下载字体"></a>下载字体</h3><p>字体可以在这下载：<a target="_blank" rel="noopener" href="https://github.com/powerline/fonts">powerline/fonts</a></p>
+<h3 id="安装字体"><a href="#安装字体" class="headerlink" title="安装字体"></a>安装字体</h3><p>安装<code>for Powerline</code>结尾的字体，以<a target="_blank" rel="noopener" href="https://github.com/powerline/fonts/raw/master/DejaVuSansMono/DejaVu%20Sans%20Mono%20for%20Powerline.ttf">DejaVu Sans Mono for Powerline.ttf</a>为例<br>右键字体文件，为所有用户安装</p>
+<h3 id="应用字体"><a href="#应用字体" class="headerlink" title="应用字体"></a>应用字体</h3><p>重新打开PowerShell，右键标题栏，在<code>属性-字体</code>中修改字体<br>PS：如果没有已安装的字体，先执行<code>chcp 65001</code>再试</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>重新打开PowerShell，观察默认字体是否发生变化</p>
+<h2 id="安装PSReadLine（可选）"><a href="#安装PSReadLine（可选）" class="headerlink" title="安装PSReadLine（可选）"></a>安装PSReadLine（可选）</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Install-Module -Name PSReadLine -Force -SkipPublisherCheck</span><br></pre></td></tr></table></figure>
+<p><code>notepad $PROFILE</code>，添加：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Set-PSReadlineOption -EditMode Emacs</span><br></pre></td></tr></table></figure>
+<p>双击Tab会出现智能提示：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/powershell_readline.png"><br>参考：<a target="_blank" rel="noopener" href="https://www.pstips.net/let-psreadline-light-ps-console.html">PSReadLine让PowerShell控制台高亮起来</a></p>
+<h2 id="配置cmd默认活动代码页编号（可选）"><a href="#配置cmd默认活动代码页编号（可选）" class="headerlink" title="配置cmd默认活动代码页编号（可选）"></a>配置cmd默认活动代码页编号（可选）</h2><p>注意：配置后将导致无法执行bat脚本<br>win+r,<code>regedit</code><br>定位到<code>计算机\HKEY_CURRENT_USER\Console\%SystemRoot%_system32_cmd.exe</code><br>修改<code>CodePage</code>字段为65001(10进制)<br>之后启动cmd即可切换字体</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_30646315/article/details/95469049">Powershell 主题美化学习过程</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/51901035">超酷的 PowerShell 美化指南</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44490152/article/details/113854767">Windows Terminal + oh-my-posh模块美化官方教程集锦以及常见问题（问题收集中）</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/16/aosp-docker/" class="post-title-link" itemprop="url">使用docker编译安卓源码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-16 07:20:05" itemprop="dateCreated datePublished" datetime="2020-04-16T07:20:05+08:00">2020-04-16</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h3><p><a href="https://blog.xhyeax.com/2020/04/15/wsl2-docker/">在WSL2(Ubuntu 18.04)中安装docker并配置自启动</a></p>
+<h3 id="配置docker源"><a href="#配置docker源" class="headerlink" title="配置docker源"></a>配置docker源</h3><p>使用阿里云的加速服务，解决下载镜像速度慢的问题<br>打开<a target="_blank" rel="noopener" href="https://cr.console.aliyun.com/">容器镜像服务</a><br>镜像中心 - 镜像加速器<br>将加速器地址写入<code>/etc/docker/daemon.json</code>，格式为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://xxxxxx.mirror.aliyuncs.com&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>重启docker</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service docker restart</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/16/aosp-docker/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/16/curl-set-proxy-by-pathvar/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -580,269 +858,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/15/win10-open-diagtask-for-inside/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/15/win10-open-diagtask-for-inside/" class="post-title-link" itemprop="url">win10 切换诊断数据为完整</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-15 00:01:13" itemprop="dateCreated datePublished" datetime="2020-04-15T00:01:13+08:00">2020-04-15</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>安装windows预览版，需要切换诊断数据为<code>完整</code>，而本人切换到<code>完整</code>后又会自动跳回<code>基本</code>。搜索后找到解决方案。<br>原因是<code>Connected User Experiences and Telemetry</code>服务被禁用</p>
-<h2 id="解决步骤"><a href="#解决步骤" class="headerlink" title="解决步骤"></a>解决步骤</h2><p>Win+R,<code>services.msc</code>,找到<code>Connected User Experiences and Telemetry</code>，设置为<code>自动(延迟启动)</code>，再点击启动此服务即可成功切换</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://tieba.baidu.com/p/6483106526">安装win10预览版，诊断数据无设置成完整</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/wsl-18-04-android-6-source/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/14/wsl-18-04-android-6-source/" class="post-title-link" itemprop="url">WSL(Ubuntu 18.04)编译安卓6.0.0_r1源码</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-14 09:54:23" itemprop="dateCreated datePublished" datetime="2020-04-14T09:54:23+08:00">2020-04-14</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="之前的尝试"><a href="#之前的尝试" class="headerlink" title="之前的尝试"></a>之前的尝试</h2><p>一开始使用wsl1进行编译，即使用了ccache，编译耗时仍难以接受（编译了很久都没结束）<br>之后又使用wsl2进行编译，编译还是需要很久<br>原因猜测：源码位于D盘，wsl访问文件可能需要经过转换，因此IO操作速度慢。<br>搜索发现<a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-ux-changes">WSL 1 与 WSL 2 之间的用户体验更改</a>中提到：</p>
-<blockquote>
-<p>请确保将你要使用 Linux 应用程序频繁访问的文件放在 Linux 根文件系统中，以享受文件性能优势。 这些文件必须位于 Linux 根文件系统内，以便较快地访问文件系统。<br>验证：使用wsl在d盘解压源码，速度远慢于直接在wsl文件系统中解压<br>由此确定最终方案</p>
-</blockquote>
-<h2 id="最终方案"><a href="#最终方案" class="headerlink" title="最终方案"></a>最终方案</h2><p>将源码压缩包移动到linux文件系统下，再解压<br>或者使用repo工具下载源码到linux文件系统</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/14/wsl-18-04-android-6-source/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/wsl-adb/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/14/wsl-adb/" class="post-title-link" itemprop="url">WSL中使用adb</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-14 09:34:07" itemprop="dateCreated datePublished" datetime="2020-04-14T09:34:07+08:00">2020-04-14</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>尝试在wsl中使用adb，发现找不到设备。搜索一番发现是因为adb版本不统一导致的。<br>注意：wsl2中adb无法查询到usb设备，可以通过使用ip地址连接(需要root权限)，或降级到wsl1</p>
-<blockquote>
-<p>在 WSL 2 的初始版本中，将会限制硬件访问支持，例如：你将无法访问 GPU、串行或 USB 设备。<br><a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-faq">WSL2 - 常见问题</a></p>
-</blockquote>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h3 id="Linux安装adb"><a href="#Linux安装adb" class="headerlink" title="Linux安装adb"></a>Linux安装adb</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install android-tools-adb</span><br></pre></td></tr></table></figure>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="查询adb版本"><a href="#查询adb版本" class="headerlink" title="查询adb版本"></a>查询adb版本</h3><p>使用</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb version</span><br></pre></td></tr></table></figure>
-<p>查看adb版本，发现windows是<code>1.0.41</code>，而WSL下是<code>1.0.39</code></p>
-<h3 id="停用adb服务"><a href="#停用adb服务" class="headerlink" title="停用adb服务"></a>停用adb服务</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb kill-server</span><br></pre></td></tr></table></figure>
-<h3 id="统一版本"><a href="#统一版本" class="headerlink" title="统一版本"></a>统一版本</h3><p>个人是把windows的adb文件替换为<code>1.0.39</code>版本，从而实现内外都可使用adb命令。</p>
-<h2 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h2><p><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA">https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA</a> 提取码: 2333</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42600072/article/details/103129441"></a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/csharp-run-as-admin/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/14/csharp-run-as-admin/" class="post-title-link" itemprop="url">VS设置C#默认以管理员身份调试及启动</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-14 06:58:43" itemprop="dateCreated datePublished" datetime="2020-04-14T06:58:43+08:00">2020-04-14</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="默认以管理员身份调试"><a href="#默认以管理员身份调试" class="headerlink" title="默认以管理员身份调试"></a>默认以管理员身份调试</h2><p>右键项目，添加应用程序清单文件。<br>将<code>&lt;requestedExecutionLevel level=&quot;asInvoker&quot; uiAccess=&quot;false&quot; /&gt;</code><br><code>asInvoker</code>修改为<code>requireAdministrator</code><br>保存后再次点击运行，将提示使用其他凭据重新启动。</p>
-<h2 id="程序自动请求管理员权限"><a href="#程序自动请求管理员权限" class="headerlink" title="程序自动请求管理员权限"></a>程序自动请求管理员权限</h2><p>修改<code>Program.cs</code>的<code>Main</code>方法:</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="built_in">string</span>[] Args</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 当前用户是管理员的时候，直接启动应用程序</span></span><br><span class="line"><span class="comment">     * 如果不是管理员，则使用启动对象启动程序，以确保使用管理员身份运行</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="comment">//获得当前登录的Windows用户标示</span></span><br><span class="line">    System.Security.Principal.WindowsIdentity identity = System.Security.Principal.WindowsIdentity.GetCurrent();</span><br><span class="line">    <span class="comment">//创建Windows用户主题</span></span><br><span class="line">    Application.EnableVisualStyles();</span><br><span class="line"></span><br><span class="line">    System.Security.Principal.WindowsPrincipal principal = <span class="keyword">new</span> System.Security.Principal.WindowsPrincipal(identity);</span><br><span class="line">    <span class="comment">//判断当前登录用户是否为管理员</span></span><br><span class="line">    <span class="keyword">if</span> (principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//如果是管理员，则直接运行</span></span><br><span class="line"></span><br><span class="line">        Application.EnableVisualStyles();</span><br><span class="line">        Application.Run(<span class="keyword">new</span> Form1());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//创建启动对象</span></span><br><span class="line">        System.Diagnostics.ProcessStartInfo startInfo = <span class="keyword">new</span> System.Diagnostics.ProcessStartInfo();</span><br><span class="line">        <span class="comment">//设置运行文件</span></span><br><span class="line">        startInfo.FileName = System.Windows.Forms.Application.ExecutablePath;</span><br><span class="line">        <span class="comment">//设置启动参数</span></span><br><span class="line">        startInfo.Arguments = String.Join(<span class="string">&quot; &quot;</span>, Args);</span><br><span class="line">        <span class="comment">//设置启动动作,确保以管理员身份运行</span></span><br><span class="line">        startInfo.Verb = <span class="string">&quot;runas&quot;</span>;</span><br><span class="line">        <span class="comment">//如果不是管理员，则启动UAC</span></span><br><span class="line">        System.Diagnostics.Process.Start(startInfo);</span><br><span class="line">        <span class="comment">//退出</span></span><br><span class="line">        System.Windows.Forms.Application.Exit();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/testcs_dn/article/details/9903727">C#默认以管理员身份运行程序</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -910,14 +929,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">120</span>
+          <span class="site-state-item-count">124</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

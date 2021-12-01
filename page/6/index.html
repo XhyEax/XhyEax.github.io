@@ -196,6 +196,265 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/15/win10-open-diagtask-for-inside/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/15/win10-open-diagtask-for-inside/" class="post-title-link" itemprop="url">win10 切换诊断数据为完整</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-15 00:01:13" itemprop="dateCreated datePublished" datetime="2020-04-15T00:01:13+08:00">2020-04-15</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>安装windows预览版，需要切换诊断数据为<code>完整</code>，而本人切换到<code>完整</code>后又会自动跳回<code>基本</code>。搜索后找到解决方案。<br>原因是<code>Connected User Experiences and Telemetry</code>服务被禁用</p>
+<h2 id="解决步骤"><a href="#解决步骤" class="headerlink" title="解决步骤"></a>解决步骤</h2><p>Win+R,<code>services.msc</code>,找到<code>Connected User Experiences and Telemetry</code>，设置为<code>自动(延迟启动)</code>，再点击启动此服务即可成功切换</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://tieba.baidu.com/p/6483106526">安装win10预览版，诊断数据无设置成完整</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/wsl-18-04-android-6-source/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/14/wsl-18-04-android-6-source/" class="post-title-link" itemprop="url">WSL(Ubuntu 18.04)编译安卓6.0.0_r1源码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-14 09:54:23" itemprop="dateCreated datePublished" datetime="2020-04-14T09:54:23+08:00">2020-04-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="之前的尝试"><a href="#之前的尝试" class="headerlink" title="之前的尝试"></a>之前的尝试</h2><p>一开始使用wsl1进行编译，即使用了ccache，编译耗时仍难以接受（编译了很久都没结束）<br>之后又使用wsl2进行编译，编译还是需要很久<br>原因猜测：源码位于D盘，wsl访问文件可能需要经过转换，因此IO操作速度慢。<br>搜索发现<a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-ux-changes">WSL 1 与 WSL 2 之间的用户体验更改</a>中提到：</p>
+<blockquote>
+<p>请确保将你要使用 Linux 应用程序频繁访问的文件放在 Linux 根文件系统中，以享受文件性能优势。 这些文件必须位于 Linux 根文件系统内，以便较快地访问文件系统。<br>验证：使用wsl在d盘解压源码，速度远慢于直接在wsl文件系统中解压<br>由此确定最终方案</p>
+</blockquote>
+<h2 id="最终方案"><a href="#最终方案" class="headerlink" title="最终方案"></a>最终方案</h2><p>将源码压缩包移动到linux文件系统下，再解压<br>或者使用repo工具下载源码到linux文件系统</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/14/wsl-18-04-android-6-source/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/wsl-adb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/14/wsl-adb/" class="post-title-link" itemprop="url">WSL中使用adb</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-14 09:34:07" itemprop="dateCreated datePublished" datetime="2020-04-14T09:34:07+08:00">2020-04-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>尝试在wsl中使用adb，发现找不到设备。搜索一番发现是因为adb版本不统一导致的。<br>注意：wsl2中adb无法查询到usb设备，可以通过使用ip地址连接(需要root权限)，或降级到wsl1</p>
+<blockquote>
+<p>在 WSL 2 的初始版本中，将会限制硬件访问支持，例如：你将无法访问 GPU、串行或 USB 设备。<br><a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-faq">WSL2 - 常见问题</a></p>
+</blockquote>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h3 id="Linux安装adb"><a href="#Linux安装adb" class="headerlink" title="Linux安装adb"></a>Linux安装adb</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install android-tools-adb</span><br></pre></td></tr></table></figure>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="查询adb版本"><a href="#查询adb版本" class="headerlink" title="查询adb版本"></a>查询adb版本</h3><p>使用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb version</span><br></pre></td></tr></table></figure>
+<p>查看adb版本，发现windows是<code>1.0.41</code>，而WSL下是<code>1.0.39</code></p>
+<h3 id="停用adb服务"><a href="#停用adb服务" class="headerlink" title="停用adb服务"></a>停用adb服务</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb kill-server</span><br></pre></td></tr></table></figure>
+<h3 id="统一版本"><a href="#统一版本" class="headerlink" title="统一版本"></a>统一版本</h3><p>个人是把windows的adb文件替换为<code>1.0.39</code>版本，从而实现内外都可使用adb命令。</p>
+<h2 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h2><p><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA">https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA</a> 提取码: 2333</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42600072/article/details/103129441"></a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/csharp-run-as-admin/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/14/csharp-run-as-admin/" class="post-title-link" itemprop="url">VS设置C#默认以管理员身份调试及启动</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-14 06:58:43" itemprop="dateCreated datePublished" datetime="2020-04-14T06:58:43+08:00">2020-04-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="默认以管理员身份调试"><a href="#默认以管理员身份调试" class="headerlink" title="默认以管理员身份调试"></a>默认以管理员身份调试</h2><p>右键项目，添加应用程序清单文件。<br>将<code>&lt;requestedExecutionLevel level=&quot;asInvoker&quot; uiAccess=&quot;false&quot; /&gt;</code><br><code>asInvoker</code>修改为<code>requireAdministrator</code><br>保存后再次点击运行，将提示使用其他凭据重新启动。</p>
+<h2 id="程序自动请求管理员权限"><a href="#程序自动请求管理员权限" class="headerlink" title="程序自动请求管理员权限"></a>程序自动请求管理员权限</h2><p>修改<code>Program.cs</code>的<code>Main</code>方法:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="built_in">string</span>[] Args</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 当前用户是管理员的时候，直接启动应用程序</span></span><br><span class="line"><span class="comment">     * 如果不是管理员，则使用启动对象启动程序，以确保使用管理员身份运行</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="comment">//获得当前登录的Windows用户标示</span></span><br><span class="line">    System.Security.Principal.WindowsIdentity identity = System.Security.Principal.WindowsIdentity.GetCurrent();</span><br><span class="line">    <span class="comment">//创建Windows用户主题</span></span><br><span class="line">    Application.EnableVisualStyles();</span><br><span class="line"></span><br><span class="line">    System.Security.Principal.WindowsPrincipal principal = <span class="keyword">new</span> System.Security.Principal.WindowsPrincipal(identity);</span><br><span class="line">    <span class="comment">//判断当前登录用户是否为管理员</span></span><br><span class="line">    <span class="keyword">if</span> (principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//如果是管理员，则直接运行</span></span><br><span class="line"></span><br><span class="line">        Application.EnableVisualStyles();</span><br><span class="line">        Application.Run(<span class="keyword">new</span> Form1());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//创建启动对象</span></span><br><span class="line">        System.Diagnostics.ProcessStartInfo startInfo = <span class="keyword">new</span> System.Diagnostics.ProcessStartInfo();</span><br><span class="line">        <span class="comment">//设置运行文件</span></span><br><span class="line">        startInfo.FileName = System.Windows.Forms.Application.ExecutablePath;</span><br><span class="line">        <span class="comment">//设置启动参数</span></span><br><span class="line">        startInfo.Arguments = String.Join(<span class="string">&quot; &quot;</span>, Args);</span><br><span class="line">        <span class="comment">//设置启动动作,确保以管理员身份运行</span></span><br><span class="line">        startInfo.Verb = <span class="string">&quot;runas&quot;</span>;</span><br><span class="line">        <span class="comment">//如果不是管理员，则启动UAC</span></span><br><span class="line">        System.Diagnostics.Process.Start(startInfo);</span><br><span class="line">        <span class="comment">//退出</span></span><br><span class="line">        System.Windows.Forms.Application.Exit();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/testcs_dn/article/details/9903727">C#默认以管理员身份运行程序</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/13/draw-bintree-by-graphviz/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -600,266 +859,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/03/30/cmd-java-class-file/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/03/30/cmd-java-class-file/" class="post-title-link" itemprop="url">命令行运行java class文件提示“找不到或无法加载主类”的解决方法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-30 10:16:58" itemprop="dateCreated datePublished" datetime="2020-03-30T10:16:58+08:00">2020-03-30</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="报错原因"><a href="#报错原因" class="headerlink" title="报错原因"></a>报错原因</h2><blockquote>
-<p>1.java指令默认在寻找class文件的地址是通过CLASSPATH环境变量中指定的目录中寻找的。<br>2.忽略了package的影响。加载一个类，是需要完整的类名，所以必须要把包名带上</p>
-</blockquote>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>指定生成class文件的文件夹为classpath，执行java指令，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -classpath &quot;D:\source\Java\Painter\bin&quot; app.OpenGLApp</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/IToBeNo_1/article/details/90115468">控制台中运行java类提示”找不到或无法加载主类”错误的原因及解决方案</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/03/28/mips-bubble-sort/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/03/28/mips-bubble-sort/" class="post-title-link" itemprop="url">MIPS冒泡排序 计算机组成原理与设计（第五版）</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-28 01:00:01" itemprop="dateCreated datePublished" datetime="2020-03-28T01:00:01+08:00">2020-03-28</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="代码如下"><a href="#代码如下" class="headerlink" title="代码如下"></a>代码如下</h2><p>（非递减排序）</p>
-<figure class="highlight mips"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">sort:</span><span class="keyword">addi </span>$<span class="built_in">sp</span>,$<span class="built_in">sp</span>,-<span class="number">20</span></span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">ra</span>,<span class="number">16</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s3</span>,<span class="number">12</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s2</span>,<span class="number">8</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s1</span>,<span class="number">4</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">s0</span>,<span class="number">0</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">s2</span>,$<span class="built_in">a0</span></span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">s3</span>,$<span class="built_in">a1</span></span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">s0</span>,$<span class="built_in">zero</span></span><br><span class="line"><span class="symbol">for1tst:</span><span class="keyword">slt </span>$<span class="built_in">t0</span>,$<span class="built_in">s0</span>,$<span class="built_in">s3</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="built_in">t0</span>,$<span class="built_in">zero</span>,exit1</span><br><span class="line"><span class="keyword">addi </span>$<span class="built_in">s1</span>,$<span class="built_in">s0</span>,-<span class="number">1</span></span><br><span class="line"><span class="symbol">for2tst:</span><span class="keyword">slti </span>$<span class="built_in">t0</span>,$<span class="built_in">s1</span>,<span class="number">0</span></span><br><span class="line"><span class="keyword">bne </span>$<span class="built_in">t0</span>,$<span class="built_in">zero</span>,exit2</span><br><span class="line"><span class="keyword">sll </span>$<span class="built_in">t1</span>,$<span class="built_in">s1</span>,<span class="number">2</span></span><br><span class="line"><span class="keyword">add </span>$<span class="built_in">t2</span>,$<span class="built_in">s2</span>,$<span class="built_in">t1</span></span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t3</span>,<span class="number">0</span>($<span class="built_in">t2</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t4</span>,<span class="number">4</span>($<span class="built_in">t2</span>)</span><br><span class="line"><span class="keyword">slt </span>$<span class="built_in">t0</span>,$<span class="built_in">t4</span>,$<span class="built_in">t3</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="built_in">t0</span>,$<span class="built_in">zero</span>,exit2</span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">a0</span>,$<span class="built_in">s2</span></span><br><span class="line"><span class="keyword">move </span>$<span class="built_in">a1</span>,$<span class="built_in">s1</span></span><br><span class="line"><span class="keyword">jal </span><span class="keyword">swap</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">addi </span>$<span class="built_in">s1</span>,$<span class="built_in">s1</span>,-<span class="number">1</span></span><br><span class="line"><span class="keyword">j </span>for2tst</span><br><span class="line"><span class="symbol">exit2:</span><span class="keyword">addi </span>$<span class="built_in">s0</span>,$<span class="built_in">s0</span>,<span class="number">1</span></span><br><span class="line"><span class="keyword">j </span>for1tst</span><br><span class="line"><span class="symbol">exit1:</span><span class="keyword">lw </span>$<span class="built_in">s0</span>,<span class="number">0</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">s1</span>,<span class="number">4</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">s2</span>,<span class="number">8</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">s3</span>,<span class="number">12</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">ra</span>,<span class="number">16</span>($<span class="built_in">sp</span>)</span><br><span class="line"><span class="keyword">addi </span>$<span class="built_in">sp</span>,$<span class="built_in">sp</span>,<span class="number">20</span></span><br><span class="line"><span class="keyword">jr </span>$<span class="built_in">ra</span></span><br><span class="line"><span class="keyword">swap: </span><span class="keyword">sll </span>$<span class="built_in">t1</span>,$<span class="built_in">a1</span>,<span class="number">2</span></span><br><span class="line"><span class="keyword">add </span>$<span class="built_in">t1</span>,$<span class="built_in">a0</span>,$<span class="built_in">t1</span></span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t0</span>,<span class="number">0</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">t2</span>,<span class="number">4</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">t2</span>,<span class="number">0</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">t0</span>,<span class="number">4</span>($<span class="built_in">t1</span>)</span><br><span class="line"><span class="keyword">jr </span>$<span class="built_in">ra</span></span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>计算机组成原理与设计（第五版） 机械工业出版社 第94页</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/03/25/linux-set-swapfile/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/03/25/linux-set-swapfile/" class="post-title-link" itemprop="url">Linux配置虚拟内存文件</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-25 03:51:56" itemprop="dateCreated datePublished" datetime="2020-03-25T03:51:56+08:00">2020-03-25</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="查询当前内存"><a href="#查询当前内存" class="headerlink" title="查询当前内存"></a>查询当前内存</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">free -h</span><br></pre></td></tr></table></figure>
-<h3 id="创建交换文件"><a href="#创建交换文件" class="headerlink" title="创建交换文件"></a>创建交换文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">touch /root/swapfile</span><br><span class="line">dd if=/dev/zero of=/root/swapfile bs=1M count=4096</span><br></pre></td></tr></table></figure>
-<h3 id="格式化交换文件"><a href="#格式化交换文件" class="headerlink" title="格式化交换文件"></a>格式化交换文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkswap /root/swapfile</span><br></pre></td></tr></table></figure>
-<h3 id="启用交换文件"><a href="#启用交换文件" class="headerlink" title="启用交换文件"></a>启用交换文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">swapon /root/swapfile</span><br></pre></td></tr></table></figure>
-<h3 id="配置开机自动加载"><a href="#配置开机自动加载" class="headerlink" title="配置开机自动加载"></a>配置开机自动加载</h3><p>在<code>/etc/fstab</code>文件中添加：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/root/swapfile swap swap defaults 0 0</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/fae46241ba0c">Linux设置虚拟内存</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/03/03/ark-server-linux/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/03/03/ark-server-linux/" class="post-title-link" itemprop="url">方舟生存进化 Linux(CentOS) 开服、mod安装</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-03 04:14:15" itemprop="dateCreated datePublished" datetime="2020-03-03T04:14:15+08:00">2020-03-03</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>阿里云服务器，CentOS 7.7 64位， 2核CPU，4G内存，4G交换空间</p>
-<h3 id="交换空间配置"><a href="#交换空间配置" class="headerlink" title="交换空间配置"></a>交换空间配置</h3><p>见<a href="https://blog.xhyeax.com/2020/03/25/linux-set-swapfile/">Linux配置虚拟内存文件</a></p>
-<h2 id="开服准备"><a href="#开服准备" class="headerlink" title="开服准备"></a>开服准备</h2><h3 id="创建用户并设置密码"><a href="#创建用户并设置密码" class="headerlink" title="创建用户并设置密码"></a>创建用户并设置密码</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adduser arkserver</span><br><span class="line">passwd arkserver</span><br></pre></td></tr></table></figure>
-<h3 id="开放以下端口"><a href="#开放以下端口" class="headerlink" title="开放以下端口"></a>开放以下端口</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">7777/udp</span><br><span class="line">27015/udp</span><br></pre></td></tr></table></figure>
-<p>PS：云服务器一般是在安全组规则中设置放行<br>同时关闭系统自带的防火墙（root用户执行<code>service firewalld stop</code>）</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/03/03/ark-server-linux/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -927,14 +930,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">120</span>
+          <span class="site-state-item-count">124</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
