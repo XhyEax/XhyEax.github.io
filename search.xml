@@ -1496,7 +1496,7 @@
       </tags>
   </entry>
   <entry>
-    <title>Frida ts环境搭建（PyCharm）</title>
+    <title>Frida ts调试环境搭建（PyCharm）</title>
     <url>/2021/11/20/frida-script-debug-env-setup-pycharm/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://blog.xhyeax.com/2021/11/20/frida-script-debug-env-setup-vscode-devtools/">前文</a>使用的是<code>VSCode</code>和<code>DevTools</code>，需要在两个应用间切换，且需要查找最终位置再下断点，比较麻烦。</p>
 <p>于是搭建<code>PyCharm</code>调试环境，可直接在源文件（ts和js）下断点</p>
@@ -3448,7 +3448,7 @@
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://blog.lc4t.me/2021/02/03/%E6%A0%A1%E6%8B%9B%E6%94%BB%E7%95%A5DLC/">校招攻略DLC</a><br><a href="https://coolshell.cn/articles/8790.html">程序算法与人生选择</a><br><a href="https://github.com/SecYouth/sec-jobs">SecYouth/sec-jobs</a><br><a href="https://github.com/cckenny/2020_autumn_mobile_security_interview">cckenny/2020_autumn_mobile_security_interview</a></p>
 ]]></content>
       <tags>
-        <tag>经验</tag>
+        <tag>总结</tag>
       </tags>
   </entry>
 </search>
