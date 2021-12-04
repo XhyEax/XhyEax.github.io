@@ -2497,7 +2497,7 @@
 <h3 id="查看信息"><a href="#查看信息" class="headerlink" title="查看信息"></a>查看信息</h3><p><code>:i?</code>: 查看帮助</p>
 <p><code>:i</code>: 查询信息<br><code>:ic</code>: 列出所有类<br><code>:icl</code>: 列出已加载的类<br><code>:icm</code>: 列出类方法<br><code>:il</code>: 列出模块<br><code>:iE 模块名</code>: 列出模块导出符号</p>
 <h3 id="搜索字符串"><a href="#搜索字符串" class="headerlink" title="搜索字符串"></a>搜索字符串</h3><p><code>:/?</code>：查看帮助</p>
-<p><code>:/ 关键字</code>: 在内存中搜索关键字</p>
+<p><code>:/ 关键字</code>: 在内存中搜索关键字<br><code>:/x 16进制</code>: 在内存中搜索十六进制数据</p>
 <h3 id="打印内存、反汇编"><a href="#打印内存、反汇编" class="headerlink" title="打印内存、反汇编"></a>打印内存、反汇编</h3><p><code>p?</code>：查看帮助 (这是r2的命令，不需要冒号)</p>
 <p><code>s 地址</code>: 设置当前地址</p>
 <p><code>x</code>: <code>hexdump</code>当前地址的内存<br><code>x @ 地址</code>: <code>hexdump</code>指定地址的内存（其他命令同理）<br><code>ps</code>: 打印字符串<br><code>pd</code>: 反汇编</p>
@@ -3449,6 +3449,21 @@
 ]]></content>
       <tags>
         <tag>总结</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>IDAPython 旧版脚本的使用与升级</title>
+    <url>/2021/12/04/idapython-scripts-upgrade/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>执行旧版的<code>IDAPython</code>脚本，提示找不到方法。(如：<code>AttributeError: module &#39;idc&#39; has no attribute &#39;MakeUnknown&#39;</code>）<br>因为<code>IDA 7.0</code>更新了API，并且从<code>7.1</code>开始默认关闭<code>AUTOIMPORT_COMPAT_IDA695</code></p>
+<p>查看源码（<code>python/3/</code>），发现<code>idc_bc695.py</code>包含旧版api与新版的对应关系。</p>
+<h2 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h2><p><a href="https://hex-rays.com/products/ida/news/7_0/docs/idapython_backward_compat_695/">IDA 7.0: IDAPython backward-compatibility with 6.95 APIs</a></p>
+<p><a href="https://hex-rays.com/products/ida/news/7_0/docs/api70_porting_guide/">IDA 7.0 SDK: Porting from IDA 4.9-6.x API to IDA 7.0 API</a></p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="法1-升级脚本"><a href="#法1-升级脚本" class="headerlink" title="法1 升级脚本"></a>法1 升级脚本</h3><p>参照<code>idc_bc695.py</code>，将脚本升级到新版</p>
+<h3 id="法2-使用idc-bc695"><a href="#法2-使用idc-bc695" class="headerlink" title="法2 使用idc_bc695"></a>法2 使用idc_bc695</h3><p>将脚本中的<code>idc</code>模块名替换为<code>idc_bc695</code>即可</p>
+<h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><p><a href="https://wonderkun.cc/2020/12/11/idapython%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/">idapython使用笔记</a></p>
+]]></content>
+      <tags>
+        <tag>IDA</tag>
       </tags>
   </entry>
 </search>

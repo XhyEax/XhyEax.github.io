@@ -28,7 +28,7 @@
 <meta property="og:description" content="概述之前了解到r2frida这一工具，由于环境问题，并未安装成功。 在Kali Linux和Windows上安装r2frida成功，记录一下。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-09-30T18:55:07.000Z">
-<meta property="article:modified_time" content="2021-10-01T02:55:07.000Z">
+<meta property="article:modified_time" content="2021-12-04T10:40:34.012Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="经验">
 <meta property="article:tag" content="Android">
@@ -286,7 +286,7 @@
 <h3 id="查看信息"><a href="#查看信息" class="headerlink" title="查看信息"></a>查看信息</h3><p><code>:i?</code>: 查看帮助</p>
 <p><code>:i</code>: 查询信息<br><code>:ic</code>: 列出所有类<br><code>:icl</code>: 列出已加载的类<br><code>:icm</code>: 列出类方法<br><code>:il</code>: 列出模块<br><code>:iE 模块名</code>: 列出模块导出符号</p>
 <h3 id="搜索字符串"><a href="#搜索字符串" class="headerlink" title="搜索字符串"></a>搜索字符串</h3><p><code>:/?</code>：查看帮助</p>
-<p><code>:/ 关键字</code>: 在内存中搜索关键字</p>
+<p><code>:/ 关键字</code>: 在内存中搜索关键字<br><code>:/x 16进制</code>: 在内存中搜索十六进制数据</p>
 <h3 id="打印内存、反汇编"><a href="#打印内存、反汇编" class="headerlink" title="打印内存、反汇编"></a>打印内存、反汇编</h3><p><code>p?</code>：查看帮助 (这是r2的命令，不需要冒号)</p>
 <p><code>s 地址</code>: 设置当前地址</p>
 <p><code>x</code>: <code>hexdump</code>当前地址的内存<br><code>x @ 地址</code>: <code>hexdump</code>指定地址的内存（其他命令同理）<br><code>ps</code>: 打印字符串<br><code>pd</code>: 反汇编</p>
@@ -413,7 +413,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-count">125</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
