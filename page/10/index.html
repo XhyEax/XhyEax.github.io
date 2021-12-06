@@ -196,6 +196,331 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/14/android-debug-onload/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/09/14/android-debug-onload/" class="post-title-link" itemprop="url">IDA调试安卓so 在libart.so OpenMemory下断点</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-14 00:58:55" itemprop="dateCreated datePublished" datetime="2019-09-14T00:58:55+08:00">2019-09-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>如果想要在so加载时就下断点的话，需要以调试模式运行，并使用ddms进行jdb的连接。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>一部打开了调试开关（ro.debuggable=1）的手机或可调试的apk, IDA及android_server, 已启动的ddms（启动<code>AndroidSDK\tools\monitor.bat</code>）</p>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><h3 id="1-开启端口转发并启动android-server"><a href="#1-开启端口转发并启动android-server" class="headerlink" title="1. 开启端口转发并启动android_server"></a>1. 开启端口转发并启动android_server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb forward tcp:12345 tcp:12345</span><br><span class="line">adb shell su -c <span class="string">&quot;/data/as&quot;</span></span><br></pre></td></tr></table></figure>
+<p>这里使用的是修改过的android_server，默认端口为12345</p>
+<h3 id="2-以调试模式启动app"><a href="#2-以调试模式启动app" class="headerlink" title="2. 以调试模式启动app"></a>2. 以调试模式启动app</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell am start -D -n xyz.sysorem.cokey/.CokeyActivity</span><br></pre></td></tr></table></figure>
+<p>这时手机会显示<code>Waiting For Debugger</code></p>
+<h3 id="3-使用IDA附加及下断点"><a href="#3-使用IDA附加及下断点" class="headerlink" title="3. 使用IDA附加及下断点"></a>3. 使用IDA附加及下断点</h3><p>点击确定前先修改<code>Debug options</code>，把Event下前三个Suspend都勾选上，然后连接。<br>选定要调试的app进程后，在模块列表中找到<code>libart.so</code>，并在目标函数位置下断点<br>然后点击运行</p>
+<h3 id="4-使用jdb附加，使程序继续运行"><a href="#4-使用jdb附加，使程序继续运行" class="headerlink" title="4. 使用jdb附加，使程序继续运行"></a>4. 使用jdb附加，使程序继续运行</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700</span><br></pre></td></tr></table></figure>
+<p>此处的8700即ddms中显示的对应端口<br>正常情况下就会在libc.so处暂停了</p>
+<h3 id="5-dump"><a href="#5-dump" class="headerlink" title="5. dump"></a>5. dump</h3><p>在OpenMemory断下时，按shift+F2，运行dump脚本</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> fp, dex_addr, end_addr;</span><br><span class="line">    fp = <span class="built_in">fopen</span>(<span class="string">&quot;D:\\dump.dex&quot;</span>, <span class="string">&quot;wb&quot;</span>);</span><br><span class="line">    end_addr = r0 + r1;</span><br><span class="line">    <span class="keyword">for</span> ( dex_addr = r0; dex_addr &lt; end_addr; dex_addr ++ )</span><br><span class="line">        <span class="built_in">fputc</span>(<span class="built_in">Byte</span>(dex_addr), fp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/341924686e51">安卓 smali启动就附加调试 的正确步骤</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/13/ida-as-port-reverse/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/09/13/ida-as-port-reverse/" class="post-title-link" itemprop="url">修改IDA android_server默认端口</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-13 12:00:49" itemprop="dateCreated datePublished" datetime="2019-09-13T12:00:49+08:00">2019-09-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>也许有的反调试会检测23946端口是否占用，所以保险起见不妨使用别的端口。<br>可以使用<code>./android_server -p12345</code>指定端口，但是不如直接逆向修改默认端口。</p>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>ida载入android_server，进入main函数，按F5查看伪代码，定位到23946（0x5dba）位置，直接修改即可。<br>可以把<code>5D BA</code>改为<code>39 30</code>，即12345端口</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jiaoxiake/p/6801093.html">浅谈android反调试之 转发端口</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/13/android-source-mod-anti-antidebug/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/09/13/android-source-mod-anti-antidebug/" class="post-title-link" itemprop="url">修改安卓内核源码 过State TracerPid wchan反调试</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-13 11:23:31" itemprop="dateCreated datePublished" datetime="2019-09-13T11:23:31+08:00">2019-09-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>修改安卓内核源码来绕过State字段及TracePid字段反调试</p>
+<h2 id="目标文件"><a href="#目标文件" class="headerlink" title="目标文件"></a>目标文件</h2><p>打开内核源码目录，<code>/fs/proc</code>下的<code>base.c</code>和<code>array.c</code></p>
+<h2 id="修改点"><a href="#修改点" class="headerlink" title="修改点"></a>修改点</h2><h3 id="base-c"><a href="#base-c" class="headerlink" title="base.c"></a>base.c</h3><h4 id="proc-pid-wchan函数"><a href="#proc-pid-wchan函数" class="headerlink" title="proc_pid_wchan函数"></a>proc_pid_wchan函数</h4><p>最后一个else分支改成</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span></span><br><span class="line">    &#123;   <span class="comment">//修改部分</span></span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">strstr</span>(symname,<span class="string">&quot;trace&quot;</span>))</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">sprintf</span>(buffer, <span class="string">&quot;%s&quot;</span>, <span class="string">&quot;sys_epoll_wait&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">sprintf</span>(buffer, <span class="string">&quot;%s&quot;</span>, symname);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>因为/proc/pid/wchan 和 /proc/pid/task/pid/wchan在调试状态下，里面内容为ptrace_stop, 非调试的状态下为ep_poll</p>
+</blockquote>
+<h3 id="array-c"><a href="#array-c" class="headerlink" title="array.c"></a>array.c</h3><h4 id="1-task-state-array字符数组"><a href="#1-task-state-array字符数组" class="headerlink" title="1. task_state_array字符数组"></a>1. task_state_array字符数组</h4><p>将4和8对应的字符（<code>&quot;T (stopped)&quot;</code>和<code>&quot;t (tracing stop)&quot;</code>）<br>都改成<code>&quot;S (sleeping)&quot;</code></p>
+<h4 id="2-task-state函数"><a href="#2-task-state函数" class="headerlink" title="2. task_state函数"></a>2. task_state函数</h4><p>与前文（<a href="https://blog.xhyeax.com/2019/09/13/android-kernel-reverse-anti-antidebug/">逆向修改安卓内核 x64 过TracerPID反调试</a>）目的一致，置<code>TracerPid</code>为0<br>将参数<code>tpid</code>改为0即可</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">seq_printf</span>(m,</span><br><span class="line">		<span class="string">&quot;State:\t%s\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Tgid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Pid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;PPid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;TracerPid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Uid:\t%d\t%d\t%d\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Gid:\t%d\t%d\t%d\t%d\n&quot;</span>,</span><br><span class="line">		<span class="built_in">get_task_state</span>(p),</span><br><span class="line">		<span class="built_in">task_tgid_nr_ns</span>(p, ns),</span><br><span class="line">		<span class="built_in">pid_nr_ns</span>(pid, ns),</span><br><span class="line">		<span class="comment">//修改部分</span></span><br><span class="line">		ppid, <span class="comment">/*tpid*/</span><span class="number">0</span>,</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;uid),</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;euid),</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;suid),</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;fsuid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;gid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;egid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;sgid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;fsgid));</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-940605-1-1.html">Android反调试——从源码入手</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/13/android-kernel-reverse-anti-antidebug/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/09/13/android-kernel-reverse-anti-antidebug/" class="post-title-link" itemprop="url">逆向修改安卓内核 x64 过TracerPID反调试</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-13 00:42:11" itemprop="dateCreated datePublished" datetime="2019-09-13T00:42:11+08:00">2019-09-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="建议在git-bash下操作"><a href="#建议在git-bash下操作" class="headerlink" title="建议在git bash下操作"></a>建议在git bash下操作</h2><p>本人解压<code>kernel.gz</code>时使用的不是命令行，导致没有看到输出信息<code>gzip trailing garbage ignored</code>，进而没有对这些数据进行处理，浪费了很多时间。</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手动nop掉TracerPID反调试代码，当然比不上直接修改内核来的快。<br>如果有内核源码以及环境，当然可以通过直接修改源码的方式生成<code>boot.img</code>。<br>在无内核源码（或者还没配置安卓源码编译环境）的情况下则只能通过逆向来修改内核。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/09/13/android-kernel-reverse-anti-antidebug/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/08/02/android-studio-import-so/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/08/02/android-studio-import-so/" class="post-title-link" itemprop="url">Android Studio 导入so</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-08-02 11:31:11" itemprop="dateCreated datePublished" datetime="2019-08-02T11:31:11+08:00">2019-08-02</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在<code>src/main</code>目录下新建<code>jniLibs</code>文件夹 ，添加cpu架构文件夹，如<code>armeabi-v7a</code>，把so文件复制进去即可。<br>编译时会自动打包。</p>
+<p>配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        ndk &#123;</span><br><span class="line">            abiFilters  &#x27;armeabi-v7a&#x27;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/anhenzhufeng/article/details/78913341">Android studio添加第三方库和so</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/07/03/cpp_vscode_segmentation_fault_cygwinS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -518,345 +843,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/13/vscode-cpp-multiplefile/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/04/13/vscode-cpp-multiplefile/" class="post-title-link" itemprop="url">VSCode配置C++多文件环境</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-04-13 14:52:07" itemprop="dateCreated datePublished" datetime="2019-04-13T14:52:07+08:00">2019-04-13</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="修正"><a href="#修正" class="headerlink" title="修正"></a>修正</h2><p>发现makefile存在问题，仅会编译比main.cpp更新的依赖文件，导致每次都要make两次才能正常调试。已修改<code>$?</code>为<code>$^</code></p>
-<blockquote>
-<p>$@ –代表目标文件(target)<br>$^  –代表所有的依赖文件(components)<br>$&lt;  –代表第一个依赖文件(components中最左边的那个)<br>$?  –代表比目标还要新的依赖文件列表</p>
-</blockquote>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前从知乎抄的配置只能编译单文件源文件，编译多文件的话需要手动修改g++编译参数（不能忍啊→_→），于是搜索之，找到解决方案。<br>关键词：makefile</p>
-<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>原本使用VSCode就可以正常进行编译调试等操作。<br>已安装make工具并添加到环境变量，我自己用的是<code>mingw32-make</code><br>（也可使用msys提供的工具包，度盘链接: <a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1zJBcS6tjfXlwg1kP6VnLSg">https://pan.baidu.com/s/1zJBcS6tjfXlwg1kP6VnLSg</a> 提取码: f9ya）</p>
-<h2 id="具体方案"><a href="#具体方案" class="headerlink" title="具体方案"></a>具体方案</h2><h3 id="构建makefile模板"><a href="#构建makefile模板" class="headerlink" title="构建makefile模板"></a>构建makefile模板</h3><p>我基本是直接复制参考博文里的模板(修改标准库为17)，内容如下</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># originating https://github.com/TheNetAdmin/Makefile-Templates</span></span><br><span class="line"><span class="comment"># tool marcros</span></span><br><span class="line">CC := g++</span><br><span class="line">CCFLAG := -std=c++17</span><br><span class="line">DBGFLAG := -g</span><br><span class="line">CCOBJFLAG := <span class="variable">$(CCFLAG)</span> -c</span><br><span class="line"></span><br><span class="line"><span class="comment"># path marcros</span></span><br><span class="line">BIN_PATH := bin</span><br><span class="line">OBJ_PATH := obj</span><br><span class="line">SRC_PATH := src</span><br><span class="line">DBG_PATH := debug</span><br><span class="line"></span><br><span class="line"><span class="comment"># compile marcros</span></span><br><span class="line">TARGET_NAME := main</span><br><span class="line"><span class="keyword">ifeq</span> (<span class="variable">$(OS)</span>,Windows_NT)</span><br><span class="line">	TARGET_NAME := <span class="variable">$(<span class="built_in">addsuffix</span> .exe,<span class="variable">$(TARGET_NAME)</span>)</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line">TARGET := <span class="variable">$(BIN_PATH)</span>/<span class="variable">$(TARGET_NAME)</span></span><br><span class="line">TARGET_DEBUG := <span class="variable">$(DBG_PATH)</span>/<span class="variable">$(TARGET_NAME)</span></span><br><span class="line">MAIN_SRC := src/main.cpp</span><br><span class="line"></span><br><span class="line"><span class="comment"># src files &amp; obj files</span></span><br><span class="line">SRC := <span class="variable">$(<span class="built_in">foreach</span> x, <span class="variable">$(SRC_PATH)</span>, $(<span class="built_in">wildcard</span> $(<span class="built_in">addprefix</span> <span class="variable">$(x)</span>/*,.c*)</span>))</span><br><span class="line">OBJ := <span class="variable">$(<span class="built_in">addprefix</span> <span class="variable">$(OBJ_PATH)</span>/, $(<span class="built_in">addsuffix</span> .o, $(<span class="built_in">notdir</span> $(<span class="built_in">basename</span> <span class="variable">$(SRC)</span>)</span>)))</span><br><span class="line">OBJ_DEBUG := <span class="variable">$(<span class="built_in">addprefix</span> <span class="variable">$(DBG_PATH)</span>/, $(<span class="built_in">addsuffix</span> .o, $(<span class="built_in">notdir</span> $(<span class="built_in">basename</span> <span class="variable">$(SRC)</span>)</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment"># clean files list</span></span><br><span class="line">DISTCLEAN_LIST := <span class="variable">$(OBJ)</span> \</span><br><span class="line">                  <span class="variable">$(OBJ_DEBUG)</span></span><br><span class="line">CLEAN_LIST := <span class="variable">$(TARGET)</span> \</span><br><span class="line">			  <span class="variable">$(TARGET_DEBUG)</span> \</span><br><span class="line">			  <span class="variable">$(DISTCLEAN_LIST)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># default rule</span></span><br><span class="line"><span class="section">default: all</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># non-phony targets</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(OBJ)</span></span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$^</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(OBJ_PATH)</span>/%.o: <span class="variable">$(SRC_PATH)</span>/%.c*</span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCOBJFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(DBG_PATH)</span>/%.o: <span class="variable">$(SRC_PATH)</span>/%.c*</span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCOBJFLAG)</span> <span class="variable">$(DBGFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(TARGET_DEBUG)</span>: <span class="variable">$(OBJ_DEBUG)</span></span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCFLAG)</span> <span class="variable">$(DBGFLAG)</span> <span class="variable">$^</span> -o <span class="variable">$@</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># phony rules</span></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: all</span></span><br><span class="line"><span class="section">all: <span class="variable">$(TARGET)</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: debug</span></span><br><span class="line"><span class="section">debug: <span class="variable">$(TARGET_DEBUG)</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: clean</span></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	@echo CLEAN <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line">	@rm -f <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: distclean</span></span><br><span class="line"><span class="section">distclean:</span></span><br><span class="line">	@echo CLEAN <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line">	@rm -f <span class="variable">$(DISTCLEAN_LIST)</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h3><p>src文件夹下放源文件以及头文件，后面还要需要修改<code>.vscode</code>中的<code>task.json</code>和<code>launch.json</code><br>注意：如果使用本文中的makefle，包含主函数的源文件名必须为<code>main.cpp</code><br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/VSCode-cpp-mf.png"></p>
-<h3 id="task-json"><a href="#task-json" class="headerlink" title="task.json"></a>task.json</h3><p>如果你使用的是msys的工具包，那command就写make<br>按快捷键<code>Ctrl+Shift+B</code>可以执行仅生成命令（build）<br>（在微软输入法中文模式时会出现表情窗口←_←）</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;2.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;tasks&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;default&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;group&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;kind&quot;</span>: <span class="string">&quot;build&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;isDefault&quot;</span>: <span class="literal">true</span></span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build-debug&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;debug&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;clean&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;clean&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="launch-json"><a href="#launch-json" class="headerlink" title="launch.json"></a>launch.json</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// https://github.com/Microsoft/vscode-cpptools/blob/master/launch.md</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;0.2.0&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;configurations&quot;</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;(gdb) Launch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;cppdbg&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;request&quot;</span>: <span class="string">&quot;launch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;program&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/debug/main.exe&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;args&quot;</span>: [],</span><br><span class="line">            <span class="attr">&quot;stopAtEntry&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">&quot;cwd&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/debug/&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;environment&quot;</span>: [],</span><br><span class="line">            <span class="attr">&quot;externalConsole&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">&quot;internalConsoleOptions&quot;</span>: <span class="string">&quot;neverOpen&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;MIMode&quot;</span>: <span class="string">&quot;gdb&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;miDebuggerPath&quot;</span>: <span class="string">&quot;gdb.exe&quot;</span>, <span class="comment">// 调试器路径，Windows下后缀不能省略，Linux下则去掉</span></span><br><span class="line">            <span class="attr">&quot;setupCommands&quot;</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">&quot;description&quot;</span>: <span class="string">&quot;Enable pretty-printing for gdb&quot;</span>,</span><br><span class="line">                    <span class="attr">&quot;text&quot;</span>: <span class="string">&quot;-enable-pretty-printing&quot;</span>,</span><br><span class="line">                    <span class="attr">&quot;ignoreFailures&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">&quot;preLaunchTask&quot;</span>: <span class="string">&quot;build-debug&quot;</span> <span class="comment">// 调试会话开始前执行的任务，一般为编译程序。与tasks.json的label相对应</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="配置完成"><a href="#配置完成" class="headerlink" title="配置完成"></a>配置完成</h3><p>enjoy it!<br>😉</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wzxlovesy/article/details/76708151">VS Code 配置 C/C++ 环境</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/07/2019-hzwas-wp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/04/07/2019-hzwas-wp/" class="post-title-link" itemprop="url">2019中国杭州网络安全技能大赛 预选赛 哈夫曼之谜 & EasyCpp Writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-04-07 12:03:45" itemprop="dateCreated datePublished" datetime="2019-04-07T12:03:45+08:00">2019-04-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Reverse-EasyCpp"><a href="#Reverse-EasyCpp" class="headerlink" title="Reverse EasyCpp"></a>Reverse EasyCpp</h2><p>[2019/10/25更新]<br>首先读入16个数字，然后生成一个斐波那契数组，长度也为16<br>然后对输入数组进行操作，从第二位开始，都加上第一位的值（<code>transform</code>）<br>动态调试可知<code>accumulate</code>的匿名函数对运算完的数组做反转操作<br>然后与斐波那契数组比较，相同则输出flag<br>也就是说输入的第一个数字是不会变的，所以就是987<br>后面的数字直接脚本跑一下就可以得到结果了</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/04/07/2019-hzwas-wp/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/02/emui9-magisk-install/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/04/02/emui9-magisk-install/" class="post-title-link" itemprop="url">emui9安装Magisk框架</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-04-02 04:49:28" itemprop="dateCreated datePublished" datetime="2019-04-02T04:49:28+08:00">2019-04-02</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="准备条件"><a href="#准备条件" class="headerlink" title="准备条件"></a>准备条件</h2><p>(设备已解锁BL，电脑fastboot环境正常是前提条件)<br>已下载magisk框架rec安装包（<a target="_blank" rel="noopener" href="https://github.com/topjohnwu/Magisk/releases/">github下载</a>），有sd卡（<code>adb sideload</code>未测试是否可安装，建议用内存卡），并已安装第三方recovery（以下简称rec）<br>或<br>已安装magisk框架app，且有原厂<code>recovery_ramdisk</code>镜像</p>
-<h2 id="安装方式"><a href="#安装方式" class="headerlink" title="安装方式"></a>安装方式</h2><p>fastboot刷入命令（华为没有boot分区，所以rec也是通过这个指令刷入）<br>(BOOT.img请自行替换为对应镜像名)</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastboot flash recovery_ramdisk BOOT.img</span><br></pre></td></tr></table></figure>
-<h3 id="rec安装法"><a href="#rec安装法" class="headerlink" title="rec安装法"></a>rec安装法</h3><p>启动至第三方rec，从sd卡选择magisk卡刷包，安装。<br>安装完成后选择重启到rec模式，即可进入带面具的系统</p>
-<h3 id="修补镜像直接刷入法"><a href="#修补镜像直接刷入法" class="headerlink" title="修补镜像直接刷入法"></a>修补镜像直接刷入法</h3><p>参考<a target="_blank" rel="noopener" href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a>，个人未测试，应该可行<br>提取出原厂<code>recovery_ramdisk</code>镜像（从官方线刷包或其他地方获得），并发送到手机（模拟器应该也行）<br>使用magisk框架app，选择安装，修补boot镜像，选择提取出的原厂镜像<br>修补完成后传回电脑，手机进入fastboot模式，刷入即可</p>
-<h2 id="启动方式"><a href="#启动方式" class="headerlink" title="启动方式"></a>启动方式</h2><p>由于修补的镜像其实是rec分区，所以要按照进入rec的方式进入带面具的系统。<br>（个人测试，在带magisk的系统下重启仍然是有root的，等价于启动到rec）<br>具体操作如图（图源自参考帖）<br><img src="https://clubimg.club.vmall.com/data/attachment/forum/201902/11/221928oai3dhzxzbbrd42d.jpg"></p>
-<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>如果安装了不适配的模块，还是需要刷入第三方rec，进入后删除<code>/data/adb</code>文件夹，然后即可正常开机（magisk要重刷）。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/03/15/android-floatview/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/03/15/android-floatview/" class="post-title-link" itemprop="url">安卓8.0以上创建悬浮窗</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-03-15 15:42:36" itemprop="dateCreated datePublished" datetime="2019-03-15T15:42:36+08:00">2019-03-15</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>代码在8.0以下系统可正常创建悬浮窗，8.0以上则创建不了。原因是悬浮窗样式需要重新设置。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>增加SDK判断代码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) &#123;</span><br><span class="line">    wmParams.type = LayoutParams.TYPE_APPLICATION_OVERLAY;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span>&#123;</span><br><span class="line">    wmParams.type = LayoutParams.TYPE_PHONE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="判断是否拥有悬浮窗权限并申请"><a href="#判断是否拥有悬浮窗权限并申请" class="headerlink" title="判断是否拥有悬浮窗权限并申请"></a>判断是否拥有悬浮窗权限并申请</h2><p>安卓6.0（代号M，SDK 23）之后，需要动态申请权限，悬浮窗权限也不例外。所以可以在添加以下代码来申请悬浮窗权限。<br>PS：当然，必须在<code>AndroidManifest.xml</code>中添加<br><code>&lt;uses-permission android:name=&quot;android.permission.SYSTEM_ALERT_WINDOW&quot; /&gt;</code></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= <span class="number">23</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (!Settings.canDrawOverlays(activity))</span><br><span class="line">                &#123;</span><br><span class="line">                    Intent it = <span class="keyword">new</span> Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);</span><br><span class="line">                    activity.startActivityForResult(it, <span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@TargetApi(23)</span> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onActivityResult</span><span class="params">(<span class="keyword">int</span> reqCode, <span class="keyword">int</span> resCode, Intent data)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!Settings.canDrawOverlays(<span class="keyword">this</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        Toast.makeText(<span class="keyword">this</span>, <span class="string">&quot;未授予悬浮窗权限！&quot;</span>, Toast.LENGTH_LONG).show();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        Toast.makeText(<span class="keyword">this</span>, <span class="string">&quot;悬浮窗权限授予成功！&quot;</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/28/android-reverse-fix-arsc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/02/28/android-reverse-fix-arsc/" class="post-title-link" itemprop="url">修复反编译资源文件报错问题(resource spec)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-02-28 08:44:40" itemprop="dateCreated datePublished" datetime="2019-02-28T08:44:40+08:00">2019-02-28</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="关于0x01010540错误"><a href="#关于0x01010540错误" class="headerlink" title="关于0x01010540错误"></a>关于<code>0x01010540</code>错误</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code><br>具体方法见后文</p>
-<h2 id="关于0x01010543错误"><a href="#关于0x01010543错误" class="headerlink" title="关于0x01010543错误"></a>关于<code>0x01010543</code>错误</h2><p>如果只有</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
-<p>没有<code>UndefinedResObject</code><br>则更换<code>apktool</code>后再试<br><code>apktool</code>可以在<a target="_blank" rel="noopener" href="https://down.52pojie.cn/Tools/Android_Tools/">爱盘</a>下载</p>
-<p>实在要修复的话，往下看：（都是修改<code>resources.arsc</code>）</p>
-<h2 id="修复UndefinedResObject错误"><a href="#修复UndefinedResObject错误" class="headerlink" title="修复UndefinedResObject错误"></a>修复UndefinedResObject错误</h2><p>报错信息：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; brut.androlib.err.UndefinedResObject: resource spec: 0x7f000006</span><br></pre></td></tr></table></figure>
-
-<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><code>aapt dump</code>查看apk的资源信息，并保存到文件</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aapt d --values resources test.apk &gt;1.txt</span><br></pre></td></tr></table></figure>
-<p>找到<code>DataType</code>数据类型不正确的值（搜索<code>attribute</code>即可）对应的描述符（一般是把7f改成00，<code>0x00000006</code>）<br>文件中没有识别出正确的数据类型，显示的是<code>(attribute) 0x00000006</code><br>使用<code>010Editor</code>，Ctrl+F，字节形式搜索对应描述的16进制数的小端字节（就是<code>00000006</code>写成<code>06000000</code>）<br>然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
-<h2 id="修复resource-spec-0x01010543"><a href="#修复resource-spec-0x01010543" class="headerlink" title="修复resource spec: 0x01010543"></a>修复resource spec: 0x01010543</h2><p>报错信息：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
-<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>12345678</code>写成<code>78564312</code>）<br>这里我们搜索<code>43050101</code>，然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
-<h2 id="修复resource-spec-0x01010540"><a href="#修复resource-spec-0x01010540" class="headerlink" title="修复resource spec: 0x01010540"></a>修复resource spec: 0x01010540</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code></p>
-<h3 id="解决方法-2"><a href="#解决方法-2" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>40050101</code>换成<code>8f040101</code>）</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u012400885/article/details/80409689">记录Android Killer反编译时遇到的异常</a><br><a target="_blank" rel="noopener" href="http://blog.csdn.net/pwelyn/article/details/50620136">保护Android resources文件不被反编译原理分析</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -928,14 +914,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-count">130</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

@@ -109,15 +109,20 @@
   <entry>
     <title>安卓9 设置热点固定IP (Xposed)</title>
     <url>/2021/03/01/android-9-set-hotpot-ip/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定IP。</p>
-<h2 id="跟踪源代码"><a href="#跟踪源代码" class="headerlink" title="跟踪源代码"></a>跟踪源代码</h2><p>定位到<code>com.android.server.connectivity.tethering.TetherInterfaceStateMachine</code>类（<a href="http://aospxref.com/android-9.0.0_r61/xref/frameworks/base/services/core/java/com/android/server/connectivity/tethering/TetherInterfaceStateMachine.java">源代码</a>）</p>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定热点IP。</p>
+<span id="more"></span>
+<h2 id="安卓8热点开启流程"><a href="#安卓8热点开启流程" class="headerlink" title="安卓8热点开启流程"></a>安卓8热点开启流程</h2><p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/softap-android-o.png"><br>图源：<a href="https://blog.csdn.net/AurumMann/article/details/103028026">android8.0热点打开流程，从Setting到framework</a></p>
+<h2 id="跟踪源码"><a href="#跟踪源码" class="headerlink" title="跟踪源码"></a>跟踪源码</h2><p>最终定位到<code>com.android.server.connectivity.tethering.TetherInterfaceStateMachine</code>类（<a href="http://aospxref.com/android-9.0.0_r61/xref/frameworks/base/services/core/java/com/android/server/connectivity/tethering/TetherInterfaceStateMachine.java#210">源代码</a>）</p>
 <p>函数调用链：<code>startIPv4</code>-<code>configureIPv4</code>-<code>getRandomWifiIPv4Address</code></p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">configureIPv4</span><span class="params">(<span class="keyword">boolean</span> enabled)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (mInterfaceType == ConnectivityManager.TETHERING_WIFI) &#123;</span><br><span class="line">    ipAsString = getRandomWifiIPv4Address();</span><br><span class="line">    prefixLen = WIFI_HOST_IFACE_PREFIX_LENGTH;</span><br><span class="line">&#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><code>getRandomWifiIPv4Address</code>函数对主机IP地址进行随机处理，然后返回字符串。修改其返回值，即可固定IP。</p>
+<p>调用<code>getRandomWifiIPv4Address</code>函数生成主机IP地址后，转换为<code>LinkAddress</code>，最终调用<code>ifcg.setLinkAddress</code>设置IP：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> LinkAddress linkAddr;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">final</span> InterfaceConfiguration ifcg = mNMService.getInterfaceConfig(mIfaceName);</span><br><span class="line">    <span class="keyword">if</span> (ifcg == <span class="keyword">null</span>) &#123;</span><br><span class="line">        mLog.e(<span class="string">&quot;Received null interface config&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    InetAddress addr = NetworkUtils.numericToInetAddress(ipAsString);</span><br><span class="line">    linkAddr = <span class="keyword">new</span> LinkAddress(addr, prefixLen);</span><br><span class="line">    ifcg.setLinkAddress(linkAddr);</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
+
+<p>查找<code>getRandomWifiIPv4Address</code>的交叉引用，发现只有这一处。直接修改返回值，即可固定IP。</p>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>使用Xposed框架Hook该函数（过滤包名android），设置返回值为<code>192.168.43.1</code>即可</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hook</span> <span class="keyword">implements</span> <span class="title">IXposedHookLoadPackage</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String classname = <span class="string">&quot;com.android.server.connectivity.tethering.TetherInterfaceStateMachine&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String methodname = <span class="string">&quot;getRandomWifiIPv4Address&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String WIFI_HOST_IFACE_ADDR = <span class="string">&quot;192.168.43.1&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleLoadPackage</span><span class="params">(XC_LoadPackage.LoadPackageParam lpparam)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (lpparam.packageName.equals(<span class="string">&quot;android&quot;</span>)) &#123;</span><br><span class="line">            Class clz = XposedHelpers.findClass(classname, lpparam.classLoader);</span><br><span class="line"></span><br><span class="line">            findAndHookMethod(clz, methodname, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">                    <span class="keyword">return</span> WIFI_HOST_IFACE_ADDR;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/sinat_20059415/article/details/82956145]">（九十七）Android O WiFi热点 开启流程梳理续（二）</a></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hook</span> <span class="keyword">implements</span> <span class="title">IXposedHookLoadPackage</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String classname = <span class="string">&quot;com.android.server.connectivity.tethering.TetherInterfaceStateMachine&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String methodname = <span class="string">&quot;getRandomWifiIPv4Address&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String WIFI_HOST_IFACE_ADDR = <span class="string">&quot;192.168.43.1&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleLoadPackage</span><span class="params">(XC_LoadPackage.LoadPackageParam lpparam)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (lpparam.packageName.equals(<span class="string">&quot;android&quot;</span>)) &#123;</span><br><span class="line">            Class&lt;?&gt; clz = XposedHelpers.findClass(classname, lpparam.classLoader);</span><br><span class="line"></span><br><span class="line">            findAndHookMethod(clz, methodname, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> </span>&#123;</span><br><span class="line">                    <span class="keyword">return</span> WIFI_HOST_IFACE_ADDR;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://android.stackexchange.com/questions/213514/how-can-i-permanently-change-my-hotspot-tethering-ip-address">How can I permanently change my hotspot tethering IP address?</a></p>
 ]]></content>
       <tags>
         <tag>Android</tag>
@@ -869,6 +874,7 @@
 ]]></content>
       <tags>
         <tag>Android</tag>
+        <tag>ARM</tag>
       </tags>
   </entry>
   <entry>
@@ -3459,11 +3465,116 @@
 <h2 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h2><p><a href="https://hex-rays.com/products/ida/news/7_0/docs/idapython_backward_compat_695/">IDA 7.0: IDAPython backward-compatibility with 6.95 APIs</a></p>
 <p><a href="https://hex-rays.com/products/ida/news/7_0/docs/api70_porting_guide/">IDA 7.0 SDK: Porting from IDA 4.9-6.x API to IDA 7.0 API</a></p>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="法1-升级脚本"><a href="#法1-升级脚本" class="headerlink" title="法1 升级脚本"></a>法1 升级脚本</h3><p>参照<code>idc_bc695.py</code>，将脚本升级到新版</p>
-<h3 id="法2-使用idc-bc695"><a href="#法2-使用idc-bc695" class="headerlink" title="法2 使用idc_bc695"></a>法2 使用idc_bc695</h3><p>将脚本中的<code>idc</code>模块名替换为<code>idc_bc695</code>即可</p>
+<h3 id="法2-使用idc-bc695"><a href="#法2-使用idc-bc695" class="headerlink" title="法2 使用idc_bc695"></a>法2 使用idc_bc695</h3><p>将脚本中的模块名<code>idc</code>替换为<code>idc_bc695</code>即可</p>
 <h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><p><a href="https://wonderkun.cc/2020/12/11/idapython%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/">idapython使用笔记</a></p>
 ]]></content>
       <tags>
         <tag>IDA</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用VSCode调试PHP代码（XDebug）</title>
+    <url>/2021/12/05/vscode-debug-php/</url>
+    <content><![CDATA[<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p><code>VSCode</code>：安装<code>PHP Debug</code>拓展<br><code>PHP 7.4.26</code>（<a href="https://sourceforge.net/projects/xampp/">XAMPP</a>）：<code>xampp-windows-x64-7.4.26-0-VC15-installer.exe</code></p>
+<p><code>XDebug</code>：使用<code>D:\xampp\php\ext</code>自带的<code>2.8.1</code>版本的<code>php_xdebug.dll</code></p>
+<span id="more"></span>
+
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h3 id="php-ini"><a href="#php-ini" class="headerlink" title="php.ini"></a>php.ini</h3><p>增加以下内容：</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="section">[XDebug]</span></span><br><span class="line"><span class="attr">zend_extension</span>=php_xdebug.dll</span><br><span class="line"><span class="attr">xdebug.remote_enable</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">xdebug.remote_autostart</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">xdebug.remote_handler</span> = <span class="string">&quot;dbgp&quot;</span></span><br><span class="line"><span class="attr">xdebug.remote_port</span> = <span class="string">&quot;9003&quot;</span></span><br><span class="line"><span class="attr">xdebug.remote_host</span> = <span class="string">&quot;127.0.0.1&quot;</span></span><br></pre></td></tr></table></figure>
+<p>重启<code>PHP</code>，打开<a href="http://localhost/dashboard/phpinfo.php">http://localhost/dashboard/phpinfo.php</a>查看是否启动成功（搜索<code>xdebug</code>）</p>
+<h3 id="VSCode"><a href="#VSCode" class="headerlink" title="VSCode"></a>VSCode</h3><h4 id="setting-json"><a href="#setting-json" class="headerlink" title="setting.json"></a>setting.json</h4><p>打开网站根目录（如<code>D:\xampp\htdocs</code>），打开一个<code>php</code>文件（如<code>index.php</code>），然后使用<code>VSCode</code>打开<br>如果之前没配置过php路径，会提示配置<code>php.validate.executablePath</code><br>修改<code>setting.json</code>，增加路径配置：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;php.validate.executablePath&quot;</span>: <span class="string">&quot;D:\\xampp\\php\\php.exe&quot;</span>,</span><br><span class="line"><span class="string">&quot;php.debug.executablePath&quot;</span>: <span class="string">&quot;D:\\xampp\\php\\php.exe&quot;</span>,</span><br></pre></td></tr></table></figure>
+<h4 id="launch-json"><a href="#launch-json" class="headerlink" title="launch.json"></a>launch.json</h4><p>增加<code>Listen for Xdebug</code>配置，端口与<code>php.ini</code>的配置保持一致<br>如：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;Listen for Xdebug&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;php&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;request&quot;</span>: <span class="string">&quot;launch&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;port&quot;</span>: <span class="number">9003</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><p>附加后下断点即可，可使用<code>curl</code>发送请求：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl http://localhost/index.php</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/phonecom/p/10340038.html#/c/subject/p/10340038.html">VSCode+Xdebug断点调试PHP（全攻略）</a></p>
+]]></content>
+      <tags>
+        <tag>VSCode</tag>
+        <tag>PHP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>无手机号 解除战网通行证锁定</title>
+    <url>/2021/12/05/unlock-battlenet-acconut/</url>
+    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>绑定的身份证是随机生成的，绑定手机号已注销，仅邮箱可用</p>
+<p>注销登陆后提示手机短信验证，由于无法接收验证码，故无法登录</p>
+<h2 id="解锁方式"><a href="#解锁方式" class="headerlink" title="解锁方式"></a>解锁方式</h2><p>操作来自<a href="https://www.iyingdi.com/tz/post/5022004">账号丢了，求助-旅法师营地</a>，笔者验证成功</p>
+<span id="more"></span>
+<h3 id="1-多次登录，触发邮件重置密码（推荐）"><a href="#1-多次登录，触发邮件重置密码（推荐）" class="headerlink" title="1. 多次登录，触发邮件重置密码（推荐）"></a>1. 多次登录，触发邮件重置密码（推荐）</h3><p>在PC浏览器上，打开<a href="https://www.battlenet.com.cn/login/zh/">战网登录页面</a>，使用正确密码多次尝试登录（点击<code>登录</code>-提示短信验证后返回-再次点击<code>登录</code>）。<br>此时会收到密码重置邮件。<br>点击链接重置密码后，使用同一浏览器环境绑定安全令（如果提示<code>安全令无效</code>，则将安全令的<code>-</code>去掉后再试）即可。</p>
+<h3 id="2-拨打客服电话解冻"><a href="#2-拨打客服电话解冻" class="headerlink" title="2. 拨打客服电话解冻"></a>2. 拨打客服电话解冻</h3><p>工作时间（每天早上10点到晚上9点），拨打网易客服电话<code>057128090163</code><br>按数字5选择<code>账号冻结问题</code>，再按3<code>保护性冻结</code>，最后按2<code>人工服务</code><br>告知客服：手机号已注销，且身份证是网上找的，邮件仍可用，希望能够解冻<br>此时需要回答账号常用地点及上次登陆时间<br>之后等待客服提交表单，处理完成后会发送密码重置邮件<br>重置后绑定安全令即可</p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用油猴脚本自动加载JQuery</title>
+    <url>/2021/12/06/auto-load-jquery-by-tampermonkey/</url>
+    <content><![CDATA[<h2 id="脚本"><a href="#脚本" class="headerlink" title="脚本"></a>脚本</h2><p><a href="https://github.com/XhyEax/JQueryAutoLoad">XhyEax/JQueryAutoLoad</a></p>
+<span id="more"></span>
+
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ==UserScript==</span></span><br><span class="line"><span class="comment">// @namespace    http://github.com/XhyEax/JQueryAutoLoad</span></span><br><span class="line"><span class="comment">// @name         JQueryAutoLoad</span></span><br><span class="line"><span class="comment">// @version      0.1</span></span><br><span class="line"><span class="comment">// @description  JQuery autoload</span></span><br><span class="line"><span class="comment">// @author       Xhy</span></span><br><span class="line"><span class="comment">// @match        *://*.github.com/*</span></span><br><span class="line"><span class="comment">// @match        *://*/*</span></span><br><span class="line"><span class="comment">// @grant        none</span></span><br><span class="line"><span class="comment">// @run-at       document-end</span></span><br><span class="line"><span class="comment">// ==/UserScript==</span></span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">    &#x27;use strict&#x27;</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> jQuery == <span class="string">&#x27;undefined&#x27;</span> || <span class="keyword">typeof</span> $ == <span class="string">&#x27;undefined&#x27;</span>) &#123;</span><br><span class="line">        loadJQuery();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;JQuery has been loaded.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">loadJQuery</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;JQuery or $ not found, try to load.&quot;</span>)</span><br><span class="line">        <span class="keyword">var</span> script = <span class="built_in">document</span>.createElement(<span class="string">&#x27;script&#x27;</span>);</span><br><span class="line">        script.type = <span class="string">&quot;text/javascript&quot;</span>;</span><br><span class="line">        script.src = <span class="string">&quot;https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js&quot;</span>;</span><br><span class="line">        <span class="keyword">var</span> parent = <span class="built_in">document</span>.getElementsByTagName(<span class="string">&#x27;head&#x27;</span>)[<span class="number">0</span>] || <span class="built_in">document</span>.getElementsByTagName(<span class="string">&#x27;body&#x27;</span>)[<span class="number">0</span>];</span><br><span class="line">        parent.appendChild(script);</span><br><span class="line">        script.onload = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123; <span class="built_in">console</span>.log(<span class="string">&quot;JQuery loaded.&quot;</span>); &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>Web</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>修复Mac Android Studio无法调试</title>
+    <url>/2021/12/06/android-studio-stuck-at-debug/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Mac版<code>Android Studio</code>调试，提示<code>Invalid argument : Argument invalid [port]</code><br>搜索得到解决方案，原因是找不到<code>localhost</code>，在<code>/etc/hosts</code>中配置即可（之前不小心覆盖了）</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p><code>sudo vim /etc/hosts</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">##</span><br><span class="line"># Host Database</span><br><span class="line">#</span><br><span class="line"># localhost is used to configure the loopback interface</span><br><span class="line"># when the system is booting.  Do not change this entry.</span><br><span class="line">##</span><br><span class="line">127.0.0.1       localhost</span><br><span class="line">255.255.255.255 broadcasthost</span><br><span class="line">::1             localhost</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.jianshu.com/p/43f2e362857f">Android Studio因为hosts变更无法debug调试问题</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>安卓10、11 固定Wifi热点IP (Xposed)</title>
+    <url>/2021/12/06/android-10-11-hostpot-set-ip/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/">前文</a>通过分析源码，定位到Hook点，然后使用<code>Xposed Hook</code>，实现了Wifi热点IP的固定。</p>
+<p>系统升级到<code>Android 11</code>后，发现源码有变化，于是再来操作一波。</p>
+<p>Xposed模块：<a href="https://github.com/XhyEax/SoftApStaticIP">SoftApStaticIP</a></p>
+<span id="more"></span>
+<h2 id="安卓10"><a href="#安卓10" class="headerlink" title="安卓10"></a>安卓10</h2><h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><p>通过<a href="https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/">前文</a>可知，设置热点IP的流程如下：<br>在<code>configureIPv4</code>函数中，首先调用<code>getRandomWifiIPv4Address</code>生成字符串形式的IP，然后转换为<code>LinkAddress</code>，最后<code>ifcg.setLinkAddress</code>设置IP地址。</p>
+<p>在源码中搜索<code>setLinkAddress</code>，可以发现有以下<a href="http://aospxref.com/android-10.0.0_r47/search?project=frameworks&full=&defs=&refs=setLinkAddress&path=&hist=&type=&xrd=&nn=1&si=refs&si=refs">几处引用</a></p>
+<p>其中<code>/frameworks/base/services/net/java/android/net/ip/IpServer.java</code>调用者为<code>configureIPv4</code>函数</p>
+<p>查看<a href="http://aospxref.com/android-10.0.0_r47/xref/frameworks/base/services/net/java/android/net/ip/IpServer.java#422">源码</a>，发现并无太大变化（增加了<code>configureDhcp</code>），仍使用<code>getRandomWifiIPv4Address</code>生成随机IP地址：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">InetAddress addr = NetworkUtils.numericToInetAddress(ipAsString);</span><br><span class="line">linkAddr = <span class="keyword">new</span> LinkAddress(addr, prefixLen);</span><br><span class="line">ifcg.setLinkAddress(linkAddr);</span><br></pre></td></tr></table></figure>
+
+<p>查找<code>getRandomWifiIPv4Address</code>的交叉引用，发现还是只有这一处。因此，修改Hook类名为<code>android.net.ip.IpServer</code>即可适配安卓10</p>
+<h3 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h3><p><a href="https://source.android.google.cn/devices/architecture/modular-system/networking#ipservices-refactor">IP 服务重构路径</a></p>
+<p><a href="https://source.android.google.cn/setup/start/android-10-release#updated_dhcp_server">已更新 DHCP 服务器</a></p>
+<h2 id="安卓11"><a href="#安卓11" class="headerlink" title="安卓11"></a>安卓11</h2><h3 id="源码分析-1"><a href="#源码分析-1" class="headerlink" title="源码分析"></a>源码分析</h3><p>搜索<code>setLinkAddress</code>，仍然只有<a href="http://aospxref.com/android-11.0.0_r21/search?project=frameworks&full=&defs=&refs=setLinkAddress&path=&hist=&type=&xrd=&nn=1&si=refs&si=refs">几处引用</a></p>
+<p>相比于安卓10，<code>IpServer.java</code>和<code>WifiP2pServiceImpl.java</code>的引用消失了，变成了<code>NetdWrapper.java</code>的<code>fromStableParcel</code>和<code>setInterfaceLinkAddress</code>函数（官方文档：<a href="https://source.android.google.cn/devices/architecture/modular-system/tethering#module-boundary">模块边界</a>）</p>
+<p>查找<code>fromStableParcel</code>的交叉引用，发现<code>NetdWrapper.java</code>和<code>NetworkManagementService.java</code>的<code>getInterfaceConfig</code>函数有调用。<br>查看源码，发现只有一行代码区别</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">NetworkStack.checkNetworkStackPermissionOr(mContext, CONNECTIVITY_INTERNAL);</span><br></pre></td></tr></table></figure>
+<p>两者都是调用<code>mNetdService.interfaceGetCfg(iface)</code>获取配置。</p>
+<p>查找<code>setInterfaceLinkAddress</code>的交叉引用，发现并没有函数调用它</p>
+<p>于是搜索<code>configureIPv4</code>，发现只有<a href="http://aospxref.com/android-11.0.0_r21/search?project=frameworks&full=&defs=&refs=configureIPv4&path=&hist=&type=&xrd=&nn=1">一处引用</a>，仍位于<code>android.net.ip.IpServer</code>类中<br>（由<code>/frameworks/base/services/net/java/android/net/ip/IpServer.java</code>移动到了<code>/frameworks/base/packages/Tethering/src/android/net/ip/IpServer.java</code>）</p>
+<p>分析该函数（<a href="http://aospxref.com/android-11.0.0_r21/xref/frameworks/base/packages/Tethering/src/android/net/ip/IpServer.java#596">源代码</a>），发现有：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (enabled) &#123;</span><br><span class="line">    mLinkProperties.addLinkAddress(mIpv4Address);</span><br><span class="line">    mLinkProperties.addRoute(getDirectConnectedRoute(mIpv4Address));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而<code>mIpv4Address</code>是在<code>configureIPv4</code>函数开头设置的:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (enabled) &#123;</span><br><span class="line">    mIpv4Address = requestIpv4Address();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>查看<code>requestIpv4Address</code>函数：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> LinkAddress <span class="title">requestIpv4Address</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (mStaticIpv4ServerAddr != <span class="keyword">null</span>) <span class="keyword">return</span> mStaticIpv4ServerAddr;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mInterfaceType == TetheringManager.TETHERING_BLUETOOTH) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> LinkAddress(BLUETOOTH_IFACE_ADDR);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> mPrivateAddressCoordinator.requestDownstreamAddress(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先判断是否设置了静态IP，如果<code>mStaticIpv4ServerAddr</code>不为空则直接使用（由<code>maybeConfigureStaticIp</code>设置）。<br>然后判断是否为蓝牙，是则使用<code>BLUETOOTH_IFACE_ADDR</code>(<code>192.168.44.1/24</code>)。<br>其他情况调用<code>mPrivateAddressCoordinator.requestDownstreamAddress(this)</code></p>
+<p>后者位于<code>com/android/networkstack/tethering/PrivateAddressCoordinator.java</code>：<a href="http://aospxref.com/android-11.0.0_r21/xref/frameworks/base/packages/Tethering/src/com/android/networkstack/tethering/PrivateAddressCoordinator.java?fi=requestDownstreamAddress#requestDownstreamAddress">源代码</a></p>
+<p>查找<code>requestIpv4Address</code>交叉引用，发现还会被<code>handleNewPrefixRequest</code>调用（分配子网IP）</p>
+<h3 id="Hook点"><a href="#Hook点" class="headerlink" title="Hook点"></a>Hook点</h3><p>由于<code>requestIpv4Address</code>还被用于分配下游IP地址，Hook该处还需要判断调用者。</p>
+<p>待续…</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://android.stackexchange.com/questions/233453/how-can-i-permanently-assign-a-static-ip-address-to-wi-fi-clients-lineage-os-1">How can I permanently assign a static IP address to Wi-Fi clients? (Lineage OS 17.1 Android 10)</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
       </tags>
   </entry>
 </search>

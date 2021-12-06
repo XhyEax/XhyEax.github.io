@@ -196,6 +196,345 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/13/vscode-cpp-multiplefile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/04/13/vscode-cpp-multiplefile/" class="post-title-link" itemprop="url">VSCode配置C++多文件环境</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-13 14:52:07" itemprop="dateCreated datePublished" datetime="2019-04-13T14:52:07+08:00">2019-04-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="修正"><a href="#修正" class="headerlink" title="修正"></a>修正</h2><p>发现makefile存在问题，仅会编译比main.cpp更新的依赖文件，导致每次都要make两次才能正常调试。已修改<code>$?</code>为<code>$^</code></p>
+<blockquote>
+<p>$@ –代表目标文件(target)<br>$^  –代表所有的依赖文件(components)<br>$&lt;  –代表第一个依赖文件(components中最左边的那个)<br>$?  –代表比目标还要新的依赖文件列表</p>
+</blockquote>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前从知乎抄的配置只能编译单文件源文件，编译多文件的话需要手动修改g++编译参数（不能忍啊→_→），于是搜索之，找到解决方案。<br>关键词：makefile</p>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>原本使用VSCode就可以正常进行编译调试等操作。<br>已安装make工具并添加到环境变量，我自己用的是<code>mingw32-make</code><br>（也可使用msys提供的工具包，度盘链接: <a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1zJBcS6tjfXlwg1kP6VnLSg">https://pan.baidu.com/s/1zJBcS6tjfXlwg1kP6VnLSg</a> 提取码: f9ya）</p>
+<h2 id="具体方案"><a href="#具体方案" class="headerlink" title="具体方案"></a>具体方案</h2><h3 id="构建makefile模板"><a href="#构建makefile模板" class="headerlink" title="构建makefile模板"></a>构建makefile模板</h3><p>我基本是直接复制参考博文里的模板(修改标准库为17)，内容如下</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># originating https://github.com/TheNetAdmin/Makefile-Templates</span></span><br><span class="line"><span class="comment"># tool marcros</span></span><br><span class="line">CC := g++</span><br><span class="line">CCFLAG := -std=c++17</span><br><span class="line">DBGFLAG := -g</span><br><span class="line">CCOBJFLAG := <span class="variable">$(CCFLAG)</span> -c</span><br><span class="line"></span><br><span class="line"><span class="comment"># path marcros</span></span><br><span class="line">BIN_PATH := bin</span><br><span class="line">OBJ_PATH := obj</span><br><span class="line">SRC_PATH := src</span><br><span class="line">DBG_PATH := debug</span><br><span class="line"></span><br><span class="line"><span class="comment"># compile marcros</span></span><br><span class="line">TARGET_NAME := main</span><br><span class="line"><span class="keyword">ifeq</span> (<span class="variable">$(OS)</span>,Windows_NT)</span><br><span class="line">	TARGET_NAME := <span class="variable">$(<span class="built_in">addsuffix</span> .exe,<span class="variable">$(TARGET_NAME)</span>)</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line">TARGET := <span class="variable">$(BIN_PATH)</span>/<span class="variable">$(TARGET_NAME)</span></span><br><span class="line">TARGET_DEBUG := <span class="variable">$(DBG_PATH)</span>/<span class="variable">$(TARGET_NAME)</span></span><br><span class="line">MAIN_SRC := src/main.cpp</span><br><span class="line"></span><br><span class="line"><span class="comment"># src files &amp; obj files</span></span><br><span class="line">SRC := <span class="variable">$(<span class="built_in">foreach</span> x, <span class="variable">$(SRC_PATH)</span>, $(<span class="built_in">wildcard</span> $(<span class="built_in">addprefix</span> <span class="variable">$(x)</span>/*,.c*)</span>))</span><br><span class="line">OBJ := <span class="variable">$(<span class="built_in">addprefix</span> <span class="variable">$(OBJ_PATH)</span>/, $(<span class="built_in">addsuffix</span> .o, $(<span class="built_in">notdir</span> $(<span class="built_in">basename</span> <span class="variable">$(SRC)</span>)</span>)))</span><br><span class="line">OBJ_DEBUG := <span class="variable">$(<span class="built_in">addprefix</span> <span class="variable">$(DBG_PATH)</span>/, $(<span class="built_in">addsuffix</span> .o, $(<span class="built_in">notdir</span> $(<span class="built_in">basename</span> <span class="variable">$(SRC)</span>)</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment"># clean files list</span></span><br><span class="line">DISTCLEAN_LIST := <span class="variable">$(OBJ)</span> \</span><br><span class="line">                  <span class="variable">$(OBJ_DEBUG)</span></span><br><span class="line">CLEAN_LIST := <span class="variable">$(TARGET)</span> \</span><br><span class="line">			  <span class="variable">$(TARGET_DEBUG)</span> \</span><br><span class="line">			  <span class="variable">$(DISTCLEAN_LIST)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># default rule</span></span><br><span class="line"><span class="section">default: all</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># non-phony targets</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(OBJ)</span></span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$^</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(OBJ_PATH)</span>/%.o: <span class="variable">$(SRC_PATH)</span>/%.c*</span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCOBJFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(DBG_PATH)</span>/%.o: <span class="variable">$(SRC_PATH)</span>/%.c*</span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCOBJFLAG)</span> <span class="variable">$(DBGFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(TARGET_DEBUG)</span>: <span class="variable">$(OBJ_DEBUG)</span></span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCFLAG)</span> <span class="variable">$(DBGFLAG)</span> <span class="variable">$^</span> -o <span class="variable">$@</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># phony rules</span></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: all</span></span><br><span class="line"><span class="section">all: <span class="variable">$(TARGET)</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: debug</span></span><br><span class="line"><span class="section">debug: <span class="variable">$(TARGET_DEBUG)</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: clean</span></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	@echo CLEAN <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line">	@rm -f <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: distclean</span></span><br><span class="line"><span class="section">distclean:</span></span><br><span class="line">	@echo CLEAN <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line">	@rm -f <span class="variable">$(DISTCLEAN_LIST)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h3><p>src文件夹下放源文件以及头文件，后面还要需要修改<code>.vscode</code>中的<code>task.json</code>和<code>launch.json</code><br>注意：如果使用本文中的makefle，包含主函数的源文件名必须为<code>main.cpp</code><br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/VSCode-cpp-mf.png"></p>
+<h3 id="task-json"><a href="#task-json" class="headerlink" title="task.json"></a>task.json</h3><p>如果你使用的是msys的工具包，那command就写make<br>按快捷键<code>Ctrl+Shift+B</code>可以执行仅生成命令（build）<br>（在微软输入法中文模式时会出现表情窗口←_←）</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;2.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;tasks&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;default&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;group&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;kind&quot;</span>: <span class="string">&quot;build&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;isDefault&quot;</span>: <span class="literal">true</span></span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build-debug&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;debug&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;clean&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;clean&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="launch-json"><a href="#launch-json" class="headerlink" title="launch.json"></a>launch.json</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// https://github.com/Microsoft/vscode-cpptools/blob/master/launch.md</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;0.2.0&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;configurations&quot;</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;(gdb) Launch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;cppdbg&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;request&quot;</span>: <span class="string">&quot;launch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;program&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/debug/main.exe&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;args&quot;</span>: [],</span><br><span class="line">            <span class="attr">&quot;stopAtEntry&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">&quot;cwd&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/debug/&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;environment&quot;</span>: [],</span><br><span class="line">            <span class="attr">&quot;externalConsole&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">&quot;internalConsoleOptions&quot;</span>: <span class="string">&quot;neverOpen&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;MIMode&quot;</span>: <span class="string">&quot;gdb&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;miDebuggerPath&quot;</span>: <span class="string">&quot;gdb.exe&quot;</span>, <span class="comment">// 调试器路径，Windows下后缀不能省略，Linux下则去掉</span></span><br><span class="line">            <span class="attr">&quot;setupCommands&quot;</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">&quot;description&quot;</span>: <span class="string">&quot;Enable pretty-printing for gdb&quot;</span>,</span><br><span class="line">                    <span class="attr">&quot;text&quot;</span>: <span class="string">&quot;-enable-pretty-printing&quot;</span>,</span><br><span class="line">                    <span class="attr">&quot;ignoreFailures&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">&quot;preLaunchTask&quot;</span>: <span class="string">&quot;build-debug&quot;</span> <span class="comment">// 调试会话开始前执行的任务，一般为编译程序。与tasks.json的label相对应</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="配置完成"><a href="#配置完成" class="headerlink" title="配置完成"></a>配置完成</h3><p>enjoy it!<br>😉</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wzxlovesy/article/details/76708151">VS Code 配置 C/C++ 环境</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/07/2019-hzwas-wp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/04/07/2019-hzwas-wp/" class="post-title-link" itemprop="url">2019中国杭州网络安全技能大赛 预选赛 哈夫曼之谜 & EasyCpp Writeup</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-07 12:03:45" itemprop="dateCreated datePublished" datetime="2019-04-07T12:03:45+08:00">2019-04-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Reverse-EasyCpp"><a href="#Reverse-EasyCpp" class="headerlink" title="Reverse EasyCpp"></a>Reverse EasyCpp</h2><p>[2019/10/25更新]<br>首先读入16个数字，然后生成一个斐波那契数组，长度也为16<br>然后对输入数组进行操作，从第二位开始，都加上第一位的值（<code>transform</code>）<br>动态调试可知<code>accumulate</code>的匿名函数对运算完的数组做反转操作<br>然后与斐波那契数组比较，相同则输出flag<br>也就是说输入的第一个数字是不会变的，所以就是987<br>后面的数字直接脚本跑一下就可以得到结果了</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/04/07/2019-hzwas-wp/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/02/emui9-magisk-install/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/04/02/emui9-magisk-install/" class="post-title-link" itemprop="url">emui9安装Magisk框架</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-02 04:49:28" itemprop="dateCreated datePublished" datetime="2019-04-02T04:49:28+08:00">2019-04-02</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="准备条件"><a href="#准备条件" class="headerlink" title="准备条件"></a>准备条件</h2><p>(设备已解锁BL，电脑fastboot环境正常是前提条件)<br>已下载magisk框架rec安装包（<a target="_blank" rel="noopener" href="https://github.com/topjohnwu/Magisk/releases/">github下载</a>），有sd卡（<code>adb sideload</code>未测试是否可安装，建议用内存卡），并已安装第三方recovery（以下简称rec）<br>或<br>已安装magisk框架app，且有原厂<code>recovery_ramdisk</code>镜像</p>
+<h2 id="安装方式"><a href="#安装方式" class="headerlink" title="安装方式"></a>安装方式</h2><p>fastboot刷入命令（华为没有boot分区，所以rec也是通过这个指令刷入）<br>(BOOT.img请自行替换为对应镜像名)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastboot flash recovery_ramdisk BOOT.img</span><br></pre></td></tr></table></figure>
+<h3 id="rec安装法"><a href="#rec安装法" class="headerlink" title="rec安装法"></a>rec安装法</h3><p>启动至第三方rec，从sd卡选择magisk卡刷包，安装。<br>安装完成后选择重启到rec模式，即可进入带面具的系统</p>
+<h3 id="修补镜像直接刷入法"><a href="#修补镜像直接刷入法" class="headerlink" title="修补镜像直接刷入法"></a>修补镜像直接刷入法</h3><p>参考<a target="_blank" rel="noopener" href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a>，个人未测试，应该可行<br>提取出原厂<code>recovery_ramdisk</code>镜像（从官方线刷包或其他地方获得），并发送到手机（模拟器应该也行）<br>使用magisk框架app，选择安装，修补boot镜像，选择提取出的原厂镜像<br>修补完成后传回电脑，手机进入fastboot模式，刷入即可</p>
+<h2 id="启动方式"><a href="#启动方式" class="headerlink" title="启动方式"></a>启动方式</h2><p>由于修补的镜像其实是rec分区，所以要按照进入rec的方式进入带面具的系统。<br>（个人测试，在带magisk的系统下重启仍然是有root的，等价于启动到rec）<br>具体操作如图（图源自参考帖）<br><img src="https://clubimg.club.vmall.com/data/attachment/forum/201902/11/221928oai3dhzxzbbrd42d.jpg"></p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>如果安装了不适配的模块，还是需要刷入第三方rec，进入后删除<code>/data/adb</code>文件夹，然后即可正常开机（magisk要重刷）。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/03/15/android-floatview/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/03/15/android-floatview/" class="post-title-link" itemprop="url">安卓8.0以上创建悬浮窗</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-15 15:42:36" itemprop="dateCreated datePublished" datetime="2019-03-15T15:42:36+08:00">2019-03-15</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>代码在8.0以下系统可正常创建悬浮窗，8.0以上则创建不了。原因是悬浮窗样式需要重新设置。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>增加SDK判断代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) &#123;</span><br><span class="line">    wmParams.type = LayoutParams.TYPE_APPLICATION_OVERLAY;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span>&#123;</span><br><span class="line">    wmParams.type = LayoutParams.TYPE_PHONE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="判断是否拥有悬浮窗权限并申请"><a href="#判断是否拥有悬浮窗权限并申请" class="headerlink" title="判断是否拥有悬浮窗权限并申请"></a>判断是否拥有悬浮窗权限并申请</h2><p>安卓6.0（代号M，SDK 23）之后，需要动态申请权限，悬浮窗权限也不例外。所以可以在添加以下代码来申请悬浮窗权限。<br>PS：当然，必须在<code>AndroidManifest.xml</code>中添加<br><code>&lt;uses-permission android:name=&quot;android.permission.SYSTEM_ALERT_WINDOW&quot; /&gt;</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= <span class="number">23</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (!Settings.canDrawOverlays(activity))</span><br><span class="line">                &#123;</span><br><span class="line">                    Intent it = <span class="keyword">new</span> Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);</span><br><span class="line">                    activity.startActivityForResult(it, <span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@TargetApi(23)</span> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onActivityResult</span><span class="params">(<span class="keyword">int</span> reqCode, <span class="keyword">int</span> resCode, Intent data)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!Settings.canDrawOverlays(<span class="keyword">this</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        Toast.makeText(<span class="keyword">this</span>, <span class="string">&quot;未授予悬浮窗权限！&quot;</span>, Toast.LENGTH_LONG).show();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        Toast.makeText(<span class="keyword">this</span>, <span class="string">&quot;悬浮窗权限授予成功！&quot;</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/28/android-reverse-fix-arsc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/02/28/android-reverse-fix-arsc/" class="post-title-link" itemprop="url">修复反编译资源文件报错问题(resource spec)</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-02-28 08:44:40" itemprop="dateCreated datePublished" datetime="2019-02-28T08:44:40+08:00">2019-02-28</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="关于0x01010540错误"><a href="#关于0x01010540错误" class="headerlink" title="关于0x01010540错误"></a>关于<code>0x01010540</code>错误</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code><br>具体方法见后文</p>
+<h2 id="关于0x01010543错误"><a href="#关于0x01010543错误" class="headerlink" title="关于0x01010543错误"></a>关于<code>0x01010543</code>错误</h2><p>如果只有</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
+<p>没有<code>UndefinedResObject</code><br>则更换<code>apktool</code>后再试<br><code>apktool</code>可以在<a target="_blank" rel="noopener" href="https://down.52pojie.cn/Tools/Android_Tools/">爱盘</a>下载</p>
+<p>实在要修复的话，往下看：（都是修改<code>resources.arsc</code>）</p>
+<h2 id="修复UndefinedResObject错误"><a href="#修复UndefinedResObject错误" class="headerlink" title="修复UndefinedResObject错误"></a>修复UndefinedResObject错误</h2><p>报错信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; brut.androlib.err.UndefinedResObject: resource spec: 0x7f000006</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><code>aapt dump</code>查看apk的资源信息，并保存到文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aapt d --values resources test.apk &gt;1.txt</span><br></pre></td></tr></table></figure>
+<p>找到<code>DataType</code>数据类型不正确的值（搜索<code>attribute</code>即可）对应的描述符（一般是把7f改成00，<code>0x00000006</code>）<br>文件中没有识别出正确的数据类型，显示的是<code>(attribute) 0x00000006</code><br>使用<code>010Editor</code>，Ctrl+F，字节形式搜索对应描述的16进制数的小端字节（就是<code>00000006</code>写成<code>06000000</code>）<br>然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
+<h2 id="修复resource-spec-0x01010543"><a href="#修复resource-spec-0x01010543" class="headerlink" title="修复resource spec: 0x01010543"></a>修复resource spec: 0x01010543</h2><p>报错信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
+<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>12345678</code>写成<code>78564312</code>）<br>这里我们搜索<code>43050101</code>，然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
+<h2 id="修复resource-spec-0x01010540"><a href="#修复resource-spec-0x01010540" class="headerlink" title="修复resource spec: 0x01010540"></a>修复resource spec: 0x01010540</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code></p>
+<h3 id="解决方法-2"><a href="#解决方法-2" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>40050101</code>换成<code>8f040101</code>）</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u012400885/article/details/80409689">记录Android Killer反编译时遇到的异常</a><br><a target="_blank" rel="noopener" href="http://blog.csdn.net/pwelyn/article/details/50620136">保护Android resources文件不被反编译原理分析</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/19/52pojie-2019-red-packet/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -562,336 +901,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/01/26/shanghai-3rd-classic/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/01/26/shanghai-3rd-classic/" class="post-title-link" itemprop="url">第三届上海市大学生网络安全大赛 Classical Writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-01-26 14:07:53" itemprop="dateCreated datePublished" datetime="2019-01-26T14:07:53+08:00">2019-01-26</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>cipher.txt内容如下</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Ld hcrakewcfaxr, f hofjjlhfo hlaxuc lj f krau ev hlaxuc kxfk zfj tjui xljkeclhfoor gtk dez xfj vfooud, vec kxu pejk afck, ldke iljtju. Ld hedkcfjk ke peiucd hcrakewcfaxlh foweclkxpj, pejk hofjjlhfo hlaxucj hfd gu acfhklhfoor hepatkui fdi jeoyui gr xfdi. Xezuyuc, OrmkO3vydJCoe2qyNLmcN2qlpJXnM3SxM2Xke3q9 kxur fcu foje tjtfoor yucr jlpaou ke gcufn zlkx peiucd kuhxdeoewr. Kxu kucp ldhotiuj kxu jlpaou jrjkupj tjui jldhu Wcuun fdi Cepfd klpuj, kxu uofgecfku Cudfljjfdhu hlaxucj, Zecoi Zfc LL hcrakewcfaxr jthx fj kxu Udlwpf pfhxldu fdi guredi. F btlhn gcezd veq mtpa eyuc kxu ofsr iew.</span><br></pre></td></tr></table></figure>
-<p>推测是移位的密码，使用<code>WinCrypto</code>分析得到（也可以使用<a target="_blank" rel="noopener" href="https://quipqiup.com/">quip</a>在线分析并修复）</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">In cryptography, a classical cipher is a type of cipher that was used historically but now has fallen, for the most part, into disuse. In contrast to modern cryptographic algorithms, most classical ciphers can be practically computed and solved by hand. However, LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9 they are also usually very simple to break with modern technology. The term includes the simple systems used since Greek and Roman times, the elaborate Renaissance ciphers, World War II cryptography such as the Enigma machine and beyond. A quick brown fox jump over the lazy dog.</span><br></pre></td></tr></table></figure>
-<p>发现该句子其实来源于英文维基百科的经典加密（Classical cipher）<br>发现最后一句话其实就是<code>A quick brown fox jumps over the lazy dog.</code><br>（包含26个字母的最短句子）并去掉s<br>由此可以得到对照表然后恢复（当然使用<code>WinCrypto</code>就直接是这个字符串了）<br>所以可以得到原本的字符是<code>LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9</code></p>
-<h2 id="解密"><a href="#解密" class="headerlink" title="解密"></a>解密</h2><p>直接解base64发现行不通<br>移位爆破<br>得到<code>ZmxhZ3tjbGFzc2ljYWxfY2lwaGVyX3NvX2Vhc3l9</code>是可以解的</p>
-<h2 id="爆破代码"><a href="#爆破代码" class="headerlink" title="爆破代码"></a>爆破代码</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">toAlpha</span>(<span class="params">c,i</span>):</span></span><br><span class="line">    num = <span class="built_in">ord</span>(c)</span><br><span class="line">    <span class="keyword">if</span> num &gt;= <span class="number">65</span> <span class="keyword">and</span> num &lt;= <span class="number">90</span>:</span><br><span class="line">        num = <span class="number">65</span> + ((num - <span class="number">65</span>) + i) % <span class="number">26</span></span><br><span class="line">    <span class="keyword">elif</span> num &gt;= <span class="number">97</span> <span class="keyword">and</span> num &lt;= <span class="number">122</span>:</span><br><span class="line">        num = <span class="number">97</span> + ((num - <span class="number">97</span>) + i) % <span class="number">26</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">chr</span>(num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encrypt</span>(<span class="params">string,i</span>):</span></span><br><span class="line">    string_new = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">for</span> s <span class="keyword">in</span> string:</span><br><span class="line">        string_new += <span class="built_in">str</span>(toAlpha(s,i))</span><br><span class="line">    <span class="built_in">print</span>(string_new)</span><br><span class="line">    <span class="keyword">return</span> string_new</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decrypt</span>(<span class="params">string</span>):</span></span><br><span class="line">     <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">26</span>):</span><br><span class="line">         encrypt(string, -i)</span><br><span class="line">encode = <span class="string">&quot;LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9&quot;</span></span><br><span class="line">decrypt(encode)</span><br></pre></td></tr></table></figure>
-<p>在<code>encrypt</code>函数中加上base64解密代码即可爆破</p>
-<h3 id="增加代码"><a href="#增加代码" class="headerlink" title="增加代码"></a>增加代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">s = <span class="built_in">str</span>(base64.b64decode(string_new))</span><br><span class="line"><span class="keyword">if</span> <span class="string">&quot;flag&quot;</span> <span class="keyword">in</span> s:</span><br><span class="line">    <span class="built_in">print</span>(s)</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Erice_s/article/details/79732499">凯撒密码与python实现</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/01/26/icq-2nd-happy-rsa256/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/01/26/icq-2nd-happy-rsa256/" class="post-title-link" itemprop="url">i春秋 第二届春秋欢乐赛 RSA256 Writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-01-26 11:59:21" itemprop="dateCreated datePublished" datetime="2019-01-26T11:59:21+08:00">2019-01-26</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="解压"><a href="#解压" class="headerlink" title="解压"></a>解压</h2><p>解压得到四个文件，有一个<code>public.key</code>和三个加密过的文件，于是先把p和q解出来</p>
-<h2 id="得到e和n"><a href="#得到e和n" class="headerlink" title="得到e和n"></a>得到e和n</h2><p><code>openssl rsa -pubin -text -modulus -in warmup -in public.key</code><br>得到</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Exponent: 65537 (0x10001)</span><br><span class="line">Modulus=D99E952296A6D960DFC2504ABA545B9442D60A7B9E930AFF451C78EC55D555EB</span><br></pre></td></tr></table></figure>
-<h2 id="使用yafu分解，得到p和q"><a href="#使用yafu分解，得到p和q" class="headerlink" title="使用yafu分解，得到p和q"></a>使用yafu分解，得到p和q</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p = 302825536744096741518546212761194311477</span><br><span class="line">q = 325045504186436346209877301320131277983</span><br></pre></td></tr></table></figure>
-<h2 id="求出d"><a href="#求出d" class="headerlink" title="求出d"></a>求出d</h2><p>使用gmpy</p>
-<h2 id="解密并打印出flag"><a href="#解密并打印出flag" class="headerlink" title="解密并打印出flag"></a>解密并打印出flag</h2><h3 id="使用rsa模块"><a href="#使用rsa模块" class="headerlink" title="使用rsa模块"></a>使用rsa模块</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> rsa</span><br><span class="line"></span><br><span class="line">n = <span class="number">0xD99E952296A6D960DFC2504ABA545B9442D60A7B9E930AFF451C78EC55D555EB</span></span><br><span class="line">e = <span class="number">0x10001</span></span><br><span class="line">p = <span class="number">302825536744096741518546212761194311477</span></span><br><span class="line">q = <span class="number">325045504186436346209877301320131277983</span></span><br><span class="line">d = <span class="number">0x4547B732CBC3527104CB57C4728D6899B44C4994FAE2713D6B594BC0F522A41</span></span><br><span class="line">ret = <span class="string">&quot;&quot;</span></span><br><span class="line">privatekey = rsa.PrivateKey(n , e , d , p , q)</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message1&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message2&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message3&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="built_in">print</span>(ret)</span><br></pre></td></tr></table></figure>
-<p>得到</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flag&#123;3b6d3806-4b2b</span><br><span class="line">-11e7-95a0-</span><br><span class="line">000c29d7e93d&#125;</span><br></pre></td></tr></table></figure>
-<p>去掉回车得到最终flag</p>
-<h3 id="不使用rsa模块"><a href="#不使用rsa模块" class="headerlink" title="不使用rsa模块"></a>不使用rsa模块</h3><p>其实就是自己实现<code>rsa.decrypt</code>中的转换16进制操作<br>以第一个文件为例，解密出来转化为16进制：<br><code>25a8007e9ad2809abbf5a00666c61677b33623664333830362d346232620a</code><br>位数为奇数，所以左边补0，得到<br><code>025a8007e9ad2809abbf5a00666c61677b33623664333830362d346232620a</code><br>转换为ascii码得到<br><code>Z��(    ��Z�flag&#123;3b6d3806-4b2b</code></p>
-<p>剩下文件同理</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiangshangbashaonian/article/details/79575062">i春秋第二届春秋欢乐赛RSA256writeup</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/01/26/icq-2nd-happy-rec/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/01/26/icq-2nd-happy-rec/" class="post-title-link" itemprop="url">i春秋 第二届春秋欢乐赛 ReCreators&Hello World Writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-01-26 10:26:40" itemprop="dateCreated datePublished" datetime="2019-01-26T10:26:40+08:00">2019-01-26</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h2><h3 id="观察"><a href="#观察" class="headerlink" title="观察"></a>观察</h3><p>浏览器打开，只有一个<code>Hello, World!</code><br>查看源代码看到有个</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;flag.xmas.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>结果没有该文件，尝试打开<code>flag.js</code>，看到混淆过的js，全选复制，放到控制台运行，得到</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Key = <span class="string">&quot;7a57a5a743894a0e&quot;</span>;</span><br><span class="line">CryptoJS.pad.Iso10126 = &#123;</span><br><span class="line">    <span class="attr">pad</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data, blockSize</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> blockSizeBytes = blockSize * <span class="number">4</span>;</span><br><span class="line">        <span class="keyword">var</span> nPaddingBytes = blockSizeBytes - data.sigBytes % blockSizeBytes;</span><br><span class="line">        data.concat(CryptoJS.lib.WordArray.random(nPaddingBytes - <span class="number">1</span>)).concat(CryptoJS.lib.WordArray.create([nPaddingBytes &lt;&lt; <span class="number">24</span>], <span class="number">1</span>))</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">unpad</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> nPaddingBytes = data.words[(data.sigBytes - <span class="number">1</span>) &gt;&gt;&gt; <span class="number">2</span>] &amp; <span class="number">0xff</span>;</span><br><span class="line">        data.sigBytes -= nPaddingBytes</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> aesEncrypt = <span class="function"><span class="keyword">function</span>(<span class="params">data, keyStr, ivStr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> sendData = CryptoJS.enc.Utf8.parse(data);</span><br><span class="line">    <span class="keyword">var</span> key = CryptoJS.enc.Utf8.parse(keyStr);</span><br><span class="line">    <span class="keyword">var</span> iv = CryptoJS.enc.Utf8.parse(ivStr);</span><br><span class="line">    <span class="keyword">var</span> encrypted = CryptoJS.AES.encrypt(sendData, key, &#123;</span><br><span class="line">        <span class="attr">iv</span>: iv,</span><br><span class="line">        <span class="attr">mode</span>: CryptoJS.mode.CBC,</span><br><span class="line">        <span class="attr">padding</span>: CryptoJS.pad.Iso10126</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> CryptoJS.enc.Base64.stringify(encrypted.ciphertext)</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> aesDecrypt = <span class="function"><span class="keyword">function</span>(<span class="params">data, keyStr, ivStr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> key = CryptoJS.enc.Utf8.parse(keyStr);</span><br><span class="line">    <span class="keyword">var</span> iv = CryptoJS.enc.Utf8.parse(ivStr);</span><br><span class="line">    <span class="keyword">var</span> decrypted = CryptoJS.AES.decrypt(data, key, &#123;</span><br><span class="line">        <span class="attr">iv</span>: iv,</span><br><span class="line">        <span class="attr">mode</span>: CryptoJS.mode.CBC,</span><br><span class="line">        <span class="attr">padding</span>: CryptoJS.pad.Iso10126</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> decrypted.toString(CryptoJS.enc.Utf8)</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> hint = <span class="string">&quot;SSNRTPIuHLUxqtJmq8mDDPtexRU7RTjNO34tLqz+Tpw=&quot;</span>;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/01/26/icq-2nd-happy-rec/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/01/26/fix-flash/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/01/26/fix-flash/" class="post-title-link" itemprop="url">修复Flash插件提示地区不符的问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-01-26 05:31:36" itemprop="dateCreated datePublished" datetime="2019-01-26T05:31:36+08:00">2019-01-26</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Adobe Flash Player 从 30 版本开始，中国大陆地区用户只能使用特供版<br>后台存在广告服务、弹出广告窗口、捆绑流氓软件的行为。<br>由于有的网站只能用flash，而安装国际版flash又提示地区不符，所以需要找个办法解决。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="安装直装版（由roustar31制作）"><a href="#安装直装版（由roustar31制作）" class="headerlink" title="安装直装版（由roustar31制作）"></a>安装直装版（由roustar31制作）</h3><p>运行程序后，会卸载原版flash再自动安装。</p>
-<blockquote>
-<p>IE浏览器使用AX版本<br>Chrome系浏览器及QQ使用PPAPI版本<br>Firefox或其他使用NPAPI版本</p>
-</blockquote>
-<p>PS：若安装后仍无效，请使用压缩包中的文件替换系统及浏览器的<code>pepflashplayer.dll</code>（具体路径自行搜索）</p>
-<h3 id="下载地址"><a href="#下载地址" class="headerlink" title="下载地址"></a>下载地址</h3><h4 id="直装版"><a href="#直装版" class="headerlink" title="直装版"></a>直装版</h4><p><a target="_blank" rel="noopener" href="https://lanzous.com/b00e2zxej">https://lanzous.com/b00e2zxej</a><br>密码:gz09</p>
-<h4 id="补丁"><a href="#补丁" class="headerlink" title="补丁"></a>补丁</h4><p><a target="_blank" rel="noopener" href="https://lanzous.com/b00dx336j">https://lanzous.com/b00dx336j</a><br>密码:f0ph</p>
-<h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p><a target="_blank" rel="noopener" href="https://www.repaik.com/forum.php?mod=viewthread&tid=340482">Adobe Flash Player AX/NP/PP 特别版</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/01/26/fix-crypto-py2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/01/26/fix-crypto-py2/" class="post-title-link" itemprop="url">修复crypto模块import失败（Python2）</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-01-26 05:26:35" itemprop="dateCreated datePublished" datetime="2019-01-26T05:26:35+08:00">2019-01-26</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用Python2.7安装好pycrypto模块后，还是报错，搜索得到解决方案</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>打开Python2.7安装目录，找到<code>Lib/site-package/crypto</code>文件夹<br>重命名为Crypto即可</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/fawaikuangtu123/p/9761943.html">解释Crypto模块怎么就这么”皮”？No module named “Crypto”</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -963,14 +972,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-count">130</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

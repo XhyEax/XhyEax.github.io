@@ -196,6 +196,327 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/10/15/db-sqlite3-to-sql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/10/15/db-sqlite3-to-sql/" class="post-title-link" itemprop="url">导出sqlite3数据库为sql</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-15 13:40:57" itemprop="dateCreated datePublished" datetime="2019-10-15T13:40:57+08:00">2019-10-15</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="执行以下语句即可"><a href="#执行以下语句即可" class="headerlink" title="执行以下语句即可"></a>执行以下语句即可</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlite3 db.sqlite3 &quot;.dump&quot; &gt; new.sql</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/10/07/vivado-custom-ip-and-instantiation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/10/07/vivado-custom-ip-and-instantiation/" class="post-title-link" itemprop="url">Vivado 自定义IP核并实例化调用</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-07 02:38:24" itemprop="dateCreated datePublished" datetime="2019-10-07T02:38:24+08:00">2019-10-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>作业：将四选一数据选择器封装成IP，用以实现八选一数据选择器。</p>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><h3 id="将项目封装成IP"><a href="#将项目封装成IP" class="headerlink" title="将项目封装成IP"></a>将项目封装成IP</h3><p>打开要封装的项目，然后点击工具栏<br><code>Tools</code>-<code>Create and Package New IP</code>-<code>Next</code><br>打包当前项目即可（选择完<code>Package your current project</code>后一路Next）<br>（当然，这里也可以手动选择路径进行打包）<br>然后会出现<code>Packaging Steps</code>窗口<br>如果不想修改配置的话，可以直接选择最后一步，<code>Review and Package</code>-<code>Package IP</code></p>
+<h3 id="在其他项目中导入"><a href="#在其他项目中导入" class="headerlink" title="在其他项目中导入"></a>在其他项目中导入</h3><p>打开需要调用IP的项目，点击左侧<br><code>Flow Navigator</code>-<code>IP Catalog</code><br>在空白处右键，<code>Add Repository</code>，选择之前打包的文件夹<br>(如果之前打包的是项目的话，则对应<code>.srcs</code>文件夹，如<code>D:\source\Vivado\mux_8_1\mux_8_1.srcs</code>)<br>然后双击导入的IP，导入并生成<br>导入成功后，在<code>Sources</code>-<code>IP Sources</code>中可以看到IP<br>其中<code>Instantiation Template</code>即为实例化模板</p>
+<h3 id="实例化调用"><a href="#实例化调用" class="headerlink" title="实例化调用"></a>实例化调用</h3><p>最简单的方法，把实例化代码复制出来，修改一下实例名称以及参数即可<br>如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">mux_4_1_0 <span class="title">m2</span> <span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  .d1(d5),    <span class="comment">// input wire [1 : 0] d1</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .d2(d6),    <span class="comment">// input wire [1 : 0] d2</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .d3(d7),    <span class="comment">// input wire [1 : 0] d3</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .d4(d8),    <span class="comment">// input wire [1 : 0] d4</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .s1(s1),    <span class="comment">// input wire s1</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .s0(s0),    <span class="comment">// input wire s0</span></span></span></span><br><span class="line"><span class="params"><span class="function">  .out(out2)  <span class="comment">// output wire [1 : 0] out</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>注意，实例化时，output只能是wire类型，不然语法错误</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/kenjianqi1647/article/details/79199054">vivado学习之自定义IP和调用自定义IP的步骤</a><br><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/36687767/unknown-error-during-synthesis-of-axi-ips">Unknown Error during synthesis of AXI IPs</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/10/03/android-import-as-system-cert/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/10/03/android-import-as-system-cert/" class="post-title-link" itemprop="url">安卓7.0及以上 导入为系统证书</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-03 03:30:48" itemprop="dateCreated datePublished" datetime="2019-10-03T03:30:48+08:00">2019-10-03</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>从安卓7.0开始，Android更改了对用户安装证书的默认信任行为。应用程序默认只信任系统级别的CA证书。<br>所以需要hook第三方包的证书校验函数（如JustTrustMe）或者直接导入为系统证书以供抓包</p>
+<h2 id="导入方法"><a href="#导入方法" class="headerlink" title="导入方法"></a>导入方法</h2><h3 id="1-导出-der证书文件"><a href="#1-导出-der证书文件" class="headerlink" title="1. 导出.der证书文件"></a>1. 导出.der证书文件</h3><p>从抓包应用中导出即可。</p>
+<h3 id="2-转换为pem格式并重命名"><a href="#2-转换为pem格式并重命名" class="headerlink" title="2. 转换为pem格式并重命名"></a>2. 转换为pem格式并重命名</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">　　openssl x509 -inform DER -<span class="keyword">in</span> cacert.der -out cacert.pem</span><br><span class="line">　　openssl x509 -inform PEM -subject_hash_old -<span class="keyword">in</span> cacert.pem |head -1</span><br><span class="line">　　mv cacert.pem &lt;<span class="built_in">hash</span>&gt;.0</span><br></pre></td></tr></table></figure>
+<p><code>&lt;hash&gt;</code>替换成输出的值</p>
+<h3 id="3-导入至-system-etc-security-cacerts"><a href="#3-导入至-system-etc-security-cacerts" class="headerlink" title="3. 导入至/system/etc/security/cacerts"></a>3. 导入至<code>/system/etc/security/cacerts</code></h3><p>挂载system为可读写</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -o remount,rw /system</span><br></pre></td></tr></table></figure>
+<p>复制到<code>/system/etc/security/cacerts</code>下，并设置权限为644，然后重启<br>（也可打包成magisk模块刷入）</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Entr0py/p/9675061.html">安卓7.0及以上用户证书导入的问题</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/28/anti-web-js-debugger-code/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/09/28/anti-web-js-debugger-code/" class="post-title-link" itemprop="url">绕过网站js中的debugger反调试</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-28 12:21:18" itemprop="dateCreated datePublished" datetime="2019-09-28T12:21:18+08:00">2019-09-28</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用开发者工具(F12)分析一个网站时发现：<br>每隔一段时间就会有js代码主动触发调试器断点，妨碍分析。<br>问之度娘，遂得解法。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h2 id="1-使用控制台对方法进行nop"><a href="#1-使用控制台对方法进行nop" class="headerlink" title="1. 使用控制台对方法进行nop"></a>1. 使用控制台对方法进行nop</h2><p>有两种情况，一种是直接调用debugger，如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_$gy</span>(<span class="params"></span>)</span>&#123;<span class="keyword">debugger</span>;&#125;</span><br></pre></td></tr></table></figure>
+<p>那么控制台执行以下语句即可：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_$gy</span>(<span class="params"></span>)</span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>另一种是匿名函数，代码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;<span class="keyword">var</span> a = <span class="keyword">new</span> <span class="built_in">Date</span>(); <span class="keyword">debugger</span>; <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>() - a &gt; <span class="number">100</span>;&#125;())</span><br></pre></td></tr></table></figure>
+<p>需要查看调用栈，找到调用进行重定义。具体操作为：<br>双击调用栈中的主调函数，找到函数名，控制台进行nop。</p>
+<h2 id="2-禁用所有断点"><a href="#2-禁用所有断点" class="headerlink" title="2. 禁用所有断点"></a>2. 禁用所有断点</h2><blockquote>
+<p>这个问题解决起来还是蛮简单的，问题解决只需要一句话：禁止断点。<br>而对应的操作是在Chrome控制台的Source Tab页点击Deactivate breakpoints按钮或者按下Ctrl + f8。</p>
+</blockquote>
+<p>来自<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000012359015">突破前端反调试–阻止页面不断debugger</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42856601/article/details/100758943">如何解决出现debugger无法调试</a><br><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000012359015">突破前端反调试–阻止页面不断debugger</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/27/andlua-app-reverse/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/09/27/andlua-app-reverse/" class="post-title-link" itemprop="url">送给最好的TA app分析</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-27 09:15:25" itemprop="dateCreated datePublished" datetime="2019-09-27T09:15:25+08:00">2019-09-27</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天群里有人传了个apk文件，名字叫<code>送给最好的TA</code>。这是一个整人app，安装并打开会播放一段音频，并循环调节媒体音量，维持最大值。从后台划掉/卸载/关机都可以停止该程序。<br><strong>网传所谓的截图、获取设备信息并上传等行为均不存在。反编译后看到的截图相关代码实际上并没有被调用，只是打包apk时封装进去的类，关键逻辑位于main.lua中。</strong></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/09/27/andlua-app-reverse/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/18/qq-813-unrevoke-module-develop/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -526,331 +847,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/14/android-debug-onload/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/09/14/android-debug-onload/" class="post-title-link" itemprop="url">IDA调试安卓so 在libart.so OpenMemory下断点</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-09-14 00:58:55" itemprop="dateCreated datePublished" datetime="2019-09-14T00:58:55+08:00">2019-09-14</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>如果想要在so加载时就下断点的话，需要以调试模式运行，并使用ddms进行jdb的连接。</p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>一部打开了调试开关（ro.debuggable=1）的手机或可调试的apk, IDA及android_server, 已启动的ddms（启动<code>AndroidSDK\tools\monitor.bat</code>）</p>
-<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><h3 id="1-开启端口转发并启动android-server"><a href="#1-开启端口转发并启动android-server" class="headerlink" title="1. 开启端口转发并启动android_server"></a>1. 开启端口转发并启动android_server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb forward tcp:12345 tcp:12345</span><br><span class="line">adb shell su -c <span class="string">&quot;/data/as&quot;</span></span><br></pre></td></tr></table></figure>
-<p>这里使用的是修改过的android_server，默认端口为12345</p>
-<h3 id="2-以调试模式启动app"><a href="#2-以调试模式启动app" class="headerlink" title="2. 以调试模式启动app"></a>2. 以调试模式启动app</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell am start -D -n xyz.sysorem.cokey/.CokeyActivity</span><br></pre></td></tr></table></figure>
-<p>这时手机会显示<code>Waiting For Debugger</code></p>
-<h3 id="3-使用IDA附加及下断点"><a href="#3-使用IDA附加及下断点" class="headerlink" title="3. 使用IDA附加及下断点"></a>3. 使用IDA附加及下断点</h3><p>点击确定前先修改<code>Debug options</code>，把Event下前三个Suspend都勾选上，然后连接。<br>选定要调试的app进程后，在模块列表中找到<code>libart.so</code>，并在目标函数位置下断点<br>然后点击运行</p>
-<h3 id="4-使用jdb附加，使程序继续运行"><a href="#4-使用jdb附加，使程序继续运行" class="headerlink" title="4. 使用jdb附加，使程序继续运行"></a>4. 使用jdb附加，使程序继续运行</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700</span><br></pre></td></tr></table></figure>
-<p>此处的8700即ddms中显示的对应端口<br>正常情况下就会在libc.so处暂停了</p>
-<h3 id="5-dump"><a href="#5-dump" class="headerlink" title="5. dump"></a>5. dump</h3><p>在OpenMemory断下时，按shift+F2，运行dump脚本</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> fp, dex_addr, end_addr;</span><br><span class="line">    fp = <span class="built_in">fopen</span>(<span class="string">&quot;D:\\dump.dex&quot;</span>, <span class="string">&quot;wb&quot;</span>);</span><br><span class="line">    end_addr = r0 + r1;</span><br><span class="line">    <span class="keyword">for</span> ( dex_addr = r0; dex_addr &lt; end_addr; dex_addr ++ )</span><br><span class="line">        <span class="built_in">fputc</span>(<span class="built_in">Byte</span>(dex_addr), fp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/341924686e51">安卓 smali启动就附加调试 的正确步骤</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/13/ida-as-port-reverse/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/09/13/ida-as-port-reverse/" class="post-title-link" itemprop="url">修改IDA android_server默认端口</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-09-13 12:00:49" itemprop="dateCreated datePublished" datetime="2019-09-13T12:00:49+08:00">2019-09-13</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>也许有的反调试会检测23946端口是否占用，所以保险起见不妨使用别的端口。<br>可以使用<code>./android_server -p12345</code>指定端口，但是不如直接逆向修改默认端口。</p>
-<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>ida载入android_server，进入main函数，按F5查看伪代码，定位到23946（0x5dba）位置，直接修改即可。<br>可以把<code>5D BA</code>改为<code>39 30</code>，即12345端口</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jiaoxiake/p/6801093.html">浅谈android反调试之 转发端口</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/13/android-source-mod-anti-antidebug/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/09/13/android-source-mod-anti-antidebug/" class="post-title-link" itemprop="url">修改安卓内核源码 过State TracerPid wchan反调试</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-09-13 11:23:31" itemprop="dateCreated datePublished" datetime="2019-09-13T11:23:31+08:00">2019-09-13</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>修改安卓内核源码来绕过State字段及TracePid字段反调试</p>
-<h2 id="目标文件"><a href="#目标文件" class="headerlink" title="目标文件"></a>目标文件</h2><p>打开内核源码目录，<code>/fs/proc</code>下的<code>base.c</code>和<code>array.c</code></p>
-<h2 id="修改点"><a href="#修改点" class="headerlink" title="修改点"></a>修改点</h2><h3 id="base-c"><a href="#base-c" class="headerlink" title="base.c"></a>base.c</h3><h4 id="proc-pid-wchan函数"><a href="#proc-pid-wchan函数" class="headerlink" title="proc_pid_wchan函数"></a>proc_pid_wchan函数</h4><p>最后一个else分支改成</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span></span><br><span class="line">    &#123;   <span class="comment">//修改部分</span></span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">strstr</span>(symname,<span class="string">&quot;trace&quot;</span>))</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">sprintf</span>(buffer, <span class="string">&quot;%s&quot;</span>, <span class="string">&quot;sys_epoll_wait&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">sprintf</span>(buffer, <span class="string">&quot;%s&quot;</span>, symname);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>因为/proc/pid/wchan 和 /proc/pid/task/pid/wchan在调试状态下，里面内容为ptrace_stop, 非调试的状态下为ep_poll</p>
-</blockquote>
-<h3 id="array-c"><a href="#array-c" class="headerlink" title="array.c"></a>array.c</h3><h4 id="1-task-state-array字符数组"><a href="#1-task-state-array字符数组" class="headerlink" title="1. task_state_array字符数组"></a>1. task_state_array字符数组</h4><p>将4和8对应的字符（<code>&quot;T (stopped)&quot;</code>和<code>&quot;t (tracing stop)&quot;</code>）<br>都改成<code>&quot;S (sleeping)&quot;</code></p>
-<h4 id="2-task-state函数"><a href="#2-task-state函数" class="headerlink" title="2. task_state函数"></a>2. task_state函数</h4><p>与前文（<a href="https://blog.xhyeax.com/2019/09/13/android-kernel-reverse-anti-antidebug/">逆向修改安卓内核 x64 过TracerPID反调试</a>）目的一致，置<code>TracerPid</code>为0<br>将参数<code>tpid</code>改为0即可</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">seq_printf</span>(m,</span><br><span class="line">		<span class="string">&quot;State:\t%s\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Tgid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Pid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;PPid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;TracerPid:\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Uid:\t%d\t%d\t%d\t%d\n&quot;</span></span><br><span class="line">		<span class="string">&quot;Gid:\t%d\t%d\t%d\t%d\n&quot;</span>,</span><br><span class="line">		<span class="built_in">get_task_state</span>(p),</span><br><span class="line">		<span class="built_in">task_tgid_nr_ns</span>(p, ns),</span><br><span class="line">		<span class="built_in">pid_nr_ns</span>(pid, ns),</span><br><span class="line">		<span class="comment">//修改部分</span></span><br><span class="line">		ppid, <span class="comment">/*tpid*/</span><span class="number">0</span>,</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;uid),</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;euid),</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;suid),</span><br><span class="line">		<span class="built_in">from_kuid_munged</span>(user_ns, cred-&gt;fsuid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;gid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;egid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;sgid),</span><br><span class="line">		<span class="built_in">from_kgid_munged</span>(user_ns, cred-&gt;fsgid));</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-940605-1-1.html">Android反调试——从源码入手</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/13/android-kernel-reverse-anti-antidebug/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/09/13/android-kernel-reverse-anti-antidebug/" class="post-title-link" itemprop="url">逆向修改安卓内核 x64 过TracerPID反调试</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-09-13 00:42:11" itemprop="dateCreated datePublished" datetime="2019-09-13T00:42:11+08:00">2019-09-13</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="建议在git-bash下操作"><a href="#建议在git-bash下操作" class="headerlink" title="建议在git bash下操作"></a>建议在git bash下操作</h2><p>本人解压<code>kernel.gz</code>时使用的不是命令行，导致没有看到输出信息<code>gzip trailing garbage ignored</code>，进而没有对这些数据进行处理，浪费了很多时间。</p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手动nop掉TracerPID反调试代码，当然比不上直接修改内核来的快。<br>如果有内核源码以及环境，当然可以通过直接修改源码的方式生成<code>boot.img</code>。<br>在无内核源码（或者还没配置安卓源码编译环境）的情况下则只能通过逆向来修改内核。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/09/13/android-kernel-reverse-anti-antidebug/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/08/02/android-studio-import-so/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/08/02/android-studio-import-so/" class="post-title-link" itemprop="url">Android Studio 导入so</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-08-02 11:31:11" itemprop="dateCreated datePublished" datetime="2019-08-02T11:31:11+08:00">2019-08-02</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在<code>src/main</code>目录下新建<code>jniLibs</code>文件夹 ，添加cpu架构文件夹，如<code>armeabi-v7a</code>，把so文件复制进去即可。<br>编译时会自动打包。</p>
-<p>配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code>：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        ndk &#123;</span><br><span class="line">            abiFilters  &#x27;armeabi-v7a&#x27;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/anhenzhufeng/article/details/78913341">Android studio添加第三方库和so</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -922,14 +918,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-count">130</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
