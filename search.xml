@@ -109,7 +109,7 @@
   <entry>
     <title>安卓9 设置热点固定IP (Xposed)</title>
     <url>/2021/03/01/android-9-set-hotpot-ip/</url>
-    <content><![CDATA[<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p><a href="https://blog.xhyeax.com/2021/12/06/android-10-11-12-hostpot-set-ip/">安卓10、11、12 固定Wifi热点IP (Xposed)</a></p>
+    <content><![CDATA[<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p><a href="https://blog.xhyeax.com/2021/12/06/android-10-11-hostpot-set-ip/">安卓10、11 固定Wifi热点IP (Xposed)</a></p>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定热点IP。</p>
 <span id="more"></span>
 <h2 id="安卓8热点开启流程"><a href="#安卓8热点开启流程" class="headerlink" title="安卓8热点开启流程"></a>安卓8热点开启流程</h2><p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/softap-android-o.png"><br>图源：<a href="https://blog.csdn.net/AurumMann/article/details/103028026">android8.0热点打开流程，从Setting到framework</a></p>
