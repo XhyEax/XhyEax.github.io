@@ -109,7 +109,8 @@
   <entry>
     <title>安卓9 设置热点固定IP (Xposed)</title>
     <url>/2021/03/01/android-9-set-hotpot-ip/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定热点IP。</p>
+    <content><![CDATA[<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p><a href="https://blog.xhyeax.com/2021/12/06/android-10-11-12-hostpot-set-ip/">安卓10、11、12 固定Wifi热点IP (Xposed)</a></p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定热点IP。</p>
 <span id="more"></span>
 <h2 id="安卓8热点开启流程"><a href="#安卓8热点开启流程" class="headerlink" title="安卓8热点开启流程"></a>安卓8热点开启流程</h2><p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/softap-android-o.png"><br>图源：<a href="https://blog.csdn.net/AurumMann/article/details/103028026">android8.0热点打开流程，从Setting到framework</a></p>
 <h2 id="跟踪源码"><a href="#跟踪源码" class="headerlink" title="跟踪源码"></a>跟踪源码</h2><p>最终定位到<code>com.android.server.connectivity.tethering.TetherInterfaceStateMachine</code>类（<a href="http://aospxref.com/android-9.0.0_r61/xref/frameworks/base/services/core/java/com/android/server/connectivity/tethering/TetherInterfaceStateMachine.java#210">源代码</a>）</p>
@@ -338,7 +339,7 @@
   <entry>
     <title>逆向修改安卓内核 x64 过TracerPID反调试</title>
     <url>/2019/09/13/android-kernel-reverse-anti-antidebug/</url>
-    <content><![CDATA[<h2 id="建议在git-bash下操作"><a href="#建议在git-bash下操作" class="headerlink" title="建议在git bash下操作"></a>建议在git bash下操作</h2><p>本人解压<code>kernel.gz</code>时使用的不是命令行，导致没有看到输出信息<code>gzip trailing garbage ignored</code>，进而没有对这些数据进行处理，浪费了很多时间。</p>
+    <content><![CDATA[<h2 id="建议在git-bash下操作"><a href="#建议在git-bash下操作" class="headerlink" title="建议在git bash下操作"></a>建议在git bash下操作</h2><p>由于解压<code>kernel.gz</code>时使用的不是命令行，导致没有看到输出信息<code>gzip trailing garbage ignored</code>，进而没有对这些数据进行处理，浪费了很多时间。</p>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手动nop掉TracerPID反调试代码，当然比不上直接修改内核来的快。<br>如果有内核源码以及环境，当然可以通过直接修改源码的方式生成<code>boot.img</code>。<br>在无内核源码（或者还没配置安卓源码编译环境）的情况下则只能通过逆向来修改内核。</p>
 <span id="more"></span>
 <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p><code>Redmi Note 3</code>, <code>arm64</code>, <code>cm12.1</code></p>
@@ -3020,7 +3021,7 @@
   <entry>
     <title>win10 切换诊断数据为完整</title>
     <url>/2020/04/15/win10-open-diagtask-for-inside/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>安装windows预览版，需要切换诊断数据为<code>完整</code>，而本人切换到<code>完整</code>后又会自动跳回<code>基本</code>。搜索后找到解决方案。<br>原因是<code>Connected User Experiences and Telemetry</code>服务被禁用</p>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>安装windows预览版，需要切换诊断数据为<code>完整</code>，而切换到<code>完整</code>后又会自动跳回<code>基本</code>。搜索后找到解决方案。<br>原因是<code>Connected User Experiences and Telemetry</code>服务被禁用</p>
 <h2 id="解决步骤"><a href="#解决步骤" class="headerlink" title="解决步骤"></a>解决步骤</h2><p>Win+R,<code>services.msc</code>,找到<code>Connected User Experiences and Telemetry</code>，设置为<code>自动(延迟启动)</code>，再点击启动此服务即可成功切换</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://tieba.baidu.com/p/6483106526">安装win10预览版，诊断数据无设置成完整</a></p>
 ]]></content>
@@ -3402,7 +3403,7 @@
       </tags>
   </entry>
   <entry>
-    <title>修复Android Studio代码修改不生效</title>
+    <title>修复Android Studio代码修改不生效问题</title>
     <url>/2021/12/01/android-studio-install-old-apk-on-android-11/</url>
     <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>重新编译<code>Xposed</code>模块并点击<code>Run</code>安装后，修改不生效。卸载重装后才生效。</p>
 <h2 id="尝试"><a href="#尝试" class="headerlink" title="尝试"></a>尝试</h2><p>尝试修改<code>build.gradle</code>中的<code>versionCode</code>，发现修改代码生效了，于是有了这篇<a href="https://blog.xhyeax.com/2021/10/07/gradle-auto-version-code/">Gradle配置版本号自动增加</a>。（不符合编译习惯，<del>喜欢刷版本号的除外</del>）</p>
@@ -3451,7 +3452,7 @@
 <h3 id="计算机基础"><a href="#计算机基础" class="headerlink" title="计算机基础"></a>计算机基础</h3><p>操作系统：进程和线程（安卓如何获取）、进程调度策略、进程的状态及转换、虚拟地址和物理地址<br>计网：OSI七层模型（协议举例）、TCP和UDP、DNS、HTTPS过程、Get和Post区别<br>C++：指针和引用、变量的区别（static、全局局部）、编译过程（哪个阶段处理include）、动态链接和静态链接、const char*, char const*, char* const的区别<br>Java：面向对象语言三大特征、多态的体现（与C++模板类的区别）、内部类和静态内部类、HashMap和ConcurrentHashMap、快速失败和安全失败、GC机制、多线程的实现方式、线程池、synchronized</p>
 <h3 id="算法题"><a href="#算法题" class="headerlink" title="算法题"></a>算法题</h3><p>最小栈、计数排序、反转链表、螺旋矩阵、后缀表达式、最大正方形、旋转数组找最小值、两个栈实现队列、求根节点到叶节点数字之和</p>
 <h2 id="三面、HR面"><a href="#三面、HR面" class="headerlink" title="三面、HR面"></a>三面、HR面</h2><p>自我介绍<br>职业规划<br>实习/项目相关<br>升学打算及原因<br>能不能提前实习<br>前几轮面试体验如何<br>对其他安全领域的了解<br>为什么选择逆向这一领域<br>最有技术深度的文章<br>遇到过的最大挑战<br>最有成就感的事<br>三个词形容自己的优/缺点<br>身边的人怎么评价你<br>家庭情况/感情生活<br>平时的兴趣爱好<br>最近看了什么书<br>其他公司投递情况及进度<br>对工作的要求（城市、岗位职责、薪资、时间等）</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://blog.lc4t.me/2021/02/03/%E6%A0%A1%E6%8B%9B%E6%94%BB%E7%95%A5DLC/">校招攻略DLC</a><br><a href="https://coolshell.cn/articles/8790.html">程序算法与人生选择</a><br><a href="https://github.com/SecYouth/sec-jobs">SecYouth/sec-jobs</a><br><a href="https://github.com/cckenny/2020_autumn_mobile_security_interview">cckenny/2020_autumn_mobile_security_interview</a></p>
+<h2 id="推荐阅读"><a href="#推荐阅读" class="headerlink" title="推荐阅读"></a>推荐阅读</h2><p><a href="http://blog.lc4t.me/2021/02/03/%E6%A0%A1%E6%8B%9B%E6%94%BB%E7%95%A5DLC/">校招攻略DLC</a><br><a href="https://coolshell.cn/articles/8790.html">程序算法与人生选择</a><br><a href="https://la0s.github.io/2019/05/13/chunzhao/">起落落落起的春招找实习之旅</a><br><a href="https://bbs.pediy.com/thread-257825.htm">收集了一些移动安全面试的问题 欢迎补充</a><br><a href="https://github.com/SecYouth/sec-jobs">SecYouth/sec-jobs</a><br><a href="https://github.com/cckenny/2020_autumn_mobile_security_interview">cckenny/2020_autumn_mobile_security_interview</a></p>
 ]]></content>
       <tags>
         <tag>总结</tag>
@@ -3514,17 +3515,19 @@
   <entry>
     <title>使用油猴脚本自动加载JQuery</title>
     <url>/2021/12/06/auto-load-jquery-by-tampermonkey/</url>
-    <content><![CDATA[<h2 id="脚本"><a href="#脚本" class="headerlink" title="脚本"></a>脚本</h2><p><a href="https://github.com/XhyEax/JQueryAutoLoad">XhyEax/JQueryAutoLoad</a></p>
-<span id="more"></span>
-
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ==UserScript==</span></span><br><span class="line"><span class="comment">// @namespace    http://github.com/XhyEax/JQueryAutoLoad</span></span><br><span class="line"><span class="comment">// @name         JQueryAutoLoad</span></span><br><span class="line"><span class="comment">// @version      0.1</span></span><br><span class="line"><span class="comment">// @description  JQuery autoload</span></span><br><span class="line"><span class="comment">// @author       Xhy</span></span><br><span class="line"><span class="comment">// @match        *://*.github.com/*</span></span><br><span class="line"><span class="comment">// @match        *://*/*</span></span><br><span class="line"><span class="comment">// @grant        none</span></span><br><span class="line"><span class="comment">// @run-at       document-end</span></span><br><span class="line"><span class="comment">// ==/UserScript==</span></span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">    &#x27;use strict&#x27;</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> jQuery == <span class="string">&#x27;undefined&#x27;</span> || <span class="keyword">typeof</span> $ == <span class="string">&#x27;undefined&#x27;</span>) &#123;</span><br><span class="line">        loadJQuery();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;JQuery has been loaded.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">loadJQuery</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;JQuery or $ not found, try to load.&quot;</span>)</span><br><span class="line">        <span class="keyword">var</span> script = <span class="built_in">document</span>.createElement(<span class="string">&#x27;script&#x27;</span>);</span><br><span class="line">        script.type = <span class="string">&quot;text/javascript&quot;</span>;</span><br><span class="line">        script.src = <span class="string">&quot;https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js&quot;</span>;</span><br><span class="line">        <span class="keyword">var</span> parent = <span class="built_in">document</span>.getElementsByTagName(<span class="string">&#x27;head&#x27;</span>)[<span class="number">0</span>] || <span class="built_in">document</span>.getElementsByTagName(<span class="string">&#x27;body&#x27;</span>)[<span class="number">0</span>];</span><br><span class="line">        parent.appendChild(script);</span><br><span class="line">        script.onload = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123; <span class="built_in">console</span>.log(<span class="string">&quot;JQuery loaded.&quot;</span>); &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>如题，使用油猴脚本实现<code>JQuery</code>自动加载。</p>
+<h2 id="脚本"><a href="#脚本" class="headerlink" title="脚本"></a>脚本</h2><p><a href="https://github.com/XhyEax/JQueryAutoLoad">XhyEax/JQueryAutoLoad</a></p>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><h3 id="被重写"><a href="#被重写" class="headerlink" title="$被重写"></a>$被重写</h3><p>网站重写了<code>$</code>，直接加载<code>JQuery</code>的话会发生覆盖，部分组件可能无法正常使用。（例如<a href="https://www.52pojie.cn/">吾爱破解</a>）</p>
+<h4 id="修复方式"><a href="#修复方式" class="headerlink" title="修复方式"></a>修复方式</h4><p>只判断<code>$</code>，存在则不覆盖</p>
+<p>PS：似乎js也有命名空间的概念？之后有空再看看</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/dolin88/article/details/80043504">区别 (function($){…})(jQuery)、$(function(){ })和$.fn</a></p>
 ]]></content>
       <tags>
         <tag>Web</tag>
       </tags>
   </entry>
   <entry>
-    <title>修复Mac Android Studio无法调试</title>
+    <title>修复Mac Android Studio无法调试问题</title>
     <url>/2021/12/06/android-studio-stuck-at-debug/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Mac版<code>Android Studio</code>调试，提示<code>Invalid argument : Argument invalid [port]</code><br>搜索得到解决方案，原因是找不到<code>localhost</code>，在<code>/etc/hosts</code>中配置即可（之前不小心覆盖了）</p>
 <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p><code>sudo vim /etc/hosts</code></p>
@@ -3538,27 +3541,38 @@
       </tags>
   </entry>
   <entry>
+    <title>VSCode 按时间排序</title>
+    <url>/2021/12/07/vscode-sort-by-time/</url>
+    <content><![CDATA[<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p><code>VSCode</code>只能配置按更改时间排序，不能按创建时间排序</p>
+<p>目前笔者的解决方案是：通过python调用系统API，把文件的创建时间赋值给更改时间（不使用git的话，会丢失文件本身的修改时间）</p>
+<h2 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h2><h3 id="法1-手动设置"><a href="#法1-手动设置" class="headerlink" title="法1 手动设置"></a>法1 手动设置</h3><p><code>设置</code>，搜索<code>sortOrder</code>，修改<code>Explorer: Sort Order</code></p>
+<h3 id="法2-配置文件"><a href="#法2-配置文件" class="headerlink" title="法2 配置文件"></a>法2 配置文件</h3><p>创建<code>.vscode</code>文件夹，增加<code>settings.json</code>：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;explorer.sortOrder&quot;</span>: <span class="string">&quot;modified&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>安卓10、11 固定Wifi热点IP (Xposed)</title>
     <url>/2021/12/06/android-10-11-hostpot-set-ip/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/">前文</a>通过分析源码，定位到Hook点，然后使用<code>Xposed Hook</code>，实现了Wifi热点IP的固定。</p>
-<p>系统升级到<code>Android 11</code>后，发现源码有变化，于是再来操作一波。</p>
-<p>Xposed模块：<a href="https://github.com/XhyEax/SoftApStaticIP">SoftApStaticIP</a></p>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/">前文</a>通过分析<code>Android 9</code>源码，定位到Hook点，然后使用<code>Xposed Hook</code>，实现了Wifi热点IP的固定。</p>
+<p>系统升级到<code>Android 11</code>后，发现源码有变化，插件不起作用了。于是再来操作一波。</p>
+<p>Xposed模块：<a href="https://github.com/XhyEax/SoftApHelper">SoftApHelper</a></p>
 <span id="more"></span>
-<h2 id="安卓10"><a href="#安卓10" class="headerlink" title="安卓10"></a>安卓10</h2><h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><p>通过<a href="https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/">前文</a>可知，设置热点IP的流程如下：<br>在<code>configureIPv4</code>函数中，首先调用<code>getRandomWifiIPv4Address</code>生成字符串形式的IP，然后转换为<code>LinkAddress</code>，最后<code>ifcg.setLinkAddress</code>设置IP地址。</p>
+<h2 id="安卓10"><a href="#安卓10" class="headerlink" title="安卓10"></a>安卓10</h2><h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><p>通过<a href="https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/">前文</a>可知，设置热点IP的流程如下：<br>在<code>configureIPv4</code>函数中，首先调用<code>getRandomWifiIPv4Address</code>生成字符串形式的IP，然后转换为<code>LinkAddress</code>，最后调用<code>ifcg.setLinkAddress</code>设置IP地址。（其中<code>ifcg</code>类型为<code>InterfaceConfiguration</code>）</p>
 <p>在源码中搜索<code>setLinkAddress</code>，可以发现有以下<a href="http://aospxref.com/android-10.0.0_r47/search?project=frameworks&full=&defs=&refs=setLinkAddress&path=&hist=&type=&xrd=&nn=1&si=refs&si=refs">几处引用</a></p>
-<p>其中<code>/frameworks/base/services/net/java/android/net/ip/IpServer.java</code>调用者为<code>configureIPv4</code>函数</p>
-<p>查看<a href="http://aospxref.com/android-10.0.0_r47/xref/frameworks/base/services/net/java/android/net/ip/IpServer.java#422">源码</a>，发现并无太大变化（增加了<code>configureDhcp</code>），仍使用<code>getRandomWifiIPv4Address</code>生成随机IP地址：</p>
+<p>其中<code>/frameworks/base/services/net/java/android/net/ip/IpServer.java</code>调用者为<code>configureIPv4</code>函数（官方文档：<a href="https://source.android.google.cn/devices/architecture/modular-system/networking#ipservices-refactor">IP 服务重构路径</a>）</p>
+<p>查看<a href="http://aospxref.com/android-10.0.0_r47/xref/frameworks/base/services/net/java/android/net/ip/IpServer.java#422">源码</a>，发现并无太大变化（增加了<code>configureDhcp</code>，<a href="https://source.android.google.cn/setup/start/android-10-release#updated_dhcp_server">已更新 DHCP 服务器</a>），仍使用<code>getRandomWifiIPv4Address</code>生成随机IP地址：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">InetAddress addr = NetworkUtils.numericToInetAddress(ipAsString);</span><br><span class="line">linkAddr = <span class="keyword">new</span> LinkAddress(addr, prefixLen);</span><br><span class="line">ifcg.setLinkAddress(linkAddr);</span><br></pre></td></tr></table></figure>
 
 <p>查找<code>getRandomWifiIPv4Address</code>的交叉引用，发现还是只有这一处。因此，修改Hook类名为<code>android.net.ip.IpServer</code>即可适配安卓10</p>
-<h3 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h3><p><a href="https://source.android.google.cn/devices/architecture/modular-system/networking#ipservices-refactor">IP 服务重构路径</a></p>
-<p><a href="https://source.android.google.cn/setup/start/android-10-release#updated_dhcp_server">已更新 DHCP 服务器</a></p>
+<h3 id="Hook点"><a href="#Hook点" class="headerlink" title="Hook点"></a>Hook点</h3><p><code>android.net.ip.IpServer</code>的<code>getRandomWifiIPv4Address</code>函数，返回固定字符串即可。</p>
 <h2 id="安卓11"><a href="#安卓11" class="headerlink" title="安卓11"></a>安卓11</h2><h3 id="源码分析-1"><a href="#源码分析-1" class="headerlink" title="源码分析"></a>源码分析</h3><p>搜索<code>setLinkAddress</code>，仍然只有<a href="http://aospxref.com/android-11.0.0_r21/search?project=frameworks&full=&defs=&refs=setLinkAddress&path=&hist=&type=&xrd=&nn=1&si=refs&si=refs">几处引用</a></p>
 <p>相比于安卓10，<code>IpServer.java</code>和<code>WifiP2pServiceImpl.java</code>的引用消失了，变成了<code>NetdWrapper.java</code>的<code>fromStableParcel</code>和<code>setInterfaceLinkAddress</code>函数（官方文档：<a href="https://source.android.google.cn/devices/architecture/modular-system/tethering#module-boundary">模块边界</a>）</p>
 <p>查找<code>fromStableParcel</code>的交叉引用，发现<code>NetdWrapper.java</code>和<code>NetworkManagementService.java</code>的<code>getInterfaceConfig</code>函数有调用。<br>查看源码，发现只有一行代码区别</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">NetworkStack.checkNetworkStackPermissionOr(mContext, CONNECTIVITY_INTERNAL);</span><br></pre></td></tr></table></figure>
 <p>两者都是调用<code>mNetdService.interfaceGetCfg(iface)</code>获取配置。</p>
-<p>查找<code>setInterfaceLinkAddress</code>的交叉引用，发现并没有函数调用它</p>
+<p>查找<code>setInterfaceLinkAddress</code>的交叉引用，发现并没有函数调用它（其实可以Hook看看）</p>
 <p>于是搜索<code>configureIPv4</code>，发现只有<a href="http://aospxref.com/android-11.0.0_r21/search?project=frameworks&full=&defs=&refs=configureIPv4&path=&hist=&type=&xrd=&nn=1">一处引用</a>，仍位于<code>android.net.ip.IpServer</code>类中<br>（由<code>/frameworks/base/services/net/java/android/net/ip/IpServer.java</code>移动到了<code>/frameworks/base/packages/Tethering/src/android/net/ip/IpServer.java</code>）</p>
 <p>分析该函数（<a href="http://aospxref.com/android-11.0.0_r21/xref/frameworks/base/packages/Tethering/src/android/net/ip/IpServer.java#596">源代码</a>），发现有：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (enabled) &#123;</span><br><span class="line">    mLinkProperties.addLinkAddress(mIpv4Address);</span><br><span class="line">    mLinkProperties.addRoute(getDirectConnectedRoute(mIpv4Address));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -3567,10 +3581,13 @@
 <p>查看<code>requestIpv4Address</code>函数：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> LinkAddress <span class="title">requestIpv4Address</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (mStaticIpv4ServerAddr != <span class="keyword">null</span>) <span class="keyword">return</span> mStaticIpv4ServerAddr;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mInterfaceType == TetheringManager.TETHERING_BLUETOOTH) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> LinkAddress(BLUETOOTH_IFACE_ADDR);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> mPrivateAddressCoordinator.requestDownstreamAddress(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>首先判断是否设置了静态IP，如果<code>mStaticIpv4ServerAddr</code>不为空则直接使用（由<code>maybeConfigureStaticIp</code>设置）。<br>然后判断是否为蓝牙，是则使用<code>BLUETOOTH_IFACE_ADDR</code>(<code>192.168.44.1/24</code>)。<br>其他情况调用<code>mPrivateAddressCoordinator.requestDownstreamAddress(this)</code></p>
-<p>后者位于<code>com/android/networkstack/tethering/PrivateAddressCoordinator.java</code>：<a href="http://aospxref.com/android-11.0.0_r21/xref/frameworks/base/packages/Tethering/src/com/android/networkstack/tethering/PrivateAddressCoordinator.java?fi=requestDownstreamAddress#requestDownstreamAddress">源代码</a></p>
+<p>后者位于<code>frameworks/base/packages/Tethering/src/com/android/networkstack/tethering/PrivateAddressCoordinator.java</code></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> LinkAddress <span class="title">requestDownstreamAddress</span><span class="params">(<span class="keyword">final</span> IpServer ipServer)</span> </span>&#123;</span><br><span class="line">    maybeRemoveDeprectedUpstreams();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Address would be 192.168.[subAddress]/24.</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">byte</span>[] bytes = mTetheringPrefix.getRawAddress();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> subAddress = getRandomSubAddr();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> subNet = (subAddress &gt;&gt; <span class="number">8</span>) &amp; BYTE_MASK;</span><br><span class="line">    bytes[<span class="number">3</span>] = getSanitizedAddressSuffix(subAddress, (<span class="keyword">byte</span>) <span class="number">0</span>, (<span class="keyword">byte</span>) <span class="number">1</span>, (<span class="keyword">byte</span>) <span class="number">0xff</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; MAX_UBYTE; i++) &#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> newSubNet = (subNet + i) &amp; BYTE_MASK;</span><br><span class="line">        <span class="keyword">if</span> (newSubNet == BLUETOOTH_RESERVED) <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">        bytes[<span class="number">2</span>] = (<span class="keyword">byte</span>) newSubNet;</span><br><span class="line">        <span class="keyword">final</span> InetAddress addr;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            addr = InetAddress.getByAddress(bytes);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (UnknownHostException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;Invalid address, shouldn&#x27;t happen.&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> IpPrefix prefix = <span class="keyword">new</span> IpPrefix(addr, PREFIX_LENGTH);</span><br><span class="line">        <span class="comment">// Check whether this prefix is in use.</span></span><br><span class="line">        <span class="keyword">if</span> (isDownstreamPrefixInUse(prefix)) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="comment">// Check whether this prefix is conflict with any current upstream network.</span></span><br><span class="line">        <span class="keyword">if</span> (isConflictWithUpstream(prefix)) <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">        mDownstreams.add(ipServer);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> LinkAddress(addr, PREFIX_LENGTH);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// No available address.</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** Get random sub address value. Return value is in 0 ~ 0xffff. */</span></span><br><span class="line"><span class="meta">@VisibleForTesting</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getRandomSubAddr</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> ((<span class="keyword">new</span> Random()).nextInt()) &amp; <span class="number">0xffff</span>; <span class="comment">// subNet is in 0 ~ 0xffff.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>调用<code>getRandomSubAddr</code>生成子网地址</p>
 <p>查找<code>requestIpv4Address</code>交叉引用，发现还会被<code>handleNewPrefixRequest</code>调用（分配子网IP）</p>
-<h3 id="Hook点"><a href="#Hook点" class="headerlink" title="Hook点"></a>Hook点</h3><p>由于<code>requestIpv4Address</code>还被用于分配下游IP地址，Hook该处还需要判断调用者。</p>
-<p>待续…</p>
+<h3 id="Hook点-1"><a href="#Hook点-1" class="headerlink" title="Hook点"></a>Hook点</h3><p>由于<code>requestIpv4Address</code>还被用于分配下游IP地址，所以需要先判断调用者（遍历堆栈即可），再进行替换。</p>
+<p>PS：测试发现<code>Android 11</code>设置IP的包名不再是<code>android</code>，而是<code>com.android.networkstack.tethering.inprocess</code></p>
+<h2 id="Hook代码"><a href="#Hook代码" class="headerlink" title="Hook代码"></a>Hook代码</h2><p>见GitHub：<a href="https://github.com/XhyEax/SoftApHelper/tree/master/app/src/main/java/com/xhy/xp/softaphelper/MainHook.java">MainHook.java</a></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://android.stackexchange.com/questions/233453/how-can-i-permanently-assign-a-static-ip-address-to-wi-fi-clients-lineage-os-1">How can I permanently assign a static IP address to Wi-Fi clients? (Lineage OS 17.1 Android 10)</a></p>
 ]]></content>
       <tags>
