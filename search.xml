@@ -3572,7 +3572,7 @@
 <p>查找<code>fromStableParcel</code>的交叉引用，发现<code>NetdWrapper.java</code>和<code>NetworkManagementService.java</code>的<code>getInterfaceConfig</code>函数有调用。<br>查看源码，发现只有一行代码区别</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">NetworkStack.checkNetworkStackPermissionOr(mContext, CONNECTIVITY_INTERNAL);</span><br></pre></td></tr></table></figure>
 <p>两者都是调用<code>mNetdService.interfaceGetCfg(iface)</code>获取配置。</p>
-<p>查找<code>setInterfaceLinkAddress</code>的交叉引用，发现并没有函数调用它（其实可以Hook看看）</p>
+<p>查找<code>setInterfaceLinkAddress</code>的交叉引用，发现并没有函数调用它</p>
 <p>于是搜索<code>configureIPv4</code>，发现只有<a href="http://aospxref.com/android-11.0.0_r21/search?project=frameworks&full=&defs=&refs=configureIPv4&path=&hist=&type=&xrd=&nn=1">一处引用</a>，仍位于<code>android.net.ip.IpServer</code>类中<br>（由<code>/frameworks/base/services/net/java/android/net/ip/IpServer.java</code>移动到了<code>/frameworks/base/packages/Tethering/src/android/net/ip/IpServer.java</code>）</p>
 <p>分析该函数（<a href="http://aospxref.com/android-11.0.0_r21/xref/frameworks/base/packages/Tethering/src/android/net/ip/IpServer.java#596">源代码</a>），发现有：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (enabled) &#123;</span><br><span class="line">    mLinkProperties.addLinkAddress(mIpv4Address);</span><br><span class="line">    mLinkProperties.addRoute(getDirectConnectedRoute(mIpv4Address));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
