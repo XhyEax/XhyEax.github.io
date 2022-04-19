@@ -369,8 +369,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>也许有的反调试会检测23946端口是否占用，所以保险起见不妨使用别的端口。<br>可以使用<code>./android_server -p12345</code>指定端口，但是不如直接逆向修改默认端口。</p>
-<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>ida载入android_server，进入main函数，按F5查看伪代码，定位到23946（0x5dba）位置，直接修改即可。<br>可以把<code>5D BA</code>改为<code>39 30</code>，即12345端口</p>
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>有的反调试会检测<code>23946</code>端口是否占用，使用其他端口即可绕过此反调试。<br>可以使用<code>./android_server -p12345</code>指定端口，也可以使用<code>IDA</code>逆向，修改默认端口。</p>
+<h2 id="测试版本"><a href="#测试版本" class="headerlink" title="测试版本"></a>测试版本</h2><p>IDA 7.0</p>
+<h2 id="patch"><a href="#patch" class="headerlink" title="patch"></a>patch</h2><p>使用<code>IDA</code>打开<code>android_server</code>，搜索字符串<code>Listening on</code>，定位到引用位置。<br>按下F5反编译，重命名端口号变量。按下x，向上搜索找到赋值位置（可能有多处），patch即可。<br>附上偏移值：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">0xAFE0 LDR     R2, =23946</span><br><span class="line">0xB220 LDR     R1, =23946</span><br></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jiaoxiake/p/6801093.html">浅谈android反调试之 转发端口</a></p>
 
       
@@ -972,7 +974,7 @@
 <div class="copyright">
   
   &copy; 2018 – 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
