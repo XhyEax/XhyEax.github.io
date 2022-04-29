@@ -28,7 +28,7 @@
 <meta property="og:description" content="建议在git bash下操作由于解压kernel.gz时使用的不是命令行，导致没有看到输出信息gzip trailing garbage ignored，进而没有对这些数据进行处理，浪费了很多时间。 概述手动nop掉TracerPID反调试代码，当然比不上直接修改内核来的快。如果有内核源码以及环境，当然可以通过直接修改源码的方式生成boot.img。在无内核源码（或者还没配置安卓源码编译环境）的情">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-09-12T16:42:11.329Z">
-<meta property="article:modified_time" content="2019-09-12T16:42:11.000Z">
+<meta property="article:modified_time" content="2022-04-29T01:01:25.751Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="Kernel">
@@ -249,7 +249,7 @@
 <span id="more"></span>
 <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p><code>Redmi Note 3</code>, <code>arm64</code>, <code>cm12.1</code></p>
 <h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><h3 id="1-找到并导出boot-img"><a href="#1-找到并导出boot-img" class="headerlink" title="1. 找到并导出boot.img"></a>1. 找到并导出boot.img</h3><p>进入<code>adb shell</code>并执行su命令获取root权限（platform下文件夹可能会有所不同，即可能不是mtk-msdc.0）</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /dev/block/platform/mtk-msdc.0/by-name</span><br><span class="line">ls -al</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -al /dev/block/platform/mtk-msdc.0/by-name</span><br></pre></td></tr></table></figure>
 <p>根据输出信息<code>boot -&gt; /dev/block/mmcblk0p7</code>得知boot对应该<code>mmcblk0p7</code><br>dd大法导出该文件</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dd if=/dev/block/mmcblk0p7 of=/data/local/boot.img</span><br><span class="line">adb pull /data/local/boot.img boot.img</span><br></pre></td></tr></table></figure>
 <h3 id="2-解包boot-img以及内核"><a href="#2-解包boot-img以及内核" class="headerlink" title="2. 解包boot.img以及内核"></a>2. 解包boot.img以及内核</h3><p>此处使用的是<code>bootimg</code>工具（<a target="_blank" rel="noopener" href="https://github.com/XhyEax/android_bootimg">下载地址</a>），创建一个临时文件夹，执行<code>./bootimg.exe --unpack-bootimg .\boot.img</code>，再解压<code>kernel.gz</code>得到内核文件<br>强烈建议在<code>git bash</code>下使用<code>gzip -d</code>解压，这样才能查看具体的输出信息<br>输出<code>gzip trailing garbage ignored</code>（尾部垃圾被忽略处理）<br>gzip认为这是尾部垃圾，实际上却是必要的数据，不考虑的话可能会导致无限重启。</p>
@@ -389,7 +389,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">133</span>
+          <span class="site-state-item-count">134</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
