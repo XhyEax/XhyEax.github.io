@@ -28,7 +28,7 @@
 <meta property="og:description" content="NoteCopy From: ChromiumOS Docs - Linux System Call TableAlso View: unistd.h - Android Code Search Calling Conventions   arch syscall NR return arg0 arg1 arg2 arg3 arg4 arg5    arm r7 r0 r0 r1 r2 r3 r4">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-04-28T04:00:28.430Z">
-<meta property="article:modified_time" content="2022-04-29T00:21:13.834Z">
+<meta property="article:modified_time" content="2022-04-29T00:24:25.175Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="ARM">
 <meta name="twitter:card" content="summary">
@@ -303,7 +303,3708 @@
 <td align="center">r9</td>
 </tr>
 </tbody></table>
-<h2 id="Table"><a href="#Table" class="headerlink" title="Table"></a>Table</h2>
+<span id="more"></span>
+<h2 id="Table"><a href="#Table" class="headerlink" title="Table"></a>Table</h2><table>
+<thead>
+<tr>
+<th align="center">NR</th>
+<th>syscall name</th>
+<th align="center">references</th>
+<th align="center">%x8</th>
+<th>arg0 (%x0)</th>
+<th>arg1 (%x1)</th>
+<th>arg2 (%x2)</th>
+<th>arg3 (%x3)</th>
+<th>arg4 (%x4)</th>
+<th>arg5 (%x5)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0</td>
+<td>io_setup</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/io_setup.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*io_setup">cs/</a></td>
+<td align="center">0x00</td>
+<td>unsigned nr_reqs</td>
+<td>aio_context_t *ctx</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td>io_destroy</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/io_destroy.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*io_destroy">cs/</a></td>
+<td align="center">0x01</td>
+<td>aio_context_t ctx</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td>io_submit</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/io_submit.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*io_submit">cs/</a></td>
+<td align="center">0x02</td>
+<td>aio_context_t</td>
+<td>long</td>
+<td>struct iocb * *</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td>io_cancel</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/io_cancel.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*io_cancel">cs/</a></td>
+<td align="center">0x03</td>
+<td>aio_context_t ctx_id</td>
+<td>struct iocb *iocb</td>
+<td>struct io_event *result</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td>io_getevents</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/io_getevents.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*io_getevents">cs/</a></td>
+<td align="center">0x04</td>
+<td>aio_context_t ctx_id</td>
+<td>long min_nr</td>
+<td>long nr</td>
+<td>struct io_event *events</td>
+<td>struct __kernel_timespec *timeout</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td>setxattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setxattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setxattr">cs/</a></td>
+<td align="center">0x05</td>
+<td>const char *path</td>
+<td>const char *name</td>
+<td>const void *value</td>
+<td>size_t size</td>
+<td>int flags</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td>lsetxattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/lsetxattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*lsetxattr">cs/</a></td>
+<td align="center">0x06</td>
+<td>const char *path</td>
+<td>const char *name</td>
+<td>const void *value</td>
+<td>size_t size</td>
+<td>int flags</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td>fsetxattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fsetxattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fsetxattr">cs/</a></td>
+<td align="center">0x07</td>
+<td>int fd</td>
+<td>const char *name</td>
+<td>const void *value</td>
+<td>size_t size</td>
+<td>int flags</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td>getxattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getxattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getxattr">cs/</a></td>
+<td align="center">0x08</td>
+<td>const char *path</td>
+<td>const char *name</td>
+<td>void *value</td>
+<td>size_t size</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">9</td>
+<td>lgetxattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/lgetxattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*lgetxattr">cs/</a></td>
+<td align="center">0x09</td>
+<td>const char *path</td>
+<td>const char *name</td>
+<td>void *value</td>
+<td>size_t size</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">10</td>
+<td>fgetxattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fgetxattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fgetxattr">cs/</a></td>
+<td align="center">0x0a</td>
+<td>int fd</td>
+<td>const char *name</td>
+<td>void *value</td>
+<td>size_t size</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">11</td>
+<td>listxattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/listxattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*listxattr">cs/</a></td>
+<td align="center">0x0b</td>
+<td>const char *path</td>
+<td>char *list</td>
+<td>size_t size</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">12</td>
+<td>llistxattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/llistxattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*llistxattr">cs/</a></td>
+<td align="center">0x0c</td>
+<td>const char *path</td>
+<td>char *list</td>
+<td>size_t size</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">13</td>
+<td>flistxattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/flistxattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*flistxattr">cs/</a></td>
+<td align="center">0x0d</td>
+<td>int fd</td>
+<td>char *list</td>
+<td>size_t size</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">14</td>
+<td>removexattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/removexattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*removexattr">cs/</a></td>
+<td align="center">0x0e</td>
+<td>const char *path</td>
+<td>const char *name</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">15</td>
+<td>lremovexattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/lremovexattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*lremovexattr">cs/</a></td>
+<td align="center">0x0f</td>
+<td>const char *path</td>
+<td>const char *name</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">16</td>
+<td>fremovexattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fremovexattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fremovexattr">cs/</a></td>
+<td align="center">0x10</td>
+<td>int fd</td>
+<td>const char *name</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">17</td>
+<td>getcwd</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getcwd.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getcwd">cs/</a></td>
+<td align="center">0x11</td>
+<td>char *buf</td>
+<td>unsigned long size</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">18</td>
+<td>lookup_dcookie</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/lookup_dcookie.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*lookup_dcookie">cs/</a></td>
+<td align="center">0x12</td>
+<td>u64 cookie64</td>
+<td>char *buf</td>
+<td>size_t len</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">19</td>
+<td>eventfd2</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/eventfd2.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*eventfd2">cs/</a></td>
+<td align="center">0x13</td>
+<td>unsigned int count</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">20</td>
+<td>epoll_create1</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/epoll_create1.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*epoll_create1">cs/</a></td>
+<td align="center">0x14</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">21</td>
+<td>epoll_ctl</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/epoll_ctl.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*epoll_ctl">cs/</a></td>
+<td align="center">0x15</td>
+<td>int epfd</td>
+<td>int op</td>
+<td>int fd</td>
+<td>struct epoll_event *event</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">22</td>
+<td>epoll_pwait</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/epoll_pwait.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*epoll_pwait">cs/</a></td>
+<td align="center">0x16</td>
+<td>int epfd</td>
+<td>struct epoll_event *events</td>
+<td>int maxevents</td>
+<td>int timeout</td>
+<td>const sigset_t *sigmask</td>
+<td>size_t sigsetsize</td>
+</tr>
+<tr>
+<td align="center">23</td>
+<td>dup</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/dup.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*dup">cs/</a></td>
+<td align="center">0x17</td>
+<td>unsigned int fildes</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">24</td>
+<td>dup3</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/dup3.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*dup3">cs/</a></td>
+<td align="center">0x18</td>
+<td>unsigned int oldfd</td>
+<td>unsigned int newfd</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">25</td>
+<td>fcntl</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fcntl.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fcntl">cs/</a></td>
+<td align="center">0x19</td>
+<td>unsigned int fd</td>
+<td>unsigned int cmd</td>
+<td>unsigned long arg</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">26</td>
+<td>inotify_init1</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/inotify_init1.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*inotify_init1">cs/</a></td>
+<td align="center">0x1a</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">27</td>
+<td>inotify_add_watch</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/inotify_add_watch.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*inotify_add_watch">cs/</a></td>
+<td align="center">0x1b</td>
+<td>int fd</td>
+<td>const char *path</td>
+<td>u32 mask</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">28</td>
+<td>inotify_rm_watch</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/inotify_rm_watch.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*inotify_rm_watch">cs/</a></td>
+<td align="center">0x1c</td>
+<td>int fd</td>
+<td>__s32 wd</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">29</td>
+<td>ioctl</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/ioctl.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*ioctl">cs/</a></td>
+<td align="center">0x1d</td>
+<td>unsigned int fd</td>
+<td>unsigned int cmd</td>
+<td>unsigned long arg</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">30</td>
+<td>ioprio_set</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/ioprio_set.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*ioprio_set">cs/</a></td>
+<td align="center">0x1e</td>
+<td>int which</td>
+<td>int who</td>
+<td>int ioprio</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">31</td>
+<td>ioprio_get</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/ioprio_get.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*ioprio_get">cs/</a></td>
+<td align="center">0x1f</td>
+<td>int which</td>
+<td>int who</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">32</td>
+<td>flock</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/flock.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*flock">cs/</a></td>
+<td align="center">0x20</td>
+<td>unsigned int fd</td>
+<td>unsigned int cmd</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">33</td>
+<td>mknodat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mknodat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mknodat">cs/</a></td>
+<td align="center">0x21</td>
+<td>int dfd</td>
+<td>const char * filename</td>
+<td>umode_t mode</td>
+<td>unsigned dev</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">34</td>
+<td>mkdirat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mkdirat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mkdirat">cs/</a></td>
+<td align="center">0x22</td>
+<td>int dfd</td>
+<td>const char * pathname</td>
+<td>umode_t mode</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">35</td>
+<td>unlinkat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/unlinkat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*unlinkat">cs/</a></td>
+<td align="center">0x23</td>
+<td>int dfd</td>
+<td>const char * pathname</td>
+<td>int flag</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">36</td>
+<td>symlinkat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/symlinkat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*symlinkat">cs/</a></td>
+<td align="center">0x24</td>
+<td>const char * oldname</td>
+<td>int newdfd</td>
+<td>const char * newname</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">37</td>
+<td>linkat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/linkat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*linkat">cs/</a></td>
+<td align="center">0x25</td>
+<td>int olddfd</td>
+<td>const char *oldname</td>
+<td>int newdfd</td>
+<td>const char *newname</td>
+<td>int flags</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">38</td>
+<td>renameat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/renameat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*renameat">cs/</a></td>
+<td align="center">0x26</td>
+<td>int olddfd</td>
+<td>const char * oldname</td>
+<td>int newdfd</td>
+<td>const char * newname</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">39</td>
+<td>umount2</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/umount2.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*umount2">cs/</a></td>
+<td align="center">0x27</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+</tr>
+<tr>
+<td align="center">40</td>
+<td>mount</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mount.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mount">cs/</a></td>
+<td align="center">0x28</td>
+<td>char *dev_name</td>
+<td>char *dir_name</td>
+<td>char *type</td>
+<td>unsigned long flags</td>
+<td>void *data</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">41</td>
+<td>pivot_root</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/pivot_root.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*pivot_root">cs/</a></td>
+<td align="center">0x29</td>
+<td>const char *new_root</td>
+<td>const char *put_old</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">42</td>
+<td>nfsservctl</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/nfsservctl.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*nfsservctl">cs/</a></td>
+<td align="center">0x2a</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+</tr>
+<tr>
+<td align="center">43</td>
+<td>statfs</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/statfs.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*statfs">cs/</a></td>
+<td align="center">0x2b</td>
+<td>const char * path</td>
+<td>struct statfs *buf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">44</td>
+<td>fstatfs</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fstatfs.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fstatfs">cs/</a></td>
+<td align="center">0x2c</td>
+<td>unsigned int fd</td>
+<td>struct statfs *buf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">45</td>
+<td>truncate</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/truncate.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*truncate">cs/</a></td>
+<td align="center">0x2d</td>
+<td>const char *path</td>
+<td>long length</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">46</td>
+<td>ftruncate</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/ftruncate.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*ftruncate">cs/</a></td>
+<td align="center">0x2e</td>
+<td>unsigned int fd</td>
+<td>unsigned long length</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">47</td>
+<td>fallocate</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fallocate.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fallocate">cs/</a></td>
+<td align="center">0x2f</td>
+<td>int fd</td>
+<td>int mode</td>
+<td>loff_t offset</td>
+<td>loff_t len</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">48</td>
+<td>faccessat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/faccessat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*faccessat">cs/</a></td>
+<td align="center">0x30</td>
+<td>int dfd</td>
+<td>const char *filename</td>
+<td>int mode</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">49</td>
+<td>chdir</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/chdir.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*chdir">cs/</a></td>
+<td align="center">0x31</td>
+<td>const char *filename</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">50</td>
+<td>fchdir</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fchdir.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fchdir">cs/</a></td>
+<td align="center">0x32</td>
+<td>unsigned int fd</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">51</td>
+<td>chroot</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/chroot.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*chroot">cs/</a></td>
+<td align="center">0x33</td>
+<td>const char *filename</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">52</td>
+<td>fchmod</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fchmod.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fchmod">cs/</a></td>
+<td align="center">0x34</td>
+<td>unsigned int fd</td>
+<td>umode_t mode</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">53</td>
+<td>fchmodat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fchmodat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fchmodat">cs/</a></td>
+<td align="center">0x35</td>
+<td>int dfd</td>
+<td>const char * filename</td>
+<td>umode_t mode</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">54</td>
+<td>fchownat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fchownat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fchownat">cs/</a></td>
+<td align="center">0x36</td>
+<td>int dfd</td>
+<td>const char *filename</td>
+<td>uid_t user</td>
+<td>gid_t group</td>
+<td>int flag</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">55</td>
+<td>fchown</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fchown.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fchown">cs/</a></td>
+<td align="center">0x37</td>
+<td>unsigned int fd</td>
+<td>uid_t user</td>
+<td>gid_t group</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">56</td>
+<td>openat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/openat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*openat">cs/</a></td>
+<td align="center">0x38</td>
+<td>int dfd</td>
+<td>const char *filename</td>
+<td>int flags</td>
+<td>umode_t mode</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">57</td>
+<td>close</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/close.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*close">cs/</a></td>
+<td align="center">0x39</td>
+<td>unsigned int fd</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">58</td>
+<td>vhangup</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/vhangup.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*vhangup">cs/</a></td>
+<td align="center">0x3a</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">59</td>
+<td>pipe2</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/pipe2.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*pipe2">cs/</a></td>
+<td align="center">0x3b</td>
+<td>int *fildes</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">60</td>
+<td>quotactl</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/quotactl.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*quotactl">cs/</a></td>
+<td align="center">0x3c</td>
+<td>unsigned int cmd</td>
+<td>const char *special</td>
+<td>qid_t id</td>
+<td>void *addr</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">61</td>
+<td>getdents64</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getdents64.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getdents64">cs/</a></td>
+<td align="center">0x3d</td>
+<td>unsigned int fd</td>
+<td>struct linux_dirent64 *dirent</td>
+<td>unsigned int count</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">62</td>
+<td>lseek</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/lseek.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*lseek">cs/</a></td>
+<td align="center">0x3e</td>
+<td>unsigned int fd</td>
+<td>off_t offset</td>
+<td>unsigned int whence</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">63</td>
+<td>read</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/read.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*read">cs/</a></td>
+<td align="center">0x3f</td>
+<td>unsigned int fd</td>
+<td>char *buf</td>
+<td>size_t count</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">64</td>
+<td>write</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/write.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*write">cs/</a></td>
+<td align="center">0x40</td>
+<td>unsigned int fd</td>
+<td>const char *buf</td>
+<td>size_t count</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">65</td>
+<td>readv</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/readv.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*readv">cs/</a></td>
+<td align="center">0x41</td>
+<td>unsigned long fd</td>
+<td>const struct iovec *vec</td>
+<td>unsigned long vlen</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">66</td>
+<td>writev</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/writev.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*writev">cs/</a></td>
+<td align="center">0x42</td>
+<td>unsigned long fd</td>
+<td>const struct iovec *vec</td>
+<td>unsigned long vlen</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">67</td>
+<td>pread64</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/pread64.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*pread64">cs/</a></td>
+<td align="center">0x43</td>
+<td>unsigned int fd</td>
+<td>char *buf</td>
+<td>size_t count</td>
+<td>loff_t pos</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">68</td>
+<td>pwrite64</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/pwrite64.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*pwrite64">cs/</a></td>
+<td align="center">0x44</td>
+<td>unsigned int fd</td>
+<td>const char *buf</td>
+<td>size_t count</td>
+<td>loff_t pos</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">69</td>
+<td>preadv</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/preadv.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*preadv">cs/</a></td>
+<td align="center">0x45</td>
+<td>unsigned long fd</td>
+<td>const struct iovec *vec</td>
+<td>unsigned long vlen</td>
+<td>unsigned long pos_l</td>
+<td>unsigned long pos_h</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">70</td>
+<td>pwritev</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/pwritev.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*pwritev">cs/</a></td>
+<td align="center">0x46</td>
+<td>unsigned long fd</td>
+<td>const struct iovec *vec</td>
+<td>unsigned long vlen</td>
+<td>unsigned long pos_l</td>
+<td>unsigned long pos_h</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">71</td>
+<td>sendfile</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sendfile.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sendfile">cs/</a></td>
+<td align="center">0x47</td>
+<td>int out_fd</td>
+<td>int in_fd</td>
+<td>off_t *offset</td>
+<td>size_t count</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">72</td>
+<td>pselect6</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/pselect6.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*pselect6">cs/</a></td>
+<td align="center">0x48</td>
+<td>int</td>
+<td>fd_set *</td>
+<td>fd_set *</td>
+<td>fd_set *</td>
+<td>struct __kernel_timespec *</td>
+<td>void *</td>
+</tr>
+<tr>
+<td align="center">73</td>
+<td>ppoll</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/ppoll.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*ppoll">cs/</a></td>
+<td align="center">0x49</td>
+<td>struct pollfd *</td>
+<td>unsigned int</td>
+<td>struct __kernel_timespec *</td>
+<td>const sigset_t *</td>
+<td>size_t</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">74</td>
+<td>signalfd4</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/signalfd4.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*signalfd4">cs/</a></td>
+<td align="center">0x4a</td>
+<td>int ufd</td>
+<td>sigset_t *user_mask</td>
+<td>size_t sizemask</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">75</td>
+<td>vmsplice</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/vmsplice.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*vmsplice">cs/</a></td>
+<td align="center">0x4b</td>
+<td>int fd</td>
+<td>const struct iovec *iov</td>
+<td>unsigned long nr_segs</td>
+<td>unsigned int flags</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">76</td>
+<td>splice</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/splice.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*splice">cs/</a></td>
+<td align="center">0x4c</td>
+<td>int fd_in</td>
+<td>loff_t *off_in</td>
+<td>int fd_out</td>
+<td>loff_t *off_out</td>
+<td>size_t len</td>
+<td>unsigned int flags</td>
+</tr>
+<tr>
+<td align="center">77</td>
+<td>tee</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/tee.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*tee">cs/</a></td>
+<td align="center">0x4d</td>
+<td>int fdin</td>
+<td>int fdout</td>
+<td>size_t len</td>
+<td>unsigned int flags</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">78</td>
+<td>readlinkat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/readlinkat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*readlinkat">cs/</a></td>
+<td align="center">0x4e</td>
+<td>int dfd</td>
+<td>const char *path</td>
+<td>char *buf</td>
+<td>int bufsiz</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">79</td>
+<td>newfstatat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/newfstatat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*newfstatat">cs/</a></td>
+<td align="center">0x4f</td>
+<td>int dfd</td>
+<td>const char *filename</td>
+<td>struct stat *statbuf</td>
+<td>int flag</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">80</td>
+<td>fstat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fstat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fstat">cs/</a></td>
+<td align="center">0x50</td>
+<td>unsigned int fd</td>
+<td>struct __old_kernel_stat *statbuf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">81</td>
+<td>sync</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sync.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sync">cs/</a></td>
+<td align="center">0x51</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">82</td>
+<td>fsync</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fsync.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fsync">cs/</a></td>
+<td align="center">0x52</td>
+<td>unsigned int fd</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">83</td>
+<td>fdatasync</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fdatasync.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fdatasync">cs/</a></td>
+<td align="center">0x53</td>
+<td>unsigned int fd</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">84</td>
+<td>sync_file_range</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sync_file_range.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sync_file_range">cs/</a></td>
+<td align="center">0x54</td>
+<td>int fd</td>
+<td>loff_t offset</td>
+<td>loff_t nbytes</td>
+<td>unsigned int flags</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">85</td>
+<td>timerfd_create</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/timerfd_create.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*timerfd_create">cs/</a></td>
+<td align="center">0x55</td>
+<td>int clockid</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">86</td>
+<td>timerfd_settime</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/timerfd_settime.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*timerfd_settime">cs/</a></td>
+<td align="center">0x56</td>
+<td>int ufd</td>
+<td>int flags</td>
+<td>const struct __kernel_itimerspec *utmr</td>
+<td>struct __kernel_itimerspec *otmr</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">87</td>
+<td>timerfd_gettime</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/timerfd_gettime.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*timerfd_gettime">cs/</a></td>
+<td align="center">0x57</td>
+<td>int ufd</td>
+<td>struct __kernel_itimerspec *otmr</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">88</td>
+<td>utimensat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/utimensat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*utimensat">cs/</a></td>
+<td align="center">0x58</td>
+<td>int dfd</td>
+<td>const char *filename</td>
+<td>struct __kernel_timespec *utimes</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">89</td>
+<td>acct</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/acct.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*acct">cs/</a></td>
+<td align="center">0x59</td>
+<td>const char *name</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">90</td>
+<td>capget</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/capget.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*capget">cs/</a></td>
+<td align="center">0x5a</td>
+<td>cap_user_header_t header</td>
+<td>cap_user_data_t dataptr</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">91</td>
+<td>capset</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/capset.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*capset">cs/</a></td>
+<td align="center">0x5b</td>
+<td>cap_user_header_t header</td>
+<td>const cap_user_data_t data</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">92</td>
+<td>personality</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/personality.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*personality">cs/</a></td>
+<td align="center">0x5c</td>
+<td>unsigned int personality</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">93</td>
+<td>exit</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/exit.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*exit">cs/</a></td>
+<td align="center">0x5d</td>
+<td>int error_code</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">94</td>
+<td>exit_group</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/exit_group.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*exit_group">cs/</a></td>
+<td align="center">0x5e</td>
+<td>int error_code</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">95</td>
+<td>waitid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/waitid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*waitid">cs/</a></td>
+<td align="center">0x5f</td>
+<td>int which</td>
+<td>pid_t pid</td>
+<td>struct siginfo *infop</td>
+<td>int options</td>
+<td>struct rusage *ru</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">96</td>
+<td>set_tid_address</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/set_tid_address.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*set_tid_address">cs/</a></td>
+<td align="center">0x60</td>
+<td>int *tidptr</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">97</td>
+<td>unshare</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/unshare.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*unshare">cs/</a></td>
+<td align="center">0x61</td>
+<td>unsigned long unshare_flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">98</td>
+<td>futex</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/futex.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*futex">cs/</a></td>
+<td align="center">0x62</td>
+<td>u32 *uaddr</td>
+<td>int op</td>
+<td>u32 val</td>
+<td>const struct __kernel_timespec *utime</td>
+<td>u32 *uaddr2</td>
+<td>u32 val3</td>
+</tr>
+<tr>
+<td align="center">99</td>
+<td>set_robust_list</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/set_robust_list.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*set_robust_list">cs/</a></td>
+<td align="center">0x63</td>
+<td>struct robust_list_head *head</td>
+<td>size_t len</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">100</td>
+<td>get_robust_list</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/get_robust_list.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*get_robust_list">cs/</a></td>
+<td align="center">0x64</td>
+<td>int pid</td>
+<td>struct robust_list_head * *head_ptr</td>
+<td>size_t *len_ptr</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">101</td>
+<td>nanosleep</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/nanosleep.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*nanosleep">cs/</a></td>
+<td align="center">0x65</td>
+<td>struct __kernel_timespec *rqtp</td>
+<td>struct __kernel_timespec *rmtp</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">102</td>
+<td>getitimer</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getitimer.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getitimer">cs/</a></td>
+<td align="center">0x66</td>
+<td>int which</td>
+<td>struct __kernel_old_itimerval *value</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">103</td>
+<td>setitimer</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setitimer.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setitimer">cs/</a></td>
+<td align="center">0x67</td>
+<td>int which</td>
+<td>struct __kernel_old_itimerval *value</td>
+<td>struct __kernel_old_itimerval *ovalue</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">104</td>
+<td>kexec_load</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/kexec_load.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*kexec_load">cs/</a></td>
+<td align="center">0x68</td>
+<td>unsigned long entry</td>
+<td>unsigned long nr_segments</td>
+<td>struct kexec_segment *segments</td>
+<td>unsigned long flags</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">105</td>
+<td>init_module</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/init_module.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*init_module">cs/</a></td>
+<td align="center">0x69</td>
+<td>void *umod</td>
+<td>unsigned long len</td>
+<td>const char *uargs</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">106</td>
+<td>delete_module</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/delete_module.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*delete_module">cs/</a></td>
+<td align="center">0x6a</td>
+<td>const char *name_user</td>
+<td>unsigned int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">107</td>
+<td>timer_create</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/timer_create.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*timer_create">cs/</a></td>
+<td align="center">0x6b</td>
+<td>clockid_t which_clock</td>
+<td>struct sigevent *timer_event_spec</td>
+<td>timer_t * created_timer_id</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">108</td>
+<td>timer_gettime</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/timer_gettime.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*timer_gettime">cs/</a></td>
+<td align="center">0x6c</td>
+<td>timer_t timer_id</td>
+<td>struct __kernel_itimerspec *setting</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">109</td>
+<td>timer_getoverrun</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/timer_getoverrun.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*timer_getoverrun">cs/</a></td>
+<td align="center">0x6d</td>
+<td>timer_t timer_id</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">110</td>
+<td>timer_settime</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/timer_settime.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*timer_settime">cs/</a></td>
+<td align="center">0x6e</td>
+<td>timer_t timer_id</td>
+<td>int flags</td>
+<td>const struct __kernel_itimerspec *new_setting</td>
+<td>struct __kernel_itimerspec *old_setting</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">111</td>
+<td>timer_delete</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/timer_delete.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*timer_delete">cs/</a></td>
+<td align="center">0x6f</td>
+<td>timer_t timer_id</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">112</td>
+<td>clock_settime</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/clock_settime.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*clock_settime">cs/</a></td>
+<td align="center">0x70</td>
+<td>clockid_t which_clock</td>
+<td>const struct __kernel_timespec *tp</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">113</td>
+<td>clock_gettime</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/clock_gettime.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*clock_gettime">cs/</a></td>
+<td align="center">0x71</td>
+<td>clockid_t which_clock</td>
+<td>struct __kernel_timespec *tp</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">114</td>
+<td>clock_getres</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/clock_getres.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*clock_getres">cs/</a></td>
+<td align="center">0x72</td>
+<td>clockid_t which_clock</td>
+<td>struct __kernel_timespec *tp</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">115</td>
+<td>clock_nanosleep</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/clock_nanosleep.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*clock_nanosleep">cs/</a></td>
+<td align="center">0x73</td>
+<td>clockid_t which_clock</td>
+<td>int flags</td>
+<td>const struct __kernel_timespec *rqtp</td>
+<td>struct __kernel_timespec *rmtp</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">116</td>
+<td>syslog</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/syslog.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*syslog">cs/</a></td>
+<td align="center">0x74</td>
+<td>int type</td>
+<td>char *buf</td>
+<td>int len</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">117</td>
+<td>ptrace</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/ptrace.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*ptrace">cs/</a></td>
+<td align="center">0x75</td>
+<td>long request</td>
+<td>long pid</td>
+<td>unsigned long addr</td>
+<td>unsigned long data</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">118</td>
+<td>sched_setparam</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_setparam.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_setparam">cs/</a></td>
+<td align="center">0x76</td>
+<td>pid_t pid</td>
+<td>struct sched_param *param</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">119</td>
+<td>sched_setscheduler</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_setscheduler.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_setscheduler">cs/</a></td>
+<td align="center">0x77</td>
+<td>pid_t pid</td>
+<td>int policy</td>
+<td>struct sched_param *param</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">120</td>
+<td>sched_getscheduler</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_getscheduler.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_getscheduler">cs/</a></td>
+<td align="center">0x78</td>
+<td>pid_t pid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">121</td>
+<td>sched_getparam</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_getparam.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_getparam">cs/</a></td>
+<td align="center">0x79</td>
+<td>pid_t pid</td>
+<td>struct sched_param *param</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">122</td>
+<td>sched_setaffinity</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_setaffinity.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_setaffinity">cs/</a></td>
+<td align="center">0x7a</td>
+<td>pid_t pid</td>
+<td>unsigned int len</td>
+<td>unsigned long *user_mask_ptr</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">123</td>
+<td>sched_getaffinity</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_getaffinity.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_getaffinity">cs/</a></td>
+<td align="center">0x7b</td>
+<td>pid_t pid</td>
+<td>unsigned int len</td>
+<td>unsigned long *user_mask_ptr</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">124</td>
+<td>sched_yield</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_yield.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_yield">cs/</a></td>
+<td align="center">0x7c</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">125</td>
+<td>sched_get_priority_max</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_get_priority_max.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_get_priority_max">cs/</a></td>
+<td align="center">0x7d</td>
+<td>int policy</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">126</td>
+<td>sched_get_priority_min</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_get_priority_min.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_get_priority_min">cs/</a></td>
+<td align="center">0x7e</td>
+<td>int policy</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">127</td>
+<td>sched_rr_get_interval</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_rr_get_interval.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_rr_get_interval">cs/</a></td>
+<td align="center">0x7f</td>
+<td>pid_t pid</td>
+<td>struct __kernel_timespec *interval</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">128</td>
+<td>restart_syscall</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/restart_syscall.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*restart_syscall">cs/</a></td>
+<td align="center">0x80</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">129</td>
+<td>kill</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/kill.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*kill">cs/</a></td>
+<td align="center">0x81</td>
+<td>pid_t pid</td>
+<td>int sig</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">130</td>
+<td>tkill</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/tkill.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*tkill">cs/</a></td>
+<td align="center">0x82</td>
+<td>pid_t pid</td>
+<td>int sig</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">131</td>
+<td>tgkill</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/tgkill.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*tgkill">cs/</a></td>
+<td align="center">0x83</td>
+<td>pid_t tgid</td>
+<td>pid_t pid</td>
+<td>int sig</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">132</td>
+<td>sigaltstack</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sigaltstack.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sigaltstack">cs/</a></td>
+<td align="center">0x84</td>
+<td>const struct sigaltstack *uss</td>
+<td>struct sigaltstack *uoss</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">133</td>
+<td>rt_sigsuspend</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/rt_sigsuspend.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*rt_sigsuspend">cs/</a></td>
+<td align="center">0x85</td>
+<td>sigset_t *unewset</td>
+<td>size_t sigsetsize</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">134</td>
+<td>rt_sigaction</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/rt_sigaction.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*rt_sigaction">cs/</a></td>
+<td align="center">0x86</td>
+<td>int</td>
+<td>const struct sigaction *</td>
+<td>struct sigaction *</td>
+<td>size_t</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">135</td>
+<td>rt_sigprocmask</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/rt_sigprocmask.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*rt_sigprocmask">cs/</a></td>
+<td align="center">0x87</td>
+<td>int how</td>
+<td>sigset_t *set</td>
+<td>sigset_t *oset</td>
+<td>size_t sigsetsize</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">136</td>
+<td>rt_sigpending</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/rt_sigpending.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*rt_sigpending">cs/</a></td>
+<td align="center">0x88</td>
+<td>sigset_t *set</td>
+<td>size_t sigsetsize</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">137</td>
+<td>rt_sigtimedwait</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/rt_sigtimedwait.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*rt_sigtimedwait">cs/</a></td>
+<td align="center">0x89</td>
+<td>const sigset_t *uthese</td>
+<td>siginfo_t *uinfo</td>
+<td>const struct __kernel_timespec *uts</td>
+<td>size_t sigsetsize</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">138</td>
+<td>rt_sigqueueinfo</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/rt_sigqueueinfo.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*rt_sigqueueinfo">cs/</a></td>
+<td align="center">0x8a</td>
+<td>pid_t pid</td>
+<td>int sig</td>
+<td>siginfo_t *uinfo</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">139</td>
+<td>rt_sigreturn</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/rt_sigreturn.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*rt_sigreturn">cs/</a></td>
+<td align="center">0x8b</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+</tr>
+<tr>
+<td align="center">140</td>
+<td>setpriority</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setpriority.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setpriority">cs/</a></td>
+<td align="center">0x8c</td>
+<td>int which</td>
+<td>int who</td>
+<td>int niceval</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">141</td>
+<td>getpriority</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getpriority.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getpriority">cs/</a></td>
+<td align="center">0x8d</td>
+<td>int which</td>
+<td>int who</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">142</td>
+<td>reboot</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/reboot.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*reboot">cs/</a></td>
+<td align="center">0x8e</td>
+<td>int magic1</td>
+<td>int magic2</td>
+<td>unsigned int cmd</td>
+<td>void *arg</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">143</td>
+<td>setregid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setregid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setregid">cs/</a></td>
+<td align="center">0x8f</td>
+<td>gid_t rgid</td>
+<td>gid_t egid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">144</td>
+<td>setgid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setgid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setgid">cs/</a></td>
+<td align="center">0x90</td>
+<td>gid_t gid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">145</td>
+<td>setreuid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setreuid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setreuid">cs/</a></td>
+<td align="center">0x91</td>
+<td>uid_t ruid</td>
+<td>uid_t euid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">146</td>
+<td>setuid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setuid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setuid">cs/</a></td>
+<td align="center">0x92</td>
+<td>uid_t uid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">147</td>
+<td>setresuid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setresuid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setresuid">cs/</a></td>
+<td align="center">0x93</td>
+<td>uid_t ruid</td>
+<td>uid_t euid</td>
+<td>uid_t suid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">148</td>
+<td>getresuid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getresuid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getresuid">cs/</a></td>
+<td align="center">0x94</td>
+<td>uid_t *ruid</td>
+<td>uid_t *euid</td>
+<td>uid_t *suid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">149</td>
+<td>setresgid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setresgid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setresgid">cs/</a></td>
+<td align="center">0x95</td>
+<td>gid_t rgid</td>
+<td>gid_t egid</td>
+<td>gid_t sgid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">150</td>
+<td>getresgid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getresgid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getresgid">cs/</a></td>
+<td align="center">0x96</td>
+<td>gid_t *rgid</td>
+<td>gid_t *egid</td>
+<td>gid_t *sgid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">151</td>
+<td>setfsuid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setfsuid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setfsuid">cs/</a></td>
+<td align="center">0x97</td>
+<td>uid_t uid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">152</td>
+<td>setfsgid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setfsgid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setfsgid">cs/</a></td>
+<td align="center">0x98</td>
+<td>gid_t gid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">153</td>
+<td>times</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/times.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*times">cs/</a></td>
+<td align="center">0x99</td>
+<td>struct tms *tbuf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">154</td>
+<td>setpgid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setpgid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setpgid">cs/</a></td>
+<td align="center">0x9a</td>
+<td>pid_t pid</td>
+<td>pid_t pgid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">155</td>
+<td>getpgid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getpgid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getpgid">cs/</a></td>
+<td align="center">0x9b</td>
+<td>pid_t pid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">156</td>
+<td>getsid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getsid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getsid">cs/</a></td>
+<td align="center">0x9c</td>
+<td>pid_t pid</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">157</td>
+<td>setsid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setsid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setsid">cs/</a></td>
+<td align="center">0x9d</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">158</td>
+<td>getgroups</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getgroups.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getgroups">cs/</a></td>
+<td align="center">0x9e</td>
+<td>int gidsetsize</td>
+<td>gid_t *grouplist</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">159</td>
+<td>setgroups</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setgroups.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setgroups">cs/</a></td>
+<td align="center">0x9f</td>
+<td>int gidsetsize</td>
+<td>gid_t *grouplist</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">160</td>
+<td>uname</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/uname.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*uname">cs/</a></td>
+<td align="center">0xa0</td>
+<td>struct old_utsname *</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">161</td>
+<td>sethostname</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sethostname.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sethostname">cs/</a></td>
+<td align="center">0xa1</td>
+<td>char *name</td>
+<td>int len</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">162</td>
+<td>setdomainname</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setdomainname.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setdomainname">cs/</a></td>
+<td align="center">0xa2</td>
+<td>char *name</td>
+<td>int len</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">163</td>
+<td>getrlimit</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getrlimit.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getrlimit">cs/</a></td>
+<td align="center">0xa3</td>
+<td>unsigned int resource</td>
+<td>struct rlimit *rlim</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">164</td>
+<td>setrlimit</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setrlimit.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setrlimit">cs/</a></td>
+<td align="center">0xa4</td>
+<td>unsigned int resource</td>
+<td>struct rlimit *rlim</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">165</td>
+<td>getrusage</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getrusage.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getrusage">cs/</a></td>
+<td align="center">0xa5</td>
+<td>int who</td>
+<td>struct rusage *ru</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">166</td>
+<td>umask</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/umask.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*umask">cs/</a></td>
+<td align="center">0xa6</td>
+<td>int mask</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">167</td>
+<td>prctl</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/prctl.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*prctl">cs/</a></td>
+<td align="center">0xa7</td>
+<td>int option</td>
+<td>unsigned long arg2</td>
+<td>unsigned long arg3</td>
+<td>unsigned long arg4</td>
+<td>unsigned long arg5</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">168</td>
+<td>getcpu</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getcpu.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getcpu">cs/</a></td>
+<td align="center">0xa8</td>
+<td>unsigned *cpu</td>
+<td>unsigned *node</td>
+<td>struct getcpu_cache *cache</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">169</td>
+<td>gettimeofday</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/gettimeofday.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*gettimeofday">cs/</a></td>
+<td align="center">0xa9</td>
+<td>struct __kernel_old_timeval *tv</td>
+<td>struct timezone *tz</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">170</td>
+<td>settimeofday</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/settimeofday.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*settimeofday">cs/</a></td>
+<td align="center">0xaa</td>
+<td>struct __kernel_old_timeval *tv</td>
+<td>struct timezone *tz</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">171</td>
+<td>adjtimex</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/adjtimex.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*adjtimex">cs/</a></td>
+<td align="center">0xab</td>
+<td>struct __kernel_timex *txc_p</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">172</td>
+<td>getpid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getpid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getpid">cs/</a></td>
+<td align="center">0xac</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">173</td>
+<td>getppid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getppid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getppid">cs/</a></td>
+<td align="center">0xad</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">174</td>
+<td>getuid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getuid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getuid">cs/</a></td>
+<td align="center">0xae</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">175</td>
+<td>geteuid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/geteuid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*geteuid">cs/</a></td>
+<td align="center">0xaf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">176</td>
+<td>getgid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getgid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getgid">cs/</a></td>
+<td align="center">0xb0</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">177</td>
+<td>getegid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getegid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getegid">cs/</a></td>
+<td align="center">0xb1</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">178</td>
+<td>gettid</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/gettid.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*gettid">cs/</a></td>
+<td align="center">0xb2</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">179</td>
+<td>sysinfo</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sysinfo.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sysinfo">cs/</a></td>
+<td align="center">0xb3</td>
+<td>struct sysinfo *info</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">180</td>
+<td>mq_open</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mq_open.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mq_open">cs/</a></td>
+<td align="center">0xb4</td>
+<td>const char *name</td>
+<td>int oflag</td>
+<td>umode_t mode</td>
+<td>struct mq_attr *attr</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">181</td>
+<td>mq_unlink</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mq_unlink.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mq_unlink">cs/</a></td>
+<td align="center">0xb5</td>
+<td>const char *name</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">182</td>
+<td>mq_timedsend</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mq_timedsend.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mq_timedsend">cs/</a></td>
+<td align="center">0xb6</td>
+<td>mqd_t mqdes</td>
+<td>const char *msg_ptr</td>
+<td>size_t msg_len</td>
+<td>unsigned int msg_prio</td>
+<td>const struct __kernel_timespec *abs_timeout</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">183</td>
+<td>mq_timedreceive</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mq_timedreceive.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mq_timedreceive">cs/</a></td>
+<td align="center">0xb7</td>
+<td>mqd_t mqdes</td>
+<td>char *msg_ptr</td>
+<td>size_t msg_len</td>
+<td>unsigned int *msg_prio</td>
+<td>const struct __kernel_timespec *abs_timeout</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">184</td>
+<td>mq_notify</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mq_notify.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mq_notify">cs/</a></td>
+<td align="center">0xb8</td>
+<td>mqd_t mqdes</td>
+<td>const struct sigevent *notification</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">185</td>
+<td>mq_getsetattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mq_getsetattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mq_getsetattr">cs/</a></td>
+<td align="center">0xb9</td>
+<td>mqd_t mqdes</td>
+<td>const struct mq_attr *mqstat</td>
+<td>struct mq_attr *omqstat</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">186</td>
+<td>msgget</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/msgget.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*msgget">cs/</a></td>
+<td align="center">0xba</td>
+<td>key_t key</td>
+<td>int msgflg</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">187</td>
+<td>msgctl</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/msgctl.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*msgctl">cs/</a></td>
+<td align="center">0xbb</td>
+<td>int msqid</td>
+<td>int cmd</td>
+<td>struct msqid_ds *buf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">188</td>
+<td>msgrcv</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/msgrcv.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*msgrcv">cs/</a></td>
+<td align="center">0xbc</td>
+<td>int msqid</td>
+<td>struct msgbuf *msgp</td>
+<td>size_t msgsz</td>
+<td>long msgtyp</td>
+<td>int msgflg</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">189</td>
+<td>msgsnd</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/msgsnd.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*msgsnd">cs/</a></td>
+<td align="center">0xbd</td>
+<td>int msqid</td>
+<td>struct msgbuf *msgp</td>
+<td>size_t msgsz</td>
+<td>int msgflg</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">190</td>
+<td>semget</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/semget.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*semget">cs/</a></td>
+<td align="center">0xbe</td>
+<td>key_t key</td>
+<td>int nsems</td>
+<td>int semflg</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">191</td>
+<td>semctl</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/semctl.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*semctl">cs/</a></td>
+<td align="center">0xbf</td>
+<td>int semid</td>
+<td>int semnum</td>
+<td>int cmd</td>
+<td>unsigned long arg</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">192</td>
+<td>semtimedop</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/semtimedop.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*semtimedop">cs/</a></td>
+<td align="center">0xc0</td>
+<td>int semid</td>
+<td>struct sembuf *sops</td>
+<td>unsigned nsops</td>
+<td>const struct __kernel_timespec *timeout</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">193</td>
+<td>semop</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/semop.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*semop">cs/</a></td>
+<td align="center">0xc1</td>
+<td>int semid</td>
+<td>struct sembuf *sops</td>
+<td>unsigned nsops</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">194</td>
+<td>shmget</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/shmget.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*shmget">cs/</a></td>
+<td align="center">0xc2</td>
+<td>key_t key</td>
+<td>size_t size</td>
+<td>int flag</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">195</td>
+<td>shmctl</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/shmctl.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*shmctl">cs/</a></td>
+<td align="center">0xc3</td>
+<td>int shmid</td>
+<td>int cmd</td>
+<td>struct shmid_ds *buf</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">196</td>
+<td>shmat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/shmat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*shmat">cs/</a></td>
+<td align="center">0xc4</td>
+<td>int shmid</td>
+<td>char *shmaddr</td>
+<td>int shmflg</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">197</td>
+<td>shmdt</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/shmdt.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*shmdt">cs/</a></td>
+<td align="center">0xc5</td>
+<td>char *shmaddr</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">198</td>
+<td>socket</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/socket.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*socket">cs/</a></td>
+<td align="center">0xc6</td>
+<td>int</td>
+<td>int</td>
+<td>int</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">199</td>
+<td>socketpair</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/socketpair.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*socketpair">cs/</a></td>
+<td align="center">0xc7</td>
+<td>int</td>
+<td>int</td>
+<td>int</td>
+<td>int *</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">200</td>
+<td>bind</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/bind.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*bind">cs/</a></td>
+<td align="center">0xc8</td>
+<td>int</td>
+<td>struct sockaddr *</td>
+<td>int</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">201</td>
+<td>listen</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/listen.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*listen">cs/</a></td>
+<td align="center">0xc9</td>
+<td>int</td>
+<td>int</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">202</td>
+<td>accept</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/accept.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*accept">cs/</a></td>
+<td align="center">0xca</td>
+<td>int</td>
+<td>struct sockaddr *</td>
+<td>int *</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">203</td>
+<td>connect</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/connect.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*connect">cs/</a></td>
+<td align="center">0xcb</td>
+<td>int</td>
+<td>struct sockaddr *</td>
+<td>int</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">204</td>
+<td>getsockname</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getsockname.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getsockname">cs/</a></td>
+<td align="center">0xcc</td>
+<td>int</td>
+<td>struct sockaddr *</td>
+<td>int *</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">205</td>
+<td>getpeername</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getpeername.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getpeername">cs/</a></td>
+<td align="center">0xcd</td>
+<td>int</td>
+<td>struct sockaddr *</td>
+<td>int *</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">206</td>
+<td>sendto</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sendto.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sendto">cs/</a></td>
+<td align="center">0xce</td>
+<td>int</td>
+<td>void *</td>
+<td>size_t</td>
+<td>unsigned</td>
+<td>struct sockaddr *</td>
+<td>int</td>
+</tr>
+<tr>
+<td align="center">207</td>
+<td>recvfrom</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/recvfrom.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*recvfrom">cs/</a></td>
+<td align="center">0xcf</td>
+<td>int</td>
+<td>void *</td>
+<td>size_t</td>
+<td>unsigned</td>
+<td>struct sockaddr *</td>
+<td>int *</td>
+</tr>
+<tr>
+<td align="center">208</td>
+<td>setsockopt</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setsockopt.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setsockopt">cs/</a></td>
+<td align="center">0xd0</td>
+<td>int fd</td>
+<td>int level</td>
+<td>int optname</td>
+<td>char *optval</td>
+<td>int optlen</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">209</td>
+<td>getsockopt</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getsockopt.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getsockopt">cs/</a></td>
+<td align="center">0xd1</td>
+<td>int fd</td>
+<td>int level</td>
+<td>int optname</td>
+<td>char *optval</td>
+<td>int *optlen</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">210</td>
+<td>shutdown</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/shutdown.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*shutdown">cs/</a></td>
+<td align="center">0xd2</td>
+<td>int</td>
+<td>int</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">211</td>
+<td>sendmsg</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sendmsg.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sendmsg">cs/</a></td>
+<td align="center">0xd3</td>
+<td>int fd</td>
+<td>struct user_msghdr *msg</td>
+<td>unsigned flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">212</td>
+<td>recvmsg</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/recvmsg.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*recvmsg">cs/</a></td>
+<td align="center">0xd4</td>
+<td>int fd</td>
+<td>struct user_msghdr *msg</td>
+<td>unsigned flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">213</td>
+<td>readahead</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/readahead.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*readahead">cs/</a></td>
+<td align="center">0xd5</td>
+<td>int fd</td>
+<td>loff_t offset</td>
+<td>size_t count</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">214</td>
+<td>brk</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/brk.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*brk">cs/</a></td>
+<td align="center">0xd6</td>
+<td>unsigned long brk</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">215</td>
+<td>munmap</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/munmap.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*munmap">cs/</a></td>
+<td align="center">0xd7</td>
+<td>unsigned long addr</td>
+<td>size_t len</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">216</td>
+<td>mremap</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mremap.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mremap">cs/</a></td>
+<td align="center">0xd8</td>
+<td>unsigned long addr</td>
+<td>unsigned long old_len</td>
+<td>unsigned long new_len</td>
+<td>unsigned long flags</td>
+<td>unsigned long new_addr</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">217</td>
+<td>add_key</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/add_key.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*add_key">cs/</a></td>
+<td align="center">0xd9</td>
+<td>const char *_type</td>
+<td>const char *_description</td>
+<td>const void *_payload</td>
+<td>size_t plen</td>
+<td>key_serial_t destringid</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">218</td>
+<td>request_key</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/request_key.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*request_key">cs/</a></td>
+<td align="center">0xda</td>
+<td>const char *_type</td>
+<td>const char *_description</td>
+<td>const char *_callout_info</td>
+<td>key_serial_t destringid</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">219</td>
+<td>keyctl</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/keyctl.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*keyctl">cs/</a></td>
+<td align="center">0xdb</td>
+<td>int cmd</td>
+<td>unsigned long arg2</td>
+<td>unsigned long arg3</td>
+<td>unsigned long arg4</td>
+<td>unsigned long arg5</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">220</td>
+<td>clone</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/clone.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*clone">cs/</a></td>
+<td align="center">0xdc</td>
+<td>unsigned long</td>
+<td>unsigned long</td>
+<td>int *</td>
+<td>int *</td>
+<td>unsigned long</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">221</td>
+<td>execve</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/execve.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*execve">cs/</a></td>
+<td align="center">0xdd</td>
+<td>const char *filename</td>
+<td>const char *const *argv</td>
+<td>const char *const *envp</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">222</td>
+<td>mmap</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mmap.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mmap">cs/</a></td>
+<td align="center">0xde</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+<td>?</td>
+</tr>
+<tr>
+<td align="center">223</td>
+<td>fadvise64</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fadvise64.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fadvise64">cs/</a></td>
+<td align="center">0xdf</td>
+<td>int fd</td>
+<td>loff_t offset</td>
+<td>size_t len</td>
+<td>int advice</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">224</td>
+<td>swapon</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/swapon.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*swapon">cs/</a></td>
+<td align="center">0xe0</td>
+<td>const char *specialfile</td>
+<td>int swap_flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">225</td>
+<td>swapoff</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/swapoff.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*swapoff">cs/</a></td>
+<td align="center">0xe1</td>
+<td>const char *specialfile</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">226</td>
+<td>mprotect</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mprotect.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mprotect">cs/</a></td>
+<td align="center">0xe2</td>
+<td>unsigned long start</td>
+<td>size_t len</td>
+<td>unsigned long prot</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">227</td>
+<td>msync</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/msync.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*msync">cs/</a></td>
+<td align="center">0xe3</td>
+<td>unsigned long start</td>
+<td>size_t len</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">228</td>
+<td>mlock</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mlock.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mlock">cs/</a></td>
+<td align="center">0xe4</td>
+<td>unsigned long start</td>
+<td>size_t len</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">229</td>
+<td>munlock</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/munlock.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*munlock">cs/</a></td>
+<td align="center">0xe5</td>
+<td>unsigned long start</td>
+<td>size_t len</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">230</td>
+<td>mlockall</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mlockall.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mlockall">cs/</a></td>
+<td align="center">0xe6</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">231</td>
+<td>munlockall</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/munlockall.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*munlockall">cs/</a></td>
+<td align="center">0xe7</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">232</td>
+<td>mincore</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mincore.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mincore">cs/</a></td>
+<td align="center">0xe8</td>
+<td>unsigned long start</td>
+<td>size_t len</td>
+<td>unsigned char * vec</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">233</td>
+<td>madvise</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/madvise.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*madvise">cs/</a></td>
+<td align="center">0xe9</td>
+<td>unsigned long start</td>
+<td>size_t len</td>
+<td>int behavior</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">234</td>
+<td>remap_file_pages</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/remap_file_pages.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*remap_file_pages">cs/</a></td>
+<td align="center">0xea</td>
+<td>unsigned long start</td>
+<td>unsigned long size</td>
+<td>unsigned long prot</td>
+<td>unsigned long pgoff</td>
+<td>unsigned long flags</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">235</td>
+<td>mbind</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mbind.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mbind">cs/</a></td>
+<td align="center">0xeb</td>
+<td>unsigned long start</td>
+<td>unsigned long len</td>
+<td>unsigned long mode</td>
+<td>const unsigned long *nmask</td>
+<td>unsigned long maxnode</td>
+<td>unsigned flags</td>
+</tr>
+<tr>
+<td align="center">236</td>
+<td>get_mempolicy</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/get_mempolicy.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*get_mempolicy">cs/</a></td>
+<td align="center">0xec</td>
+<td>int *policy</td>
+<td>unsigned long *nmask</td>
+<td>unsigned long maxnode</td>
+<td>unsigned long addr</td>
+<td>unsigned long flags</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">237</td>
+<td>set_mempolicy</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/set_mempolicy.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*set_mempolicy">cs/</a></td>
+<td align="center">0xed</td>
+<td>int mode</td>
+<td>const unsigned long *nmask</td>
+<td>unsigned long maxnode</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">238</td>
+<td>migrate_pages</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/migrate_pages.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*migrate_pages">cs/</a></td>
+<td align="center">0xee</td>
+<td>pid_t pid</td>
+<td>unsigned long maxnode</td>
+<td>const unsigned long *from</td>
+<td>const unsigned long *to</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">239</td>
+<td>move_pages</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/move_pages.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*move_pages">cs/</a></td>
+<td align="center">0xef</td>
+<td>pid_t pid</td>
+<td>unsigned long nr_pages</td>
+<td>const void * *pages</td>
+<td>const int *nodes</td>
+<td>int *status</td>
+<td>int flags</td>
+</tr>
+<tr>
+<td align="center">240</td>
+<td>rt_tgsigqueueinfo</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/rt_tgsigqueueinfo.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*rt_tgsigqueueinfo">cs/</a></td>
+<td align="center">0xf0</td>
+<td>pid_t tgid</td>
+<td>pid_t pid</td>
+<td>int sig</td>
+<td>siginfo_t *uinfo</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">241</td>
+<td>perf_event_open</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/perf_event_open.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*perf_event_open">cs/</a></td>
+<td align="center">0xf1</td>
+<td>struct perf_event_attr *attr_uptr</td>
+<td>pid_t pid</td>
+<td>int cpu</td>
+<td>int group_fd</td>
+<td>unsigned long flags</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">242</td>
+<td>accept4</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/accept4.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*accept4">cs/</a></td>
+<td align="center">0xf2</td>
+<td>int</td>
+<td>struct sockaddr *</td>
+<td>int *</td>
+<td>int</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">243</td>
+<td>recvmmsg</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/recvmmsg.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*recvmmsg">cs/</a></td>
+<td align="center">0xf3</td>
+<td>int fd</td>
+<td>struct mmsghdr *msg</td>
+<td>unsigned int vlen</td>
+<td>unsigned flags</td>
+<td>struct __kernel_timespec *timeout</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">244</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xf4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">245</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xf5</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">246</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xf6</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">247</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xf7</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">248</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xf8</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">249</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xf9</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">250</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xfa</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">251</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xfb</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">252</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xfc</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">253</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xfd</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">254</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xfe</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">255</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0xff</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">256</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x100</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">257</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x101</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">258</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x102</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">259</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x103</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">260</td>
+<td>wait4</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/wait4.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*wait4">cs/</a></td>
+<td align="center">0x104</td>
+<td>pid_t pid</td>
+<td>int *stat_addr</td>
+<td>int options</td>
+<td>struct rusage *ru</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">261</td>
+<td>prlimit64</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/prlimit64.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*prlimit64">cs/</a></td>
+<td align="center">0x105</td>
+<td>pid_t pid</td>
+<td>unsigned int resource</td>
+<td>const struct rlimit64 *new_rlim</td>
+<td>struct rlimit64 *old_rlim</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">262</td>
+<td>fanotify_init</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fanotify_init.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fanotify_init">cs/</a></td>
+<td align="center">0x106</td>
+<td>unsigned int flags</td>
+<td>unsigned int event_f_flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">263</td>
+<td>fanotify_mark</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/fanotify_mark.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*fanotify_mark">cs/</a></td>
+<td align="center">0x107</td>
+<td>int fanotify_fd</td>
+<td>unsigned int flags</td>
+<td>u64 mask</td>
+<td>int fd</td>
+<td>const char *pathname</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">264</td>
+<td>name_to_handle_at</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/name_to_handle_at.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*name_to_handle_at">cs/</a></td>
+<td align="center">0x108</td>
+<td>int dfd</td>
+<td>const char *name</td>
+<td>struct file_handle *handle</td>
+<td>int *mnt_id</td>
+<td>int flag</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">265</td>
+<td>open_by_handle_at</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/open_by_handle_at.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*open_by_handle_at">cs/</a></td>
+<td align="center">0x109</td>
+<td>int mountdirfd</td>
+<td>struct file_handle *handle</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">266</td>
+<td>clock_adjtime</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/clock_adjtime.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*clock_adjtime">cs/</a></td>
+<td align="center">0x10a</td>
+<td>clockid_t which_clock</td>
+<td>struct __kernel_timex *tx</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">267</td>
+<td>syncfs</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/syncfs.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*syncfs">cs/</a></td>
+<td align="center">0x10b</td>
+<td>int fd</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">268</td>
+<td>setns</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/setns.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*setns">cs/</a></td>
+<td align="center">0x10c</td>
+<td>int fd</td>
+<td>int nstype</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">269</td>
+<td>sendmmsg</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sendmmsg.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sendmmsg">cs/</a></td>
+<td align="center">0x10d</td>
+<td>int fd</td>
+<td>struct mmsghdr *msg</td>
+<td>unsigned int vlen</td>
+<td>unsigned flags</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">270</td>
+<td>process_vm_readv</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/process_vm_readv.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*process_vm_readv">cs/</a></td>
+<td align="center">0x10e</td>
+<td>pid_t pid</td>
+<td>const struct iovec *lvec</td>
+<td>unsigned long liovcnt</td>
+<td>const struct iovec *rvec</td>
+<td>unsigned long riovcnt</td>
+<td>unsigned long flags</td>
+</tr>
+<tr>
+<td align="center">271</td>
+<td>process_vm_writev</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/process_vm_writev.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*process_vm_writev">cs/</a></td>
+<td align="center">0x10f</td>
+<td>pid_t pid</td>
+<td>const struct iovec *lvec</td>
+<td>unsigned long liovcnt</td>
+<td>const struct iovec *rvec</td>
+<td>unsigned long riovcnt</td>
+<td>unsigned long flags</td>
+</tr>
+<tr>
+<td align="center">272</td>
+<td>kcmp</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/kcmp.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*kcmp">cs/</a></td>
+<td align="center">0x110</td>
+<td>pid_t pid1</td>
+<td>pid_t pid2</td>
+<td>int type</td>
+<td>unsigned long idx1</td>
+<td>unsigned long idx2</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">273</td>
+<td>finit_module</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/finit_module.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*finit_module">cs/</a></td>
+<td align="center">0x111</td>
+<td>int fd</td>
+<td>const char *uargs</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">274</td>
+<td>sched_setattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_setattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_setattr">cs/</a></td>
+<td align="center">0x112</td>
+<td>pid_t pid</td>
+<td>struct sched_attr *attr</td>
+<td>unsigned int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">275</td>
+<td>sched_getattr</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/sched_getattr.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*sched_getattr">cs/</a></td>
+<td align="center">0x113</td>
+<td>pid_t pid</td>
+<td>struct sched_attr *attr</td>
+<td>unsigned int size</td>
+<td>unsigned int flags</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">276</td>
+<td>renameat2</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/renameat2.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*renameat2">cs/</a></td>
+<td align="center">0x114</td>
+<td>int olddfd</td>
+<td>const char *oldname</td>
+<td>int newdfd</td>
+<td>const char *newname</td>
+<td>unsigned int flags</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">277</td>
+<td>seccomp</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/seccomp.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*seccomp">cs/</a></td>
+<td align="center">0x115</td>
+<td>unsigned int op</td>
+<td>unsigned int flags</td>
+<td>void *uargs</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">278</td>
+<td>getrandom</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/getrandom.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*getrandom">cs/</a></td>
+<td align="center">0x116</td>
+<td>char *buf</td>
+<td>size_t count</td>
+<td>unsigned int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">279</td>
+<td>memfd_create</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/memfd_create.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*memfd_create">cs/</a></td>
+<td align="center">0x117</td>
+<td>const char *uname_ptr</td>
+<td>unsigned int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">280</td>
+<td>bpf</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/bpf.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*bpf">cs/</a></td>
+<td align="center">0x118</td>
+<td>int cmd</td>
+<td>union bpf_attr *attr</td>
+<td>unsigned int size</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">281</td>
+<td>execveat</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/execveat.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*execveat">cs/</a></td>
+<td align="center">0x119</td>
+<td>int dfd</td>
+<td>const char *filename</td>
+<td>const char *const *argv</td>
+<td>const char *const *envp</td>
+<td>int flags</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">282</td>
+<td>userfaultfd</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/userfaultfd.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*userfaultfd">cs/</a></td>
+<td align="center">0x11a</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">283</td>
+<td>membarrier</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/membarrier.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*membarrier">cs/</a></td>
+<td align="center">0x11b</td>
+<td>int cmd</td>
+<td>unsigned int flags</td>
+<td>int cpu_id</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">284</td>
+<td>mlock2</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/mlock2.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*mlock2">cs/</a></td>
+<td align="center">0x11c</td>
+<td>unsigned long start</td>
+<td>size_t len</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">285</td>
+<td>copy_file_range</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/copy_file_range.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*copy_file_range">cs/</a></td>
+<td align="center">0x11d</td>
+<td>int fd_in</td>
+<td>loff_t *off_in</td>
+<td>int fd_out</td>
+<td>loff_t *off_out</td>
+<td>size_t len</td>
+<td>unsigned int flags</td>
+</tr>
+<tr>
+<td align="center">286</td>
+<td>preadv2</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/preadv2.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*preadv2">cs/</a></td>
+<td align="center">0x11e</td>
+<td>unsigned long fd</td>
+<td>const struct iovec *vec</td>
+<td>unsigned long vlen</td>
+<td>unsigned long pos_l</td>
+<td>unsigned long pos_h</td>
+<td>rwf_t flags</td>
+</tr>
+<tr>
+<td align="center">287</td>
+<td>pwritev2</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/pwritev2.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*pwritev2">cs/</a></td>
+<td align="center">0x11f</td>
+<td>unsigned long fd</td>
+<td>const struct iovec *vec</td>
+<td>unsigned long vlen</td>
+<td>unsigned long pos_l</td>
+<td>unsigned long pos_h</td>
+<td>rwf_t flags</td>
+</tr>
+<tr>
+<td align="center">288</td>
+<td>pkey_mprotect</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/pkey_mprotect.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*pkey_mprotect">cs/</a></td>
+<td align="center">0x120</td>
+<td>unsigned long start</td>
+<td>size_t len</td>
+<td>unsigned long prot</td>
+<td>int pkey</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">289</td>
+<td>pkey_alloc</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/pkey_alloc.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*pkey_alloc">cs/</a></td>
+<td align="center">0x121</td>
+<td>unsigned long flags</td>
+<td>unsigned long init_val</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">290</td>
+<td>pkey_free</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/pkey_free.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*pkey_free">cs/</a></td>
+<td align="center">0x122</td>
+<td>int pkey</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">291</td>
+<td>statx</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/statx.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*statx">cs/</a></td>
+<td align="center">0x123</td>
+<td>int dfd</td>
+<td>const char *path</td>
+<td>unsigned flags</td>
+<td>unsigned mask</td>
+<td>struct statx *buffer</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">425</td>
+<td>io_uring_setup</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/io_uring_setup.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*io_uring_setup">cs/</a></td>
+<td align="center">0x1a9</td>
+<td>u32 entries</td>
+<td>struct io_uring_params *p</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td align="center">426</td>
+<td>io_uring_enter</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/io_uring_enter.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*io_uring_enter">cs/</a></td>
+<td align="center">0x1aa</td>
+<td>unsigned int fd</td>
+<td>u32 to_submit</td>
+<td>u32 min_complete</td>
+<td>u32 flags</td>
+<td>const void *argp</td>
+<td>size_t argsz</td>
+</tr>
+<tr>
+<td align="center">427</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1ab</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">428</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1ac</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">429</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1ad</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">430</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1ae</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">431</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1af</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">432</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1b0</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">433</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1b1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">434</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1b2</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">435</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1b3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">436</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1b4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">437</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1b5</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">438</td>
+<td><em>not implemented</em></td>
+<td align="center"></td>
+<td align="center">0x1b6</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">439</td>
+<td>faccessat2</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/faccessat2.2.html">man/</a> <a target="_blank" rel="noopener" href="https://source.chromium.org/search?ss=chromiumos&q=SYSCALL_DEFINE.*faccessat2">cs/</a></td>
+<td align="center">0x1b7</td>
+<td>int dfd</td>
+<td>const char *filename</td>
+<td>int mode</td>
+<td>int flags</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody></table>
+
     </div>
 
     

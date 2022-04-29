@@ -28,7 +28,7 @@
 <meta property="og:description" content="概述有的反调试会检测23946端口是否占用，使用其他端口即可绕过此反调试。可以使用.&#x2F;android_server -p12345指定端口，也可以使用IDA逆向，修改默认端口。 测试版本IDA 7.0 patch使用IDA打开android_server，搜索字符串Listening on，定位到引用位置。按下F5反编译，重命名端口号变量。按下x，向上搜索找到赋值位置（可能有多处），patch即可">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-09-13T04:00:49.490Z">
-<meta property="article:modified_time" content="2022-04-19T08:34:50.272Z">
+<meta property="article:modified_time" content="2019-09-13T04:00:49.000Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="IDA">
 <meta name="twitter:card" content="summary">

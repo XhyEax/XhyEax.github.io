@@ -34,6 +34,7 @@
 <meta property="article:modified_time" content="2021-04-10T12:30:32.000Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
+<meta property="article:tag" content="CTF">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-final-1.png">
 
@@ -274,7 +275,7 @@
 <p>等libil2cpp.so解密后，动态patch此处即可<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-final-3.png"></p>
 <p>使用frida验证，发现可以实现功能</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hook_il2cpp</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> libbase = Module.findBaseAddress(<span class="string">&quot;libil2cpp.so&quot;</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(libbase);</span><br><span class="line">    <span class="keyword">var</span> addr = libbase.add(<span class="number">0x540e60</span>);</span><br><span class="line">    <span class="keyword">var</span> barr = [<span class="number">0xe2</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xea</span>];</span><br><span class="line">    Memory.protect(addr, <span class="number">0x4</span>, <span class="string">&#x27;rwx&#x27;</span>);</span><br><span class="line">    Memory.writeByteArray(addr, barr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="去检测（未完成）"><a href="#去检测（未完成）" class="headerlink" title="去检测（未完成）"></a>去检测（未完成）</h4><p>使用堆栈回溯法逐一去除检测（即每当app崩溃，就使用日志查看堆栈，修改<code>libsec2021so</code>的相应位置）<br>结果还是未完全绕过，猜测解密so文件时有校验</p>
+<h4 id="去检测（未完成）"><a href="#去检测（未完成）" class="headerlink" title="去检测（未完成）"></a>去检测（未完成）</h4><p>使用堆栈回溯法逐一去除检测（即每当app崩溃，就使用日志查看堆栈，修改<code>libsec2021.so</code>的相应位置）<br>结果还是未完全绕过，猜测解密so文件时有校验</p>
 
     </div>
 
@@ -300,6 +301,7 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/Android/" rel="tag"># Android</a>
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
           </div>
 
         
