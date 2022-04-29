@@ -196,6 +196,135 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/01/android-studio-install-old-apk-on-android-11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/01/android-studio-install-old-apk-on-android-11/" class="post-title-link" itemprop="url">修复Android Studio代码修改不生效问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-01 13:47:05" itemprop="dateCreated datePublished" datetime="2021-12-01T13:47:05+08:00">2021-12-01</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>重新编译<code>Xposed</code>模块并点击<code>Run</code>安装后，修改不生效。卸载重装后才生效。</p>
+<h2 id="尝试"><a href="#尝试" class="headerlink" title="尝试"></a>尝试</h2><p>尝试修改<code>build.gradle</code>中的<code>versionCode</code>，发现修改代码生效了，于是有了这篇<a href="https://blog.xhyeax.com/2021/10/07/gradle-auto-version-code/">Gradle配置版本号自动增加</a>。（不符合编译习惯，<del>喜欢刷版本号的除外</del>）</p>
+<p>今天发现手动<code>Generate Signed APK</code>，然后使用<code>adb install</code>安装，修改也生效了。（太麻烦）</p>
+<p>猜测是因为<code>versionCode</code>没变，ART运行了<code>dex2oat</code>优化后的旧代码。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>修改启动配置，设置使用<code>package manager</code>安装：</p>
+<p><code>Run / Debug Configurations</code> - <code>General</code> - <code>Always install with package manager (disable deploy optimization on Android 11 and later)</code></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/11/28/arm-v7-a-r-m/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/11/28/arm-v7-a-r-m/" class="post-title-link" itemprop="url">armv7 A R M版本区别</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-28 08:25:38" itemprop="dateCreated datePublished" datetime="2021-11-28T08:25:38+08:00">2021-11-28</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h2><p><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/ddi0406/latest/">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+<p><code>A1.3 Architecture versions, profiles, and variants</code></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/11/28/arm-v7-a-r-m/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/11/28/arm-instruction-set/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -720,139 +849,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/10/07/gradle-auto-version-code/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/10/07/gradle-auto-version-code/" class="post-title-link" itemprop="url">Gradle配置版本号自动增加</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-10-07 08:33:24" itemprop="dateCreated datePublished" datetime="2021-10-07T08:33:24+08:00">2021-10-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通过搜索引擎，学习一下如何配置版本号自增。</p>
-<h2 id="增加函数"><a href="#增加函数" class="headerlink" title="增加函数"></a>增加函数</h2><p>修改<code>app</code>模块的<code>build.gradle</code>，增加<code>getVersionCode</code>函数</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/10/07/gradle-auto-version-code/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/10/06/lineage-compile-for-nexus5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/10/06/lineage-compile-for-nexus5/" class="post-title-link" itemprop="url">编译 Lineage 18.1 (Android 11.0) for Nexus 5</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-10-06 04:50:00" itemprop="dateCreated datePublished" datetime="2021-10-06T04:50:00+08:00">2021-10-06</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>AOSP官方源码，对<code>Nexus 5</code>仅支持到<code>Android 6.0</code>，而第三方系统支持<code>Android 11.0</code>。</p>
-<p>由于需要定制系统和内核，故考虑克隆源码，手动编译。</p>
-<h2 id="ROM下载地址"><a href="#ROM下载地址" class="headerlink" title="ROM下载地址"></a>ROM下载地址</h2><p><a target="_blank" rel="noopener" href="https://forum.xda-developers.com/t/rom-unofficial-lineageos-18-1-for-nexus-5-hammerhead-discontinued.4214367/">[ROM][UNOFFICIAL] LineageOS 18.1 for Nexus 5 (hammerhead) [DISCONTINUED] | XDA Forums</a></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/10/06/lineage-compile-for-nexus5/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -924,14 +920,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">131</span>
+          <span class="site-state-item-count">133</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

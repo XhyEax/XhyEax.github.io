@@ -196,6 +196,137 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/16/ida-call-analysis-fail/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/02/16/ida-call-analysis-fail/" class="post-title-link" itemprop="url">IDA不能F5查看伪代码的解决方法(call analysis failed)</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-02-16 14:17:04" itemprop="dateCreated datePublished" datetime="2019-02-16T14:17:04+08:00">2019-02-16</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><blockquote>
+<p>原因有可能分两种：<br>1、IDA无法识别出正确的调用约定(calling convention)；<br>2、IDA无法识别出正确的参数个数。</p>
+</blockquote>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="方法1-IDA自动分析"><a href="#方法1-IDA自动分析" class="headerlink" title="方法1 - IDA自动分析"></a>方法1 - IDA自动分析</h3><p>定位到报错的代码位置，双击调用的函数，进入后按一次F5，再返回就可以F5了。</p>
+<h3 id="方法2-修改参数个数"><a href="#方法2-修改参数个数" class="headerlink" title="方法2 - 修改参数个数"></a>方法2 - 修改参数个数</h3><p>定位到报错的代码位置，鼠标点击调用的函数，按下Y键，修改参数个数。<br>比如将<code>(_JNIEnv *, int, int, int, int, int, int, int);</code>改为<code>(_JNIEnv *, int, int, int);</code></p>
+<p>具体参数个数，需要根据函数调用约定及汇编代码确定（看它传入了几个参数）。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiangshangbashaonian/article/details/82889924">解决IDA出现Decompilation failure: call analysis failed不可以F5的问题</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/echo579/p/6564433.html">IDA反编译失败-call analysis failed</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/16/fix-linux-time/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/02/16/fix-linux-time/" class="post-title-link" itemprop="url">修复双系统（Win+Linux）时间不同步问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-02-16 13:54:29" itemprop="dateCreated datePublished" datetime="2019-02-16T13:54:29+08:00">2019-02-16</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>笔记本装了win10+Ubuntu18.04双系统，但是两个系统的时间并不同步，相差8小时（正好是时区数）。于是搜索之，找到解决方案</p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>Windows 与 Mac/Linux 看待系统硬件时间（Hardware Ttime，或称实时时间，即RTC，Real_Time Clock）的方式不同。<br>Windows把计算机硬件时间当作本地时间(local time)，所以在Windows系统中显示的时间跟BIOS中显示的时间是一样的。<br>而Linux/Unix/Mac把计算机硬件时间当作UTC（Universal Time Coordinated，世界统一时间）， 所以在Linux/Unix/Mac系统启动后在该时间的基础上，加上电脑设置的时区数。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>所以只需要使两个系统对待硬件时间的方式一致即可。<br>自然，有两种方法。</p>
+<h3 id="方法1-修改Linux系统"><a href="#方法1-修改Linux系统" class="headerlink" title="方法1 修改Linux系统"></a>方法1 修改Linux系统</h3><p>打开终端，执行<br><code>timedatectl set-local-rtc 1</code><br>禁用Linux系统的UTC时间，重启即可生效（不需要管理员权限）</p>
+<blockquote>
+<p>提示： 在 Ubuntu 16.04 版本以前，关闭UTC的方法是编辑/etc/default/rcS，将UTC=yes改成UTC=no， 但在Ubuntu 16.04使用systemd启动之后，时间改成了由timedatectl来管理</p>
+</blockquote>
+<p>如果时间还是不对，就先在设置里修改系统时间为当前时间（北京时间），然后执行<br><code>timedatectl set-local-rtc 1</code><br>再<br><code>sudo hwclock -w</code><br>写入当前时间到硬件</p>
+<h3 id="方法2-修改Windows系统（不建议）"><a href="#方法2-修改Windows系统（不建议）" class="headerlink" title="方法2 修改Windows系统（不建议）"></a>方法2 修改Windows系统（不建议）</h3><p>Win+X，打开<code>Powershell</code>（管理员），执行<br><code>Reg add HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v RealTimeIsUniversal /t REG_DWORD /d 1</code><br>解释：设置<code>RealTimeIsUniversal</code>键值为1，也就是把RTC当作UTC<br>然而我用这种方法，切换几次系统以后时间往后推了16小时= =<br>所以个人不推荐使用这种方法</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zyqblog/article/details/79318955?utm_source=copy">解决Windows10与Ubuntu16.04双系统时间不一样问题！</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/03/friend-ctf/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -756,129 +887,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2018/12/13/cookies-local-save-read/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/12/13/cookies-local-save-read/" class="post-title-link" itemprop="url">Cookie的本地保存和读取(Python requests模块)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2018-12-13 10:52:56" itemprop="dateCreated datePublished" datetime="2018-12-13T10:52:56+08:00">2018-12-13</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>获取到cookie后转化为dictionary（使用<code>requests.utils.dict_from_cookiejar</code>方法转化CookieJar为dictionary），再以字符串形式保存到文件<br>读取时把字符串转换为字典（<code>json.load</code>方法），再设置为requests请求的cookies</p>
-<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>这里有个坑，保存到文件时是单引号，使用json读取时需要双引号，所以需要replace一下</p>
-<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><h3 id="保存"><a href="#保存" class="headerlink" title="保存"></a>保存</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#转换为dictionary</span></span><br><span class="line">load_cookies = requests.utils.dict_from_cookiejar(res.cookies)</span><br><span class="line"><span class="comment">#转换为字符串保存到文件</span></span><br><span class="line">fo = <span class="built_in">open</span>(<span class="string">&quot;cookie&quot;</span>, <span class="string">&quot;w&quot;</span>)</span><br><span class="line">fo.write(<span class="built_in">str</span>(load_cookies))</span><br><span class="line">fo.close()</span><br></pre></td></tr></table></figure>
-<h3 id="读取"><a href="#读取" class="headerlink" title="读取"></a>读取</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##读取文件内容到text变量后</span></span><br><span class="line"><span class="comment">#转换为dictionary</span></span><br><span class="line">dic = json.loads(text.replace(<span class="string">&quot;&#x27;&quot;</span>,<span class="string">&quot;\&quot;&quot;</span>))</span><br><span class="line">res = requests.post(url,cookies=dic)</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/42950252">Python——Cookie保存到本地</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2018/12/07/fix-python-h/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/12/07/fix-python-h/" class="post-title-link" itemprop="url">gcc编译Python模块失败(找不到Python.h)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2018-12-07 07:32:34" itemprop="dateCreated datePublished" datetime="2018-12-07T07:32:34+08:00">2018-12-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>服务器恢复快照以后，一大堆东西都要重新安装。<br>安装PyCrypto时发生错误，提示<br><code>Python.h: No such file or directory</code><br>于是 首先执行 <code>yum upgrade</code>，升级下试试<br>然而还是编译错误，所以肯定是没有安装依赖</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>查了一下是没安装开发环境（然而之前好像是可以直接编译的。。）<br>而<code>python-devel</code>已安装，然而搜不到<code>python3-devel</code><br>于是搜索<code>python3</code>,找到了<code>python36u-devel</code><br><code>yum install python36u-devel</code><br>安装后编译成功</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u013414502/article/details/79531509">Centos7 “fatal error: Python.h: No such file or directory “commmand ‘gcc’ failed with exit status 1</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -950,14 +958,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">131</span>
+          <span class="site-state-item-count">133</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

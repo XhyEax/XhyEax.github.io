@@ -58,5 +58,5 @@ def redate(path):
                 modifyFileTime(filepath, createTime, mTime, aTime)
 
 
-redate("D:\Blog\source\_drafts")
+# redate("D:\Blog\source\_drafts")
 redate("D:\Blog\source\_posts")
