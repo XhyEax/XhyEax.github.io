@@ -196,6 +196,74 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/02/process_vm_readv-analysis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/02/process_vm_readv-analysis/" class="post-title-link" itemprop="url">process_vm_readv 源码分析</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-02 12:00:00" itemprop="dateCreated datePublished" datetime="2022-05-02T12:00:00+08:00">2022-05-02</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="调用链"><a href="#调用链" class="headerlink" title="调用链"></a>调用链</h2><p><code>process_vm_rw</code>-&gt;<code>process_vm_rw_core</code>-&gt;<code>process_vm_rw_single_vec</code>-&gt;<code>process_vm_rw_pages</code>-&gt;<code>copy_page_to_iter</code>-&gt;<br><code>copy_page_to_iter_iovec</code>-&gt;<code>copyout</code></p>
+<h2 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h2><p><a target="_blank" rel="noopener" href="https://cs.android.com/android/kernel/superproject/+/common-android-4.14-stable:common/mm/process_vm_access.c">common/mm/process_vm_access.c</a><br><a target="_blank" rel="noopener" href="https://cs.android.com/android/kernel/superproject/+/common-android-4.14-stable:common/lib/iov_iter.c">common/lib/iov_iter.c</a></p>
+<p>版本号：<code>android-4.14-stable</code></p>
+<h2 id="Linux-manual-page"><a href="#Linux-manual-page" class="headerlink" title="Linux manual page"></a>Linux manual page</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/uio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">process_vm_readv</span><span class="params">(<span class="keyword">pid_t</span> pid,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">const</span> struct iovec *local_iov,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">unsigned</span> <span class="keyword">long</span> liovcnt,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">const</span> struct iovec *remote_iov,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">unsigned</span> <span class="keyword">long</span> riovcnt,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">unsigned</span> <span class="keyword">long</span> flags)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">process_vm_writev</span><span class="params">(<span class="keyword">pid_t</span> pid,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">const</span> struct iovec *local_iov,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">unsigned</span> <span class="keyword">long</span> liovcnt,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">const</span> struct iovec *remote_iov,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">unsigned</span> <span class="keyword">long</span> riovcnt,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">unsigned</span> <span class="keyword">long</span> flags)</span></span>;</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/05/02/process_vm_readv-analysis/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/04/29/patch-kernel-check-version/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -247,12 +315,13 @@
 <figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> idc</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, <span class="number">0x100000</span>):</span><br><span class="line">    idc.create_insn(i)</span><br></pre></td></tr></table></figure>
 <p>然后等待<code>IDA</code>分析结束。</p>
 <h2 id="定位check-version"><a href="#定位check-version" class="headerlink" title="定位check_version"></a>定位check_version</h2><p>使用<code>010Editor</code>搜索字符串<code>disagrees about version of symbol</code>，复制地址。<br>在<code>IDA64</code>中查看交叉引用，定位到的函数即为<code>check_version</code></p>
-<p>将函数体的第一个跳转Patch为B指令，跳到返回代码处。<br>例如：<br><code>CBZ X2, loc_FB8A8</code><br>Patch为：<br><code>B loc_FB8A8</code></p>
+<h2 id="Patch"><a href="#Patch" class="headerlink" title="Patch"></a>Patch</h2><p>将函数体的第一个跳转Patch为B指令。然后F5，查看返回值是否为1。</p>
+<p>例如：<br><code>CBZ X2, loc_FB8A8</code><br>Patch为：<br><code>B loc_FB8A8</code></p>
+<p>相关代码：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ROM:00000000000FB8A8                               loc_FB8A8                               ; CODE XREF: sub_FB804+14↑j</span><br><span class="line">ROM:00000000000FB8A8 35 00 80 52                   MOV             W21, #1</span><br><span class="line">ROM:00000000000FB8AC 0A 00 00 14                   B               loc_FB8D4</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ROM:00000000000FB8D4                               loc_FB8D4                               ; CODE XREF: sub_FB804+74↑j</span><br><span class="line">ROM:00000000000FB8D4                                                                       ; sub_FB804+90↑j</span><br><span class="line">ROM:00000000000FB8D4                                                                       ; sub_FB804+A8↑j</span><br><span class="line">ROM:00000000000FB8D4 E0 03 15 2A                   MOV             W0, W21</span><br><span class="line">ROM:00000000000FB8D8 F4 4F 43 A9                   LDP             X20, X19, [SP,#0x20+var_s10]</span><br><span class="line">ROM:00000000000FB8DC F6 57 42 A9                   LDP             X22, X21, [SP,#0x20+var_s0]</span><br><span class="line">ROM:00000000000FB8E0 F7 0B 40 F9                   LDR             X23, [SP,#0x20+var_10]</span><br><span class="line">ROM:00000000000FB8E4 FD 7B C4 A8                   LDP             X29, X30, [SP+0x20+var_20],#0x40</span><br><span class="line">ROM:00000000000FB8E8 C0 03 5F D6                   RET</span><br></pre></td></tr></table></figure>
 
-<p>F5，查看返回值是否为1。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-271179.htm">绕过Android内核模块加载验证</a></p>
 
       
@@ -903,70 +972,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/04/idapython-scripts-upgrade/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/04/idapython-scripts-upgrade/" class="post-title-link" itemprop="url">IDAPython 旧版脚本的使用与升级</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-04 07:34:02" itemprop="dateCreated datePublished" datetime="2021-12-04T07:34:02+08:00">2021-12-04</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>执行旧版的<code>IDAPython</code>脚本，提示找不到方法。(如：<code>AttributeError: module &#39;idc&#39; has no attribute &#39;MakeUnknown&#39;</code>）<br>因为<code>IDA 7.0</code>更新了API，并且从<code>7.1</code>开始默认关闭<code>AUTOIMPORT_COMPAT_IDA695</code></p>
-<p>查看源码（<code>python/3/</code>），发现<code>idc_bc695.py</code>包含旧版api与新版的对应关系。</p>
-<h2 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h2><p><a target="_blank" rel="noopener" href="https://hex-rays.com/products/ida/news/7_0/docs/idapython_backward_compat_695/">IDA 7.0: IDAPython backward-compatibility with 6.95 APIs</a></p>
-<p><a target="_blank" rel="noopener" href="https://hex-rays.com/products/ida/news/7_0/docs/api70_porting_guide/">IDA 7.0 SDK: Porting from IDA 4.9-6.x API to IDA 7.0 API</a></p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="法1-升级脚本"><a href="#法1-升级脚本" class="headerlink" title="法1 升级脚本"></a>法1 升级脚本</h3><p>参照<code>idc_bc695.py</code>，将脚本升级到新版</p>
-<h3 id="法2-使用idc-bc695"><a href="#法2-使用idc-bc695" class="headerlink" title="法2 使用idc_bc695"></a>法2 使用idc_bc695</h3><p>将脚本中的模块名<code>idc</code>替换为<code>idc_bc695</code>即可</p>
-<h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><p><a target="_blank" rel="noopener" href="https://wonderkun.cc/2020/12/11/idapython%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/">idapython使用笔记</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1038,14 +1043,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">134</span>
+          <span class="site-state-item-count">135</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

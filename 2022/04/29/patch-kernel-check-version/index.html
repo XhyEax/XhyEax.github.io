@@ -28,7 +28,7 @@
 <meta property="og:description" content="环境Redmi K40 Gaming、MIUI 12.5.8 提取boot.img查看文件名： 1ls -al &#x2F;dev&#x2F;block&#x2F;by-name | grep boot 提取boot.img： 1dd if&#x3D;$(readlink &#x2F;dev&#x2F;block&#x2F;by-name&#x2F;boot_a) of&#x3D;&#x2F;sdcard&#x2F;boot.img 提取内核法1 PC自己编译或者使用affggh&#x2F;magiskbootki">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-04-29T04:00:28.430Z">
-<meta property="article:modified_time" content="2022-04-29T01:38:49.038Z">
+<meta property="article:modified_time" content="2022-04-29T01:40:09.793Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="Kernel">
@@ -257,12 +257,13 @@
 <figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> idc</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, <span class="number">0x100000</span>):</span><br><span class="line">    idc.create_insn(i)</span><br></pre></td></tr></table></figure>
 <p>然后等待<code>IDA</code>分析结束。</p>
 <h2 id="定位check-version"><a href="#定位check-version" class="headerlink" title="定位check_version"></a>定位check_version</h2><p>使用<code>010Editor</code>搜索字符串<code>disagrees about version of symbol</code>，复制地址。<br>在<code>IDA64</code>中查看交叉引用，定位到的函数即为<code>check_version</code></p>
-<p>将函数体的第一个跳转Patch为B指令，跳到返回代码处。<br>例如：<br><code>CBZ X2, loc_FB8A8</code><br>Patch为：<br><code>B loc_FB8A8</code></p>
+<h2 id="Patch"><a href="#Patch" class="headerlink" title="Patch"></a>Patch</h2><p>将函数体的第一个跳转Patch为B指令。然后F5，查看返回值是否为1。</p>
+<p>例如：<br><code>CBZ X2, loc_FB8A8</code><br>Patch为：<br><code>B loc_FB8A8</code></p>
+<p>相关代码：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ROM:00000000000FB8A8                               loc_FB8A8                               ; CODE XREF: sub_FB804+14↑j</span><br><span class="line">ROM:00000000000FB8A8 35 00 80 52                   MOV             W21, #1</span><br><span class="line">ROM:00000000000FB8AC 0A 00 00 14                   B               loc_FB8D4</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ROM:00000000000FB8D4                               loc_FB8D4                               ; CODE XREF: sub_FB804+74↑j</span><br><span class="line">ROM:00000000000FB8D4                                                                       ; sub_FB804+90↑j</span><br><span class="line">ROM:00000000000FB8D4                                                                       ; sub_FB804+A8↑j</span><br><span class="line">ROM:00000000000FB8D4 E0 03 15 2A                   MOV             W0, W21</span><br><span class="line">ROM:00000000000FB8D8 F4 4F 43 A9                   LDP             X20, X19, [SP,#0x20+var_s10]</span><br><span class="line">ROM:00000000000FB8DC F6 57 42 A9                   LDP             X22, X21, [SP,#0x20+var_s0]</span><br><span class="line">ROM:00000000000FB8E0 F7 0B 40 F9                   LDR             X23, [SP,#0x20+var_10]</span><br><span class="line">ROM:00000000000FB8E4 FD 7B C4 A8                   LDP             X29, X30, [SP+0x20+var_20],#0x40</span><br><span class="line">ROM:00000000000FB8E8 C0 03 5F D6                   RET</span><br></pre></td></tr></table></figure>
 
-<p>F5，查看返回值是否为1。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-271179.htm">绕过Android内核模块加载验证</a></p>
 
     </div>
@@ -301,7 +302,10 @@
     <a href="/2022/04/28/arm64-syscall-table/" rel="prev" title="ARM64 syscall table">
       <i class="fa fa-chevron-left"></i> ARM64 syscall table
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022/05/02/process_vm_readv-analysis/" rel="next" title="process_vm_readv 源码分析">
+      process_vm_readv 源码分析 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -360,7 +364,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E5%8F%96boot-img"><span class="nav-number">2.</span> <span class="nav-text">提取boot.img</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E5%8F%96%E5%86%85%E6%A0%B8"><span class="nav-number">3.</span> <span class="nav-text">提取内核</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%951-PC"><span class="nav-number">3.1.</span> <span class="nav-text">法1 PC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%952-%E6%89%8B%E6%9C%BA"><span class="nav-number">3.2.</span> <span class="nav-text">法2 手机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E7%BC%96%E8%AF%91"><span class="nav-number">4.</span> <span class="nav-text">反编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%BD%8Dcheck-version"><span class="nav-number">5.</span> <span class="nav-text">定位check_version</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E5%8F%96boot-img"><span class="nav-number">2.</span> <span class="nav-text">提取boot.img</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E5%8F%96%E5%86%85%E6%A0%B8"><span class="nav-number">3.</span> <span class="nav-text">提取内核</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%951-PC"><span class="nav-number">3.1.</span> <span class="nav-text">法1 PC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%952-%E6%89%8B%E6%9C%BA"><span class="nav-number">3.2.</span> <span class="nav-text">法2 手机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E7%BC%96%E8%AF%91"><span class="nav-number">4.</span> <span class="nav-text">反编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%BD%8Dcheck-version"><span class="nav-number">5.</span> <span class="nav-text">定位check_version</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Patch"><span class="nav-number">6.</span> <span class="nav-text">Patch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -376,14 +380,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">134</span>
+          <span class="site-state-item-count">135</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
