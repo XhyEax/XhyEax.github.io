@@ -196,6 +196,136 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/03/app-access-device-by-selinux-rule/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/03/app-access-device-by-selinux-rule/" class="post-title-link" itemprop="url">定制SELinux规则 允许app访问内核模块</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-03 07:46:31" itemprop="dateCreated datePublished" datetime="2022-05-03T07:46:31+08:00">2022-05-03</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>使用<code>insmod</code>安装内核模块后，在<code>app</code>的<code>Native</code>层访问驱动，提示<code>Permission Denied</code>。<br>设置驱动权限，绕过<code>DAC</code>权限检查：<code>chmod 666 /dev/helloworld</code>。<br>再次调用，仍然失败，观察到<code>SELinux</code>日志输出。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[23292:logd.auditd]type=1400 audit(1651503112.740:5320): avc: denied &#123; read write &#125; for comm=&quot;exp.hellokernel&quot; name=&quot;helloworld&quot; dev=&quot;tmpfs&quot; ino=297747 scontext=u:r:priv_app:s0:c227,c256,c512,c768 tcontext=u:object_r:device:s0 tclass=chr_file permissive=1</span><br></pre></td></tr></table></figure>
+<p>关闭<code>SELinux</code>后，成功调用驱动。</p>
+<p>添加<code>allow</code>规则，调用仍失败，查阅资料得知需要设置为<code>mlstrustedsubject</code>。</p>
+<p>最终基于<code>magiskpolicy</code>，实现了自定义<code>SELinux</code>规则的添加。</p>
+<p>PS：笔者将apk放到了<code>system/priv-app</code>目录下，所以<code>role</code>是<code>priv_app</code>。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/05/03/app-access-device-by-selinux-rule/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/03/fix-android-logd-crash/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/03/fix-android-logd-crash/" class="post-title-link" itemprop="url">修复安卓Log日志不输出问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-03 07:00:59" itemprop="dateCreated datePublished" datetime="2022-05-03T07:00:59+08:00">2022-05-03</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="报错信息"><a href="#报错信息" class="headerlink" title="报错信息"></a>报错信息</h2><h3 id="Log"><a href="#Log" class="headerlink" title="Log"></a>Log</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">logcat: Unexpected EOF!</span><br><span class="line"></span><br><span class="line">This means that either the device shut down, logd crashed, or this instance of logcat was unable to read log</span><br><span class="line">messages as quickly as they were being produced.</span><br></pre></td></tr></table></figure>
+<h3 id="LSPosed"><a href="#LSPosed" class="headerlink" title="LSPosed"></a>LSPosed</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Logd maybe crashed, retrying in 1s...</span><br><span class="line">Logd crashed too many times, trying manually start...</span><br></pre></td></tr></table></figure>
+<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p><code>开发者选项</code>-<code>日志记录器缓冲区大小</code>修改为<code>16M</code>。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/03/pidof-analisis/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -220,7 +350,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-05-03 12:00:00" itemprop="dateCreated datePublished" datetime="2022-05-03T12:00:00+08:00">2022-05-03</time>
+              <time title="创建时间：2022-05-03 04:00:31" itemprop="dateCreated datePublished" datetime="2022-05-03T04:00:31+08:00">2022-05-03</time>
             </span>
 
           
@@ -845,135 +975,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/06/auto-load-jquery-by-tampermonkey/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/06/auto-load-jquery-by-tampermonkey/" class="post-title-link" itemprop="url">使用油猴脚本自动加载JQuery</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-06 14:57:36" itemprop="dateCreated datePublished" datetime="2021-12-06T14:57:36+08:00">2021-12-06</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>如题，使用油猴脚本实现<code>JQuery</code>自动加载。</p>
-<h2 id="脚本"><a href="#脚本" class="headerlink" title="脚本"></a>脚本</h2><p><a target="_blank" rel="noopener" href="https://github.com/XhyEax/JQueryAutoLoad">XhyEax/JQueryAutoLoad</a></p>
-<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><h3 id="被重写"><a href="#被重写" class="headerlink" title="$被重写"></a>$被重写</h3><p>网站重写了<code>$</code>，直接加载<code>JQuery</code>的话会发生覆盖，部分组件可能无法正常使用。（例如<a target="_blank" rel="noopener" href="https://www.52pojie.cn/">吾爱破解</a>）</p>
-<h4 id="修复方式"><a href="#修复方式" class="headerlink" title="修复方式"></a>修复方式</h4><p>只判断<code>$</code>，存在则不覆盖</p>
-<p>PS：似乎js也有命名空间的概念？之后有空再看看</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/dolin88/article/details/80043504">区别 (function($){…})(jQuery)、$(function(){ })和$.fn</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/05/vscode-debug-php/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/05/vscode-debug-php/" class="post-title-link" itemprop="url">使用VSCode调试PHP代码（XDebug）</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-05 06:31:56" itemprop="dateCreated datePublished" datetime="2021-12-05T06:31:56+08:00">2021-12-05</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p><code>VSCode</code>：安装<code>PHP Debug</code>拓展<br><code>PHP 7.4.26</code>（<a target="_blank" rel="noopener" href="https://sourceforge.net/projects/xampp/">XAMPP</a>）：<code>xampp-windows-x64-7.4.26-0-VC15-installer.exe</code></p>
-<p><code>XDebug</code>：使用<code>D:\xampp\php\ext</code>自带的<code>2.8.1</code>版本的<code>php_xdebug.dll</code></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/12/05/vscode-debug-php/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1045,7 +1046,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">136</span>
+          <span class="site-state-item-count">138</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
