@@ -12940,4 +12940,42 @@
         <tag>Android</tag>
       </tags>
   </entry>
+  <entry>
+    <title>使用GDB、LLDB调试安卓程序</title>
+    <url>/2022/05/06/debug-android-by-gdb-and-lldb/</url>
+    <content><![CDATA[<h2 id="命令对照表"><a href="#命令对照表" class="headerlink" title="命令对照表"></a>命令对照表</h2><p><a href="https://lldb.llvm.org/use/map.html">GDB to LLDB command map</a></p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>PC: <code>Windows 10</code><br>NDK: <code>22.1.7171670</code></p>
+<h3 id="程序位置"><a href="#程序位置" class="headerlink" title="程序位置"></a>程序位置</h3><p><code>GDB 8.3</code>（位于<code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\bin</code>）<br><code>lldb version 11.0.5</code>（位于<code>&lt;ndk&gt;\prebuilt\windows-x86_64\bin</code>）</p>
+<h3 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h3><h4 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h4><p><code>&lt;ndk&gt;\prebuilt\android-arm64\gdbserver</code><br><code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\arm\lldb-server</code></p>
+<h4 id="ARM64"><a href="#ARM64" class="headerlink" title="ARM64"></a>ARM64</h4><p><code>&lt;ndk&gt;\prebuilt\android-arm\gdbserver</code><br><code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\aarch64\lldb-server</code></p>
+<span id="more"></span>
+<h2 id="Spawn模式"><a href="#Spawn模式" class="headerlink" title="Spawn模式"></a>Spawn模式</h2><h3 id="gdb"><a href="#gdb" class="headerlink" title="gdb"></a>gdb</h3><h4 id="启动server"><a href="#启动server" class="headerlink" title="启动server"></a>启动server</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:9999 tcp:9999</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/gdbserver :9999 /data/local/tmp/victim&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="PC连接"><a href="#PC连接" class="headerlink" title="PC连接"></a>PC连接</h4><p>进入<code>gdb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">target remote :9999</span><br></pre></td></tr></table></figure>
+<p>调试器自动断在<code>__dl__start () from target:/system/bin/linker</code></p>
+<h3 id="lldb"><a href="#lldb" class="headerlink" title="lldb"></a>lldb</h3><h4 id="server"><a href="#server" class="headerlink" title="server"></a>server</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:9090 tcp:9090</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:9090&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h4><p>进入<code>lldb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:9090</span><br></pre></td></tr></table></figure>
+<h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p>设置工作目录，指定文件后执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform settings -w /data/local/tmp</span><br><span class="line">file victim</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+<h2 id="Attach模式"><a href="#Attach模式" class="headerlink" title="Attach模式"></a>Attach模式</h2><p>可使用<code>pidof</code>获取进程<code>pid</code></p>
+<h3 id="gdb-1"><a href="#gdb-1" class="headerlink" title="gdb"></a>gdb</h3><h4 id="server-1"><a href="#server-1" class="headerlink" title="server"></a>server</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:9999 tcp:9999</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/gdbserver :9999 --attach $(pidof victim)&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="PC连接-1"><a href="#PC连接-1" class="headerlink" title="PC连接"></a>PC连接</h4><p>进入<code>gdb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">target remote :9999</span><br></pre></td></tr></table></figure>
+
+<h3 id="lldb-1"><a href="#lldb-1" class="headerlink" title="lldb"></a>lldb</h3><h4 id="server-2"><a href="#server-2" class="headerlink" title="server"></a>server</h4><p>转发端口，并以后台模式启动：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:4321 tcp:4321</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:4321&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="连接-1"><a href="#连接-1" class="headerlink" title="连接"></a>连接</h4><p>进入<code>lldb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:4321</span><br></pre></td></tr></table></figure>
+<h4 id="附加"><a href="#附加" class="headerlink" title="附加"></a>附加</h4><p>可使用进程名或<code>pid</code>附加</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">attach -name victim</span><br><span class="line">attach -p 18600</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://lldb.llvm.org/use/remote.html">Remote Debugging — The LLDB Debugger</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
+        <tag>Android</tag>
+        <tag>ARM</tag>
+      </tags>
+  </entry>
 </search>

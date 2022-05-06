@@ -20,22 +20,22 @@
     var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="准备条件(设备已解锁BL，电脑fastboot环境正常是前提条件)已下载magisk框架rec安装包（github下载），有sd卡（adb sideload未测试是否可安装，建议用内存卡），并已安装第三方recovery（以下简称rec）或已安装magisk框架app，且有原厂recovery_ramdisk镜像 安装方式fastboot刷入命令（华为没有boot分区，所以rec也是通过这个指令刷">
+  <meta name="description" content="命令对照表GDB to LLDB command map 环境PC: Windows 10NDK: 22.1.7171670 程序位置GDB 8.3（位于&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\bin）lldb version 11.0.5（位于&lt;ndk&gt;\prebuilt\windows-x86_64\bin） Serv">
 <meta property="og:type" content="article">
-<meta property="og:title" content="emui9安装Magisk框架">
-<meta property="og:url" content="https://blog.xhyeax.com/2019/04/02/emui9-magisk-install/index.html">
+<meta property="og:title" content="使用GDB、LLDB调试安卓程序">
+<meta property="og:url" content="https://blog.xhyeax.com/2022/05/06/debug-android-by-gdb-and-lldb/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="准备条件(设备已解锁BL，电脑fastboot环境正常是前提条件)已下载magisk框架rec安装包（github下载），有sd卡（adb sideload未测试是否可安装，建议用内存卡），并已安装第三方recovery（以下简称rec）或已安装magisk框架app，且有原厂recovery_ramdisk镜像 安装方式fastboot刷入命令（华为没有boot分区，所以rec也是通过这个指令刷">
+<meta property="og:description" content="命令对照表GDB to LLDB command map 环境PC: Windows 10NDK: 22.1.7171670 程序位置GDB 8.3（位于&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\bin）lldb version 11.0.5（位于&lt;ndk&gt;\prebuilt\windows-x86_64\bin） Serv">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://clubimg.club.vmall.com/data/attachment/forum/201902/11/221928oai3dhzxzbbrd42d.jpg">
-<meta property="article:published_time" content="2019-04-01T20:49:28.809Z">
-<meta property="article:modified_time" content="2019-04-01T20:49:28.000Z">
+<meta property="article:published_time" content="2022-05-05T23:00:59.000Z">
+<meta property="article:modified_time" content="2022-05-06T04:02:57.708Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="经验">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="ARM">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://clubimg.club.vmall.com/data/attachment/forum/201902/11/221928oai3dhzxzbbrd42d.jpg">
 
-<link rel="canonical" href="https://blog.xhyeax.com/2019/04/02/emui9-magisk-install/">
+<link rel="canonical" href="https://blog.xhyeax.com/2022/05/06/debug-android-by-gdb-and-lldb/">
 
 
 <script id="page-configurations">
@@ -48,7 +48,7 @@
   };
 </script>
 
-  <title>emui9安装Magisk框架 | Xhy's Blog</title>
+  <title>使用GDB、LLDB调试安卓程序 | Xhy's Blog</title>
   
 
 
@@ -201,7 +201,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/02/emui9-magisk-install/">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/06/debug-android-by-gdb-and-lldb/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -214,7 +214,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          emui9安装Magisk框架
+          使用GDB、LLDB调试安卓程序
         </h1>
 
         <div class="post-meta">
@@ -224,7 +224,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-04-02 04:49:28" itemprop="dateCreated datePublished" datetime="2019-04-02T04:49:28+08:00">2019-04-02</time>
+              <time title="创建时间：2022-05-06 07:00:59" itemprop="dateCreated datePublished" datetime="2022-05-06T07:00:59+08:00">2022-05-06</time>
             </span>
 
           
@@ -245,14 +245,34 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="准备条件"><a href="#准备条件" class="headerlink" title="准备条件"></a>准备条件</h2><p>(设备已解锁BL，电脑fastboot环境正常是前提条件)<br>已下载magisk框架rec安装包（<a target="_blank" rel="noopener" href="https://github.com/topjohnwu/Magisk/releases/">github下载</a>），有sd卡（<code>adb sideload</code>未测试是否可安装，建议用内存卡），并已安装第三方recovery（以下简称rec）<br>或<br>已安装magisk框架app，且有原厂<code>recovery_ramdisk</code>镜像</p>
-<h2 id="安装方式"><a href="#安装方式" class="headerlink" title="安装方式"></a>安装方式</h2><p>fastboot刷入命令（华为没有boot分区，所以rec也是通过这个指令刷入）<br>(BOOT.img请自行替换为对应镜像名)</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastboot flash recovery_ramdisk BOOT.img</span><br></pre></td></tr></table></figure>
-<h3 id="rec安装法"><a href="#rec安装法" class="headerlink" title="rec安装法"></a>rec安装法</h3><p>启动至第三方rec，从sd卡选择magisk卡刷包，安装。<br>安装完成后选择重启到rec模式，即可进入带面具的系统</p>
-<h3 id="修补镜像直接刷入法"><a href="#修补镜像直接刷入法" class="headerlink" title="修补镜像直接刷入法"></a>修补镜像直接刷入法</h3><p>参考<a target="_blank" rel="noopener" href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a>，个人未测试，应该可行<br>提取出原厂<code>recovery_ramdisk</code>镜像（从官方线刷包或其他地方获得），并发送到手机（模拟器应该也行）<br>使用magisk框架app，选择安装，修补boot镜像，选择提取出的原厂镜像<br>修补完成后传回电脑，手机进入fastboot模式，刷入即可</p>
-<h2 id="启动方式"><a href="#启动方式" class="headerlink" title="启动方式"></a>启动方式</h2><p>由于修补的镜像其实是rec分区，所以要按照进入rec的方式进入带面具的系统。<br>（个人测试，在带magisk的系统下重启仍然是有root的，等价于启动到rec）<br>具体操作如图（图源自参考帖）<br><img src="https://clubimg.club.vmall.com/data/attachment/forum/201902/11/221928oai3dhzxzbbrd42d.jpg"></p>
-<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>如果安装了不适配的模块，还是需要刷入第三方rec，进入后删除<code>/data/adb</code>文件夹，然后即可正常开机（magisk要重刷）。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a></p>
+        <h2 id="命令对照表"><a href="#命令对照表" class="headerlink" title="命令对照表"></a>命令对照表</h2><p><a target="_blank" rel="noopener" href="https://lldb.llvm.org/use/map.html">GDB to LLDB command map</a></p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>PC: <code>Windows 10</code><br>NDK: <code>22.1.7171670</code></p>
+<h3 id="程序位置"><a href="#程序位置" class="headerlink" title="程序位置"></a>程序位置</h3><p><code>GDB 8.3</code>（位于<code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\bin</code>）<br><code>lldb version 11.0.5</code>（位于<code>&lt;ndk&gt;\prebuilt\windows-x86_64\bin</code>）</p>
+<h3 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h3><h4 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h4><p><code>&lt;ndk&gt;\prebuilt\android-arm64\gdbserver</code><br><code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\arm\lldb-server</code></p>
+<h4 id="ARM64"><a href="#ARM64" class="headerlink" title="ARM64"></a>ARM64</h4><p><code>&lt;ndk&gt;\prebuilt\android-arm\gdbserver</code><br><code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\aarch64\lldb-server</code></p>
+<span id="more"></span>
+<h2 id="Spawn模式"><a href="#Spawn模式" class="headerlink" title="Spawn模式"></a>Spawn模式</h2><h3 id="gdb"><a href="#gdb" class="headerlink" title="gdb"></a>gdb</h3><h4 id="启动server"><a href="#启动server" class="headerlink" title="启动server"></a>启动server</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb forward tcp:9999 tcp:9999</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/gdbserver :9999 /data/local/tmp/victim&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="PC连接"><a href="#PC连接" class="headerlink" title="PC连接"></a>PC连接</h4><p>进入<code>gdb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">target remote :9999</span><br></pre></td></tr></table></figure>
+<p>调试器自动断在<code>__dl__start () from target:/system/bin/linker</code></p>
+<h3 id="lldb"><a href="#lldb" class="headerlink" title="lldb"></a>lldb</h3><h4 id="server"><a href="#server" class="headerlink" title="server"></a>server</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb forward tcp:9090 tcp:9090</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:9090&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h4><p>进入<code>lldb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:9090</span><br></pre></td></tr></table></figure>
+<h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p>设置工作目录，指定文件后执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">platform settings -w /data/local/tmp</span><br><span class="line">file victim</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+<h2 id="Attach模式"><a href="#Attach模式" class="headerlink" title="Attach模式"></a>Attach模式</h2><p>可使用<code>pidof</code>获取进程<code>pid</code></p>
+<h3 id="gdb-1"><a href="#gdb-1" class="headerlink" title="gdb"></a>gdb</h3><h4 id="server-1"><a href="#server-1" class="headerlink" title="server"></a>server</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb forward tcp:9999 tcp:9999</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/gdbserver :9999 --attach $(pidof victim)&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="PC连接-1"><a href="#PC连接-1" class="headerlink" title="PC连接"></a>PC连接</h4><p>进入<code>gdb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">target remote :9999</span><br></pre></td></tr></table></figure>
+
+<h3 id="lldb-1"><a href="#lldb-1" class="headerlink" title="lldb"></a>lldb</h3><h4 id="server-2"><a href="#server-2" class="headerlink" title="server"></a>server</h4><p>转发端口，并以后台模式启动：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb forward tcp:4321 tcp:4321</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:4321&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="连接-1"><a href="#连接-1" class="headerlink" title="连接"></a>连接</h4><p>进入<code>lldb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:4321</span><br></pre></td></tr></table></figure>
+<h4 id="附加"><a href="#附加" class="headerlink" title="附加"></a>附加</h4><p>可使用进程名或<code>pid</code>附加</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">attach -name victim</span><br><span class="line">attach -p 18600</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://lldb.llvm.org/use/remote.html">Remote Debugging — The LLDB Debugger</a></p>
 
     </div>
 
@@ -278,6 +298,8 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/%E7%BB%8F%E9%AA%8C/" rel="tag"># 经验</a>
+              <a href="/tags/Android/" rel="tag"># Android</a>
+              <a href="/tags/ARM/" rel="tag"># ARM</a>
           </div>
 
         
@@ -286,13 +308,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2019/03/15/android-floatview/" rel="prev" title="安卓8.0以上创建悬浮窗">
-      <i class="fa fa-chevron-left"></i> 安卓8.0以上创建悬浮窗
+    <a href="/2022/05/03/app-access-device-by-selinux-rule/" rel="prev" title="定制SELinux规则 允许app访问内核模块">
+      <i class="fa fa-chevron-left"></i> 定制SELinux规则 允许app访问内核模块
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/04/07/2019-hzwas-wp/" rel="next" title="2019中国杭州网络安全技能大赛 预选赛 哈夫曼之谜 & EasyCpp Writeup">
-      2019中国杭州网络安全技能大赛 预选赛 哈夫曼之谜 & EasyCpp Writeup <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -351,7 +370,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">准备条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E6%96%B9%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">安装方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rec%E5%AE%89%E8%A3%85%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">rec安装法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E8%A1%A5%E9%95%9C%E5%83%8F%E7%9B%B4%E6%8E%A5%E5%88%B7%E5%85%A5%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">修补镜像直接刷入法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">启动方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">4.</span> <span class="nav-text">注意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%AF%B9%E7%85%A7%E8%A1%A8"><span class="nav-number">1.</span> <span class="nav-text">命令对照表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-number">2.</span> <span class="nav-text">环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E4%BD%8D%E7%BD%AE"><span class="nav-number">2.1.</span> <span class="nav-text">程序位置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Server"><span class="nav-number">2.2.</span> <span class="nav-text">Server</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ARM"><span class="nav-number">2.2.1.</span> <span class="nav-text">ARM</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ARM64"><span class="nav-number">2.2.2.</span> <span class="nav-text">ARM64</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spawn%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">Spawn模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#gdb"><span class="nav-number">3.1.</span> <span class="nav-text">gdb</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8server"><span class="nav-number">3.1.1.</span> <span class="nav-text">启动server</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PC%E8%BF%9E%E6%8E%A5"><span class="nav-number">3.1.2.</span> <span class="nav-text">PC连接</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lldb"><span class="nav-number">3.2.</span> <span class="nav-text">lldb</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#server"><span class="nav-number">3.2.1.</span> <span class="nav-text">server</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5"><span class="nav-number">3.2.2.</span> <span class="nav-text">连接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8"><span class="nav-number">3.2.3.</span> <span class="nav-text">启动</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Attach%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">Attach模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#gdb-1"><span class="nav-number">4.1.</span> <span class="nav-text">gdb</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#server-1"><span class="nav-number">4.1.1.</span> <span class="nav-text">server</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PC%E8%BF%9E%E6%8E%A5-1"><span class="nav-number">4.1.2.</span> <span class="nav-text">PC连接</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lldb-1"><span class="nav-number">4.2.</span> <span class="nav-text">lldb</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#server-2"><span class="nav-number">4.2.1.</span> <span class="nav-text">server</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5-1"><span class="nav-number">4.2.2.</span> <span class="nav-text">连接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%99%84%E5%8A%A0"><span class="nav-number">4.2.3.</span> <span class="nav-text">附加</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

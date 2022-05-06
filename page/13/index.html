@@ -196,6 +196,75 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/01/26/icq-2nd-happy-rsa256/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/01/26/icq-2nd-happy-rsa256/" class="post-title-link" itemprop="url">i春秋 第二届春秋欢乐赛 RSA256 Writeup</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-26 11:59:21" itemprop="dateCreated datePublished" datetime="2019-01-26T11:59:21+08:00">2019-01-26</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="解压"><a href="#解压" class="headerlink" title="解压"></a>解压</h2><p>解压得到四个文件，有一个<code>public.key</code>和三个加密过的文件，于是先把p和q解出来</p>
+<h2 id="得到e和n"><a href="#得到e和n" class="headerlink" title="得到e和n"></a>得到e和n</h2><p><code>openssl rsa -pubin -text -modulus -in warmup -in public.key</code><br>得到</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Exponent: 65537 (0x10001)</span><br><span class="line">Modulus=D99E952296A6D960DFC2504ABA545B9442D60A7B9E930AFF451C78EC55D555EB</span><br></pre></td></tr></table></figure>
+<h2 id="使用yafu分解，得到p和q"><a href="#使用yafu分解，得到p和q" class="headerlink" title="使用yafu分解，得到p和q"></a>使用yafu分解，得到p和q</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p = 302825536744096741518546212761194311477</span><br><span class="line">q = 325045504186436346209877301320131277983</span><br></pre></td></tr></table></figure>
+<h2 id="求出d"><a href="#求出d" class="headerlink" title="求出d"></a>求出d</h2><p>使用gmpy</p>
+<h2 id="解密并打印出flag"><a href="#解密并打印出flag" class="headerlink" title="解密并打印出flag"></a>解密并打印出flag</h2><h3 id="使用rsa模块"><a href="#使用rsa模块" class="headerlink" title="使用rsa模块"></a>使用rsa模块</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> rsa</span><br><span class="line"></span><br><span class="line">n = <span class="number">0xD99E952296A6D960DFC2504ABA545B9442D60A7B9E930AFF451C78EC55D555EB</span></span><br><span class="line">e = <span class="number">0x10001</span></span><br><span class="line">p = <span class="number">302825536744096741518546212761194311477</span></span><br><span class="line">q = <span class="number">325045504186436346209877301320131277983</span></span><br><span class="line">d = <span class="number">0x4547B732CBC3527104CB57C4728D6899B44C4994FAE2713D6B594BC0F522A41</span></span><br><span class="line">ret = <span class="string">&quot;&quot;</span></span><br><span class="line">privatekey = rsa.PrivateKey(n , e , d , p , q)</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message1&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message2&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message3&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="built_in">print</span>(ret)</span><br></pre></td></tr></table></figure>
+<p>得到</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flag&#123;3b6d3806-4b2b</span><br><span class="line">-11e7-95a0-</span><br><span class="line">000c29d7e93d&#125;</span><br></pre></td></tr></table></figure>
+<p>去掉回车得到最终flag</p>
+<h3 id="不使用rsa模块"><a href="#不使用rsa模块" class="headerlink" title="不使用rsa模块"></a>不使用rsa模块</h3><p>其实就是自己实现<code>rsa.decrypt</code>中的转换16进制操作<br>以第一个文件为例，解密出来转化为16进制：<br><code>25a8007e9ad2809abbf5a00666c61677b33623664333830362d346232620a</code><br>位数为奇数，所以左边补0，得到<br><code>025a8007e9ad2809abbf5a00666c61677b33623664333830362d346232620a</code><br>转换为ascii码得到<br><code>Z��(    ��Z�flag&#123;3b6d3806-4b2b</code></p>
+<p>剩下文件同理</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiangshangbashaonian/article/details/79575062">i春秋第二届春秋欢乐赛RSA256writeup</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/01/26/icq-2nd-happy-rec/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -766,73 +835,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2018/12/01/txcos-as-imgurl/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/12/01/txcos-as-imgurl/" class="post-title-link" itemprop="url">在服务器上部署腾讯云COS同步方案</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2018-12-01 05:25:06" itemprop="dateCreated datePublished" datetime="2018-12-01T05:25:06+08:00">2018-12-01</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>由于截图后手动上传到COS比较麻烦，而<a target="_blank" rel="noopener" href="https://github.com/ShareX/ShareX">ShareX</a>（一个截图工具）支持SFTP上传到服务器<br>于是决定在服务器上配置腾讯云COS同步方案，然后就可以愉快地截图后上传图片了</p>
-<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p>在腾讯云的对象存储（COS）配置好密钥以后，在服务器上配置同步方案<br>（建议设置一个用户组给予COS读写权限）</p>
-<h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install automake gcc-c++ git libcurl-devel libxml2-devel fuse-devel make openssl-devel</span><br></pre></td></tr></table></figure>
-<h3 id="安装cosfs"><a href="#安装cosfs" class="headerlink" title="安装cosfs"></a>安装cosfs</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/tencentyun/cosfs-v4.2.1 /usr/cosfs</span><br><span class="line"><span class="built_in">cd</span> /usr/cosfs</span><br><span class="line">./autogen.sh</span><br><span class="line">./configure</span><br><span class="line">make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
-<h3 id="修改配置文件-格式为bucket-name-bucket-appid-secretId-secredKey"><a href="#修改配置文件-格式为bucket-name-bucket-appid-secretId-secredKey" class="headerlink" title="修改配置文件(格式为bucket_name-bucket_appid:secretId:secredKey)"></a>修改配置文件(格式为<code>bucket_name-bucket_appid:secretId:secredKey</code>)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> xhy-1252675344:AKIDXXXXXXXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXX &gt; /etc/passwd-cosfs</span><br><span class="line">chmod 640 /etc/passwd-cosfs</span><br></pre></td></tr></table></figure>
-<h3 id="挂载-以挂载到-usr-upload-为例"><a href="#挂载-以挂载到-usr-upload-为例" class="headerlink" title="挂载(以挂载到/usr/upload/为例)"></a>挂载(以挂载到<code>/usr/upload/</code>为例)</h3><p>格式为<code>cosfs bucket_appid:bucket_name 挂载目录 -ourl=对象储存url -odbglevel=info</code><br>例如：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cosfs 1252675344:xhy /usr/upload/ -ourl=xhy-1252675344.cos.ap-beijing.myqcloud.com -odbglevel=info</span><br></pre></td></tr></table></figure>
-<h3 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fusermount -u /u01/docker/kenny_hexo/public</span><br><span class="line">或者</span><br><span class="line">umount -l /u01/docker/kenny_hexo/public</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.234du.com/1167.html">ImgURL配合腾讯云COS（对象存储）搭建个人图床</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -904,7 +906,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">138</span>
+          <span class="site-state-item-count">139</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
