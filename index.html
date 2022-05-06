@@ -196,6 +196,75 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/06/curl-openssl-bypass/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/06/curl-openssl-bypass/" class="post-title-link" itemprop="url">绕过curl openssl证书校验</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-06 07:00:00" itemprop="dateCreated datePublished" datetime="2022-05-06T07:00:00+08:00">2022-05-06</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>某app使用了<code>curl</code>+<code>openssl</code>进行<code>https</code>通信，并开启了证书校验。<br>通过分析<code>curl</code>源码，定位到证书校验位置，Patch汇编代码，绕过证书校验。</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h3 id="相关代码"><a href="#相关代码" class="headerlink" title="相关代码"></a>相关代码</h3><p><code>SSL_CTX_set_verify</code>定义：<a target="_blank" rel="noopener" href="https://github.com/openssl/openssl/blob/openssl-3.0.3/ssl/ssl_lib.c#L3551">openssl/ssl/ssl_lib.c#L3551</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SSL_CTX_set_verify</span><span class="params">(SSL_CTX *ctx, <span class="keyword">int</span> mode,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">int</span> (*cb) (<span class="keyword">int</span>, X509_STORE_CTX *))</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ctx-&gt;verify_mode = mode;</span><br><span class="line">    ctx-&gt;default_verify_callback = cb;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用位置<code>ossl_connect_step1</code>：<a target="_blank" rel="noopener" href="https://github.com/curl/curl/blob/curl-7_83_0/lib/vtls/openssl.c#L3200">curl/lib/vtls/openssl.c#L3200</a><br>相关变量<code>verifypeer</code>：<a target="_blank" rel="noopener" href="https://github.com/curl/curl/blob/curl-7_83_0/lib/vtls/openssl.c#L2676">curl/lib/vtls/openssl.c#L2676</a></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/05/06/curl-openssl-bypass/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/06/debug-android-by-gdb-and-lldb/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -220,7 +289,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-05-06 07:00:59" itemprop="dateCreated datePublished" datetime="2022-05-06T07:00:59+08:00">2022-05-06</time>
+              <time title="创建时间：2022-05-06 04:00:00" itemprop="dateCreated datePublished" datetime="2022-05-06T04:00:00+08:00">2022-05-06</time>
             </span>
 
           
@@ -915,73 +984,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/06/android-10-11-hostpot-set-ip/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/06/android-10-11-hostpot-set-ip/" class="post-title-link" itemprop="url">安卓10、11 固定Wifi热点IP (Xposed)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-06 18:39:04" itemprop="dateCreated datePublished" datetime="2021-12-06T18:39:04+08:00">2021-12-06</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/">前文</a>通过分析<code>Android 9</code>源码，定位到Hook点，然后使用<code>Xposed Hook</code>，实现了Wifi热点IP的固定。</p>
-<p>系统升级到<code>Android 11</code>后，发现源码有变化，插件不起作用了。于是再来操作一波。</p>
-<p>Xposed模块：<a target="_blank" rel="noopener" href="https://github.com/XhyEax/SoftApHelper">SoftApHelper</a></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/12/06/android-10-11-hostpot-set-ip/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1053,14 +1055,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-count">140</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">30</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

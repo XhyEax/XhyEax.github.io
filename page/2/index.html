@@ -196,6 +196,73 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/06/android-10-11-hostpot-set-ip/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/06/android-10-11-hostpot-set-ip/" class="post-title-link" itemprop="url">安卓10、11 固定Wifi热点IP (Xposed)</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-06 18:39:04" itemprop="dateCreated datePublished" datetime="2021-12-06T18:39:04+08:00">2021-12-06</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/">前文</a>通过分析<code>Android 9</code>源码，定位到Hook点，然后使用<code>Xposed Hook</code>，实现了Wifi热点IP的固定。</p>
+<p>系统升级到<code>Android 11</code>后，发现源码有变化，插件不起作用了。于是再来操作一波。</p>
+<p>Xposed模块：<a target="_blank" rel="noopener" href="https://github.com/XhyEax/SoftApHelper">SoftApHelper</a></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/12/06/android-10-11-hostpot-set-ip/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/06/android-studio-stuck-at-debug/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -771,73 +838,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/11/21/cryptography-mode-and-padding/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/11/21/cryptography-mode-and-padding/" class="post-title-link" itemprop="url">对称加密 工作模式 填充方式</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-11-21 11:08:59" itemprop="dateCreated datePublished" datetime="2021-11-21T11:08:59+08:00">2021-11-21</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通过维基百科和博客，学习了对称加密的工作模式和填充方式，记录一下。</p>
-<p>图源：<a target="_blank" rel="noopener" href="https://blog.csdn.net/gozhuyinglong/article/details/121200733">一文搞懂对称加密：加密算法、工作模式、填充方式、代码实现</a></p>
-<h2 id="工作模式"><a href="#工作模式" class="headerlink" title="工作模式"></a>工作模式</h2><h3 id="ECB"><a href="#ECB" class="headerlink" title="ECB"></a>ECB</h3><p>最简单的加密模式即为电子密码本（Electronic codebook，ECB）模式。需要加密的消息按照块密码的块大小被分为数个块，并对每个块进行独立加密。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/11/21/cryptography-mode-and-padding/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -909,14 +909,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-count">140</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">30</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
