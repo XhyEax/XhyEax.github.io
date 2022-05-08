@@ -196,6 +196,75 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/16/aosp-docker/" class="post-title-link" itemprop="url">使用docker编译安卓源码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-16 07:20:05" itemprop="dateCreated datePublished" datetime="2020-04-16T07:20:05+08:00">2020-04-16</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h3><p><a href="https://blog.xhyeax.com/2020/04/15/wsl2-docker/">在WSL2(Ubuntu 18.04)中安装docker并配置自启动</a></p>
+<h3 id="配置docker源"><a href="#配置docker源" class="headerlink" title="配置docker源"></a>配置docker源</h3><p>使用阿里云的加速服务，解决下载镜像速度慢的问题<br>打开<a target="_blank" rel="noopener" href="https://cr.console.aliyun.com/">容器镜像服务</a><br>镜像中心 - 镜像加速器<br>将加速器地址写入<code>/etc/docker/daemon.json</code>，格式为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://xxxxxx.mirror.aliyuncs.com&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>重启docker</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service docker restart</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/16/aosp-docker/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/16/curl-set-proxy-by-pathvar/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -778,71 +847,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/csharp-run-as-admin/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/14/csharp-run-as-admin/" class="post-title-link" itemprop="url">VS设置C#默认以管理员身份调试及启动</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-14 06:58:43" itemprop="dateCreated datePublished" datetime="2020-04-14T06:58:43+08:00">2020-04-14</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="默认以管理员身份调试"><a href="#默认以管理员身份调试" class="headerlink" title="默认以管理员身份调试"></a>默认以管理员身份调试</h2><p>右键项目，添加应用程序清单文件。<br>将<code>&lt;requestedExecutionLevel level=&quot;asInvoker&quot; uiAccess=&quot;false&quot; /&gt;</code><br><code>asInvoker</code>修改为<code>requireAdministrator</code><br>保存后再次点击运行，将提示使用其他凭据重新启动。</p>
-<h2 id="程序自动请求管理员权限"><a href="#程序自动请求管理员权限" class="headerlink" title="程序自动请求管理员权限"></a>程序自动请求管理员权限</h2><p>修改<code>Program.cs</code>的<code>Main</code>方法:</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="built_in">string</span>[] Args</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 当前用户是管理员的时候，直接启动应用程序</span></span><br><span class="line"><span class="comment">     * 如果不是管理员，则使用启动对象启动程序，以确保使用管理员身份运行</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="comment">//获得当前登录的Windows用户标示</span></span><br><span class="line">    System.Security.Principal.WindowsIdentity identity = System.Security.Principal.WindowsIdentity.GetCurrent();</span><br><span class="line">    <span class="comment">//创建Windows用户主题</span></span><br><span class="line">    Application.EnableVisualStyles();</span><br><span class="line"></span><br><span class="line">    System.Security.Principal.WindowsPrincipal principal = <span class="keyword">new</span> System.Security.Principal.WindowsPrincipal(identity);</span><br><span class="line">    <span class="comment">//判断当前登录用户是否为管理员</span></span><br><span class="line">    <span class="keyword">if</span> (principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//如果是管理员，则直接运行</span></span><br><span class="line"></span><br><span class="line">        Application.EnableVisualStyles();</span><br><span class="line">        Application.Run(<span class="keyword">new</span> Form1());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//创建启动对象</span></span><br><span class="line">        System.Diagnostics.ProcessStartInfo startInfo = <span class="keyword">new</span> System.Diagnostics.ProcessStartInfo();</span><br><span class="line">        <span class="comment">//设置运行文件</span></span><br><span class="line">        startInfo.FileName = System.Windows.Forms.Application.ExecutablePath;</span><br><span class="line">        <span class="comment">//设置启动参数</span></span><br><span class="line">        startInfo.Arguments = String.Join(<span class="string">&quot; &quot;</span>, Args);</span><br><span class="line">        <span class="comment">//设置启动动作,确保以管理员身份运行</span></span><br><span class="line">        startInfo.Verb = <span class="string">&quot;runas&quot;</span>;</span><br><span class="line">        <span class="comment">//如果不是管理员，则启动UAC</span></span><br><span class="line">        System.Diagnostics.Process.Start(startInfo);</span><br><span class="line">        <span class="comment">//退出</span></span><br><span class="line">        System.Windows.Forms.Application.Exit();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/testcs_dn/article/details/9903727">C#默认以管理员身份运行程序</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -910,7 +918,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">140</span>
+          <span class="site-state-item-count">141</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

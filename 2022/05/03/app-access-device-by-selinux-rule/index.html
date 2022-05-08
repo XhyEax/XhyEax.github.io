@@ -20,18 +20,19 @@
     var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="问题描述使用insmod安装内核模块后，在app的Native层访问驱动，提示Permission Denied。设置驱动权限，绕过DAC权限检查：chmod 666 &#x2F;dev&#x2F;helloworld。再次调用，仍然失败，观察到SELinux日志输出。 1[23292:logd.auditd]type&#x3D;1400 audit(1651503112.740:5320): avc: denied &amp;#12">
+  <meta name="description" content="问题描述使用insmod安装内核模块后，在app的Native层访问驱动，提示Permission Denied。设置驱动权限，绕过DAC权限检查：chmod 666 &#x2F;dev&#x2F;helloworld。再次调用，仍然失败。执行dmesg -w | grep &quot;avc: denied&quot;，查看SELinux日志。 1[23292:logd.auditd]type&#x3D;1400 audit">
 <meta property="og:type" content="article">
 <meta property="og:title" content="定制SELinux规则 允许app访问内核模块">
 <meta property="og:url" content="https://blog.xhyeax.com/2022/05/03/app-access-device-by-selinux-rule/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="问题描述使用insmod安装内核模块后，在app的Native层访问驱动，提示Permission Denied。设置驱动权限，绕过DAC权限检查：chmod 666 &#x2F;dev&#x2F;helloworld。再次调用，仍然失败，观察到SELinux日志输出。 1[23292:logd.auditd]type&#x3D;1400 audit(1651503112.740:5320): avc: denied &amp;#12">
+<meta property="og:description" content="问题描述使用insmod安装内核模块后，在app的Native层访问驱动，提示Permission Denied。设置驱动权限，绕过DAC权限检查：chmod 666 &#x2F;dev&#x2F;helloworld。再次调用，仍然失败。执行dmesg -w | grep &quot;avc: denied&quot;，查看SELinux日志。 1[23292:logd.auditd]type&#x3D;1400 audit">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-05-02T23:46:31.000Z">
-<meta property="article:modified_time" content="2022-05-03T07:46:31.000Z">
+<meta property="article:modified_time" content="2022-05-08T02:42:34.807Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="经验">
 <meta property="article:tag" content="Android">
+<meta property="article:tag" content="Kernel">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://blog.xhyeax.com/2022/05/03/app-access-device-by-selinux-rule/">
@@ -244,17 +245,19 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>使用<code>insmod</code>安装内核模块后，在<code>app</code>的<code>Native</code>层访问驱动，提示<code>Permission Denied</code>。<br>设置驱动权限，绕过<code>DAC</code>权限检查：<code>chmod 666 /dev/helloworld</code>。<br>再次调用，仍然失败，观察到<code>SELinux</code>日志输出。</p>
+        <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>使用<code>insmod</code>安装内核模块后，在<code>app</code>的<code>Native</code>层访问驱动，提示<code>Permission Denied</code>。<br>设置驱动权限，绕过<code>DAC</code>权限检查：<code>chmod 666 /dev/helloworld</code>。<br>再次调用，仍然失败。<br>执行<code>dmesg -w | grep &quot;avc: denied&quot;</code>，查看<code>SELinux</code>日志。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[23292:logd.auditd]type=1400 audit(1651503112.740:5320): avc: denied &#123; read write &#125; for comm=&quot;exp.hellokernel&quot; name=&quot;helloworld&quot; dev=&quot;tmpfs&quot; ino=297747 scontext=u:r:priv_app:s0:c227,c256,c512,c768 tcontext=u:object_r:device:s0 tclass=chr_file permissive=1</span><br></pre></td></tr></table></figure>
 <p>关闭<code>SELinux</code>后，成功调用驱动。</p>
 <p>添加<code>allow</code>规则，调用仍失败，查阅资料得知需要设置为<code>mlstrustedsubject</code>。</p>
 <p>最终基于<code>magiskpolicy</code>，实现了自定义<code>SELinux</code>规则的添加。</p>
-<p>PS：笔者将apk放到了<code>system/priv-app</code>目录下，所以<code>role</code>是<code>priv_app</code>。</p>
+<p>PS：笔者将apk放到了<code>system/priv-app</code>目录下，所以<code>role</code>是<code>priv_app</code>，而非<code>untrusted_app</code>。</p>
 <span id="more"></span>
 <h2 id="手动添加规则"><a href="#手动添加规则" class="headerlink" title="手动添加规则"></a>手动添加规则</h2><h3 id="方法一：sepolicy-rule"><a href="#方法一：sepolicy-rule" class="headerlink" title="方法一：sepolicy.rule"></a>方法一：sepolicy.rule</h3><p>创建一个<code>Magisk</code>模块，放入<code>sepolicy.rule</code>，将其解压到<code>$MODPATH</code>。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">allow priv_app device chr_file &#123; read write ioctl open getattr &#125;</span><br><span class="line">attradd priv_app mlstrustedsubject</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">allow priv_app device chr_file &#123; read write ioctl open getattr map &#125;</span><br><span class="line">attradd priv_app mlstrustedsubject</span><br></pre></td></tr></table></figure>
 <h3 id="方法二：命令行"><a href="#方法二：命令行" class="headerlink" title="方法二：命令行"></a>方法二：命令行</h3><p>手动执行，或在<code>Magisk</code>模块的<code>post-fs-data.sh</code>中添加以下命令</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">magiskpolicy --live &quot;allow priv_app device chr_file &#123; read write ioctl open getattr &#125;&quot;</span><br><span class="line">magiskpolicy --live &quot;attradd priv_app mlstrustedsubject&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">magiskpolicy --live &quot;allow priv_app device chr_file &#123; read write ioctl open getattr map &#125;&quot;</span><br><span class="line">magiskpolicy --live &quot;attradd priv_app mlstrustedsubject&quot;</span><br></pre></td></tr></table></figure>
+
+<h4 id="untrusted-app"><a href="#untrusted-app" class="headerlink" title="untrusted_app"></a>untrusted_app</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">magiskpolicy --live &quot;allow untrusted_app device chr_file &#123; read write ioctl open getattr map &#125;&quot;</span><br><span class="line">magiskpolicy --live &quot;attradd untrusted_app mlstrustedsubject&quot;</span><br></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/806a055b50b3">AOSP 8.1 新增/dev设备节点 Selinux的权限设置</a><br><a target="_blank" rel="noopener" href="https://www.likecs.com/show-305821532.html">Android/SELinux 添加 AVC 权限</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/9374e4421d38">SELinux 添加一个权限</a><br><a target="_blank" rel="noopener" href="https://github.com/Magisk-Modules-Repo/vold-posix/blob/master/common/post-fs-data.sh">vold-posix_post-fs-data.sh</a></p>
 
     </div>
@@ -282,6 +285,7 @@
           <div class="post-tags">
               <a href="/tags/%E7%BB%8F%E9%AA%8C/" rel="tag"># 经验</a>
               <a href="/tags/Android/" rel="tag"># Android</a>
+              <a href="/tags/Kernel/" rel="tag"># Kernel</a>
           </div>
 
         
@@ -355,7 +359,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E6%B7%BB%E5%8A%A0%E8%A7%84%E5%88%99"><span class="nav-number">2.</span> <span class="nav-text">手动添加规则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80%EF%BC%9Asepolicy-rule"><span class="nav-number">2.1.</span> <span class="nav-text">方法一：sepolicy.rule</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%BA%8C%EF%BC%9A%E5%91%BD%E4%BB%A4%E8%A1%8C"><span class="nav-number">2.2.</span> <span class="nav-text">方法二：命令行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E6%B7%BB%E5%8A%A0%E8%A7%84%E5%88%99"><span class="nav-number">2.</span> <span class="nav-text">手动添加规则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80%EF%BC%9Asepolicy-rule"><span class="nav-number">2.1.</span> <span class="nav-text">方法一：sepolicy.rule</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%BA%8C%EF%BC%9A%E5%91%BD%E4%BB%A4%E8%A1%8C"><span class="nav-number">2.2.</span> <span class="nav-text">方法二：命令行</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#untrusted-app"><span class="nav-number">2.2.1.</span> <span class="nav-text">untrusted_app</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -371,7 +375,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">140</span>
+          <span class="site-state-item-count">141</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

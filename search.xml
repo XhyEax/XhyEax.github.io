@@ -12911,22 +12911,25 @@
   <entry>
     <title>定制SELinux规则 允许app访问内核模块</title>
     <url>/2022/05/03/app-access-device-by-selinux-rule/</url>
-    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>使用<code>insmod</code>安装内核模块后，在<code>app</code>的<code>Native</code>层访问驱动，提示<code>Permission Denied</code>。<br>设置驱动权限，绕过<code>DAC</code>权限检查：<code>chmod 666 /dev/helloworld</code>。<br>再次调用，仍然失败，观察到<code>SELinux</code>日志输出。</p>
+    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>使用<code>insmod</code>安装内核模块后，在<code>app</code>的<code>Native</code>层访问驱动，提示<code>Permission Denied</code>。<br>设置驱动权限，绕过<code>DAC</code>权限检查：<code>chmod 666 /dev/helloworld</code>。<br>再次调用，仍然失败。<br>执行<code>dmesg -w | grep &quot;avc: denied&quot;</code>，查看<code>SELinux</code>日志。</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[23292:logd.auditd]type=1400 audit(1651503112.740:5320): avc: denied &#123; read write &#125; for comm=&quot;exp.hellokernel&quot; name=&quot;helloworld&quot; dev=&quot;tmpfs&quot; ino=297747 scontext=u:r:priv_app:s0:c227,c256,c512,c768 tcontext=u:object_r:device:s0 tclass=chr_file permissive=1</span><br></pre></td></tr></table></figure>
 <p>关闭<code>SELinux</code>后，成功调用驱动。</p>
 <p>添加<code>allow</code>规则，调用仍失败，查阅资料得知需要设置为<code>mlstrustedsubject</code>。</p>
 <p>最终基于<code>magiskpolicy</code>，实现了自定义<code>SELinux</code>规则的添加。</p>
-<p>PS：笔者将apk放到了<code>system/priv-app</code>目录下，所以<code>role</code>是<code>priv_app</code>。</p>
+<p>PS：笔者将apk放到了<code>system/priv-app</code>目录下，所以<code>role</code>是<code>priv_app</code>，而非<code>untrusted_app</code>。</p>
 <span id="more"></span>
 <h2 id="手动添加规则"><a href="#手动添加规则" class="headerlink" title="手动添加规则"></a>手动添加规则</h2><h3 id="方法一：sepolicy-rule"><a href="#方法一：sepolicy-rule" class="headerlink" title="方法一：sepolicy.rule"></a>方法一：sepolicy.rule</h3><p>创建一个<code>Magisk</code>模块，放入<code>sepolicy.rule</code>，将其解压到<code>$MODPATH</code>。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">allow priv_app device chr_file &#123; read write ioctl open getattr &#125;</span><br><span class="line">attradd priv_app mlstrustedsubject</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">allow priv_app device chr_file &#123; read write ioctl open getattr map &#125;</span><br><span class="line">attradd priv_app mlstrustedsubject</span><br></pre></td></tr></table></figure>
 <h3 id="方法二：命令行"><a href="#方法二：命令行" class="headerlink" title="方法二：命令行"></a>方法二：命令行</h3><p>手动执行，或在<code>Magisk</code>模块的<code>post-fs-data.sh</code>中添加以下命令</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">magiskpolicy --live &quot;allow priv_app device chr_file &#123; read write ioctl open getattr &#125;&quot;</span><br><span class="line">magiskpolicy --live &quot;attradd priv_app mlstrustedsubject&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">magiskpolicy --live &quot;allow priv_app device chr_file &#123; read write ioctl open getattr map &#125;&quot;</span><br><span class="line">magiskpolicy --live &quot;attradd priv_app mlstrustedsubject&quot;</span><br></pre></td></tr></table></figure>
+
+<h4 id="untrusted-app"><a href="#untrusted-app" class="headerlink" title="untrusted_app"></a>untrusted_app</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">magiskpolicy --live &quot;allow untrusted_app device chr_file &#123; read write ioctl open getattr map &#125;&quot;</span><br><span class="line">magiskpolicy --live &quot;attradd untrusted_app mlstrustedsubject&quot;</span><br></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.jianshu.com/p/806a055b50b3">AOSP 8.1 新增/dev设备节点 Selinux的权限设置</a><br><a href="https://www.likecs.com/show-305821532.html">Android/SELinux 添加 AVC 权限</a><br><a href="https://www.jianshu.com/p/9374e4421d38">SELinux 添加一个权限</a><br><a href="https://github.com/Magisk-Modules-Repo/vold-posix/blob/master/common/post-fs-data.sh">vold-posix_post-fs-data.sh</a></p>
 ]]></content>
       <tags>
         <tag>经验</tag>
         <tag>Android</tag>
+        <tag>Kernel</tag>
       </tags>
   </entry>
   <entry>
@@ -13022,6 +13025,29 @@
       <tags>
         <tag>Android</tag>
         <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>修复内核驱动 mmap 4K对齐问题</title>
+    <url>/2022/05/07/mmap-page-4k-align/</url>
+    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>编写内核驱动，使用<code>mmap</code>共享内存。发现读取到的数据不对。<br>联想到<code>mmap</code>的<code>length</code>会自动调整为<code>PAGE_SIZE</code>的倍数，猜测是因为<code>mmap</code>返回的是对应<code>page</code>的起始地址，导致存在偏移。</p>
+<p>修复方式：初始化时，单独申请一块大小为<code>PAGE_SIZE</code>的内存，不使用数组。<br>并调用<code>SetPageReserved</code>，保留该页。</p>
+<span id="more"></span>
+<h2 id="问题代码"><a href="#问题代码" class="headerlink" title="问题代码"></a>问题代码</h2><h3 id="内核驱动"><a href="#内核驱动" class="headerlink" title="内核驱动"></a>内核驱动</h3><h4 id="结构体"><a href="#结构体" class="headerlink" title="结构体"></a>结构体</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ShareData</span>&#123;</span></span><br><span class="line"><span class="keyword">bool</span> isCompleted;</span><br><span class="line"><span class="keyword">int</span> data[<span class="number">20</span>];</span><br><span class="line">&#125;</span><br><span class="line">ShareData * g_ShareData;</span><br></pre></td></tr></table></figure>
+<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">g_ShareData = <span class="built_in">kmalloc</span>(<span class="built_in"><span class="keyword">sizeof</span></span>(struct ShareData), GFP_KERNEL);</span><br></pre></td></tr></table></figure>
+<h4 id="mmap"><a href="#mmap" class="headerlink" title="mmap"></a>mmap</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="built_in">remap_pfn_range</span>(vma, vma-&gt;vm_start, <span class="built_in">virt_to_phys</span>(g_ShareData-&gt;data) &gt;&gt; PAGE_SHIFT,</span><br><span class="line">vma-&gt;vm_end - vma-&gt;vm_start, vma-&gt;vm_page_prot)) &#123;</span><br><span class="line">    <span class="keyword">return</span>  -EAGAIN;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="应用层"><a href="#应用层" class="headerlink" title="应用层"></a>应用层</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">(<span class="keyword">int</span> *) data_mapped = (<span class="keyword">int</span> *)<span class="built_in">mmap</span>(<span class="number">0</span>, <span class="number">4096</span>, PROT_READ | PROT_WRITE, MAP_SHARED, fd, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>计算偏移值：<code>offset = (uint64_t)g_ShareData-&gt;data % PAGE_SIZE</code></p>
+<p>加上该偏移值后，读取<code>data_mapped + offset/4</code>，发现确实是要读取的数据。</p>
+<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><h4 id="结构体-1"><a href="#结构体-1" class="headerlink" title="结构体"></a>结构体</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ShareData</span>&#123;</span></span><br><span class="line"><span class="keyword">bool</span> isCompleted;</span><br><span class="line"><span class="keyword">int</span>* data;</span><br><span class="line">&#125;</span><br><span class="line">ShareData * g_ShareData;</span><br></pre></td></tr></table></figure>
+<h4 id="初始化-1"><a href="#初始化-1" class="headerlink" title="初始化"></a>初始化</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">g_ShareData = <span class="built_in">kmalloc</span>(<span class="built_in"><span class="keyword">sizeof</span></span>(struct ShareData), GFP_KERNEL);</span><br><span class="line">g_ShareData-&gt;data = <span class="built_in">kmalloc</span>(PAGE_SIZE, GFP_KERNEL);</span><br><span class="line"><span class="built_in">SetPageReserved</span>(<span class="built_in">virt_to_page</span>(g_ShareData-&gt;data));</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/shallnet/article/details/47903163">例说linux内核与应用数据通信（四）：映射设备内核空间到用户态</a><br><a href="https://github.com/jasonblog/note/blob/master/linux_kernel/src/%E4%BE%8B%E8%AA%AA%E6%A0%B8%E5%BF%83%E5%B1%A4%E8%88%87%E4%BD%BF%E7%94%A8%E5%B1%A4%E9%80%9A%E8%A8%8A/4_memdev/drv/chr_memdev.c">例說核心層與使用層通訊/4_memdev/drv/chr_memdev.c</a><br><a href="https://github.com/jasonblog/note/blob/master/blog/jin-yang.github.com/examples/examples/linux/memory/mmap/kernel/hello.c">linux/memory/mmap/kernel/hello.c</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>Linux</tag>
+        <tag>Kernel</tag>
       </tags>
   </entry>
 </search>

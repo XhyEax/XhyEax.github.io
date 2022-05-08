@@ -196,6 +196,72 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/07/mmap-page-4k-align/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/07/mmap-page-4k-align/" class="post-title-link" itemprop="url">修复内核驱动 mmap 4K对齐问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-07 14:00:00" itemprop="dateCreated datePublished" datetime="2022-05-07T14:00:00+08:00">2022-05-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>编写内核驱动，使用<code>mmap</code>共享内存。发现读取到的数据不对。<br>联想到<code>mmap</code>的<code>length</code>会自动调整为<code>PAGE_SIZE</code>的倍数，猜测是因为<code>mmap</code>返回的是对应<code>page</code>的起始地址，导致存在偏移。</p>
+<p>修复方式：初始化时，单独申请一块大小为<code>PAGE_SIZE</code>的内存，不使用数组。<br>并调用<code>SetPageReserved</code>，保留该页。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/05/07/mmap-page-4k-align/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/06/curl-openssl-bypass/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -372,12 +438,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>使用<code>insmod</code>安装内核模块后，在<code>app</code>的<code>Native</code>层访问驱动，提示<code>Permission Denied</code>。<br>设置驱动权限，绕过<code>DAC</code>权限检查：<code>chmod 666 /dev/helloworld</code>。<br>再次调用，仍然失败，观察到<code>SELinux</code>日志输出。</p>
+          <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>使用<code>insmod</code>安装内核模块后，在<code>app</code>的<code>Native</code>层访问驱动，提示<code>Permission Denied</code>。<br>设置驱动权限，绕过<code>DAC</code>权限检查：<code>chmod 666 /dev/helloworld</code>。<br>再次调用，仍然失败。<br>执行<code>dmesg -w | grep &quot;avc: denied&quot;</code>，查看<code>SELinux</code>日志。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[23292:logd.auditd]type=1400 audit(1651503112.740:5320): avc: denied &#123; read write &#125; for comm=&quot;exp.hellokernel&quot; name=&quot;helloworld&quot; dev=&quot;tmpfs&quot; ino=297747 scontext=u:r:priv_app:s0:c227,c256,c512,c768 tcontext=u:object_r:device:s0 tclass=chr_file permissive=1</span><br></pre></td></tr></table></figure>
 <p>关闭<code>SELinux</code>后，成功调用驱动。</p>
 <p>添加<code>allow</code>规则，调用仍失败，查阅资料得知需要设置为<code>mlstrustedsubject</code>。</p>
 <p>最终基于<code>magiskpolicy</code>，实现了自定义<code>SELinux</code>规则的添加。</p>
-<p>PS：笔者将apk放到了<code>system/priv-app</code>目录下，所以<code>role</code>是<code>priv_app</code>。</p>
+<p>PS：笔者将apk放到了<code>system/priv-app</code>目录下，所以<code>role</code>是<code>priv_app</code>，而非<code>untrusted_app</code>。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2022/05/03/app-access-device-by-selinux-rule/#more" rel="contents">
@@ -923,71 +989,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/07/vscode-sort-by-time/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/07/vscode-sort-by-time/" class="post-title-link" itemprop="url">VSCode 按时间排序</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-07 13:36:25" itemprop="dateCreated datePublished" datetime="2021-12-07T13:36:25+08:00">2021-12-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p><code>VSCode</code>只能配置按更改时间排序，不能按创建时间排序</p>
-<p>目前笔者的解决方案是：通过python调用系统API，把文件的创建时间赋值给更改时间（不使用git的话，会丢失文件本身的修改时间）</p>
-<h2 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h2><h3 id="法1-手动设置"><a href="#法1-手动设置" class="headerlink" title="法1 手动设置"></a>法1 手动设置</h3><p><code>设置</code>，搜索<code>sortOrder</code>，修改<code>Explorer: Sort Order</code></p>
-<h3 id="法2-配置文件"><a href="#法2-配置文件" class="headerlink" title="法2 配置文件"></a>法2 配置文件</h3><p>创建<code>.vscode</code>文件夹，增加<code>settings.json</code>：</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;explorer.sortOrder&quot;</span>: <span class="string">&quot;modified&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1055,7 +1060,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">140</span>
+          <span class="site-state-item-count">141</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
