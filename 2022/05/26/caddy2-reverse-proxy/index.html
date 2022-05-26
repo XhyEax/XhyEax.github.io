@@ -20,20 +20,20 @@
     var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="概述笔记本装了win10+Ubuntu18.04双系统，但是两个系统的时间并不同步，相差8小时（正好是时区数）。于是搜索之，找到解决方案 原因Windows 与 Mac&#x2F;Linux 看待系统硬件时间（Hardware Ttime，或称实时时间，即RTC，Real_Time Clock）的方式不同。Windows把计算机硬件时间当作本地时间(local time)，所以在Windows系统中显示的时">
+  <meta name="description" content="编辑CaddyFilev212345https:&#x2F;&#x2F;bd.xxx.com &amp;#123;	reverse_proxy https:&#x2F;&#x2F;www.baidu.com &amp;#123;		header_up Host &amp;#123;http.reverse_proxy.upstream.hostport&amp;#125;	&amp;#125;&amp;#125; v112345https:&#x2F;&#x2F;bd.xxx.com &amp;#123;gzi">
 <meta property="og:type" content="article">
-<meta property="og:title" content="修复双系统（Win+Linux）时间不同步问题">
-<meta property="og:url" content="https://blog.xhyeax.com/2019/02/16/fix-linux-time/index.html">
+<meta property="og:title" content="caddy2配置反向代理">
+<meta property="og:url" content="https://blog.xhyeax.com/2022/05/26/caddy2-reverse-proxy/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="概述笔记本装了win10+Ubuntu18.04双系统，但是两个系统的时间并不同步，相差8小时（正好是时区数）。于是搜索之，找到解决方案 原因Windows 与 Mac&#x2F;Linux 看待系统硬件时间（Hardware Ttime，或称实时时间，即RTC，Real_Time Clock）的方式不同。Windows把计算机硬件时间当作本地时间(local time)，所以在Windows系统中显示的时">
+<meta property="og:description" content="编辑CaddyFilev212345https:&#x2F;&#x2F;bd.xxx.com &amp;#123;	reverse_proxy https:&#x2F;&#x2F;www.baidu.com &amp;#123;		header_up Host &amp;#123;http.reverse_proxy.upstream.hostport&amp;#125;	&amp;#125;&amp;#125; v112345https:&#x2F;&#x2F;bd.xxx.com &amp;#123;gzi">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2019-02-16T05:54:29.259Z">
-<meta property="article:modified_time" content="2019-02-16T05:54:29.000Z">
+<meta property="article:published_time" content="2022-05-25T22:00:31.000Z">
+<meta property="article:modified_time" content="2022-05-26T06:09:13.773Z">
 <meta property="article:author" content="Xhy">
-<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="经验">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://blog.xhyeax.com/2019/02/16/fix-linux-time/">
+<link rel="canonical" href="https://blog.xhyeax.com/2022/05/26/caddy2-reverse-proxy/">
 
 
 <script id="page-configurations">
@@ -46,7 +46,7 @@
   };
 </script>
 
-  <title>修复双系统（Win+Linux）时间不同步问题 | Xhy's Blog</title>
+  <title>caddy2配置反向代理 | Xhy's Blog</title>
   
 
 
@@ -199,7 +199,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/16/fix-linux-time/">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/26/caddy2-reverse-proxy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -212,7 +212,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          修复双系统（Win+Linux）时间不同步问题
+          caddy2配置反向代理
         </h1>
 
         <div class="post-meta">
@@ -222,7 +222,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-02-16 13:54:29" itemprop="dateCreated datePublished" datetime="2019-02-16T13:54:29+08:00">2019-02-16</time>
+              <time title="创建时间：2022-05-26 06:00:31" itemprop="dateCreated datePublished" datetime="2022-05-26T06:00:31+08:00">2022-05-26</time>
             </span>
 
           
@@ -243,17 +243,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>笔记本装了win10+Ubuntu18.04双系统，但是两个系统的时间并不同步，相差8小时（正好是时区数）。于是搜索之，找到解决方案</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>Windows 与 Mac/Linux 看待系统硬件时间（Hardware Ttime，或称实时时间，即RTC，Real_Time Clock）的方式不同。<br>Windows把计算机硬件时间当作本地时间(local time)，所以在Windows系统中显示的时间跟BIOS中显示的时间是一样的。<br>而Linux/Unix/Mac把计算机硬件时间当作UTC（Universal Time Coordinated，世界统一时间）， 所以在Linux/Unix/Mac系统启动后在该时间的基础上，加上电脑设置的时区数。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>所以只需要使两个系统对待硬件时间的方式一致即可。<br>自然，有两种方法。</p>
-<h3 id="方法1-修改Linux系统"><a href="#方法1-修改Linux系统" class="headerlink" title="方法1 修改Linux系统"></a>方法1 修改Linux系统</h3><p>打开终端，执行<br><code>timedatectl set-local-rtc 1</code><br>禁用Linux系统的UTC时间，重启即可生效（不需要管理员权限）</p>
-<blockquote>
-<p>提示： 在 Ubuntu 16.04 版本以前，关闭UTC的方法是编辑/etc/default/rcS，将UTC=yes改成UTC=no， 但在Ubuntu 16.04使用systemd启动之后，时间改成了由timedatectl来管理</p>
-</blockquote>
-<p>如果时间还是不对，就先在设置里修改系统时间为当前时间（北京时间），然后执行<br><code>timedatectl set-local-rtc 1</code><br>再<br><code>sudo hwclock -w</code><br>写入当前时间到硬件</p>
-<h3 id="方法2-修改Windows系统（不建议）"><a href="#方法2-修改Windows系统（不建议）" class="headerlink" title="方法2 修改Windows系统（不建议）"></a>方法2 修改Windows系统（不建议）</h3><p>Win+X，打开<code>Powershell</code>（管理员），执行<br><code>Reg add HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v RealTimeIsUniversal /t REG_DWORD /d 1</code><br>解释：设置<code>RealTimeIsUniversal</code>键值为1，也就是把RTC当作UTC<br>然而我用这种方法，切换几次系统以后时间往后推了16小时= =<br>所以个人不推荐使用这种方法</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zyqblog/article/details/79318955?utm_source=copy">解决Windows10与Ubuntu16.04双系统时间不一样问题！</a></p>
-
+        <h2 id="编辑CaddyFile"><a href="#编辑CaddyFile" class="headerlink" title="编辑CaddyFile"></a>编辑CaddyFile</h2><h3 id="v2"><a href="#v2" class="headerlink" title="v2"></a>v2</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">https://bd.xxx.com &#123;</span><br><span class="line">	reverse_proxy https://www.baidu.com &#123;</span><br><span class="line">		header_up Host &#123;http.reverse_proxy.upstream.hostport&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="v1"><a href="#v1" class="headerlink" title="v1"></a>v1</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">https://bd.xxx.com &#123;</span><br><span class="line">gzip</span><br><span class="line">tls xxx@xxx.xx</span><br><span class="line">proxy / https://www.baidu.com</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -277,7 +268,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/%E7%BB%8F%E9%AA%8C/" rel="tag"># 经验</a>
           </div>
 
         
@@ -286,13 +277,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2019/02/03/friend-ctf/" rel="prev" title="一道同学出的CTF题">
-      <i class="fa fa-chevron-left"></i> 一道同学出的CTF题
+    <a href="/2022/05/26/miui-powerkeeper-bypass/" rel="prev" title="使用Xposed实现MIUI 12全局高刷">
+      <i class="fa fa-chevron-left"></i> 使用Xposed实现MIUI 12全局高刷
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/02/16/ida-call-analysis-fail/" rel="next" title="IDA不能F5查看伪代码的解决方法(call analysis failed)">
-      IDA不能F5查看伪代码的解决方法(call analysis failed) <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -351,7 +339,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0"><span class="nav-number">2.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-%E4%BF%AE%E6%94%B9Linux%E7%B3%BB%E7%BB%9F"><span class="nav-number">3.1.</span> <span class="nav-text">方法1 修改Linux系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-%E4%BF%AE%E6%94%B9Windows%E7%B3%BB%E7%BB%9F%EF%BC%88%E4%B8%8D%E5%BB%BA%E8%AE%AE%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">方法2 修改Windows系统（不建议）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%BE%91CaddyFile"><span class="nav-number">1.</span> <span class="nav-text">编辑CaddyFile</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#v2"><span class="nav-number">1.1.</span> <span class="nav-text">v2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#v1"><span class="nav-number">1.2.</span> <span class="nav-text">v1</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

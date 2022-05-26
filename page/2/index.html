@@ -196,6 +196,84 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/04/29/patch-kernel-check-version/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/29/patch-kernel-check-version/" class="post-title-link" itemprop="url">绕过内核模块加载校验 (check_version)</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-29 12:00:28" itemprop="dateCreated datePublished" datetime="2022-04-29T12:00:28+08:00">2022-04-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p><code>Redmi K40 Gaming</code>、<code>MIUI 12.5.8</code></p>
+<h2 id="提取boot-img"><a href="#提取boot-img" class="headerlink" title="提取boot.img"></a>提取boot.img</h2><p>查看文件名：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -al /dev/block/by-name | grep boot</span><br></pre></td></tr></table></figure>
+<p>提取<code>boot.img</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dd if=$(readlink /dev/block/by-name/boot_a) of=/sdcard/boot.img</span><br></pre></td></tr></table></figure>
+<h2 id="提取内核"><a href="#提取内核" class="headerlink" title="提取内核"></a>提取内核</h2><h3 id="法1-PC"><a href="#法1-PC" class="headerlink" title="法1 PC"></a>法1 PC</h3><p>自己编译或者使用<a target="_blank" rel="noopener" href="https://github.com/affggh/magiskbootkitchen">affggh/magiskbootkitchen</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb pull /sdcard/boot.img .</span><br><span class="line">./magiskboot unpack boot.img</span><br></pre></td></tr></table></figure>
+<h3 id="法2-手机"><a href="#法2-手机" class="headerlink" title="法2 手机"></a>法2 手机</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./magiskboot unpack /sdcard/boot.img</span><br></pre></td></tr></table></figure>
+
+<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><p>使用<code>IDA64</code>打开<code>kernel</code>，选择<code>ARM processer</code>、<code>64-Bit</code>。<br>执行Python脚本：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> idc</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, <span class="number">0x100000</span>):</span><br><span class="line">    idc.create_insn(i)</span><br></pre></td></tr></table></figure>
+<p>然后等待<code>IDA</code>分析结束。</p>
+<h2 id="定位check-version"><a href="#定位check-version" class="headerlink" title="定位check_version"></a>定位check_version</h2><p>使用<code>010Editor</code>搜索字符串<code>disagrees about version of symbol</code>，复制地址。<br>在<code>IDA64</code>中查看交叉引用，定位到的函数即为<code>check_version</code></p>
+<h2 id="Patch"><a href="#Patch" class="headerlink" title="Patch"></a>Patch</h2><p>将函数体的第一个跳转Patch为B指令。然后F5，查看返回值是否为1。</p>
+<p>例如：<br><code>CBZ X2, loc_FB8A8</code><br>Patch为：<br><code>B loc_FB8A8</code></p>
+<p>相关代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ROM:00000000000FB8A8                               loc_FB8A8                               ; CODE XREF: sub_FB804+14↑j</span><br><span class="line">ROM:00000000000FB8A8 35 00 80 52                   MOV             W21, #1</span><br><span class="line">ROM:00000000000FB8AC 0A 00 00 14                   B               loc_FB8D4</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ROM:00000000000FB8D4                               loc_FB8D4                               ; CODE XREF: sub_FB804+74↑j</span><br><span class="line">ROM:00000000000FB8D4                                                                       ; sub_FB804+90↑j</span><br><span class="line">ROM:00000000000FB8D4                                                                       ; sub_FB804+A8↑j</span><br><span class="line">ROM:00000000000FB8D4 E0 03 15 2A                   MOV             W0, W21</span><br><span class="line">ROM:00000000000FB8D8 F4 4F 43 A9                   LDP             X20, X19, [SP,#0x20+var_s10]</span><br><span class="line">ROM:00000000000FB8DC F6 57 42 A9                   LDP             X22, X21, [SP,#0x20+var_s0]</span><br><span class="line">ROM:00000000000FB8E0 F7 0B 40 F9                   LDR             X23, [SP,#0x20+var_10]</span><br><span class="line">ROM:00000000000FB8E4 FD 7B C4 A8                   LDP             X29, X30, [SP+0x20+var_20],#0x40</span><br><span class="line">ROM:00000000000FB8E8 C0 03 5F D6                   RET</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-271179.htm">绕过Android内核模块加载验证</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/04/28/arm64-syscall-table/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -890,73 +968,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/01/2022-autumn-mobile-security-interview-experience/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/01/2022-autumn-mobile-security-interview-experience/" class="post-title-link" itemprop="url">2022秋招 安全工程师（安卓方向）面经</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-01 14:00:00" itemprop="dateCreated datePublished" datetime="2021-12-01T14:00:00+08:00">2021-12-01</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="认清形势，放弃幻想"><a href="#认清形势，放弃幻想" class="headerlink" title="认清形势，放弃幻想"></a>认清形势，放弃幻想</h2><p>末流985本，计算机科学与技术专业，无国奖，无实习经历。<br>15年开始搞安卓逆向，目前技术一般。</p>
-<p>8.16第一次投简历，8.18第一次面试，9.10第一个意向书，10.15第一个正式offer。</p>
-<p>PS：没有实习经历还是比较吃亏的，建议大三下学期春招找个实习，然后秋招投提前批。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/12/01/2022-autumn-mobile-security-interview-experience/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1028,7 +1039,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">143</span>
+          <span class="site-state-item-count">144</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

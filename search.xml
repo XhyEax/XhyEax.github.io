@@ -914,7 +914,8 @@
   <entry>
     <title>caddy配置反向代理</title>
     <url>/2020/04/11/caddy-reverse-proxy/</url>
-    <content><![CDATA[<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h2 id="解析域名"><a href="#解析域名" class="headerlink" title="解析域名"></a>解析域名</h2><blockquote>
+    <content><![CDATA[<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p><a href="https://blog.xhyeax.com/2022/05/26/caddy2-reverse-proxy/">caddy2配置反向代理</a></p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h2 id="解析域名"><a href="#解析域名" class="headerlink" title="解析域名"></a>解析域名</h2><blockquote>
 <p>申请SSL证书前，请务必提前解析好域名记录(解析后最好等一会，以全球生效)</p>
 </blockquote>
 <h3 id="申请证书"><a href="#申请证书" class="headerlink" title="申请证书"></a>申请证书</h3><p>此处可使用<code>Caddy</code>自动申请的<code>Let&#39;s Encrypt</code>证书，个人使用的是<code>CloudFlare</code>的免费证书</p>
@@ -13092,6 +13093,15 @@
         <tag>Mono</tag>
         <tag>源码分析</tag>
         <tag>Unity</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>caddy2配置反向代理</title>
+    <url>/2022/05/26/caddy2-reverse-proxy/</url>
+    <content><![CDATA[<h2 id="编辑CaddyFile"><a href="#编辑CaddyFile" class="headerlink" title="编辑CaddyFile"></a>编辑CaddyFile</h2><h3 id="v2"><a href="#v2" class="headerlink" title="v2"></a>v2</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">https://bd.xxx.com &#123;</span><br><span class="line">	reverse_proxy https://www.baidu.com &#123;</span><br><span class="line">		header_up Host &#123;http.reverse_proxy.upstream.hostport&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="v1"><a href="#v1" class="headerlink" title="v1"></a>v1</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">https://bd.xxx.com &#123;</span><br><span class="line">gzip</span><br><span class="line">tls xxx@xxx.xx</span><br><span class="line">proxy / https://www.baidu.com</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>经验</tag>
       </tags>
   </entry>
 </search>
