@@ -2203,7 +2203,7 @@
     <title>使用Frida绕过MIUI 12系统设置倒计时</title>
     <url>/2021/10/02/miui-countdowntimer-bypass/</url>
     <content><![CDATA[<h2 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h2><p>完整项目见<a href="https://github.com/XhyEax/MIUICustom">MIUICustom</a></p>
-<p>注意：该模块仅测试于手机管家 <code>5.4.0</code>及<code>5.6.0</code>，其他版本未测试。</p>
+<p>注意：该模块仅测试于<code>手机管家</code> <code>5.4.0</code>及<code>5.6.0</code>，其他版本未测试。</p>
 <p>如果模块未生效，可自行反编译apk，查找并替换Hook点，自行编译Xposed模块。</p>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>每次修改系统设置（设置通知使用权、允许app安装未知应用、开启无障碍功能等），都会有10秒倒计时，使用起来很不方便。</p>
 <p>于是考虑使用<code>Frida</code>绕过倒计时，并开发<code>Xposed</code>模块。</p>
@@ -2291,6 +2291,9 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">findAndHookMethod(<span class="string">&quot;com.miui.permcenter.privacymanager.d&quot;</span>, lpparam.classLoader, <span class="string">&quot;c&quot;</span>, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        Method mtdA = param.thisObject.getClass().getDeclaredMethod(<span class="string">&quot;a&quot;</span>, <span class="keyword">boolean</span>.class);</span><br><span class="line">        mtdA.invoke(param.thisObject, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.52pojie.cn/thread-675777-1-1.html">MIUI9绕开联网和插卡打开未知来源</a></p>
 ]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
   </entry>
   <entry>
     <title>MIPS冒泡排序 计算机组成原理与设计（第五版）</title>
@@ -13059,6 +13062,36 @@
         <tag>Android</tag>
         <tag>Linux</tag>
         <tag>Kernel</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用Xposed实现MIUI 12全局高刷</title>
+    <url>/2022/05/26/miui-powerkeeper-bypass/</url>
+    <content><![CDATA[<h2 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h2><p>完整项目见<a href="https://github.com/XhyEax/MIUICustom">MIUICustom</a></p>
+<p>注意：该模块仅测试于<code>电池与性能</code> <code>4.2.00</code>，其他版本未测试。</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>即使在设置中将屏幕刷新率设置为120Hz，对于某些应用（如哔哩哔哩）仍锁60帧。<br>通过<code>Xposed</code> Hook <code>DisplayFrameSetting.isFeatureOn</code>，实现全局高刷。</p>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 4.2.00</span></span><br><span class="line">Method mtd_isFeatureOn_4200 = XposedHelpers.findMethodExactIfExists(<span class="string">&quot;com.miui.powerkeeper.statemachine.DisplayFrameSetting&quot;</span>,</span><br><span class="line">        lpparam.classLoader, <span class="string">&quot;isFeatureOn&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (mtd_isFeatureOn_4200 != <span class="keyword">null</span>) &#123;</span><br><span class="line">    XposedBridge.hookMethod(mtd_isFeatureOn_4200, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><p>打开<code>设置</code>-<code>开发者选项</code>-<code>显示刷新频率</code></p>
+<ol>
+<li>打开哔哩哔哩，帧率为60。</li>
+<li>在<code>LSPosed</code>钟对<code>电池与性能</code>启动模块，并强行停止（长按）。</li>
+<li>打开哔哩哔哩，帧率为120。</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.bilibili.com/video/BV18i4y1S7FU">[教程] MIUI 修改 反编译 全局高刷 教程</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Mono RuntimeMethodHandle GetFunctionPointer 源码分析</title>
+    <url>/2022/05/12/mono-runtimemethodhandle-getfunctionpointer-analysis/</url>
+    <content><![CDATA[]]></content>
+      <tags>
+        <tag>Mono</tag>
+        <tag>源码分析</tag>
+        <tag>Unity</tag>
       </tags>
   </entry>
 </search>

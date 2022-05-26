@@ -196,6 +196,132 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/26/miui-powerkeeper-bypass/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/26/miui-powerkeeper-bypass/" class="post-title-link" itemprop="url">使用Xposed实现MIUI 12全局高刷</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-26 04:00:31" itemprop="dateCreated datePublished" datetime="2022-05-26T04:00:31+08:00">2022-05-26</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h2><p>完整项目见<a target="_blank" rel="noopener" href="https://github.com/XhyEax/MIUICustom">MIUICustom</a></p>
+<p>注意：该模块仅测试于<code>电池与性能</code> <code>4.2.00</code>，其他版本未测试。</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>即使在设置中将屏幕刷新率设置为120Hz，对于某些应用（如哔哩哔哩）仍锁60帧。<br>通过<code>Xposed</code> Hook <code>DisplayFrameSetting.isFeatureOn</code>，实现全局高刷。</p>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 4.2.00</span></span><br><span class="line">Method mtd_isFeatureOn_4200 = XposedHelpers.findMethodExactIfExists(<span class="string">&quot;com.miui.powerkeeper.statemachine.DisplayFrameSetting&quot;</span>,</span><br><span class="line">        lpparam.classLoader, <span class="string">&quot;isFeatureOn&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (mtd_isFeatureOn_4200 != <span class="keyword">null</span>) &#123;</span><br><span class="line">    XposedBridge.hookMethod(mtd_isFeatureOn_4200, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><p>打开<code>设置</code>-<code>开发者选项</code>-<code>显示刷新频率</code></p>
+<ol>
+<li>打开哔哩哔哩，帧率为60。</li>
+<li>在<code>LSPosed</code>钟对<code>电池与性能</code>启动模块，并强行停止（长按）。</li>
+<li>打开哔哩哔哩，帧率为120。</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV18i4y1S7FU">[教程] MIUI 修改 反编译 全局高刷 教程</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/12/mono-runtimemethodhandle-getfunctionpointer-analysis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/12/mono-runtimemethodhandle-getfunctionpointer-analysis/" class="post-title-link" itemprop="url">Mono RuntimeMethodHandle GetFunctionPointer 源码分析</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-12 06:01:02" itemprop="dateCreated datePublished" datetime="2022-05-12T06:01:02+08:00">2022-05-12</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/07/mmap-page-4k-align/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -741,254 +867,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/04/28/arm64-syscall-table/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/28/arm64-syscall-table/" class="post-title-link" itemprop="url">ARM64 syscall table</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-28 12:00:28" itemprop="dateCreated datePublished" datetime="2022-04-28T12:00:28+08:00">2022-04-28</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h2><p>Copy From: <a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromiumos/docs/+/HEAD/constants/syscalls.md">ChromiumOS Docs - Linux System Call Table</a><br>Also View: <a target="_blank" rel="noopener" href="https://cs.android.com/android/platform/superproject/+/master:bionic/libc/kernel/uapi/asm-generic/unistd.h">unistd.h - Android Code Search</a></p>
-<h2 id="Calling-Conventions"><a href="#Calling-Conventions" class="headerlink" title="Calling Conventions"></a>Calling Conventions</h2><table>
-<thead>
-<tr>
-<th align="center">arch</th>
-<th align="center">syscall NR</th>
-<th align="center">return</th>
-<th align="center">arg0</th>
-<th align="center">arg1</th>
-<th align="center">arg2</th>
-<th align="center">arg3</th>
-<th align="center">arg4</th>
-<th align="center">arg5</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">arm</td>
-<td align="center">r7</td>
-<td align="center">r0</td>
-<td align="center">r0</td>
-<td align="center">r1</td>
-<td align="center">r2</td>
-<td align="center">r3</td>
-<td align="center">r4</td>
-<td align="center">r5</td>
-</tr>
-<tr>
-<td align="center">arm64</td>
-<td align="center">x8</td>
-<td align="center">x0</td>
-<td align="center">x0</td>
-<td align="center">x1</td>
-<td align="center">x2</td>
-<td align="center">x3</td>
-<td align="center">x4</td>
-<td align="center">x5</td>
-</tr>
-<tr>
-<td align="center">x86</td>
-<td align="center">eax</td>
-<td align="center">eax</td>
-<td align="center">ebx</td>
-<td align="center">ecx</td>
-<td align="center">edx</td>
-<td align="center">esi</td>
-<td align="center">edi</td>
-<td align="center">ebp</td>
-</tr>
-<tr>
-<td align="center">x86_64</td>
-<td align="center">rax</td>
-<td align="center">rax</td>
-<td align="center">rdi</td>
-<td align="center">rsi</td>
-<td align="center">rdx</td>
-<td align="center">r10</td>
-<td align="center">r8</td>
-<td align="center">r9</td>
-</tr>
-</tbody></table>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/04/28/arm64-syscall-table/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/04/28/arm-syscall-table/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/28/arm-syscall-table/" class="post-title-link" itemprop="url">ARM syscall table</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-28 12:00:28" itemprop="dateCreated datePublished" datetime="2022-04-28T12:00:28+08:00">2022-04-28</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h2><p>Copy From: <a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromiumos/docs/+/HEAD/constants/syscalls.md">ChromiumOS Docs - Linux System Call Table</a><br>Also View: <a target="_blank" rel="noopener" href="https://cs.android.com/android/platform/superproject/+/master:bionic/libc/kernel/uapi/asm-generic/unistd.h">unistd.h - Android Code Search</a></p>
-<h2 id="Calling-Conventions"><a href="#Calling-Conventions" class="headerlink" title="Calling Conventions"></a>Calling Conventions</h2><table>
-<thead>
-<tr>
-<th align="center">arch</th>
-<th align="center">syscall NR</th>
-<th align="center">return</th>
-<th align="center">arg0</th>
-<th align="center">arg1</th>
-<th align="center">arg2</th>
-<th align="center">arg3</th>
-<th align="center">arg4</th>
-<th align="center">arg5</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">arm</td>
-<td align="center">r7</td>
-<td align="center">r0</td>
-<td align="center">r0</td>
-<td align="center">r1</td>
-<td align="center">r2</td>
-<td align="center">r3</td>
-<td align="center">r4</td>
-<td align="center">r5</td>
-</tr>
-<tr>
-<td align="center">arm64</td>
-<td align="center">x8</td>
-<td align="center">x0</td>
-<td align="center">x0</td>
-<td align="center">x1</td>
-<td align="center">x2</td>
-<td align="center">x3</td>
-<td align="center">x4</td>
-<td align="center">x5</td>
-</tr>
-<tr>
-<td align="center">x86</td>
-<td align="center">eax</td>
-<td align="center">eax</td>
-<td align="center">ebx</td>
-<td align="center">ecx</td>
-<td align="center">edx</td>
-<td align="center">esi</td>
-<td align="center">edi</td>
-<td align="center">ebp</td>
-</tr>
-<tr>
-<td align="center">x86_64</td>
-<td align="center">rax</td>
-<td align="center">rax</td>
-<td align="center">rdi</td>
-<td align="center">rsi</td>
-<td align="center">rdx</td>
-<td align="center">r10</td>
-<td align="center">r8</td>
-<td align="center">r9</td>
-</tr>
-</tbody></table>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/04/28/arm-syscall-table/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1060,7 +938,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">141</span>
+          <span class="site-state-item-count">143</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

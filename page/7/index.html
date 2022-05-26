@@ -196,6 +196,146 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/07/21/use-attribute-packed-to-disable-align/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/07/21/use-attribute-packed-to-disable-align/" class="post-title-link" itemprop="url">使用__attribute__配置结构体，禁用编译器自动对齐</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-21 09:06:50" itemprop="dateCreated datePublished" datetime="2020-07-21T09:06:50+08:00">2020-07-21</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>结构体声明中加上<code>__attribute__((packed))</code>，可以防止编译器对结构进行字节对齐优化。<br>使用<code>__attribute__((aligned(8)))</code>(8为对齐字节数)，可以强制编译器按指定字节对齐。</p>
+<h2 id="结构体定义"><a href="#结构体定义" class="headerlink" title="结构体定义"></a>结构体定义</h2><h3 id="使用-packed"><a href="#使用-packed" class="headerlink" title="使用 packed"></a>使用 packed</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">    <span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">&#125; __attribute__((packed));</span><br></pre></td></tr></table></figure>
+<p>使用sizeof获取结构体的大小，返回7</p>
+<h3 id="不使用-packed"><a href="#不使用-packed" class="headerlink" title="不使用 packed"></a>不使用 packed</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">	<span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>根据结构体中最长的类型(int)，进行对齐，获取到的结构体大小为8</p>
+<h3 id="指定对齐大小"><a href="#指定对齐大小" class="headerlink" title="指定对齐大小"></a>指定对齐大小</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AlignTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">char</span> a;	 <span class="comment">//1</span></span><br><span class="line">	<span class="keyword">short</span> b; <span class="comment">//2</span></span><br><span class="line">	<span class="keyword">int</span> c;	 <span class="comment">//4</span></span><br><span class="line">    <span class="keyword">int</span> d;	 <span class="comment">//4</span></span><br><span class="line">&#125; __attribute__((<span class="built_in">aligned</span>(<span class="number">8</span>)));</span><br></pre></td></tr></table></figure>
+<p>不使用指定对齐字节时，结构体大小为3*4=12，指定后变为16</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zuiyinian/article/details/81174031">为什么要用 “ <strong>attribute</strong> ((<strong>packed</strong>)) ” 定义结构体</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/swj9099/article/details/96713277"><strong>attribute</strong> 用法</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/17/powershell-add-font/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/17/powershell-add-font/" class="post-title-link" itemprop="url">PowerShell配置主题、字体</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-17 02:15:27" itemprop="dateCreated datePublished" datetime="2020-04-17T02:15:27+08:00">2020-04-17</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="主题安装"><a href="#主题安装" class="headerlink" title="主题安装"></a>主题安装</h2><h3 id="安装模块"><a href="#安装模块" class="headerlink" title="安装模块"></a>安装模块</h3><p>win+x, PowerShell(管理员)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Install-Module posh-git -Force -SkipPublisherCheck</span><br><span class="line">Install-Module oh-my-posh -Force -SkipPublisherCheck</span><br></pre></td></tr></table></figure>
+<h3 id="允许执行脚本"><a href="#允许执行脚本" class="headerlink" title="允许执行脚本"></a>允许执行脚本</h3><p>win+x, PowerShell(管理员)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set-ExecutionPolicy RemoteSigned</span><br></pre></td></tr></table></figure>
+<h3 id="编辑配置文件"><a href="#编辑配置文件" class="headerlink" title="编辑配置文件"></a>编辑配置文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">if (!(Test-Path -Path $PROFILE )) &#123; New-Item -Type File -Path $PROFILE -Force &#125;</span><br><span class="line">notepad $PROFILE</span><br></pre></td></tr></table></figure>
+<p>写入以下内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">chcp 65001</span><br><span class="line">Import-Module posh-git</span><br><span class="line">Import-Module oh-my-posh</span><br><span class="line">Set-PoshPrompt -Theme Paradox</span><br></pre></td></tr></table></figure>
+<p>注意：旧版本<code>oh-my-posh</code>设置主题命令为<code>Set-Theme Paradox</code><br>全部主题见：<a target="_blank" rel="noopener" href="https://github.com/JanDeDobbeleer/oh-my-posh/tree/master/Themes">JanDeDobbeleer/oh-my-posh/Themes</a></p>
+<h2 id="字体安装及切换"><a href="#字体安装及切换" class="headerlink" title="字体安装及切换"></a>字体安装及切换</h2><h3 id="下载字体"><a href="#下载字体" class="headerlink" title="下载字体"></a>下载字体</h3><p>字体可以在这下载：<a target="_blank" rel="noopener" href="https://github.com/powerline/fonts">powerline/fonts</a></p>
+<h3 id="安装字体"><a href="#安装字体" class="headerlink" title="安装字体"></a>安装字体</h3><p>安装<code>for Powerline</code>结尾的字体，以<a target="_blank" rel="noopener" href="https://github.com/powerline/fonts/raw/master/DejaVuSansMono/DejaVu%20Sans%20Mono%20for%20Powerline.ttf">DejaVu Sans Mono for Powerline.ttf</a>为例<br>右键字体文件，为所有用户安装</p>
+<h3 id="应用字体"><a href="#应用字体" class="headerlink" title="应用字体"></a>应用字体</h3><p>重新打开PowerShell，右键标题栏，在<code>属性-字体</code>中修改字体<br>PS：如果没有已安装的字体，先执行<code>chcp 65001</code>再试</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>重新打开PowerShell，观察默认字体是否发生变化</p>
+<h2 id="安装PSReadLine（可选）"><a href="#安装PSReadLine（可选）" class="headerlink" title="安装PSReadLine（可选）"></a>安装PSReadLine（可选）</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Install-Module -Name PSReadLine -Force -SkipPublisherCheck</span><br></pre></td></tr></table></figure>
+<p><code>notepad $PROFILE</code>，添加：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Set-PSReadlineOption -EditMode Emacs</span><br></pre></td></tr></table></figure>
+<p>双击Tab会出现智能提示：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/powershell_readline.png"><br>参考：<a target="_blank" rel="noopener" href="https://www.pstips.net/let-psreadline-light-ps-console.html">PSReadLine让PowerShell控制台高亮起来</a></p>
+<h2 id="配置cmd默认活动代码页编号（可选）"><a href="#配置cmd默认活动代码页编号（可选）" class="headerlink" title="配置cmd默认活动代码页编号（可选）"></a>配置cmd默认活动代码页编号（可选）</h2><p>注意：配置后将导致无法执行bat脚本<br>win+r,<code>regedit</code><br>定位到<code>计算机\HKEY_CURRENT_USER\Console\%SystemRoot%_system32_cmd.exe</code><br>修改<code>CodePage</code>字段为65001(10进制)<br>之后启动cmd即可切换字体</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_30646315/article/details/95469049">Powershell 主题美化学习过程</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/51901035">超酷的 PowerShell 美化指南</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44490152/article/details/113854767">Windows Terminal + oh-my-posh模块美化官方教程集锦以及常见问题（问题收集中）</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -709,144 +849,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/wsl-18-04-android-6-source/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/14/wsl-18-04-android-6-source/" class="post-title-link" itemprop="url">WSL(Ubuntu 18.04)编译安卓6.0.0_r1源码</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-14 09:54:23" itemprop="dateCreated datePublished" datetime="2020-04-14T09:54:23+08:00">2020-04-14</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="之前的尝试"><a href="#之前的尝试" class="headerlink" title="之前的尝试"></a>之前的尝试</h2><p>一开始使用wsl1进行编译，即使用了ccache，编译耗时仍难以接受（编译了很久都没结束）<br>之后又使用wsl2进行编译，编译还是需要很久<br>原因猜测：源码位于D盘，wsl访问文件可能需要经过转换，因此IO操作速度慢。<br>搜索发现<a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-ux-changes">WSL 1 与 WSL 2 之间的用户体验更改</a>中提到：</p>
-<blockquote>
-<p>请确保将你要使用 Linux 应用程序频繁访问的文件放在 Linux 根文件系统中，以享受文件性能优势。 这些文件必须位于 Linux 根文件系统内，以便较快地访问文件系统。<br>验证：使用wsl在d盘解压源码，速度远慢于直接在wsl文件系统中解压<br>由此确定最终方案</p>
-</blockquote>
-<h2 id="最终方案"><a href="#最终方案" class="headerlink" title="最终方案"></a>最终方案</h2><p>将源码压缩包移动到linux文件系统下，再解压<br>或者使用repo工具下载源码到linux文件系统</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/14/wsl-18-04-android-6-source/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2020/04/14/wsl-adb/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/14/wsl-adb/" class="post-title-link" itemprop="url">WSL中使用adb</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-14 09:34:07" itemprop="dateCreated datePublished" datetime="2020-04-14T09:34:07+08:00">2020-04-14</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>尝试在wsl中使用adb，发现找不到设备。搜索一番发现是因为adb版本不统一导致的。<br>注意：wsl2中adb无法查询到usb设备，可以通过使用ip地址连接(需要root权限)，或降级到wsl1</p>
-<blockquote>
-<p>在 WSL 2 的初始版本中，将会限制硬件访问支持，例如：你将无法访问 GPU、串行或 USB 设备。<br><a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-faq">WSL2 - 常见问题</a></p>
-</blockquote>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h3 id="Linux安装adb"><a href="#Linux安装adb" class="headerlink" title="Linux安装adb"></a>Linux安装adb</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install android-tools-adb</span><br></pre></td></tr></table></figure>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="查询adb版本"><a href="#查询adb版本" class="headerlink" title="查询adb版本"></a>查询adb版本</h3><p>使用</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb version</span><br></pre></td></tr></table></figure>
-<p>查看adb版本，发现windows是<code>1.0.41</code>，而WSL下是<code>1.0.39</code></p>
-<h3 id="停用adb服务"><a href="#停用adb服务" class="headerlink" title="停用adb服务"></a>停用adb服务</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb kill-server</span><br></pre></td></tr></table></figure>
-<h3 id="统一版本"><a href="#统一版本" class="headerlink" title="统一版本"></a>统一版本</h3><p>个人是把windows的adb文件替换为<code>1.0.39</code>版本，从而实现内外都可使用adb命令。</p>
-<h2 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h2><p><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA">https://pan.baidu.com/s/1j8IKIyiIpVhqrPEKveJAGA</a> 提取码: 2333</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42600072/article/details/103129441"></a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -918,7 +920,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">141</span>
+          <span class="site-state-item-count">143</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

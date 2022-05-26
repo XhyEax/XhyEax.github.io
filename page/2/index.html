@@ -196,6 +196,254 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/04/28/arm64-syscall-table/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/28/arm64-syscall-table/" class="post-title-link" itemprop="url">ARM64 syscall table</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-28 12:00:28" itemprop="dateCreated datePublished" datetime="2022-04-28T12:00:28+08:00">2022-04-28</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h2><p>Copy From: <a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromiumos/docs/+/HEAD/constants/syscalls.md">ChromiumOS Docs - Linux System Call Table</a><br>Also View: <a target="_blank" rel="noopener" href="https://cs.android.com/android/platform/superproject/+/master:bionic/libc/kernel/uapi/asm-generic/unistd.h">unistd.h - Android Code Search</a></p>
+<h2 id="Calling-Conventions"><a href="#Calling-Conventions" class="headerlink" title="Calling Conventions"></a>Calling Conventions</h2><table>
+<thead>
+<tr>
+<th align="center">arch</th>
+<th align="center">syscall NR</th>
+<th align="center">return</th>
+<th align="center">arg0</th>
+<th align="center">arg1</th>
+<th align="center">arg2</th>
+<th align="center">arg3</th>
+<th align="center">arg4</th>
+<th align="center">arg5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">arm</td>
+<td align="center">r7</td>
+<td align="center">r0</td>
+<td align="center">r0</td>
+<td align="center">r1</td>
+<td align="center">r2</td>
+<td align="center">r3</td>
+<td align="center">r4</td>
+<td align="center">r5</td>
+</tr>
+<tr>
+<td align="center">arm64</td>
+<td align="center">x8</td>
+<td align="center">x0</td>
+<td align="center">x0</td>
+<td align="center">x1</td>
+<td align="center">x2</td>
+<td align="center">x3</td>
+<td align="center">x4</td>
+<td align="center">x5</td>
+</tr>
+<tr>
+<td align="center">x86</td>
+<td align="center">eax</td>
+<td align="center">eax</td>
+<td align="center">ebx</td>
+<td align="center">ecx</td>
+<td align="center">edx</td>
+<td align="center">esi</td>
+<td align="center">edi</td>
+<td align="center">ebp</td>
+</tr>
+<tr>
+<td align="center">x86_64</td>
+<td align="center">rax</td>
+<td align="center">rax</td>
+<td align="center">rdi</td>
+<td align="center">rsi</td>
+<td align="center">rdx</td>
+<td align="center">r10</td>
+<td align="center">r8</td>
+<td align="center">r9</td>
+</tr>
+</tbody></table>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/28/arm64-syscall-table/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/04/28/arm-syscall-table/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/28/arm-syscall-table/" class="post-title-link" itemprop="url">ARM syscall table</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-28 12:00:28" itemprop="dateCreated datePublished" datetime="2022-04-28T12:00:28+08:00">2022-04-28</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h2><p>Copy From: <a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromiumos/docs/+/HEAD/constants/syscalls.md">ChromiumOS Docs - Linux System Call Table</a><br>Also View: <a target="_blank" rel="noopener" href="https://cs.android.com/android/platform/superproject/+/master:bionic/libc/kernel/uapi/asm-generic/unistd.h">unistd.h - Android Code Search</a></p>
+<h2 id="Calling-Conventions"><a href="#Calling-Conventions" class="headerlink" title="Calling Conventions"></a>Calling Conventions</h2><table>
+<thead>
+<tr>
+<th align="center">arch</th>
+<th align="center">syscall NR</th>
+<th align="center">return</th>
+<th align="center">arg0</th>
+<th align="center">arg1</th>
+<th align="center">arg2</th>
+<th align="center">arg3</th>
+<th align="center">arg4</th>
+<th align="center">arg5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">arm</td>
+<td align="center">r7</td>
+<td align="center">r0</td>
+<td align="center">r0</td>
+<td align="center">r1</td>
+<td align="center">r2</td>
+<td align="center">r3</td>
+<td align="center">r4</td>
+<td align="center">r5</td>
+</tr>
+<tr>
+<td align="center">arm64</td>
+<td align="center">x8</td>
+<td align="center">x0</td>
+<td align="center">x0</td>
+<td align="center">x1</td>
+<td align="center">x2</td>
+<td align="center">x3</td>
+<td align="center">x4</td>
+<td align="center">x5</td>
+</tr>
+<tr>
+<td align="center">x86</td>
+<td align="center">eax</td>
+<td align="center">eax</td>
+<td align="center">ebx</td>
+<td align="center">ecx</td>
+<td align="center">edx</td>
+<td align="center">esi</td>
+<td align="center">edi</td>
+<td align="center">ebp</td>
+</tr>
+<tr>
+<td align="center">x86_64</td>
+<td align="center">rax</td>
+<td align="center">rax</td>
+<td align="center">rdi</td>
+<td align="center">rsi</td>
+<td align="center">rdx</td>
+<td align="center">r10</td>
+<td align="center">r8</td>
+<td align="center">r9</td>
+</tr>
+</tbody></table>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/28/arm-syscall-table/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/07/vscode-sort-by-time/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -709,135 +957,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/12/01/android-studio-install-old-apk-on-android-11/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/01/android-studio-install-old-apk-on-android-11/" class="post-title-link" itemprop="url">修复Android Studio代码修改不生效问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-01 13:47:05" itemprop="dateCreated datePublished" datetime="2021-12-01T13:47:05+08:00">2021-12-01</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>重新编译<code>Xposed</code>模块并点击<code>Run</code>安装后，修改不生效。卸载重装后才生效。</p>
-<h2 id="尝试"><a href="#尝试" class="headerlink" title="尝试"></a>尝试</h2><p>尝试修改<code>build.gradle</code>中的<code>versionCode</code>，发现修改代码生效了，于是有了这篇<a href="https://blog.xhyeax.com/2021/10/07/gradle-auto-version-code/">Gradle配置版本号自动增加</a>。（不符合编译习惯，<del>喜欢刷版本号的除外</del>）</p>
-<p>今天发现手动<code>Generate Signed APK</code>，然后使用<code>adb install</code>安装，修改也生效了。（太麻烦）</p>
-<p>猜测是因为<code>versionCode</code>没变，ART运行了<code>dex2oat</code>优化后的旧代码。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>修改启动配置，设置使用<code>package manager</code>安装：</p>
-<p><code>Run / Debug Configurations</code> - <code>General</code> - <code>Always install with package manager (disable deploy optimization on Android 11 and later)</code></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/11/28/arm-v7-a-r-m/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/11/28/arm-v7-a-r-m/" class="post-title-link" itemprop="url">armv7 A R M版本区别</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-11-28 08:25:38" itemprop="dateCreated datePublished" datetime="2021-11-28T08:25:38+08:00">2021-11-28</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h2><p><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/ddi0406/latest/">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
-<p><code>A1.3 Architecture versions, profiles, and variants</code></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/11/28/arm-v7-a-r-m/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -909,7 +1028,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">141</span>
+          <span class="site-state-item-count">143</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

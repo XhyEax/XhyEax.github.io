@@ -196,6 +196,136 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/15/magisk-set-debuggable/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/09/15/magisk-set-debuggable/" class="post-title-link" itemprop="url">使用Magisk指令修改 ro.debuggable（不刷机）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-15 07:18:00" itemprop="dateCreated datePublished" datetime="2019-09-15T07:18:00+08:00">2019-09-15</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><h3 id="使用magisk指令修改："><a href="#使用magisk指令修改：" class="headerlink" title="使用magisk指令修改："></a>使用magisk指令修改：</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">magisk resetprop ro.debuggable 1</span><br><span class="line">stop;start;</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.renyiwei.com/archives/1704.html">Android修改ro.debuggable 华为真机adb调试所有进程</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/14/latex-to-word-in-mathml/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/09/14/latex-to-word-in-mathml/" class="post-title-link" itemprop="url">LaTeX公式复制到Word中显示</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-14 14:27:50" itemprop="dateCreated datePublished" datetime="2019-09-14T14:27:50+08:00">2019-09-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>Word是可以直接使用<code>LaTeX</code>公式的，本文适用于已经使用<code>LaTeX</code>写好的论文。<br>方法：插入-公式-插入新公式，然后点击设计，选择<code>LaTeX</code>。</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><code>LaTeX</code>公式直接复制到word的公式编辑中效果可能不太好，而且不太方便。<br>这里通过<code>MathML</code>作为中间格式进行转换。</p>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><h2 id="文件转换（建议使用）"><a href="#文件转换（建议使用）" class="headerlink" title="文件转换（建议使用）"></a>文件转换（建议使用）</h2><h3 id="文件转换工具pandoc"><a href="#文件转换工具pandoc" class="headerlink" title="文件转换工具pandoc"></a><a target="_blank" rel="noopener" href="https://pandoc.org/">文件转换工具pandoc</a></h3><p>该工具能把tex文件整体转换为docx文件，执行以下命令（homework自行替换）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pandoc homework.tex -o homework.docx</span><br></pre></td></tr></table></figure>
+
+<h2 id="公式转换为MathML"><a href="#公式转换为MathML" class="headerlink" title="公式转换为MathML"></a>公式转换为MathML</h2><p>以$\bar{x}$为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\bar&#123;x&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="latex、MathML在线互转"><a href="#latex、MathML在线互转" class="headerlink" title="latex、MathML在线互转"></a><a target="_blank" rel="noopener" href="https://johnmacfarlane.net/texmath">latex、MathML在线互转</a></h3><p>结果为</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">math</span> <span class="attr">display</span>=<span class="string">&quot;block&quot;</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.w3.org/1998/Math/MathML&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">mover</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mi</span>&gt;</span>x<span class="tag">&lt;/<span class="name">mi</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mo</span> <span class="attr">accent</span>=<span class="string">&quot;true&quot;</span>&gt;</span>‾<span class="tag">&lt;/<span class="name">mo</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">mover</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">math</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="使用MathJax转换"><a href="#使用MathJax转换" class="headerlink" title="使用MathJax转换"></a>使用MathJax转换</h3><p>同样打开<a target="_blank" rel="noopener" href="https://johnmacfarlane.net/texmath">texmath demo</a><br>右键顶部的公式，<code>Show Math As</code>，选择<code>MathML</code>即可<br>结果为</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">math</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.w3.org/1998/Math/MathML&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">mrow</span> <span class="attr">class</span>=<span class="string">&quot;MJX-TeXAtom-ORD&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mover</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">mi</span>&gt;</span>x<span class="tag">&lt;/<span class="name">mi</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">mo</span> <span class="attr">stretchy</span>=<span class="string">&quot;false&quot;</span>&gt;</span><span class="symbol">&amp;#x00AF;</span><span class="comment">&lt;!-- ¯ --&gt;</span><span class="tag">&lt;/<span class="name">mo</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">mover</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">mrow</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">math</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="在word中以纯文本形式粘贴"><a href="#在word中以纯文本形式粘贴" class="headerlink" title="在word中以纯文本形式粘贴"></a>在word中以纯文本形式粘贴</h3><p>enjoy it.</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/66ed4c8edfd4">公式图片转latex神器Mathpix以及latex公式与word公式的相互转换</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/09/14/vscode-latex/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -714,145 +844,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/05/07/cpp-template-class-cout-overload/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/05/07/cpp-template-class-cout-overload/" class="post-title-link" itemprop="url">C++中模板类的输出流重载</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-05-07 15:05:54" itemprop="dateCreated datePublished" datetime="2019-05-07T15:05:54+08:00">2019-05-07</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在模板类中使用输出流重载发现报错，g++提示</p>
-<blockquote>
-<p>warning: friend declaration ‘std::ostream&amp; operator&lt;&lt;(std::ostream&amp;, const A<T>&amp;)’ declares a non-template function<br>note: (if this is not what you intended, make sure the function template has already been declared and add &lt;&gt; after the function name here)<br>增加&lt;&gt;后依旧报错，遂百度之，解决。</p>
-</blockquote>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><blockquote>
-<p>定义的友元函数还是一个模版，要实例化为参数变元后才能使用。也就是说，即使上面的友元看起来像函数定义，但是若没有经过参数化，编译器就不会生成该函数的代码<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/autosar/archive/2011/10/29/2228674.html">关于操作符的友元模版函数重载</a><br>个人理解是由于友元函数还没有给出声明（或者说是定义），编译器识别不出来。所以可以在类之前预先声明，而又因为该函数使用了类名，所以类名也要预先声明。</p>
-</blockquote>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h3 id="1-在类内部加上友元函数体（不推荐）"><a href="#1-在类内部加上友元函数体（不推荐）" class="headerlink" title="1.在类内部加上友元函数体（不推荐）"></a>1.在类内部加上友元函数体（不推荐）</h3><h3 id="2-在类的定义之前对类和友元函数进行预声明，并在内部加上-lt-gt"><a href="#2-在类的定义之前对类和友元函数进行预声明，并在内部加上-lt-gt" class="headerlink" title="2.在类的定义之前对类和友元函数进行预声明，并在内部加上&lt;&gt;"></a>2.在类的定义之前对类和友元函数进行预声明，并在内部加上&lt;&gt;</h3><p>即在类定义前加上如下代码：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="class"><span class="keyword">class</span> <span class="title">A</span>;</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; ostream &amp;<span class="keyword">operator</span>&lt;&lt; (ostream &amp;out, <span class="keyword">const</span> A&lt;T&gt; &amp;a);</span><br></pre></td></tr></table></figure>
-<p>在类定义中给输出流重载函数加上&lt;&gt;：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">friend</span> ostream &amp;<span class="keyword">operator</span>&lt;&lt; &lt;&gt;(ostream &amp;, <span class="keyword">const</span> A&lt;T&gt; &amp;);</span><br></pre></td></tr></table></figure>
-<h4 id="注意：重载函数定义时不需要加上-lt-gt"><a href="#注意：重载函数定义时不需要加上-lt-gt" class="headerlink" title="注意：重载函数定义时不需要加上&lt;&gt;"></a>注意：重载函数定义时不需要加上&lt;&gt;</h4><p>与其他友元函数定义类似：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">ostream &amp;<span class="keyword">operator</span>&lt;&lt; (ostream &amp;out, <span class="keyword">const</span> A&lt;T&gt; &amp;a)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		out &lt;&lt; a[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> out;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h3 id="3-在类中再使用一次模板（自用）"><a href="#3-在类中再使用一次模板（自用）" class="headerlink" title="3.在类中再使用一次模板（自用）"></a>3.在类中再使用一次模板（自用）</h3><p>参考<a target="_blank" rel="noopener" href="https://www.cnblogs.com/autosar/archive/2011/10/29/2228674.html">关于操作符的友元模版函数重载</a><br>直接修改类定义中的输出流重载函数为：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1&gt;</span><br><span class="line">    <span class="keyword">friend</span> ostream &amp;<span class="keyword">operator</span>&lt;&lt;(ostream &amp;, <span class="keyword">const</span> A&lt;T1&gt; &amp;);</span><br></pre></td></tr></table></figure>
-<p>重载函数定义不需要修改为T1（当然改也行）</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/larryzeal/p/5664418.html">C++ 模板类友元之输出流操作符重载</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/autosar/archive/2011/10/29/2228674.html">关于操作符的友元模版函数重载</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/05/01/cpp-class-member-func-ptr/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/05/01/cpp-class-member-func-ptr/" class="post-title-link" itemprop="url">C++中类的成员函数的函数指针</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-05-01 06:38:44" itemprop="dateCreated datePublished" datetime="2019-05-01T06:38:44+08:00">2019-05-01</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="获取指针"><a href="#获取指针" class="headerlink" title="获取指针"></a>获取指针</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">staticmember</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;static&quot;</span> &lt;&lt; endl; &#125;	 <span class="comment">//static member</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">nonstatic</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;nonstatic&quot;</span> &lt;&lt; endl; &#125;			 <span class="comment">//nonstatic member</span></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">virtualmember</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;virtual&quot;</span> &lt;&lt; endl; &#125;; <span class="comment">//virtual member</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	A a;</span><br><span class="line">	<span class="comment">//static成员函数,取得的是该函数在内存中的实际地址，而且因为static成员是全局的，所以不能用A::限定符</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (*ptrstatic)() = &amp;A::staticmember;</span><br><span class="line">	<span class="comment">//nonstatic成员函数 取得的是该函数在内存中的实际地址</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (A::*ptrnonstatic)() = &amp;A::nonstatic;</span><br><span class="line">	<span class="comment">//虚函数取得的是虚函数表中的偏移值，这样可以保证能过指针调用时同样的多态效果</span></span><br><span class="line">	<span class="built_in"><span class="keyword">void</span></span> (A::*ptrvirtual)() = &amp;A::virtualmember;</span><br><span class="line">	<span class="comment">//函数指针的使用方式</span></span><br><span class="line">	<span class="built_in">ptrstatic</span>();</span><br><span class="line">	(a.*ptrnonstatic)();</span><br><span class="line">	(a.*ptrvirtual)();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="在map中使用指针"><a href="#在map中使用指针" class="headerlink" title="在map中使用指针"></a>在map中使用指针</h2><p>直接使用对应类型也是可以的，比如：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">map&lt;string, <span class="keyword">void</span> (A::*)()&gt; zeroParmsFuns;</span><br></pre></td></tr></table></figure>
-<p>不过为了方便起见，还是自定义类型吧</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(A::*func)</span><span class="params">()</span></span>;</span><br><span class="line">map&lt;string, func&gt; zeroParmsFuns;</span><br></pre></td></tr></table></figure>
-<p>使用迭代器来遍历map，funcName是函数名，对应map的key</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">map&lt;string, func&gt;::iterator iter = zeroParmsFuns.<span class="built_in">find</span>(funcName);</span><br><span class="line">       <span class="keyword">if</span> (iter != zeroParmsFuns.<span class="built_in">end</span>())</span><br><span class="line">       &#123;</span><br><span class="line">           (<span class="keyword">this</span>-&gt;*(iter-&gt;second))();</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lidabo/p/3597559.html">C++中怎么获取类的成员函数的函数指针？</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/limedia/p/cxx_class_inner_poiner.html">C++ 类内函数指针的使用的使用</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -924,7 +915,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">141</span>
+          <span class="site-state-item-count">143</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
