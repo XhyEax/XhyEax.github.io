@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="概述脱离Android Studio，使用CMake交叉编译，生成Android ARM可执行文件及公共库。">
+  <meta name="description" content="概述脱离Android Studio，使用CMake交叉编译，生成Android ARM&amp;ARM64可执行文件及公共库。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用CMake交叉编译Android ARM程序">
+<meta property="og:title" content="使用CMake交叉编译Android ARM&amp;ARM64 程序">
 <meta property="og:url" content="https://blog.xhyeax.com/2021/08/22/arm-compile-without-as/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="概述脱离Android Studio，使用CMake交叉编译，生成Android ARM可执行文件及公共库。">
+<meta property="og:description" content="概述脱离Android Studio，使用CMake交叉编译，生成Android ARM&amp;ARM64可执行文件及公共库。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-08-22T07:32:00.000Z">
-<meta property="article:modified_time" content="2021-08-22T15:32:00.000Z">
+<meta property="article:modified_time" content="2022-06-02T12:25:27.734Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta name="twitter:card" content="summary">
@@ -46,7 +46,7 @@
   };
 </script>
 
-  <title>使用CMake交叉编译Android ARM程序 | Xhy's Blog</title>
+  <title>使用CMake交叉编译Android ARM&ARM64 程序 | Xhy's Blog</title>
   
 
 
@@ -212,7 +212,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          使用CMake交叉编译Android ARM程序
+          使用CMake交叉编译Android ARM&ARM64 程序
         </h1>
 
         <div class="post-meta">
@@ -243,15 +243,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>脱离<code>Android Studio</code>，使用<code>CMake</code>交叉编译，生成<code>Android ARM</code>可执行文件及公共库。</p>
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>脱离<code>Android Studio</code>，使用<code>CMake</code>交叉编译，生成<code>Android ARM&amp;ARM64</code>可执行文件及公共库。</p>
 <span id="more"></span>
-<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p><code>CMake 3.10.2</code>、<code>NDK 21.4.7075529</code>（从<code>Android Studio</code>的<code>SDK Manager</code>中下载）<br><code>ABI</code>:<code>armeabi-v7a</code></p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p><code>CMake 3.10.2、3.18.1</code>、<code>NDK 21.4.7075529、22.1.7171670</code>（从<code>Android Studio</code>的<code>SDK Manager</code>中下载）<br><code>ABI</code>:<code>armeabi-v7a</code>、<code>arm64-v8a</code></p>
 <h2 id="CMakeLists-txt"><a href="#CMakeLists-txt" class="headerlink" title="CMakeLists.txt"></a>CMakeLists.txt</h2><h3 id="可执行文件"><a href="#可执行文件" class="headerlink" title="可执行文件"></a>可执行文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION 3.10.2)</span><br><span class="line"></span><br><span class="line">project(victim)</span><br><span class="line"></span><br><span class="line">add_executable(victim victim.cpp)</span><br></pre></td></tr></table></figure>
 
-<h3 id="共享库"><a href="#共享库" class="headerlink" title="共享库"></a>共享库</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION 3.10.2)</span><br><span class="line"></span><br><span class="line">project(inject)</span><br><span class="line"></span><br><span class="line">add_library(inject SHARED inject.cpp)</span><br><span class="line"></span><br><span class="line">target_link_libraries(inject log)</span><br></pre></td></tr></table></figure>
+<h3 id="共享库"><a href="#共享库" class="headerlink" title="共享库"></a>共享库</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION 3.18.1)</span><br><span class="line"></span><br><span class="line">project(inject)</span><br><span class="line"></span><br><span class="line">add_library(inject SHARED inject.cpp)</span><br><span class="line"></span><br><span class="line">target_link_libraries(inject log)</span><br></pre></td></tr></table></figure>
 
-<h2 id="compile-bat"><a href="#compile-bat" class="headerlink" title="compile.bat"></a>compile.bat</h2><p>其中CMake和NDK路径自行修改</p>
-<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span> abi=armeabi-v7a</span><br><span class="line"><span class="built_in">set</span> CMAKE_PATH=D:\AndroidSDK\cmake\<span class="number">3</span>.<span class="number">10</span>.<span class="number">2</span>.<span class="number">4988404</span>\bin</span><br><span class="line"><span class="built_in">set</span> NDK_HOME=D:\AndroidSDK\ndk\<span class="number">21</span>.<span class="number">4</span>.<span class="number">7075529</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> <span class="keyword">exist</span> <span class="variable">%abi%</span> <span class="built_in">md</span> <span class="variable">%abi%</span></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">%abi%</span></span><br><span class="line"></span><br><span class="line"><span class="variable">%CMAKE_PATH%</span>\cmake ^</span><br><span class="line">  -DANDROID_ABI=<span class="variable">%abi%</span> ^</span><br><span class="line">  -DANDROID_NDK=<span class="variable">%NDK_HOME%</span> ^</span><br><span class="line">  -DCMAKE_BUILD_TYPE=Debug ^</span><br><span class="line">  -DCMAKE_TOOLCHAIN_FILE=<span class="variable">%NDK_HOME%</span>/build/cmake/android.toolchain.cmake ^</span><br><span class="line">  -DANDROID_NATIVE_API_LEVEL=<span class="number">16</span> ^</span><br><span class="line">  -DANDROID_TOOLCHAIN=clang -DCMAKE_GENERATOR=&quot;Ninja&quot; ^</span><br><span class="line">  -DCMAKE_MAKE_PROGRAM=<span class="variable">%CMAKE_PATH%</span>/ninja ^</span><br><span class="line">  ..</span><br><span class="line"></span><br><span class="line"><span class="variable">%CMAKE_PATH%</span>/ninja</span><br><span class="line"><span class="built_in">cd</span> ..</span><br><span class="line"><span class="built_in">pause</span></span><br></pre></td></tr></table></figure>
+<h2 id="compile-bat"><a href="#compile-bat" class="headerlink" title="compile.bat"></a>compile.bat</h2><figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span> abi=arm64-v8a</span><br><span class="line"><span class="built_in">set</span> CMAKE_PATH=D:\Tools\AndroidSDK\cmake\<span class="number">3</span>.<span class="number">18</span>.<span class="number">1</span>\bin</span><br><span class="line"><span class="built_in">set</span> NDK_HOME=D:\Tools\AndroidSDK\ndk\<span class="number">21</span>.<span class="number">4</span>.<span class="number">7075529</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> <span class="keyword">exist</span> <span class="variable">%abi%</span> <span class="built_in">md</span> <span class="variable">%abi%</span></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">%abi%</span></span><br><span class="line"><span class="built_in">del</span> /q *.*</span><br><span class="line"></span><br><span class="line"><span class="variable">%CMAKE_PATH%</span>\cmake ^</span><br><span class="line">  -DANDROID_ABI=<span class="variable">%abi%</span> ^</span><br><span class="line">  -DANDROID_NDK=<span class="variable">%NDK_HOME%</span> ^</span><br><span class="line">  -DCMAKE_BUILD_TYPE=Debug ^</span><br><span class="line">  -DCMAKE_TOOLCHAIN_FILE=<span class="variable">%NDK_HOME%</span>/build/cmake/android.toolchain.cmake ^</span><br><span class="line">  -DANDROID_NATIVE_API_LEVEL=<span class="number">16</span> ^</span><br><span class="line">  -DANDROID_TOOLCHAIN=clang -DCMAKE_GENERATOR=&quot;Ninja&quot; ^</span><br><span class="line">  -DCMAKE_MAKE_PROGRAM=<span class="variable">%CMAKE_PATH%</span>/ninja ^</span><br><span class="line">  ..</span><br><span class="line"></span><br><span class="line"><span class="variable">%CMAKE_PATH%</span>/ninja</span><br><span class="line"><span class="built_in">cd</span> ..</span><br><span class="line"><span class="built_in">pause</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-1486586-1-1.html">实现简易安卓inlinehook</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/lljjyy001/article/details/77866049">脱离AS在windows下使用CMake交叉编译for Android</a></p>
 
@@ -368,7 +367,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">144</span>
+          <span class="site-state-item-count">145</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

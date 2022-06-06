@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Blog of XhyEax">
+  <meta name="description" content="总结最终调用mono_jit_compile_method_with_opt，使用JIT对方法进行编译优化，返回JIT方法指针。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mono RuntimeMethodHandle GetFunctionPointer 源码分析">
 <meta property="og:url" content="https://blog.xhyeax.com/2022/05/12/mono-runtimemethodhandle-getfunctionpointer-analysis/index.html">
 <meta property="og:site_name" content="Xhy&#39;s Blog">
-<meta property="og:description" content="Blog of XhyEax">
+<meta property="og:description" content="总结最终调用mono_jit_compile_method_with_opt，使用JIT对方法进行编译优化，返回JIT方法指针。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-05-11T22:01:02.000Z">
-<meta property="article:modified_time" content="2022-05-12T06:02:59.355Z">
+<meta property="article:modified_time" content="2022-06-06T12:19:22.945Z">
 <meta property="article:author" content="Xhy">
+<meta property="article:tag" content="Unity">
 <meta property="article:tag" content="Mono">
 <meta property="article:tag" content="源码分析">
-<meta property="article:tag" content="Unity">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://blog.xhyeax.com/2022/05/12/mono-runtimemethodhandle-getfunctionpointer-analysis/">
@@ -245,7 +245,27 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>最终调用<code>mono_jit_compile_method_with_opt</code>，使用JIT对方法进行编译优化，返回JIT方法指针。</p>
+<span id="more"></span>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><h3 id="CSharp函数声明"><a href="#CSharp函数声明" class="headerlink" title="CSharp函数声明"></a>CSharp函数声明</h3><p><a target="_blank" rel="noopener" href="https://github.com/mono/mono/blob/5d2e3bc3b3c8184d35b2f7801e88d96470d367c4/mcs/class/corlib/System/RuntimeMethodHandle.cs#L81">RuntimeMethodHandle.cs#L81</a></p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">MethodImpl (MethodImplOptions.InternalCall)</span>]</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">extern</span> IntPtr <span class="title">GetFunctionPointer</span> (<span class="params">IntPtr m</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> IntPtr <span class="title">GetFunctionPointer</span> (<span class="params"></span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> GetFunctionPointer (<span class="keyword">value</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>声明为<code>MethodImplOptions.InternalCall</code></p>
+<h3 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h3><p><a target="_blank" rel="noopener" href="https://github.com/mono/mono/blob/5d2e3bc3b3c8184d35b2f7801e88d96470d367c4/mono/metadata/icall-def-netcore.h#L387">icall-def-netcore.h#L387</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">HANDLES</span>(MHAN_1, <span class="string">&quot;GetFunctionPointer&quot;</span>, ves_icall_RuntimeMethodHandle_GetFunctionPointer, gpointer, <span class="number">1</span>, (MonoMethod_ptr))</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p><a target="_blank" rel="noopener" href="https://github.com/mono/mono/blob/5d2e3bc3b3c8184d35b2f7801e88d96470d367c4/mono/metadata/icall.c#L7768">icall.c#L7768</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">gpointer</span></span><br><span class="line"><span class="function"><span class="title">ves_icall_RuntimeMethodHandle_GetFunctionPointer</span> <span class="params">(MonoMethod *method, MonoError *error)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">mono_compile_method_checked</span> (method, error);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="mono-compile-method-checked"><a href="#mono-compile-method-checked" class="headerlink" title="mono_compile_method_checked"></a>mono_compile_method_checked</h3><h4 id="声明-1"><a href="#声明-1" class="headerlink" title="声明"></a>声明</h4><p><a target="_blank" rel="noopener" href="https://github.com/mono/mono/blob/5d2e3bc3b3c8184d35b2f7801e88d96470d367c4/mono/metadata/object-internals.h#L2128">object-internals.h#L2128</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>* </span></span><br><span class="line"><span class="function"><span class="title">mono_compile_method_checked</span> <span class="params">(MonoMethod *method, MonoError *error)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4 id="实现-1"><a href="#实现-1" class="headerlink" title="实现"></a>实现</h4><p><a target="_blank" rel="noopener" href="https://github.com/mono/mono/blob/5d2e3bc3b3c8184d35b2f7801e88d96470d367c4/mono/metadata/object.c#L797">object.c#L797</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">gpointer</span></span><br><span class="line"><span class="function"><span class="title">mono_compile_method_checked</span> <span class="params">(MonoMethod *method, MonoError *error)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	gpointer res;</span><br><span class="line"></span><br><span class="line">	<span class="function">MONO_REQ_GC_NEUTRAL_MODE</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">	<span class="title">error_init</span> <span class="params">(error)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">g_assert</span> (callbacks.compile_method);</span><br><span class="line">	res = callbacks.<span class="built_in">compile_method</span> (method, error);</span><br><span class="line">	<span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="callbacks-compile-method"><a href="#callbacks-compile-method" class="headerlink" title="callbacks.compile_method"></a>callbacks.compile_method</h3><p><a target="_blank" rel="noopener" href="https://github.com/mono/mono/blob/5d2e3bc3b3c8184d35b2f7801e88d96470d367c4/mono/mini/mini-runtime.c#L4445">mini-runtime.c#L4445</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> JIT_TRAMPOLINES_WORK</span></span><br><span class="line">	callbacks.compile_method = mono_jit_compile_method;</span><br></pre></td></tr></table></figure>
+
+<h3 id="mono-jit-compile-method"><a href="#mono-jit-compile-method" class="headerlink" title="mono_jit_compile_method"></a>mono_jit_compile_method</h3><p><a target="_blank" rel="noopener" href="https://github.com/mono/mono/blob/5d2e3bc3b3c8184d35b2f7801e88d96470d367c4/mono/mini/mini-runtime.c#L2755">mini-runtime.c#L2755</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">gpointer</span></span><br><span class="line"><span class="function"><span class="title">mono_jit_compile_method</span> <span class="params">(MonoMethod *method, MonoError *error)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	gpointer code;</span><br><span class="line"></span><br><span class="line">	code = <span class="built_in">mono_jit_compile_method_with_opt</span> (method, <span class="built_in">mono_get_optimizations_for_method</span> (method, default_opt), FALSE, error);</span><br><span class="line">	<span class="keyword">return</span> code;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -269,9 +289,9 @@
 
       <footer class="post-footer">
           <div class="post-tags">
+              <a href="/tags/Unity/" rel="tag"># Unity</a>
               <a href="/tags/Mono/" rel="tag"># Mono</a>
               <a href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="tag"># 源码分析</a>
-              <a href="/tags/Unity/" rel="tag"># Unity</a>
           </div>
 
         
@@ -345,6 +365,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BA%90%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">源码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CSharp%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E"><span class="nav-number">2.1.</span> <span class="nav-text">CSharp函数声明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A3%B0%E6%98%8E"><span class="nav-number">2.2.</span> <span class="nav-text">声明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.3.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mono-compile-method-checked"><span class="nav-number">2.4.</span> <span class="nav-text">mono_compile_method_checked</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A3%B0%E6%98%8E-1"><span class="nav-number">2.4.1.</span> <span class="nav-text">声明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0-1"><span class="nav-number">2.4.2.</span> <span class="nav-text">实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#callbacks-compile-method"><span class="nav-number">2.5.</span> <span class="nav-text">callbacks.compile_method</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mono-jit-compile-method"><span class="nav-number">2.6.</span> <span class="nav-text">mono_jit_compile_method</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -360,7 +381,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">144</span>
+          <span class="site-state-item-count">145</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

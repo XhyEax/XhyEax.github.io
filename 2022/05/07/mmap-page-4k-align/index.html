@@ -28,11 +28,11 @@
 <meta property="og:description" content="问题描述编写内核驱动，使用mmap共享内存。发现读取到的数据不对。联想到mmap的length会自动调整为PAGE_SIZE的倍数，猜测是因为mmap返回的是对应page的起始地址，导致存在偏移。 修复方式：初始化时，单独申请一块大小为PAGE_SIZE的内存，不使用数组。并调用SetPageReserved，保留该页。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-05-07T06:00:00.000Z">
-<meta property="article:modified_time" content="2022-05-07T15:23:02.219Z">
+<meta property="article:modified_time" content="2022-05-07T14:00:00.000Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
-<meta property="article:tag" content="Linux">
 <meta property="article:tag" content="Kernel">
+<meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://blog.xhyeax.com/2022/05/07/mmap-page-4k-align/">
@@ -283,8 +283,8 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/Android/" rel="tag"># Android</a>
-              <a href="/tags/Linux/" rel="tag"># Linux</a>
               <a href="/tags/Kernel/" rel="tag"># Kernel</a>
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
           </div>
 
         
@@ -374,7 +374,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">144</span>
+          <span class="site-state-item-count">145</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

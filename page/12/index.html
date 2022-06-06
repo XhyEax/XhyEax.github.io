@@ -196,6 +196,65 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/07/03/cpp_vscode_segmentation_fault_cygwinS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/07/03/cpp_vscode_segmentation_fault_cygwinS/" class="post-title-link" itemprop="url">修复VSCode Segmentation Fault in cygwinS</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-07-03 07:24:04" itemprop="dateCreated datePublished" datetime="2019-07-03T07:24:04+08:00">2019-07-03</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="段错误"><a href="#段错误" class="headerlink" title="段错误"></a>段错误</h2><p>一般来说是因为爆栈了，使用动态数组即可。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/kangyupl/article/details/90723526">VSCODE调试时在cygwin.S中发生段错误</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/05/28/isc-2019-wp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -798,75 +857,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/19/52pojie-2019-red-packet/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/02/19/52pojie-2019-red-packet/" class="post-title-link" itemprop="url">2019吾爱破解论坛春节红包四题Writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-02-19 16:00:00" itemprop="dateCreated datePublished" datetime="2019-02-19T16:00:00+08:00">2019-02-19</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>解题方法并不唯一，仅供参考。</p>
-<h2 id="题目打包下载地址"><a href="#题目打包下载地址" class="headerlink" title="题目打包下载地址"></a>题目打包下载地址</h2><p><a target="_blank" rel="noopener" href="https://down.52pojie.cn/Challenge/Happy_New_Year_2019_Challenge.rar">https://down.52pojie.cn/Challenge/Happy_New_Year_2019_Challenge.rar</a></p>
-<h2 id="第一题-签到题"><a href="#第一题-签到题" class="headerlink" title="第一题 签到题"></a>第一题 签到题</h2><p>关注“吾爱破解论坛”公众号，回复指定字符串即可获得本题正确口令和第二题题目下载地址。</p>
-<h2 id="第二题-CrackMe"><a href="#第二题-CrackMe" class="headerlink" title="第二题 CrackMe"></a>第二题 CrackMe</h2><p>（本题我做的时候是无壳的，因为碰巧发现了内测时的题。公测时加了个upx的壳，故需要先脱壳，esp定律即可）<br>（这题用OD其实更方便些，个人习惯用IDA）<br>脱壳后IDA打开，<code>Shift+F12</code>查看字符串，找到关键字符串<code>正确!!!回复你输入的内容到吾爱破解论坛公众号</code><br>按X查看引用，定位到判断代码<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-1.png"><br>按F5查看伪代码<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-2.png"><br>上面有个长度判断，输入字符串长度为16<br>然后下面有个strcmp判断，相等则返回0，不过加了个<code>!</code>就变成相等返回真了</p>
-<p>所以在strcmp下个断点查看寄存器(v2)即可得到密码<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-3.png"></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/02/19/52pojie-2019-red-packet/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -938,7 +928,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">144</span>
+          <span class="site-state-item-count">145</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
