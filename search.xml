@@ -89,21 +89,6 @@
       </tags>
   </entry>
   <entry>
-    <title>2020吾爱破解论坛春节红包前三题 Writeup</title>
-    <url>/2020/01/29/52pojie-2020-red-packet/</url>
-    <content><![CDATA[<p>解题方法并不唯一，仅供参考。</p>
-<h2 id="题目打包下载地址"><a href="#题目打包下载地址" class="headerlink" title="题目打包下载地址"></a>题目打包下载地址</h2><p><a href="https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar">https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar</a></p>
-<h2 id="第一题-送分题"><a href="#第一题-送分题" class="headerlink" title="第一题 送分题"></a>第一题 送分题</h2><p>关注“吾爱破解论坛”微信公众号，回复指定字符串即可获得本题正确口令。</p>
-<h2 id="第二题-Windows-初级题"><a href="#第二题-Windows-初级题" class="headerlink" title="第二题 Windows 初级题"></a>第二题 Windows 初级题</h2><p>使用<code>PEiD</code>查壳，得知该程序是<code>UPX</code>壳，并修改了区段名。于是使用<code>OD</code>脱壳，再用<code>ImportREConstructor</code>修复IAT。<br>再次查壳，得到<code>Borland Delphi v3.0 *</code>。故使用<code>IDR</code>（<a href="https://down.52pojie.cn/Tools/Disassemblers/IDR%20(Interactive%20Delphi%20Reconstructor).rar">爱盘下载地址</a>）进行分析。<br>查看窗体，定位到关键函数<code>TForm1.edtPwdChange</code>：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-1.png"><br>其中对输入字符串进行切片，然后分别进行md5计算，并与以下字符比较：<br><code>E7EE5F4653E31955CACC7CD68E2A7839</code><br><code>ea6b2efbdd4255a9f1b3bbc6399b58f4</code><br><code>c8d46d341bea4fd5bff866a65ff8aea9</code><br>反查md5并拼接即可得到<code>52pojie2019game</code><br>输入进行校验，得到提示：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-2.png"><br>将该字符串回复到公众号即可获得本题正确口令。</p>
-<h2 id="第三题-Android-初级题"><a href="#第三题-Android-初级题" class="headerlink" title="第三题 Android 初级题"></a>第三题 Android 初级题</h2><p>使用<code>AndroidKiller</code>反编译，打开<code>MainActivity.smali</code>，发现<code>checkFlag</code>和<code>onClick</code>方法被nativie化了。<br>于是使用<code>IDA</code>打开<code>libcrack_j2c.so</code>，定位到<code>onClick</code>方法，可以发现是通过JNI反射调用Java方法。由此可以大致分析出程序流程：<br>首先获取输入框文本，对长度进行判断，为30则调用<code>checkFlag</code>方法进行检查<br>在<code>checkFlag</code>方法中，定位到关键位置：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-3.png"><br>由此可知，安装并打开该APP后，输入30位长度的字符串，点击确定就会调用<code>equals</code>方法<br>于是使用<code>Frida</code>进行hook，打印出调用该方法的参数和实例内容，从而得到真码：<br><code>ed61f6308c74bcf35c71729d4db24c</code><br>将该字符串回复到公众号即可获得本题正确口令。<br>Frida脚本如下：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(Java.available)</span><br><span class="line">&#123;</span><br><span class="line">    Java.perform(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">       <span class="keyword">var</span> <span class="built_in">String</span>= Java.use(<span class="string">&#x27;java.lang.String&#x27;</span>);</span><br><span class="line">		<span class="built_in">String</span>.equals.overload(<span class="string">&quot;java.lang.Object&quot;</span>).implementation=<span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="built_in">this</span>.toString());</span><br><span class="line">        <span class="built_in">console</span>.log(obj);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.equals(obj);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="此处应有分割线"><a href="#此处应有分割线" class="headerlink" title="此处应有分割线"></a>此处应有分割线</h2><p>祝各位身体健康，心想事成！</p>
-]]></content>
-      <tags>
-        <tag>CTF</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>送给最好的TA app分析</title>
     <url>/2019/09/27/andlua-app-reverse/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天群里有人传了个apk文件，名字叫<code>送给最好的TA</code>。这是一个整人app，安装并打开会播放一段音频，并循环调节媒体音量，维持最大值。从后台划掉/卸载/关机都可以停止该程序。<br><strong>网传所谓的截图、获取设备信息并上传等行为均不存在。反编译后看到的截图相关代码实际上并没有被调用，只是打包apk时封装进去的类，关键逻辑位于main.lua中。</strong></p>
@@ -168,26 +153,18 @@
       </tags>
   </entry>
   <entry>
-    <title>安卓9 设置热点固定IP (Xposed)</title>
-    <url>/2021/03/01/android-9-set-hotpot-ip/</url>
-    <content><![CDATA[<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p><a href="https://blog.xhyeax.com/2021/12/06/android-10-11-hostpot-set-ip/">安卓10、11 固定Wifi热点IP (Xposed)</a></p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定热点IP。</p>
-<span id="more"></span>
-<h2 id="安卓8热点开启流程"><a href="#安卓8热点开启流程" class="headerlink" title="安卓8热点开启流程"></a>安卓8热点开启流程</h2><p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/softap-android-o.png"><br>图源：<a href="https://blog.csdn.net/AurumMann/article/details/103028026">android8.0热点打开流程，从Setting到framework</a></p>
-<h2 id="跟踪源码"><a href="#跟踪源码" class="headerlink" title="跟踪源码"></a>跟踪源码</h2><p>最终定位到<code>com.android.server.connectivity.tethering.TetherInterfaceStateMachine</code>类（<a href="http://aospxref.com/android-9.0.0_r61/xref/frameworks/base/services/core/java/com/android/server/connectivity/tethering/TetherInterfaceStateMachine.java#210">源代码</a>）</p>
-<p>函数调用链：<code>startIPv4</code>-<code>configureIPv4</code>-<code>getRandomWifiIPv4Address</code></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">configureIPv4</span><span class="params">(<span class="keyword">boolean</span> enabled)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (mInterfaceType == ConnectivityManager.TETHERING_WIFI) &#123;</span><br><span class="line">    ipAsString = getRandomWifiIPv4Address();</span><br><span class="line">    prefixLen = WIFI_HOST_IFACE_PREFIX_LENGTH;</span><br><span class="line">&#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>调用<code>getRandomWifiIPv4Address</code>函数生成主机IP地址后，转换为<code>LinkAddress</code>，最终调用<code>ifcg.setLinkAddress</code>设置IP：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> LinkAddress linkAddr;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">final</span> InterfaceConfiguration ifcg = mNMService.getInterfaceConfig(mIfaceName);</span><br><span class="line">    <span class="keyword">if</span> (ifcg == <span class="keyword">null</span>) &#123;</span><br><span class="line">        mLog.e(<span class="string">&quot;Received null interface config&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    InetAddress addr = NetworkUtils.numericToInetAddress(ipAsString);</span><br><span class="line">    linkAddr = <span class="keyword">new</span> LinkAddress(addr, prefixLen);</span><br><span class="line">    ifcg.setLinkAddress(linkAddr);</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
-
-<p>查找<code>getRandomWifiIPv4Address</code>的交叉引用，发现只有这一处。直接修改返回值，即可固定IP。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>使用Xposed框架Hook该函数（过滤包名android），设置返回值为<code>192.168.43.1</code>即可</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hook</span> <span class="keyword">implements</span> <span class="title">IXposedHookLoadPackage</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String classname = <span class="string">&quot;com.android.server.connectivity.tethering.TetherInterfaceStateMachine&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String methodname = <span class="string">&quot;getRandomWifiIPv4Address&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String WIFI_HOST_IFACE_ADDR = <span class="string">&quot;192.168.43.1&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleLoadPackage</span><span class="params">(XC_LoadPackage.LoadPackageParam lpparam)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (lpparam.packageName.equals(<span class="string">&quot;android&quot;</span>)) &#123;</span><br><span class="line">            Class&lt;?&gt; clz = XposedHelpers.findClass(classname, lpparam.classLoader);</span><br><span class="line"></span><br><span class="line">            findAndHookMethod(clz, methodname, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> </span>&#123;</span><br><span class="line">                    <span class="keyword">return</span> WIFI_HOST_IFACE_ADDR;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://android.stackexchange.com/questions/213514/how-can-i-permanently-change-my-hotspot-tethering-ip-address">How can I permanently change my hotspot tethering IP address?</a></p>
+    <title>2020吾爱破解论坛春节红包前三题 Writeup</title>
+    <url>/2020/01/29/52pojie-2020-red-packet/</url>
+    <content><![CDATA[<p>解题方法并不唯一，仅供参考。</p>
+<h2 id="题目打包下载地址"><a href="#题目打包下载地址" class="headerlink" title="题目打包下载地址"></a>题目打包下载地址</h2><p><a href="https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar">https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar</a></p>
+<h2 id="第一题-送分题"><a href="#第一题-送分题" class="headerlink" title="第一题 送分题"></a>第一题 送分题</h2><p>关注“吾爱破解论坛”微信公众号，回复指定字符串即可获得本题正确口令。</p>
+<h2 id="第二题-Windows-初级题"><a href="#第二题-Windows-初级题" class="headerlink" title="第二题 Windows 初级题"></a>第二题 Windows 初级题</h2><p>使用<code>PEiD</code>查壳，得知该程序是<code>UPX</code>壳，并修改了区段名。于是使用<code>OD</code>脱壳，再用<code>ImportREConstructor</code>修复IAT。<br>再次查壳，得到<code>Borland Delphi v3.0 *</code>。故使用<code>IDR</code>（<a href="https://down.52pojie.cn/Tools/Disassemblers/IDR%20(Interactive%20Delphi%20Reconstructor).rar">爱盘下载地址</a>）进行分析。<br>查看窗体，定位到关键函数<code>TForm1.edtPwdChange</code>：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-1.png"><br>其中对输入字符串进行切片，然后分别进行md5计算，并与以下字符比较：<br><code>E7EE5F4653E31955CACC7CD68E2A7839</code><br><code>ea6b2efbdd4255a9f1b3bbc6399b58f4</code><br><code>c8d46d341bea4fd5bff866a65ff8aea9</code><br>反查md5并拼接即可得到<code>52pojie2019game</code><br>输入进行校验，得到提示：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-2.png"><br>将该字符串回复到公众号即可获得本题正确口令。</p>
+<h2 id="第三题-Android-初级题"><a href="#第三题-Android-初级题" class="headerlink" title="第三题 Android 初级题"></a>第三题 Android 初级题</h2><p>使用<code>AndroidKiller</code>反编译，打开<code>MainActivity.smali</code>，发现<code>checkFlag</code>和<code>onClick</code>方法被nativie化了。<br>于是使用<code>IDA</code>打开<code>libcrack_j2c.so</code>，定位到<code>onClick</code>方法，可以发现是通过JNI反射调用Java方法。由此可以大致分析出程序流程：<br>首先获取输入框文本，对长度进行判断，为30则调用<code>checkFlag</code>方法进行检查<br>在<code>checkFlag</code>方法中，定位到关键位置：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-3.png"><br>由此可知，安装并打开该APP后，输入30位长度的字符串，点击确定就会调用<code>equals</code>方法<br>于是使用<code>Frida</code>进行hook，打印出调用该方法的参数和实例内容，从而得到真码：<br><code>ed61f6308c74bcf35c71729d4db24c</code><br>将该字符串回复到公众号即可获得本题正确口令。<br>Frida脚本如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(Java.available)</span><br><span class="line">&#123;</span><br><span class="line">    Java.perform(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">       <span class="keyword">var</span> <span class="built_in">String</span>= Java.use(<span class="string">&#x27;java.lang.String&#x27;</span>);</span><br><span class="line">		<span class="built_in">String</span>.equals.overload(<span class="string">&quot;java.lang.Object&quot;</span>).implementation=<span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="built_in">this</span>.toString());</span><br><span class="line">        <span class="built_in">console</span>.log(obj);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.equals(obj);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="此处应有分割线"><a href="#此处应有分割线" class="headerlink" title="此处应有分割线"></a>此处应有分割线</h2><p>祝各位身体健康，心想事成！</p>
 ]]></content>
       <tags>
-        <tag>Android</tag>
+        <tag>CTF</tag>
       </tags>
   </entry>
   <entry>
@@ -324,6 +301,29 @@
       </tags>
   </entry>
   <entry>
+    <title>安卓9 设置热点固定IP (Xposed)</title>
+    <url>/2021/03/01/android-9-set-hotpot-ip/</url>
+    <content><![CDATA[<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p><a href="https://blog.xhyeax.com/2021/12/06/android-10-11-hostpot-set-ip/">安卓10、11 固定Wifi热点IP (Xposed)</a></p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定热点IP。</p>
+<span id="more"></span>
+<h2 id="安卓8热点开启流程"><a href="#安卓8热点开启流程" class="headerlink" title="安卓8热点开启流程"></a>安卓8热点开启流程</h2><p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/softap-android-o.png"><br>图源：<a href="https://blog.csdn.net/AurumMann/article/details/103028026">android8.0热点打开流程，从Setting到framework</a></p>
+<h2 id="跟踪源码"><a href="#跟踪源码" class="headerlink" title="跟踪源码"></a>跟踪源码</h2><p>最终定位到<code>com.android.server.connectivity.tethering.TetherInterfaceStateMachine</code>类（<a href="http://aospxref.com/android-9.0.0_r61/xref/frameworks/base/services/core/java/com/android/server/connectivity/tethering/TetherInterfaceStateMachine.java#210">源代码</a>）</p>
+<p>函数调用链：<code>startIPv4</code>-<code>configureIPv4</code>-<code>getRandomWifiIPv4Address</code></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">configureIPv4</span><span class="params">(<span class="keyword">boolean</span> enabled)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (mInterfaceType == ConnectivityManager.TETHERING_WIFI) &#123;</span><br><span class="line">    ipAsString = getRandomWifiIPv4Address();</span><br><span class="line">    prefixLen = WIFI_HOST_IFACE_PREFIX_LENGTH;</span><br><span class="line">&#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用<code>getRandomWifiIPv4Address</code>函数生成主机IP地址后，转换为<code>LinkAddress</code>，最终调用<code>ifcg.setLinkAddress</code>设置IP：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> LinkAddress linkAddr;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">final</span> InterfaceConfiguration ifcg = mNMService.getInterfaceConfig(mIfaceName);</span><br><span class="line">    <span class="keyword">if</span> (ifcg == <span class="keyword">null</span>) &#123;</span><br><span class="line">        mLog.e(<span class="string">&quot;Received null interface config&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    InetAddress addr = NetworkUtils.numericToInetAddress(ipAsString);</span><br><span class="line">    linkAddr = <span class="keyword">new</span> LinkAddress(addr, prefixLen);</span><br><span class="line">    ifcg.setLinkAddress(linkAddr);</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
+
+<p>查找<code>getRandomWifiIPv4Address</code>的交叉引用，发现只有这一处。直接修改返回值，即可固定IP。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>使用Xposed框架Hook该函数（过滤包名android），设置返回值为<code>192.168.43.1</code>即可</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hook</span> <span class="keyword">implements</span> <span class="title">IXposedHookLoadPackage</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String classname = <span class="string">&quot;com.android.server.connectivity.tethering.TetherInterfaceStateMachine&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String methodname = <span class="string">&quot;getRandomWifiIPv4Address&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String WIFI_HOST_IFACE_ADDR = <span class="string">&quot;192.168.43.1&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleLoadPackage</span><span class="params">(XC_LoadPackage.LoadPackageParam lpparam)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (lpparam.packageName.equals(<span class="string">&quot;android&quot;</span>)) &#123;</span><br><span class="line">            Class&lt;?&gt; clz = XposedHelpers.findClass(classname, lpparam.classLoader);</span><br><span class="line"></span><br><span class="line">            findAndHookMethod(clz, methodname, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> </span>&#123;</span><br><span class="line">                    <span class="keyword">return</span> WIFI_HOST_IFACE_ADDR;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://android.stackexchange.com/questions/213514/how-can-i-permanently-change-my-hotspot-tethering-ip-address">How can I permanently change my hotspot tethering IP address?</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ARM64 GOT Hook中对.rela.plt的处理</title>
     <url>/2022/06/08/android-arm64-got-hook-rela-plt/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在<a href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a>项目中，对于<code>ARM64</code>架构，在重定位表中找不到目标符号，无法基于<code>Segment</code>进行<code>GOT Hook</code>。</p>
@@ -337,6 +337,9 @@
 <h2 id="相关数据结构"><a href="#相关数据结构" class="headerlink" title="相关数据结构"></a>相关数据结构</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">elf64_rel</span> &#123;</span></span><br><span class="line">  Elf64_Addr r_offset;</span><br><span class="line">  Elf64_Xword r_info;</span><br><span class="line">&#125; Elf64_Rel;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">elf64_rela</span> &#123;</span></span><br><span class="line">  Elf64_Addr r_offset;</span><br><span class="line">  Elf64_Xword r_info;</span><br><span class="line">  Elf64_Sxword r_addend;</span><br><span class="line">&#125; Elf64_Rela;</span><br></pre></td></tr></table></figure>
 
 <h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p>抄<a href="https://cs.android.com/android/platform/superproject/+/master:bionic/linker/linker.cpp">linker.cpp</a>代码即可。</p>
+<p>使用宏定义进行条件判断，例如：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__LP64__)</span></span><br><span class="line">                rela_plt = (<span class="built_in">ELFW</span>(Rela) *) (moduleBase + dyn.d_un.d_ptr);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">                rel_plt = (<span class="built_in">ELFW</span>(Rel) *) (moduleBase + dyn.d_un.d_ptr);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
 <p>对<code>.rela</code>的适配见<a href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a></p>
 ]]></content>
       <tags>
@@ -431,31 +434,6 @@
       <tags>
         <tag>Android</tag>
         <tag>Kernel</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>修复反编译资源文件报错问题(resource spec)</title>
-    <url>/2019/02/28/android-reverse-fix-arsc/</url>
-    <content><![CDATA[<h2 id="关于0x01010540错误"><a href="#关于0x01010540错误" class="headerlink" title="关于0x01010540错误"></a>关于<code>0x01010540</code>错误</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code><br>具体方法见后文</p>
-<h2 id="关于0x01010543错误"><a href="#关于0x01010543错误" class="headerlink" title="关于0x01010543错误"></a>关于<code>0x01010543</code>错误</h2><p>如果只有</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
-<p>没有<code>UndefinedResObject</code><br>则更换<code>apktool</code>后再试<br><code>apktool</code>可以在<a href="https://down.52pojie.cn/Tools/Android_Tools/">爱盘</a>下载</p>
-<p>实在要修复的话，往下看：（都是修改<code>resources.arsc</code>）</p>
-<h2 id="修复UndefinedResObject错误"><a href="#修复UndefinedResObject错误" class="headerlink" title="修复UndefinedResObject错误"></a>修复UndefinedResObject错误</h2><p>报错信息：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; brut.androlib.err.UndefinedResObject: resource spec: 0x7f000006</span><br></pre></td></tr></table></figure>
-
-<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><code>aapt dump</code>查看apk的资源信息，并保存到文件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">aapt d --values resources test.apk &gt;1.txt</span><br></pre></td></tr></table></figure>
-<p>找到<code>DataType</code>数据类型不正确的值（搜索<code>attribute</code>即可）对应的描述符（一般是把7f改成00，<code>0x00000006</code>）<br>文件中没有识别出正确的数据类型，显示的是<code>(attribute) 0x00000006</code><br>使用<code>010Editor</code>，Ctrl+F，字节形式搜索对应描述的16进制数的小端字节（就是<code>00000006</code>写成<code>06000000</code>）<br>然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
-<h2 id="修复resource-spec-0x01010543"><a href="#修复resource-spec-0x01010543" class="headerlink" title="修复resource spec: 0x01010543"></a>修复resource spec: 0x01010543</h2><p>报错信息：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
-<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>12345678</code>写成<code>78564312</code>）<br>这里我们搜索<code>43050101</code>，然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
-<h2 id="修复resource-spec-0x01010540"><a href="#修复resource-spec-0x01010540" class="headerlink" title="修复resource spec: 0x01010540"></a>修复resource spec: 0x01010540</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code></p>
-<h3 id="解决方法-2"><a href="#解决方法-2" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>40050101</code>换成<code>8f040101</code>）</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u012400885/article/details/80409689">记录Android Killer反编译时遇到的异常</a><br><a href="http://blog.csdn.net/pwelyn/article/details/50620136">保护Android resources文件不被反编译原理分析</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
       </tags>
   </entry>
   <entry>
@@ -720,6 +698,58 @@
       </tags>
   </entry>
   <entry>
+    <title>修复反编译资源文件报错问题(resource spec)</title>
+    <url>/2019/02/28/android-reverse-fix-arsc/</url>
+    <content><![CDATA[<h2 id="关于0x01010540错误"><a href="#关于0x01010540错误" class="headerlink" title="关于0x01010540错误"></a>关于<code>0x01010540</code>错误</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code><br>具体方法见后文</p>
+<h2 id="关于0x01010543错误"><a href="#关于0x01010543错误" class="headerlink" title="关于0x01010543错误"></a>关于<code>0x01010543</code>错误</h2><p>如果只有</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
+<p>没有<code>UndefinedResObject</code><br>则更换<code>apktool</code>后再试<br><code>apktool</code>可以在<a href="https://down.52pojie.cn/Tools/Android_Tools/">爱盘</a>下载</p>
+<p>实在要修复的话，往下看：（都是修改<code>resources.arsc</code>）</p>
+<h2 id="修复UndefinedResObject错误"><a href="#修复UndefinedResObject错误" class="headerlink" title="修复UndefinedResObject错误"></a>修复UndefinedResObject错误</h2><p>报错信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; brut.androlib.err.UndefinedResObject: resource spec: 0x7f000006</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><code>aapt dump</code>查看apk的资源信息，并保存到文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">aapt d --values resources test.apk &gt;1.txt</span><br></pre></td></tr></table></figure>
+<p>找到<code>DataType</code>数据类型不正确的值（搜索<code>attribute</code>即可）对应的描述符（一般是把7f改成00，<code>0x00000006</code>）<br>文件中没有识别出正确的数据类型，显示的是<code>(attribute) 0x00000006</code><br>使用<code>010Editor</code>，Ctrl+F，字节形式搜索对应描述的16进制数的小端字节（就是<code>00000006</code>写成<code>06000000</code>）<br>然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
+<h2 id="修复resource-spec-0x01010543"><a href="#修复resource-spec-0x01010543" class="headerlink" title="修复resource spec: 0x01010543"></a>修复resource spec: 0x01010543</h2><p>报错信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
+<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>12345678</code>写成<code>78564312</code>）<br>这里我们搜索<code>43050101</code>，然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
+<h2 id="修复resource-spec-0x01010540"><a href="#修复resource-spec-0x01010540" class="headerlink" title="修复resource spec: 0x01010540"></a>修复resource spec: 0x01010540</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code></p>
+<h3 id="解决方法-2"><a href="#解决方法-2" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>40050101</code>换成<code>8f040101</code>）</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u012400885/article/details/80409689">记录Android Killer反编译时遇到的异常</a><br><a href="http://blog.csdn.net/pwelyn/article/details/50620136">保护Android resources文件不被反编译原理分析</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Android Studio 导入so</title>
+    <url>/2019/08/02/android-studio-import-so/</url>
+    <content><![CDATA[<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在<code>src/main</code>目录下新建<code>jniLibs</code>文件夹 ，添加cpu架构文件夹，如<code>armeabi-v7a</code>，把so文件复制进去即可。<br>编译时会自动打包。</p>
+<p>配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        ndk &#123;</span><br><span class="line">            abiFilters  &#x27;armeabi-v7a&#x27;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/anhenzhufeng/article/details/78913341">Android studio添加第三方库和so</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>修复Android Studio代码修改不生效问题</title>
+    <url>/2021/12/01/android-studio-install-old-apk-on-android-11/</url>
+    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>重新编译<code>Xposed</code>模块并点击<code>Run</code>安装后，修改不生效。卸载重装后才生效。</p>
+<h2 id="尝试"><a href="#尝试" class="headerlink" title="尝试"></a>尝试</h2><p>尝试修改<code>build.gradle</code>中的<code>versionCode</code>，发现修改代码生效了，于是有了这篇<a href="https://blog.xhyeax.com/2021/10/07/gradle-auto-version-code/">Gradle配置版本号自动增加</a>。（不符合编译习惯，<del>喜欢刷版本号的除外</del>）</p>
+<p>今天发现手动<code>Generate Signed APK</code>，然后使用<code>adb install</code>安装，修改也生效了。（太麻烦）</p>
+<p>猜测是因为<code>versionCode</code>没变，ART运行了<code>dex2oat</code>优化后的旧代码。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>修改启动配置，设置使用<code>package manager</code>安装：</p>
+<p><code>Run / Debug Configurations</code> - <code>General</code> - <code>Always install with package manager (disable deploy optimization on Android 11 and later)</code></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>修改安卓内核源码 过State TracerPid wchan反调试</title>
     <url>/2019/09/13/android-source-mod-anti-antidebug/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>修改安卓内核源码，绕过对<code>/proc/$pid/state</code>的<code>State</code>和<code>TracerPid</code>字段，以及<code>/proc/$pid/wchan</code>的反调试检测</p>
@@ -742,19 +772,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Android Studio 导入so</title>
-    <url>/2019/08/02/android-studio-import-so/</url>
-    <content><![CDATA[<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在<code>src/main</code>目录下新建<code>jniLibs</code>文件夹 ，添加cpu架构文件夹，如<code>armeabi-v7a</code>，把so文件复制进去即可。<br>编译时会自动打包。</p>
-<p>配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code>：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        ndk &#123;</span><br><span class="line">            abiFilters  &#x27;armeabi-v7a&#x27;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/anhenzhufeng/article/details/78913341">Android studio添加第三方库和so</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>修复Mac Android Studio无法调试问题</title>
     <url>/2021/12/06/android-studio-stuck-at-debug/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Mac版<code>Android Studio</code>调试，提示<code>Invalid argument : Argument invalid [port]</code><br>搜索得到解决方案，原因是找不到<code>localhost</code>，在<code>/etc/hosts</code>中配置即可（之前不小心覆盖了）</p>
@@ -766,60 +783,6 @@
       <tags>
         <tag>Android</tag>
         <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>修复Android Studio代码修改不生效问题</title>
-    <url>/2021/12/01/android-studio-install-old-apk-on-android-11/</url>
-    <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>重新编译<code>Xposed</code>模块并点击<code>Run</code>安装后，修改不生效。卸载重装后才生效。</p>
-<h2 id="尝试"><a href="#尝试" class="headerlink" title="尝试"></a>尝试</h2><p>尝试修改<code>build.gradle</code>中的<code>versionCode</code>，发现修改代码生效了，于是有了这篇<a href="https://blog.xhyeax.com/2021/10/07/gradle-auto-version-code/">Gradle配置版本号自动增加</a>。（不符合编译习惯，<del>喜欢刷版本号的除外</del>）</p>
-<p>今天发现手动<code>Generate Signed APK</code>，然后使用<code>adb install</code>安装，修改也生效了。（太麻烦）</p>
-<p>猜测是因为<code>versionCode</code>没变，ART运行了<code>dex2oat</code>优化后的旧代码。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>修改启动配置，设置使用<code>package manager</code>安装：</p>
-<p><code>Run / Debug Configurations</code> - <code>General</code> - <code>Always install with package manager (disable deploy optimization on Android 11 and later)</code></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用docker编译安卓源码</title>
-    <url>/2020/04/16/aosp-docker/</url>
-    <content><![CDATA[<h3 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h3><p><a href="https://blog.xhyeax.com/2020/04/15/wsl2-docker/">在WSL2(Ubuntu 18.04)中安装docker并配置自启动</a></p>
-<h3 id="配置docker源"><a href="#配置docker源" class="headerlink" title="配置docker源"></a>配置docker源</h3><p>使用阿里云的加速服务，解决下载镜像速度慢的问题<br>打开<a href="https://cr.console.aliyun.com/">容器镜像服务</a><br>镜像中心 - 镜像加速器<br>将加速器地址写入<code>/etc/docker/daemon.json</code>，格式为：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://xxxxxx.mirror.aliyuncs.com&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>重启docker</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo service docker restart</span><br></pre></td></tr></table></figure>
-<span id="more"></span>
-<h3 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h3><p>编译安卓5.0到6.0，则克隆<code>android-5</code>分支</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/XhyEax/docker-aosp -b android-5</span><br></pre></td></tr></table></figure>
-<p>7.0及以上直接克隆即可</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/XhyEax/docker-aosp</span><br></pre></td></tr></table></figure>
-<h3 id="配置源码保存路径（可选）"><a href="#配置源码保存路径（可选）" class="headerlink" title="配置源码保存路径（可选）"></a>配置源码保存路径（可选）</h3><p>默认保存到<code>~/aosp-root</code> (即<code>/root/aosp-root</code>)</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export AOSP_VOL=~/Android/</span><br></pre></td></tr></table></figure>
-<p>也可修改<code>aosp</code>中的<code>AOSP_VOL</code></p>
-<h3 id="手动配置镜像版本（可选）"><a href="#手动配置镜像版本（可选）" class="headerlink" title="手动配置镜像版本（可选）"></a>手动配置镜像版本（可选）</h3><p>以编译6.0系统为例，修改<code>aosp</code>的第十二行为：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">AOSP_IMAGE=$&#123;AOSP_IMAGE:-kylemanna/aosp:5.0-lolipop&#125;</span><br></pre></td></tr></table></figure>
-<p>所有tag：<a href="https://hub.docker.com/r/kylemanna/aosp/tags">dockerhub kylemanna/aosp tags</a></p>
-<h3 id="启动容器-进入bash"><a href="#启动容器-进入bash" class="headerlink" title="启动容器 进入bash"></a>启动容器 进入bash</h3><p>用于测试文件夹映射是否正确，进入后执行<code>ls</code></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">./aosp</span><br></pre></td></tr></table></figure>
-<p><strong>注意：不要执行<code>exit</code>，会关闭容器。使用<code>Ctrl+P+Q</code>从容器中Detach即可</strong></p>
-<h3 id="以root用户进入bash"><a href="#以root用户进入bash" class="headerlink" title="以root用户进入bash"></a>以root用户进入bash</h3><p>用于编译系统</p>
-<h4 id="使用VSCode-Docker插件（推荐）"><a href="#使用VSCode-Docker插件（推荐）" class="headerlink" title="使用VSCode Docker插件（推荐）"></a>使用VSCode Docker插件（推荐）</h4><p>在<code>VSCode</code>中安装<code>Docker</code>插件后，在<code>Containers</code>中右键打开的<code>aosp</code>容器，<code>Attach Shell</code></p>
-<h4 id="使用命令行"><a href="#使用命令行" class="headerlink" title="使用命令行"></a>使用命令行</h4><h5 id="查询容器id"><a href="#查询容器id" class="headerlink" title="查询容器id"></a>查询容器id</h5><p>启动docker容器后，复制容器id（用户名后面的字符）<br>也可以使用<code>docker ps</code>查询<br>（下面是使用命令提取出第一个容器id）</p>
-<h5 id="登录bash"><a href="#登录bash" class="headerlink" title="登录bash"></a>登录bash</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cid=$(docker ps | grep aosp | cut -d&quot; &quot; -f1) &amp;&amp; echo $cid</span><br><span class="line">docker exec --privileged -u root -it $cid bash</span><br></pre></td></tr></table></figure>
-<h3 id="已有源码：直接编译系统"><a href="#已有源码：直接编译系统" class="headerlink" title="已有源码：直接编译系统"></a>已有源码：直接编译系统</h3><p>进入容器的bash后，打开源码目录，执行以下命令：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">prebuilts/misc/linux-x86/ccache/ccache -M 100G</span><br><span class="line">source build/envsetup.sh</span><br><span class="line">lunch aosp_arm-eng</span><br><span class="line">cpus=$(grep ^processor /proc/cpuinfo | wc -l)</span><br><span class="line">make -j $[2*$cpus]</span><br></pre></td></tr></table></figure>
-<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>如果需要编译手机（如nexus5）使用的系统镜像，还需要下载驱动文件。<br>见：<a href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">Ubuntu 19.10 编译安卓6.0.0_r1源码</a><br>并修改脚本中的<code>aosp_arm-eng</code>为<code>aosp_hammerhead-userdebug</code></p>
-<h3 id="无源码：下载源码并编译"><a href="#无源码：下载源码并编译" class="headerlink" title="无源码：下载源码并编译"></a>无源码：下载源码并编译</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd tests</span><br><span class="line">bash ./build-aosp.sh</span><br></pre></td></tr></table></figure>
-<p>该脚本下载的是<code>android-6.0.0_r1</code>的代码，编译目标为<code>aosp_arm-eng</code>，如需更换请自行修改脚本</p>
-<h3 id="删除容器"><a href="#删除容器" class="headerlink" title="删除容器"></a>删除容器</h3><p><code>docker ps</code>找到容器id，执行<code>docker rm -f 容器id</code>删除</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/tiann/docker-aosp">tiann/docker-aosp</a><br><a href="https://www.cnblogs.com/asminfo/p/6789258.html">使用docker创建aosp编译环境</a><br><a href="https://blog.csdn.net/weixin_43569697/article/details/89279225">docker下载镜像太慢的解决方案</a><br><a href="https://www.jianshu.com/p/b1ce248d2a42">Docker退出容器不关闭容器的方法</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-        <tag>Linux</tag>
-        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
@@ -860,6 +823,46 @@
 ]]></content>
       <tags>
         <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用docker编译安卓源码</title>
+    <url>/2020/04/16/aosp-docker/</url>
+    <content><![CDATA[<h3 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h3><p><a href="https://blog.xhyeax.com/2020/04/15/wsl2-docker/">在WSL2(Ubuntu 18.04)中安装docker并配置自启动</a></p>
+<h3 id="配置docker源"><a href="#配置docker源" class="headerlink" title="配置docker源"></a>配置docker源</h3><p>使用阿里云的加速服务，解决下载镜像速度慢的问题<br>打开<a href="https://cr.console.aliyun.com/">容器镜像服务</a><br>镜像中心 - 镜像加速器<br>将加速器地址写入<code>/etc/docker/daemon.json</code>，格式为：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://xxxxxx.mirror.aliyuncs.com&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>重启docker</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo service docker restart</span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+<h3 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h3><p>编译安卓5.0到6.0，则克隆<code>android-5</code>分支</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/XhyEax/docker-aosp -b android-5</span><br></pre></td></tr></table></figure>
+<p>7.0及以上直接克隆即可</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/XhyEax/docker-aosp</span><br></pre></td></tr></table></figure>
+<h3 id="配置源码保存路径（可选）"><a href="#配置源码保存路径（可选）" class="headerlink" title="配置源码保存路径（可选）"></a>配置源码保存路径（可选）</h3><p>默认保存到<code>~/aosp-root</code> (即<code>/root/aosp-root</code>)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export AOSP_VOL=~/Android/</span><br></pre></td></tr></table></figure>
+<p>也可修改<code>aosp</code>中的<code>AOSP_VOL</code></p>
+<h3 id="手动配置镜像版本（可选）"><a href="#手动配置镜像版本（可选）" class="headerlink" title="手动配置镜像版本（可选）"></a>手动配置镜像版本（可选）</h3><p>以编译6.0系统为例，修改<code>aosp</code>的第十二行为：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">AOSP_IMAGE=$&#123;AOSP_IMAGE:-kylemanna/aosp:5.0-lolipop&#125;</span><br></pre></td></tr></table></figure>
+<p>所有tag：<a href="https://hub.docker.com/r/kylemanna/aosp/tags">dockerhub kylemanna/aosp tags</a></p>
+<h3 id="启动容器-进入bash"><a href="#启动容器-进入bash" class="headerlink" title="启动容器 进入bash"></a>启动容器 进入bash</h3><p>用于测试文件夹映射是否正确，进入后执行<code>ls</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">./aosp</span><br></pre></td></tr></table></figure>
+<p><strong>注意：不要执行<code>exit</code>，会关闭容器。使用<code>Ctrl+P+Q</code>从容器中Detach即可</strong></p>
+<h3 id="以root用户进入bash"><a href="#以root用户进入bash" class="headerlink" title="以root用户进入bash"></a>以root用户进入bash</h3><p>用于编译系统</p>
+<h4 id="使用VSCode-Docker插件（推荐）"><a href="#使用VSCode-Docker插件（推荐）" class="headerlink" title="使用VSCode Docker插件（推荐）"></a>使用VSCode Docker插件（推荐）</h4><p>在<code>VSCode</code>中安装<code>Docker</code>插件后，在<code>Containers</code>中右键打开的<code>aosp</code>容器，<code>Attach Shell</code></p>
+<h4 id="使用命令行"><a href="#使用命令行" class="headerlink" title="使用命令行"></a>使用命令行</h4><h5 id="查询容器id"><a href="#查询容器id" class="headerlink" title="查询容器id"></a>查询容器id</h5><p>启动docker容器后，复制容器id（用户名后面的字符）<br>也可以使用<code>docker ps</code>查询<br>（下面是使用命令提取出第一个容器id）</p>
+<h5 id="登录bash"><a href="#登录bash" class="headerlink" title="登录bash"></a>登录bash</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cid=$(docker ps | grep aosp | cut -d&quot; &quot; -f1) &amp;&amp; echo $cid</span><br><span class="line">docker exec --privileged -u root -it $cid bash</span><br></pre></td></tr></table></figure>
+<h3 id="已有源码：直接编译系统"><a href="#已有源码：直接编译系统" class="headerlink" title="已有源码：直接编译系统"></a>已有源码：直接编译系统</h3><p>进入容器的bash后，打开源码目录，执行以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">prebuilts/misc/linux-x86/ccache/ccache -M 100G</span><br><span class="line">source build/envsetup.sh</span><br><span class="line">lunch aosp_arm-eng</span><br><span class="line">cpus=$(grep ^processor /proc/cpuinfo | wc -l)</span><br><span class="line">make -j $[2*$cpus]</span><br></pre></td></tr></table></figure>
+<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>如果需要编译手机（如nexus5）使用的系统镜像，还需要下载驱动文件。<br>见：<a href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">Ubuntu 19.10 编译安卓6.0.0_r1源码</a><br>并修改脚本中的<code>aosp_arm-eng</code>为<code>aosp_hammerhead-userdebug</code></p>
+<h3 id="无源码：下载源码并编译"><a href="#无源码：下载源码并编译" class="headerlink" title="无源码：下载源码并编译"></a>无源码：下载源码并编译</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd tests</span><br><span class="line">bash ./build-aosp.sh</span><br></pre></td></tr></table></figure>
+<p>该脚本下载的是<code>android-6.0.0_r1</code>的代码，编译目标为<code>aosp_arm-eng</code>，如需更换请自行修改脚本</p>
+<h3 id="删除容器"><a href="#删除容器" class="headerlink" title="删除容器"></a>删除容器</h3><p><code>docker ps</code>找到容器id，执行<code>docker rm -f 容器id</code>删除</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/tiann/docker-aosp">tiann/docker-aosp</a><br><a href="https://www.cnblogs.com/asminfo/p/6789258.html">使用docker创建aosp编译环境</a><br><a href="https://blog.csdn.net/weixin_43569697/article/details/89279225">docker下载镜像太慢的解决方案</a><br><a href="https://www.jianshu.com/p/b1ce248d2a42">Docker退出容器不关闭容器的方法</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>Linux</tag>
+        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
@@ -1154,20 +1157,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Cookie的本地保存和读取(Python requests模块)</title>
-    <url>/2018/12/13/cookies-local-save-read/</url>
-    <content><![CDATA[<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>获取到cookie后转化为dictionary（使用<code>requests.utils.dict_from_cookiejar</code>方法转化CookieJar为dictionary），再以字符串形式保存到文件<br>读取时把字符串转换为字典（<code>json.load</code>方法），再设置为requests请求的cookies</p>
-<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>这里有个坑，保存到文件时是单引号，使用json读取时需要双引号，所以需要replace一下</p>
-<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><h3 id="保存"><a href="#保存" class="headerlink" title="保存"></a>保存</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#转换为dictionary</span></span><br><span class="line">load_cookies = requests.utils.dict_from_cookiejar(res.cookies)</span><br><span class="line"><span class="comment">#转换为字符串保存到文件</span></span><br><span class="line">fo = <span class="built_in">open</span>(<span class="string">&quot;cookie&quot;</span>, <span class="string">&quot;w&quot;</span>)</span><br><span class="line">fo.write(<span class="built_in">str</span>(load_cookies))</span><br><span class="line">fo.close()</span><br></pre></td></tr></table></figure>
-<h3 id="读取"><a href="#读取" class="headerlink" title="读取"></a>读取</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">##读取文件内容到text变量后</span></span><br><span class="line"><span class="comment">#转换为dictionary</span></span><br><span class="line">dic = json.loads(text.replace(<span class="string">&quot;&#x27;&quot;</span>,<span class="string">&quot;\&quot;&quot;</span>))</span><br><span class="line">res = requests.post(url,cookies=dic)</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://zhuanlan.zhihu.com/p/42950252">Python——Cookie保存到本地</a></p>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>命令行运行java class文件提示“找不到或无法加载主类”的解决方法</title>
     <url>/2020/03/30/cmd-java-class-file/</url>
     <content><![CDATA[<h2 id="报错原因"><a href="#报错原因" class="headerlink" title="报错原因"></a>报错原因</h2><blockquote>
@@ -1179,6 +1168,20 @@
 ]]></content>
       <tags>
         <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Cookie的本地保存和读取(Python requests模块)</title>
+    <url>/2018/12/13/cookies-local-save-read/</url>
+    <content><![CDATA[<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>获取到cookie后转化为dictionary（使用<code>requests.utils.dict_from_cookiejar</code>方法转化CookieJar为dictionary），再以字符串形式保存到文件<br>读取时把字符串转换为字典（<code>json.load</code>方法），再设置为requests请求的cookies</p>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>这里有个坑，保存到文件时是单引号，使用json读取时需要双引号，所以需要replace一下</p>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><h3 id="保存"><a href="#保存" class="headerlink" title="保存"></a>保存</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#转换为dictionary</span></span><br><span class="line">load_cookies = requests.utils.dict_from_cookiejar(res.cookies)</span><br><span class="line"><span class="comment">#转换为字符串保存到文件</span></span><br><span class="line">fo = <span class="built_in">open</span>(<span class="string">&quot;cookie&quot;</span>, <span class="string">&quot;w&quot;</span>)</span><br><span class="line">fo.write(<span class="built_in">str</span>(load_cookies))</span><br><span class="line">fo.close()</span><br></pre></td></tr></table></figure>
+<h3 id="读取"><a href="#读取" class="headerlink" title="读取"></a>读取</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">##读取文件内容到text变量后</span></span><br><span class="line"><span class="comment">#转换为dictionary</span></span><br><span class="line">dic = json.loads(text.replace(<span class="string">&quot;&#x27;&quot;</span>,<span class="string">&quot;\&quot;&quot;</span>))</span><br><span class="line">res = requests.post(url,cookies=dic)</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://zhuanlan.zhihu.com/p/42950252">Python——Cookie保存到本地</a></p>
+]]></content>
+      <tags>
+        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -1350,6 +1353,44 @@
       </tags>
   </entry>
   <entry>
+    <title>使用GDB、LLDB调试安卓程序</title>
+    <url>/2022/05/06/debug-android-by-gdb-and-lldb/</url>
+    <content><![CDATA[<h2 id="命令对照表"><a href="#命令对照表" class="headerlink" title="命令对照表"></a>命令对照表</h2><p><a href="https://lldb.llvm.org/use/map.html">GDB to LLDB command map</a></p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>PC: <code>Windows 10</code><br>NDK: <code>22.1.7171670</code></p>
+<h3 id="程序位置"><a href="#程序位置" class="headerlink" title="程序位置"></a>程序位置</h3><p><code>GDB 8.3</code>（位于<code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\bin</code>）<br><code>lldb version 11.0.5</code>（位于<code>&lt;ndk&gt;\prebuilt\windows-x86_64\bin</code>）</p>
+<h3 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h3><h4 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h4><p><code>&lt;ndk&gt;\prebuilt\android-arm64\gdbserver</code><br><code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\arm\lldb-server</code></p>
+<h4 id="ARM64"><a href="#ARM64" class="headerlink" title="ARM64"></a>ARM64</h4><p><code>&lt;ndk&gt;\prebuilt\android-arm\gdbserver</code><br><code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\aarch64\lldb-server</code></p>
+<span id="more"></span>
+<h2 id="Spawn模式"><a href="#Spawn模式" class="headerlink" title="Spawn模式"></a>Spawn模式</h2><h3 id="gdb"><a href="#gdb" class="headerlink" title="gdb"></a>gdb</h3><h4 id="启动server"><a href="#启动server" class="headerlink" title="启动server"></a>启动server</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:9999 tcp:9999</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/gdbserver :9999 /data/local/tmp/victim&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="PC连接"><a href="#PC连接" class="headerlink" title="PC连接"></a>PC连接</h4><p>进入<code>gdb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">target remote :9999</span><br></pre></td></tr></table></figure>
+<p>调试器自动断在<code>__dl__start () from target:/system/bin/linker</code></p>
+<h3 id="lldb"><a href="#lldb" class="headerlink" title="lldb"></a>lldb</h3><h4 id="server"><a href="#server" class="headerlink" title="server"></a>server</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:9090 tcp:9090</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:9090&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h4><p>进入<code>lldb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:9090</span><br></pre></td></tr></table></figure>
+<h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p>设置工作目录，指定文件后执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform settings -w /data/local/tmp</span><br><span class="line">file victim</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+<h2 id="Attach模式"><a href="#Attach模式" class="headerlink" title="Attach模式"></a>Attach模式</h2><p>可使用<code>pidof</code>获取进程<code>pid</code></p>
+<h3 id="gdb-1"><a href="#gdb-1" class="headerlink" title="gdb"></a>gdb</h3><h4 id="server-1"><a href="#server-1" class="headerlink" title="server"></a>server</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:9999 tcp:9999</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/gdbserver :9999 --attach $(pidof victim)&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="PC连接-1"><a href="#PC连接-1" class="headerlink" title="PC连接"></a>PC连接</h4><p>进入<code>gdb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">target remote :9999</span><br></pre></td></tr></table></figure>
+
+<h3 id="lldb-1"><a href="#lldb-1" class="headerlink" title="lldb"></a>lldb</h3><h4 id="server-2"><a href="#server-2" class="headerlink" title="server"></a>server</h4><p>转发端口，并以后台模式启动：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:4321 tcp:4321</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:4321&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="连接-1"><a href="#连接-1" class="headerlink" title="连接"></a>连接</h4><p>进入<code>lldb</code>命令行，执行以下命令连接：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:4321</span><br></pre></td></tr></table></figure>
+<h4 id="附加"><a href="#附加" class="headerlink" title="附加"></a>附加</h4><p>可使用进程名或<code>pid</code>附加</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">attach -name victim</span><br><span class="line">attach -p 18600</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://lldb.llvm.org/use/remote.html">Remote Debugging — The LLDB Debugger</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>ARM</tag>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>导出sqlite3数据库为sql</title>
     <url>/2019/10/15/db-sqlite3-to-sql/</url>
     <content><![CDATA[<h2 id="执行以下语句即可"><a href="#执行以下语句即可" class="headerlink" title="执行以下语句即可"></a>执行以下语句即可</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sqlite3 db.sqlite3 &quot;.dump&quot; &gt; new.sql</span><br></pre></td></tr></table></figure>]]></content>
@@ -1407,44 +1448,6 @@
         <tag>Kernel</tag>
         <tag>Linux</tag>
         <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用GDB、LLDB调试安卓程序</title>
-    <url>/2022/05/06/debug-android-by-gdb-and-lldb/</url>
-    <content><![CDATA[<h2 id="命令对照表"><a href="#命令对照表" class="headerlink" title="命令对照表"></a>命令对照表</h2><p><a href="https://lldb.llvm.org/use/map.html">GDB to LLDB command map</a></p>
-<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>PC: <code>Windows 10</code><br>NDK: <code>22.1.7171670</code></p>
-<h3 id="程序位置"><a href="#程序位置" class="headerlink" title="程序位置"></a>程序位置</h3><p><code>GDB 8.3</code>（位于<code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\bin</code>）<br><code>lldb version 11.0.5</code>（位于<code>&lt;ndk&gt;\prebuilt\windows-x86_64\bin</code>）</p>
-<h3 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h3><h4 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h4><p><code>&lt;ndk&gt;\prebuilt\android-arm64\gdbserver</code><br><code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\arm\lldb-server</code></p>
-<h4 id="ARM64"><a href="#ARM64" class="headerlink" title="ARM64"></a>ARM64</h4><p><code>&lt;ndk&gt;\prebuilt\android-arm\gdbserver</code><br><code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\aarch64\lldb-server</code></p>
-<span id="more"></span>
-<h2 id="Spawn模式"><a href="#Spawn模式" class="headerlink" title="Spawn模式"></a>Spawn模式</h2><h3 id="gdb"><a href="#gdb" class="headerlink" title="gdb"></a>gdb</h3><h4 id="启动server"><a href="#启动server" class="headerlink" title="启动server"></a>启动server</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:9999 tcp:9999</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/gdbserver :9999 /data/local/tmp/victim&quot;</span><br></pre></td></tr></table></figure>
-<h4 id="PC连接"><a href="#PC连接" class="headerlink" title="PC连接"></a>PC连接</h4><p>进入<code>gdb</code>命令行，执行以下命令连接：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">target remote :9999</span><br></pre></td></tr></table></figure>
-<p>调试器自动断在<code>__dl__start () from target:/system/bin/linker</code></p>
-<h3 id="lldb"><a href="#lldb" class="headerlink" title="lldb"></a>lldb</h3><h4 id="server"><a href="#server" class="headerlink" title="server"></a>server</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:9090 tcp:9090</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:9090&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
-<h4 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h4><p>进入<code>lldb</code>命令行，执行以下命令连接：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:9090</span><br></pre></td></tr></table></figure>
-<h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p>设置工作目录，指定文件后执行：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform settings -w /data/local/tmp</span><br><span class="line">file victim</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
-<h2 id="Attach模式"><a href="#Attach模式" class="headerlink" title="Attach模式"></a>Attach模式</h2><p>可使用<code>pidof</code>获取进程<code>pid</code></p>
-<h3 id="gdb-1"><a href="#gdb-1" class="headerlink" title="gdb"></a>gdb</h3><h4 id="server-1"><a href="#server-1" class="headerlink" title="server"></a>server</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:9999 tcp:9999</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/gdbserver :9999 --attach $(pidof victim)&quot;</span><br></pre></td></tr></table></figure>
-<h4 id="PC连接-1"><a href="#PC连接-1" class="headerlink" title="PC连接"></a>PC连接</h4><p>进入<code>gdb</code>命令行，执行以下命令连接：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">target remote :9999</span><br></pre></td></tr></table></figure>
-
-<h3 id="lldb-1"><a href="#lldb-1" class="headerlink" title="lldb"></a>lldb</h3><h4 id="server-2"><a href="#server-2" class="headerlink" title="server"></a>server</h4><p>转发端口，并以后台模式启动：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:4321 tcp:4321</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:4321&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
-<h4 id="连接-1"><a href="#连接-1" class="headerlink" title="连接"></a>连接</h4><p>进入<code>lldb</code>命令行，执行以下命令连接：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:4321</span><br></pre></td></tr></table></figure>
-<h4 id="附加"><a href="#附加" class="headerlink" title="附加"></a>附加</h4><p>可使用进程名或<code>pid</code>附加</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">attach -name victim</span><br><span class="line">attach -p 18600</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://lldb.llvm.org/use/remote.html">Remote Debugging — The LLDB Debugger</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-        <tag>ARM</tag>
-        <tag>经验</tag>
       </tags>
   </entry>
   <entry>
@@ -1760,17 +1763,6 @@
       </tags>
   </entry>
   <entry>
-    <title>gcc编译Python模块失败(找不到Python.h)</title>
-    <url>/2018/12/07/fix-python-h/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>服务器恢复快照以后，一大堆东西都要重新安装。<br>安装PyCrypto时发生错误，提示<br><code>Python.h: No such file or directory</code><br>于是 首先执行 <code>yum upgrade</code>，升级下试试<br>然而还是编译错误，所以肯定是没有安装依赖</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>查了一下是没安装开发环境（然而之前好像是可以直接编译的。。）<br>而<code>python-devel</code>已安装，然而搜不到<code>python3-devel</code><br>于是搜索<code>python3</code>,找到了<code>python36u-devel</code><br><code>yum install python36u-devel</code><br>安装后编译成功</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u013414502/article/details/79531509">Centos7 “fatal error: Python.h: No such file or directory “commmand ‘gcc’ failed with exit status 1</a></p>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>修复 AOSP QSEECOMD 错误日志</title>
     <url>/2019/11/20/fix_error_log_qseecomd_aosp/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>刷入自己编译的AOSP系统，一直有日志输出，TAG为<code>QSEECOMD</code>，日志内容如下</p>
@@ -1797,6 +1789,17 @@
 ]]></content>
       <tags>
         <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>gcc编译Python模块失败(找不到Python.h)</title>
+    <url>/2018/12/07/fix-python-h/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>服务器恢复快照以后，一大堆东西都要重新安装。<br>安装PyCrypto时发生错误，提示<br><code>Python.h: No such file or directory</code><br>于是 首先执行 <code>yum upgrade</code>，升级下试试<br>然而还是编译错误，所以肯定是没有安装依赖</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>查了一下是没安装开发环境（然而之前好像是可以直接编译的。。）<br>而<code>python-devel</code>已安装，然而搜不到<code>python3-devel</code><br>于是搜索<code>python3</code>,找到了<code>python36u-devel</code><br><code>yum install python36u-devel</code><br>安装后编译成功</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u013414502/article/details/79531509">Centos7 “fatal error: Python.h: No such file or directory “commmand ‘gcc’ failed with exit status 1</a></p>
+]]></content>
+      <tags>
+        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -3180,6 +3183,29 @@
       </tags>
   </entry>
   <entry>
+    <title>取石头游戏</title>
+    <url>/2020/04/13/stone-game/</url>
+    <content><![CDATA[<h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>两个足够聪明的人玩轮流取石头的游戏，谁取到最后一个石头谁就赢了，他们一次只能取1个、3个、7个或8个石头，写一程序判断n个石头时先取的人是输还是赢。</p>
+<h3 id="输入格式"><a href="#输入格式" class="headerlink" title="输入格式:"></a>输入格式:</h3><p>一个整数n，其值不超过10000000。</p>
+<h3 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式:"></a>输出格式:</h3><p>如果先取的人赢，请以单独一行输出1，否则输出0。</p>
+<h3 id="输入样例"><a href="#输入样例" class="headerlink" title="输入样例:"></a>输入样例:</h3><p>这里是3组输入。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1</span><br><span class="line">10</span><br><span class="line">300</span><br></pre></td></tr></table></figure>
+<h3 id="输出样例"><a href="#输出样例" class="headerlink" title="输出样例:"></a>输出样例:</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1</span><br><span class="line">1</span><br><span class="line">0</span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+<h2 id="初始解法（内存超限）"><a href="#初始解法（内存超限）" class="headerlink" title="初始解法（内存超限）"></a>初始解法（内存超限）</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> maxN = <span class="number">10000000</span>+<span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> V[<span class="number">4</span>] = &#123;<span class="number">1</span>, <span class="number">3</span>, <span class="number">7</span>, <span class="number">8</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> dp[maxN];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">solve</span><span class="params">(<span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; i &gt;= V[j] &amp;&amp; j &lt; <span class="number">4</span>; j++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int</span> v = V[j];</span><br><span class="line">            <span class="keyword">if</span> (i == v)</span><br><span class="line">            &#123;</span><br><span class="line">                dp[i] = <span class="number">1</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (dp[i - v] == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                dp[i] = <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; dp[n] &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;n);</span><br><span class="line">    <span class="built_in">solve</span>(n);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="最终解法"><a href="#最终解法" class="headerlink" title="最终解法"></a>最终解法</h2><p>打印dp数组，发现(n%15)==0,2,4,6时为0，其他都为1</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">solve</span><span class="params">(<span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> left = n % <span class="number">15</span>;</span><br><span class="line">    <span class="keyword">if</span> (left == <span class="number">0</span> || left == <span class="number">2</span> || left == <span class="number">4</span> || left == <span class="number">6</span>)</span><br><span class="line">        cout &lt;&lt; <span class="number">0</span> &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        cout &lt;&lt; <span class="number">1</span> &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;n);</span><br><span class="line">    <span class="built_in">solve</span>(n);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="证明"><a href="#证明" class="headerlink" title="证明"></a>证明</h2><p>n=1~15的结果可直接求得：n=2, 4, 6, 15时，先手必输。<br>然后只需要保证：n+15胜负仍相同<br>即：当n&gt;15时，无论先手方如何选取，后手方都存在策略使得总石子数减少15后，取石头的人仍是先手<br>即：无论先手方如何选取，后手方都有办法拿到这15个石头中的最后一个<br>而n=15时，先手必输，即后手必胜，也就是说满足上述假设。<br>所以n+15之后，先手仍然必输。</p>
+<h2 id="引申"><a href="#引申" class="headerlink" title="引申"></a>引申</h2><p>如果被迫拿到最后一个石子的输，则n%15 =1, 3, 5, 7时，先手必输。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/qq_44378358/article/details/103166981">取石头游戏</a></p>
+]]></content>
+      <tags>
+        <tag>OJ</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用Xposed绕过某加固的Xposed堆栈检测</title>
     <url>/2021/10/07/shell-xposed-check-bypass/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>更新某营业厅app（版本号<code>7.4.0</code>）后，发现加载<code>Xposed</code>模块会导致app crash。</p>
@@ -3212,29 +3238,6 @@
       </tags>
   </entry>
   <entry>
-    <title>取石头游戏</title>
-    <url>/2020/04/13/stone-game/</url>
-    <content><![CDATA[<h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>两个足够聪明的人玩轮流取石头的游戏，谁取到最后一个石头谁就赢了，他们一次只能取1个、3个、7个或8个石头，写一程序判断n个石头时先取的人是输还是赢。</p>
-<h3 id="输入格式"><a href="#输入格式" class="headerlink" title="输入格式:"></a>输入格式:</h3><p>一个整数n，其值不超过10000000。</p>
-<h3 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式:"></a>输出格式:</h3><p>如果先取的人赢，请以单独一行输出1，否则输出0。</p>
-<h3 id="输入样例"><a href="#输入样例" class="headerlink" title="输入样例:"></a>输入样例:</h3><p>这里是3组输入。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1</span><br><span class="line">10</span><br><span class="line">300</span><br></pre></td></tr></table></figure>
-<h3 id="输出样例"><a href="#输出样例" class="headerlink" title="输出样例:"></a>输出样例:</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1</span><br><span class="line">1</span><br><span class="line">0</span><br></pre></td></tr></table></figure>
-<span id="more"></span>
-<h2 id="初始解法（内存超限）"><a href="#初始解法（内存超限）" class="headerlink" title="初始解法（内存超限）"></a>初始解法（内存超限）</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> maxN = <span class="number">10000000</span>+<span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> V[<span class="number">4</span>] = &#123;<span class="number">1</span>, <span class="number">3</span>, <span class="number">7</span>, <span class="number">8</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> dp[maxN];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">solve</span><span class="params">(<span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; i &gt;= V[j] &amp;&amp; j &lt; <span class="number">4</span>; j++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int</span> v = V[j];</span><br><span class="line">            <span class="keyword">if</span> (i == v)</span><br><span class="line">            &#123;</span><br><span class="line">                dp[i] = <span class="number">1</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (dp[i - v] == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                dp[i] = <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; dp[n] &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;n);</span><br><span class="line">    <span class="built_in">solve</span>(n);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="最终解法"><a href="#最终解法" class="headerlink" title="最终解法"></a>最终解法</h2><p>打印dp数组，发现(n%15)==0,2,4,6时为0，其他都为1</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">solve</span><span class="params">(<span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> left = n % <span class="number">15</span>;</span><br><span class="line">    <span class="keyword">if</span> (left == <span class="number">0</span> || left == <span class="number">2</span> || left == <span class="number">4</span> || left == <span class="number">6</span>)</span><br><span class="line">        cout &lt;&lt; <span class="number">0</span> &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        cout &lt;&lt; <span class="number">1</span> &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;n);</span><br><span class="line">    <span class="built_in">solve</span>(n);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="证明"><a href="#证明" class="headerlink" title="证明"></a>证明</h2><p>n=1~15的结果可直接求得：n=2, 4, 6, 15时，先手必输。<br>然后只需要保证：n+15胜负仍相同<br>即：当n&gt;15时，无论先手方如何选取，后手方都存在策略使得总石子数减少15后，取石头的人仍是先手<br>即：无论先手方如何选取，后手方都有办法拿到这15个石头中的最后一个<br>而n=15时，先手必输，即后手必胜，也就是说满足上述假设。<br>所以n+15之后，先手仍然必输。</p>
-<h2 id="引申"><a href="#引申" class="headerlink" title="引申"></a>引申</h2><p>如果被迫拿到最后一个石子的输，则n%15 =1, 3, 5, 7时，先手必输。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/qq_44378358/article/details/103166981">取石头游戏</a></p>
-]]></content>
-      <tags>
-        <tag>OJ</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>telegram机器人返回markdown格式</title>
     <url>/2018/12/03/tgbot-ret-md/</url>
     <content><![CDATA[<h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>让telegram机器人使用markdown语法渲染，并返回信息</p>
@@ -3260,6 +3263,24 @@
 <h3 id="自实现Stack版本"><a href="#自实现Stack版本" class="headerlink" title="自实现Stack版本"></a>自实现Stack版本</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Linked Node</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> E&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	E data;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">Node</span>&lt;</span>E&gt; *next;</span><br><span class="line">	Node&lt;E&gt;()</span><br><span class="line">	&#123;</span><br><span class="line">		next = <span class="literal">NULL</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">Node</span>(E it, Node&lt;E&gt; *_next)</span><br><span class="line">	&#123;</span><br><span class="line">		data = it;</span><br><span class="line">		next = _next;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Linked Based Stack</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> E&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Stack</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Node&lt;E&gt; *head;</span><br><span class="line">	<span class="keyword">int</span> size;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		head = <span class="keyword">new</span> Node&lt;E&gt;;</span><br><span class="line">		size = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">Stack</span>()</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">init</span>();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> size == <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function">E <span class="title">top</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> head-&gt;data;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(E it)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		head = <span class="keyword">new</span> Node&lt;E&gt;(it, head);</span><br><span class="line">		size++;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function">E <span class="title">pop</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		E tmp = <span class="built_in">top</span>();</span><br><span class="line">		size--;</span><br><span class="line">		Node&lt;E&gt; *temphead = head;</span><br><span class="line">		head = head-&gt;next;</span><br><span class="line">		<span class="keyword">delete</span> temphead;</span><br><span class="line">		<span class="keyword">return</span> tmp;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Queue implement</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> E&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Queue</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	Stack&lt;E&gt; inbox;</span><br><span class="line">	Stack&lt;E&gt; outbox;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">int</span> size = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">push_back</span><span class="params">(E it)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		inbox.<span class="built_in">push</span>(it);</span><br><span class="line">		size++;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function">E <span class="title">pop_front</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (outbox.<span class="built_in">empty</span>())</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">while</span> (!inbox.<span class="built_in">empty</span>())</span><br><span class="line">			&#123;</span><br><span class="line">				outbox.<span class="built_in">push</span>(inbox.<span class="built_in">pop</span>());</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		size--;</span><br><span class="line">		<span class="keyword">return</span> outbox.<span class="built_in">pop</span>();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Queue&lt;<span class="keyword">int</span>&gt; que;</span><br><span class="line">	<span class="comment">//push 01234</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		que.<span class="built_in">push_back</span>(i);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//pop 012</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; que.<span class="built_in">pop_front</span>() &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//push 78</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">7</span>; i &lt; <span class="number">9</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		que.<span class="built_in">push_back</span>(i);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//pop all left elements (3478)</span></span><br><span class="line">	<span class="keyword">int</span> len = que.size;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; que.<span class="built_in">pop_front</span>() &lt;&lt; endl;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
       <tags>
         <tag>CPP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在服务器上部署腾讯云COS同步方案</title>
+    <url>/2018/12/01/txcos-as-imgurl/</url>
+    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>由于截图后手动上传到COS比较麻烦，而<a href="https://github.com/ShareX/ShareX">ShareX</a>（一个截图工具）支持SFTP上传到服务器<br>于是决定在服务器上配置腾讯云COS同步方案，然后就可以愉快地截图后上传图片了</p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p>在腾讯云的对象存储（COS）配置好密钥以后，在服务器上配置同步方案<br>（建议设置一个用户组给予COS读写权限）</p>
+<h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo yum install automake gcc-c++ git libcurl-devel libxml2-devel fuse-devel make openssl-devel</span><br></pre></td></tr></table></figure>
+<h3 id="安装cosfs"><a href="#安装cosfs" class="headerlink" title="安装cosfs"></a>安装cosfs</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/tencentyun/cosfs-v4.2.1 /usr/cosfs</span><br><span class="line"><span class="built_in">cd</span> /usr/cosfs</span><br><span class="line">./autogen.sh</span><br><span class="line">./configure</span><br><span class="line">make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<h3 id="修改配置文件-格式为bucket-name-bucket-appid-secretId-secredKey"><a href="#修改配置文件-格式为bucket-name-bucket-appid-secretId-secredKey" class="headerlink" title="修改配置文件(格式为bucket_name-bucket_appid:secretId:secredKey)"></a>修改配置文件(格式为<code>bucket_name-bucket_appid:secretId:secredKey</code>)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> xhy-1252675344:AKIDXXXXXXXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXX &gt; /etc/passwd-cosfs</span><br><span class="line">chmod 640 /etc/passwd-cosfs</span><br></pre></td></tr></table></figure>
+<h3 id="挂载-以挂载到-usr-upload-为例"><a href="#挂载-以挂载到-usr-upload-为例" class="headerlink" title="挂载(以挂载到/usr/upload/为例)"></a>挂载(以挂载到<code>/usr/upload/</code>为例)</h3><p>格式为<code>cosfs bucket_appid:bucket_name 挂载目录 -ourl=对象储存url -odbglevel=info</code><br>例如：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cosfs 1252675344:xhy /usr/upload/ -ourl=xhy-1252675344.cos.ap-beijing.myqcloud.com -odbglevel=info</span><br></pre></td></tr></table></figure>
+<h3 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">fusermount -u /u01/docker/kenny_hexo/public</span><br><span class="line">或者</span><br><span class="line">umount -l /u01/docker/kenny_hexo/public</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.234du.com/1167.html">ImgURL配合腾讯云COS（对象存储）搭建个人图床</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
       </tags>
   </entry>
   <entry>
@@ -3299,24 +3320,6 @@
 ]]></content>
       <tags>
         <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>在服务器上部署腾讯云COS同步方案</title>
-    <url>/2018/12/01/txcos-as-imgurl/</url>
-    <content><![CDATA[<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>由于截图后手动上传到COS比较麻烦，而<a href="https://github.com/ShareX/ShareX">ShareX</a>（一个截图工具）支持SFTP上传到服务器<br>于是决定在服务器上配置腾讯云COS同步方案，然后就可以愉快地截图后上传图片了</p>
-<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p>在腾讯云的对象存储（COS）配置好密钥以后，在服务器上配置同步方案<br>（建议设置一个用户组给予COS读写权限）</p>
-<h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo yum install automake gcc-c++ git libcurl-devel libxml2-devel fuse-devel make openssl-devel</span><br></pre></td></tr></table></figure>
-<h3 id="安装cosfs"><a href="#安装cosfs" class="headerlink" title="安装cosfs"></a>安装cosfs</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/tencentyun/cosfs-v4.2.1 /usr/cosfs</span><br><span class="line"><span class="built_in">cd</span> /usr/cosfs</span><br><span class="line">./autogen.sh</span><br><span class="line">./configure</span><br><span class="line">make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
-<h3 id="修改配置文件-格式为bucket-name-bucket-appid-secretId-secredKey"><a href="#修改配置文件-格式为bucket-name-bucket-appid-secretId-secredKey" class="headerlink" title="修改配置文件(格式为bucket_name-bucket_appid:secretId:secredKey)"></a>修改配置文件(格式为<code>bucket_name-bucket_appid:secretId:secredKey</code>)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> xhy-1252675344:AKIDXXXXXXXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXX &gt; /etc/passwd-cosfs</span><br><span class="line">chmod 640 /etc/passwd-cosfs</span><br></pre></td></tr></table></figure>
-<h3 id="挂载-以挂载到-usr-upload-为例"><a href="#挂载-以挂载到-usr-upload-为例" class="headerlink" title="挂载(以挂载到/usr/upload/为例)"></a>挂载(以挂载到<code>/usr/upload/</code>为例)</h3><p>格式为<code>cosfs bucket_appid:bucket_name 挂载目录 -ourl=对象储存url -odbglevel=info</code><br>例如：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cosfs 1252675344:xhy /usr/upload/ -ourl=xhy-1252675344.cos.ap-beijing.myqcloud.com -odbglevel=info</span><br></pre></td></tr></table></figure>
-<h3 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">fusermount -u /u01/docker/kenny_hexo/public</span><br><span class="line">或者</span><br><span class="line">umount -l /u01/docker/kenny_hexo/public</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.234du.com/1167.html">ImgURL配合腾讯云COS（对象存储）搭建个人图床</a></p>
-]]></content>
-      <tags>
-        <tag>经验</tag>
       </tags>
   </entry>
   <entry>
@@ -3365,19 +3368,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Windows安装Cmake</title>
-    <url>/2019/11/05/use-cmake-in-windows/</url>
-    <content><![CDATA[<h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><p>已安装<code>MinGW64</code>，即具有<code>mingw32-make.exe</code>文件</p>
-<h2 id="下载CMake"><a href="#下载CMake" class="headerlink" title="下载CMake"></a>下载CMake</h2><p><a href="https://cmake.org/download/">CMake下载页面</a><br>根据平台下载安装包<br>PS：下载<code>Binary distributions</code>，别下载成源码了</p>
-<h2 id="生成"><a href="#生成" class="headerlink" title="生成"></a>生成</h2><p>创建输出文件夹，指定生成类型</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir bulid</span><br><span class="line">cd bulid</span><br><span class="line">cmake -G &quot;MinGW Makefiles&quot; ../</span><br><span class="line">mingw32-make</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/JohnJim0/article/details/81842249">WINDOWS下CMake+MinGW64搭建C/C++编译环境</a></p>
-]]></content>
-      <tags>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>使用__attribute__配置结构体，禁用编译器自动对齐</title>
     <url>/2020/07/21/use-attribute-packed-to-disable-align/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>结构体声明中加上<code>__attribute__((packed))</code>，可以防止编译器对结构进行字节对齐优化。<br>使用<code>__attribute__((aligned(8)))</code>(8为对齐字节数)，可以强制编译器按指定字节对齐。</p>
@@ -3391,6 +3381,19 @@
 ]]></content>
       <tags>
         <tag>CPP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Windows安装Cmake</title>
+    <url>/2019/11/05/use-cmake-in-windows/</url>
+    <content><![CDATA[<h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><p>已安装<code>MinGW64</code>，即具有<code>mingw32-make.exe</code>文件</p>
+<h2 id="下载CMake"><a href="#下载CMake" class="headerlink" title="下载CMake"></a>下载CMake</h2><p><a href="https://cmake.org/download/">CMake下载页面</a><br>根据平台下载安装包<br>PS：下载<code>Binary distributions</code>，别下载成源码了</p>
+<h2 id="生成"><a href="#生成" class="headerlink" title="生成"></a>生成</h2><p>创建输出文件夹，指定生成类型</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir bulid</span><br><span class="line">cd bulid</span><br><span class="line">cmake -G &quot;MinGW Makefiles&quot; ../</span><br><span class="line">mingw32-make</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/JohnJim0/article/details/81842249">WINDOWS下CMake+MinGW64搭建C/C++编译环境</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
       </tags>
   </entry>
   <entry>
@@ -3415,6 +3418,30 @@
 <h2 id="修改方法"><a href="#修改方法" class="headerlink" title="修改方法"></a>修改方法</h2><h3 id="1-tasks-json中直接使用g-的情况"><a href="#1-tasks-json中直接使用g-的情况" class="headerlink" title="1. tasks.json中直接使用g++的情况"></a>1. tasks.json中直接使用g++的情况</h3><p>具体方法：<br>在tasks[args]中添加<code>&quot;-fexec-charset=GB2312&quot;</code></p>
 <h3 id="1-tasks-json中使用make的情况"><a href="#1-tasks-json中使用make的情况" class="headerlink" title="1. tasks.json中使用make的情况"></a>1. tasks.json中使用make的情况</h3><p>在makefile中添加<code>-fexec-charset=GB2312</code><br>比如<a href="https://blog.xhyeax.com/2019/04/13/vscode-cpp-multiplefile/">上一篇博文</a>中的makefile，则在<code>CCOBJFLAG</code>后添加该参数，变为</p>
 <figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">CCOBJFLAG := <span class="variable">$(CCFLAG)</span> -c -fexec-charset=GB2312</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>CPP</tag>
+        <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VSCode配置C++多文件环境</title>
+    <url>/2019/04/13/vscode-cpp-multiplefile/</url>
+    <content><![CDATA[<h2 id="修正"><a href="#修正" class="headerlink" title="修正"></a>修正</h2><p>发现makefile存在问题，仅会编译比main.cpp更新的依赖文件，导致每次都要make两次才能正常调试。已修改<code>$?</code>为<code>$^</code></p>
+<blockquote>
+<p>$@ –代表目标文件(target)<br>$^  –代表所有的依赖文件(components)<br>$&lt;  –代表第一个依赖文件(components中最左边的那个)<br>$?  –代表比目标还要新的依赖文件列表</p>
+</blockquote>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前从知乎抄的配置只能编译单文件源文件，编译多文件的话需要手动修改g++编译参数（不能忍啊→_→），于是搜索之，找到解决方案。<br>关键词：makefile</p>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>原本使用VSCode就可以正常进行编译调试等操作。<br>已安装make工具并添加到环境变量，我自己用的是<code>mingw32-make</code><br>（也可使用msys提供的工具包，度盘链接: <a href="https://pan.baidu.com/s/1zJBcS6tjfXlwg1kP6VnLSg">https://pan.baidu.com/s/1zJBcS6tjfXlwg1kP6VnLSg</a> 提取码: f9ya）</p>
+<h2 id="具体方案"><a href="#具体方案" class="headerlink" title="具体方案"></a>具体方案</h2><h3 id="构建makefile模板"><a href="#构建makefile模板" class="headerlink" title="构建makefile模板"></a>构建makefile模板</h3><p>我基本是直接复制参考博文里的模板(修改标准库为17)，内容如下</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="comment"># originating https://github.com/TheNetAdmin/Makefile-Templates</span></span><br><span class="line"><span class="comment"># tool marcros</span></span><br><span class="line">CC := g++</span><br><span class="line">CCFLAG := -std=c++17</span><br><span class="line">DBGFLAG := -g</span><br><span class="line">CCOBJFLAG := <span class="variable">$(CCFLAG)</span> -c</span><br><span class="line"></span><br><span class="line"><span class="comment"># path marcros</span></span><br><span class="line">BIN_PATH := bin</span><br><span class="line">OBJ_PATH := obj</span><br><span class="line">SRC_PATH := src</span><br><span class="line">DBG_PATH := debug</span><br><span class="line"></span><br><span class="line"><span class="comment"># compile marcros</span></span><br><span class="line">TARGET_NAME := main</span><br><span class="line"><span class="keyword">ifeq</span> (<span class="variable">$(OS)</span>,Windows_NT)</span><br><span class="line">	TARGET_NAME := <span class="variable">$(<span class="built_in">addsuffix</span> .exe,<span class="variable">$(TARGET_NAME)</span>)</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line">TARGET := <span class="variable">$(BIN_PATH)</span>/<span class="variable">$(TARGET_NAME)</span></span><br><span class="line">TARGET_DEBUG := <span class="variable">$(DBG_PATH)</span>/<span class="variable">$(TARGET_NAME)</span></span><br><span class="line">MAIN_SRC := src/main.cpp</span><br><span class="line"></span><br><span class="line"><span class="comment"># src files &amp; obj files</span></span><br><span class="line">SRC := <span class="variable">$(<span class="built_in">foreach</span> x, <span class="variable">$(SRC_PATH)</span>, $(<span class="built_in">wildcard</span> $(<span class="built_in">addprefix</span> <span class="variable">$(x)</span>/*,.c*)</span>))</span><br><span class="line">OBJ := <span class="variable">$(<span class="built_in">addprefix</span> <span class="variable">$(OBJ_PATH)</span>/, $(<span class="built_in">addsuffix</span> .o, $(<span class="built_in">notdir</span> $(<span class="built_in">basename</span> <span class="variable">$(SRC)</span>)</span>)))</span><br><span class="line">OBJ_DEBUG := <span class="variable">$(<span class="built_in">addprefix</span> <span class="variable">$(DBG_PATH)</span>/, $(<span class="built_in">addsuffix</span> .o, $(<span class="built_in">notdir</span> $(<span class="built_in">basename</span> <span class="variable">$(SRC)</span>)</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment"># clean files list</span></span><br><span class="line">DISTCLEAN_LIST := <span class="variable">$(OBJ)</span> \</span><br><span class="line">                  <span class="variable">$(OBJ_DEBUG)</span></span><br><span class="line">CLEAN_LIST := <span class="variable">$(TARGET)</span> \</span><br><span class="line">			  <span class="variable">$(TARGET_DEBUG)</span> \</span><br><span class="line">			  <span class="variable">$(DISTCLEAN_LIST)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># default rule</span></span><br><span class="line"><span class="section">default: all</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># non-phony targets</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(OBJ)</span></span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$^</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(OBJ_PATH)</span>/%.o: <span class="variable">$(SRC_PATH)</span>/%.c*</span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCOBJFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(DBG_PATH)</span>/%.o: <span class="variable">$(SRC_PATH)</span>/%.c*</span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCOBJFLAG)</span> <span class="variable">$(DBGFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(TARGET_DEBUG)</span>: <span class="variable">$(OBJ_DEBUG)</span></span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCFLAG)</span> <span class="variable">$(DBGFLAG)</span> <span class="variable">$^</span> -o <span class="variable">$@</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># phony rules</span></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: all</span></span><br><span class="line"><span class="section">all: <span class="variable">$(TARGET)</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: debug</span></span><br><span class="line"><span class="section">debug: <span class="variable">$(TARGET_DEBUG)</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: clean</span></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	@echo CLEAN <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line">	@rm -f <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: distclean</span></span><br><span class="line"><span class="section">distclean:</span></span><br><span class="line">	@echo CLEAN <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line">	@rm -f <span class="variable">$(DISTCLEAN_LIST)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h3><p>src文件夹下放源文件以及头文件，后面还要需要修改<code>.vscode</code>中的<code>task.json</code>和<code>launch.json</code><br>注意：如果使用本文中的makefle，包含主函数的源文件名必须为<code>main.cpp</code><br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/VSCode-cpp-mf.png"></p>
+<h3 id="task-json"><a href="#task-json" class="headerlink" title="task.json"></a>task.json</h3><p>如果你使用的是msys的工具包，那command就写make<br>按快捷键<code>Ctrl+Shift+B</code>可以执行仅生成命令（build）<br>（在微软输入法中文模式时会出现表情窗口←_←）</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;2.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;tasks&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;default&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;group&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;kind&quot;</span>: <span class="string">&quot;build&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;isDefault&quot;</span>: <span class="literal">true</span></span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build-debug&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;debug&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;clean&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;clean&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="launch-json"><a href="#launch-json" class="headerlink" title="launch.json"></a>launch.json</h3><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// https://github.com/Microsoft/vscode-cpptools/blob/master/launch.md</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;0.2.0&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;configurations&quot;</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;(gdb) Launch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;cppdbg&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;request&quot;</span>: <span class="string">&quot;launch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;program&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/debug/main.exe&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;args&quot;</span>: [],</span><br><span class="line">            <span class="attr">&quot;stopAtEntry&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">&quot;cwd&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/debug/&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;environment&quot;</span>: [],</span><br><span class="line">            <span class="attr">&quot;externalConsole&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">&quot;internalConsoleOptions&quot;</span>: <span class="string">&quot;neverOpen&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;MIMode&quot;</span>: <span class="string">&quot;gdb&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;miDebuggerPath&quot;</span>: <span class="string">&quot;gdb.exe&quot;</span>, <span class="comment">// 调试器路径，Windows下后缀不能省略，Linux下则去掉</span></span><br><span class="line">            <span class="attr">&quot;setupCommands&quot;</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">&quot;description&quot;</span>: <span class="string">&quot;Enable pretty-printing for gdb&quot;</span>,</span><br><span class="line">                    <span class="attr">&quot;text&quot;</span>: <span class="string">&quot;-enable-pretty-printing&quot;</span>,</span><br><span class="line">                    <span class="attr">&quot;ignoreFailures&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">&quot;preLaunchTask&quot;</span>: <span class="string">&quot;build-debug&quot;</span> <span class="comment">// 调试会话开始前执行的任务，一般为编译程序。与tasks.json的label相对应</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="配置完成"><a href="#配置完成" class="headerlink" title="配置完成"></a>配置完成</h3><p>enjoy it!<br>😉</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/wzxlovesy/article/details/76708151">VS Code 配置 C/C++ 环境</a></p>
+]]></content>
       <tags>
         <tag>CPP</tag>
         <tag>VSCode</tag>
@@ -3471,30 +3498,6 @@
       </tags>
   </entry>
   <entry>
-    <title>VSCode配置C++多文件环境</title>
-    <url>/2019/04/13/vscode-cpp-multiplefile/</url>
-    <content><![CDATA[<h2 id="修正"><a href="#修正" class="headerlink" title="修正"></a>修正</h2><p>发现makefile存在问题，仅会编译比main.cpp更新的依赖文件，导致每次都要make两次才能正常调试。已修改<code>$?</code>为<code>$^</code></p>
-<blockquote>
-<p>$@ –代表目标文件(target)<br>$^  –代表所有的依赖文件(components)<br>$&lt;  –代表第一个依赖文件(components中最左边的那个)<br>$?  –代表比目标还要新的依赖文件列表</p>
-</blockquote>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前从知乎抄的配置只能编译单文件源文件，编译多文件的话需要手动修改g++编译参数（不能忍啊→_→），于是搜索之，找到解决方案。<br>关键词：makefile</p>
-<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>原本使用VSCode就可以正常进行编译调试等操作。<br>已安装make工具并添加到环境变量，我自己用的是<code>mingw32-make</code><br>（也可使用msys提供的工具包，度盘链接: <a href="https://pan.baidu.com/s/1zJBcS6tjfXlwg1kP6VnLSg">https://pan.baidu.com/s/1zJBcS6tjfXlwg1kP6VnLSg</a> 提取码: f9ya）</p>
-<h2 id="具体方案"><a href="#具体方案" class="headerlink" title="具体方案"></a>具体方案</h2><h3 id="构建makefile模板"><a href="#构建makefile模板" class="headerlink" title="构建makefile模板"></a>构建makefile模板</h3><p>我基本是直接复制参考博文里的模板(修改标准库为17)，内容如下</p>
-<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="comment"># originating https://github.com/TheNetAdmin/Makefile-Templates</span></span><br><span class="line"><span class="comment"># tool marcros</span></span><br><span class="line">CC := g++</span><br><span class="line">CCFLAG := -std=c++17</span><br><span class="line">DBGFLAG := -g</span><br><span class="line">CCOBJFLAG := <span class="variable">$(CCFLAG)</span> -c</span><br><span class="line"></span><br><span class="line"><span class="comment"># path marcros</span></span><br><span class="line">BIN_PATH := bin</span><br><span class="line">OBJ_PATH := obj</span><br><span class="line">SRC_PATH := src</span><br><span class="line">DBG_PATH := debug</span><br><span class="line"></span><br><span class="line"><span class="comment"># compile marcros</span></span><br><span class="line">TARGET_NAME := main</span><br><span class="line"><span class="keyword">ifeq</span> (<span class="variable">$(OS)</span>,Windows_NT)</span><br><span class="line">	TARGET_NAME := <span class="variable">$(<span class="built_in">addsuffix</span> .exe,<span class="variable">$(TARGET_NAME)</span>)</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line">TARGET := <span class="variable">$(BIN_PATH)</span>/<span class="variable">$(TARGET_NAME)</span></span><br><span class="line">TARGET_DEBUG := <span class="variable">$(DBG_PATH)</span>/<span class="variable">$(TARGET_NAME)</span></span><br><span class="line">MAIN_SRC := src/main.cpp</span><br><span class="line"></span><br><span class="line"><span class="comment"># src files &amp; obj files</span></span><br><span class="line">SRC := <span class="variable">$(<span class="built_in">foreach</span> x, <span class="variable">$(SRC_PATH)</span>, $(<span class="built_in">wildcard</span> $(<span class="built_in">addprefix</span> <span class="variable">$(x)</span>/*,.c*)</span>))</span><br><span class="line">OBJ := <span class="variable">$(<span class="built_in">addprefix</span> <span class="variable">$(OBJ_PATH)</span>/, $(<span class="built_in">addsuffix</span> .o, $(<span class="built_in">notdir</span> $(<span class="built_in">basename</span> <span class="variable">$(SRC)</span>)</span>)))</span><br><span class="line">OBJ_DEBUG := <span class="variable">$(<span class="built_in">addprefix</span> <span class="variable">$(DBG_PATH)</span>/, $(<span class="built_in">addsuffix</span> .o, $(<span class="built_in">notdir</span> $(<span class="built_in">basename</span> <span class="variable">$(SRC)</span>)</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment"># clean files list</span></span><br><span class="line">DISTCLEAN_LIST := <span class="variable">$(OBJ)</span> \</span><br><span class="line">                  <span class="variable">$(OBJ_DEBUG)</span></span><br><span class="line">CLEAN_LIST := <span class="variable">$(TARGET)</span> \</span><br><span class="line">			  <span class="variable">$(TARGET_DEBUG)</span> \</span><br><span class="line">			  <span class="variable">$(DISTCLEAN_LIST)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># default rule</span></span><br><span class="line"><span class="section">default: all</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># non-phony targets</span></span><br><span class="line"><span class="variable">$(TARGET)</span>: <span class="variable">$(OBJ)</span></span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$^</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(OBJ_PATH)</span>/%.o: <span class="variable">$(SRC_PATH)</span>/%.c*</span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCOBJFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(DBG_PATH)</span>/%.o: <span class="variable">$(SRC_PATH)</span>/%.c*</span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCOBJFLAG)</span> <span class="variable">$(DBGFLAG)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(TARGET_DEBUG)</span>: <span class="variable">$(OBJ_DEBUG)</span></span><br><span class="line">	<span class="variable">$(CC)</span> <span class="variable">$(CCFLAG)</span> <span class="variable">$(DBGFLAG)</span> <span class="variable">$^</span> -o <span class="variable">$@</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># phony rules</span></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: all</span></span><br><span class="line"><span class="section">all: <span class="variable">$(TARGET)</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: debug</span></span><br><span class="line"><span class="section">debug: <span class="variable">$(TARGET_DEBUG)</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: clean</span></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	@echo CLEAN <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line">	@rm -f <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: distclean</span></span><br><span class="line"><span class="section">distclean:</span></span><br><span class="line">	@echo CLEAN <span class="variable">$(CLEAN_LIST)</span></span><br><span class="line">	@rm -f <span class="variable">$(DISTCLEAN_LIST)</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h3><p>src文件夹下放源文件以及头文件，后面还要需要修改<code>.vscode</code>中的<code>task.json</code>和<code>launch.json</code><br>注意：如果使用本文中的makefle，包含主函数的源文件名必须为<code>main.cpp</code><br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/VSCode-cpp-mf.png"></p>
-<h3 id="task-json"><a href="#task-json" class="headerlink" title="task.json"></a>task.json</h3><p>如果你使用的是msys的工具包，那command就写make<br>按快捷键<code>Ctrl+Shift+B</code>可以执行仅生成命令（build）<br>（在微软输入法中文模式时会出现表情窗口←_←）</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;2.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;tasks&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;default&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;group&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;kind&quot;</span>: <span class="string">&quot;build&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;isDefault&quot;</span>: <span class="literal">true</span></span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;build-debug&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;debug&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;label&quot;</span>: <span class="string">&quot;clean&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;mingw32-make&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;args&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;clean&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;shell&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="launch-json"><a href="#launch-json" class="headerlink" title="launch.json"></a>launch.json</h3><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// https://github.com/Microsoft/vscode-cpptools/blob/master/launch.md</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;0.2.0&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;configurations&quot;</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;(gdb) Launch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;cppdbg&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;request&quot;</span>: <span class="string">&quot;launch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;program&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/debug/main.exe&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;args&quot;</span>: [],</span><br><span class="line">            <span class="attr">&quot;stopAtEntry&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">&quot;cwd&quot;</span>: <span class="string">&quot;$&#123;workspaceFolder&#125;/debug/&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;environment&quot;</span>: [],</span><br><span class="line">            <span class="attr">&quot;externalConsole&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">&quot;internalConsoleOptions&quot;</span>: <span class="string">&quot;neverOpen&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;MIMode&quot;</span>: <span class="string">&quot;gdb&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;miDebuggerPath&quot;</span>: <span class="string">&quot;gdb.exe&quot;</span>, <span class="comment">// 调试器路径，Windows下后缀不能省略，Linux下则去掉</span></span><br><span class="line">            <span class="attr">&quot;setupCommands&quot;</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">&quot;description&quot;</span>: <span class="string">&quot;Enable pretty-printing for gdb&quot;</span>,</span><br><span class="line">                    <span class="attr">&quot;text&quot;</span>: <span class="string">&quot;-enable-pretty-printing&quot;</span>,</span><br><span class="line">                    <span class="attr">&quot;ignoreFailures&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">&quot;preLaunchTask&quot;</span>: <span class="string">&quot;build-debug&quot;</span> <span class="comment">// 调试会话开始前执行的任务，一般为编译程序。与tasks.json的label相对应</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="配置完成"><a href="#配置完成" class="headerlink" title="配置完成"></a>配置完成</h3><p>enjoy it!<br>😉</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/wzxlovesy/article/details/76708151">VS Code 配置 C/C++ 环境</a></p>
-]]></content>
-      <tags>
-        <tag>CPP</tag>
-        <tag>VSCode</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>VSCode中配置git使用ssh连接</title>
     <url>/2020/04/13/vscode-git-by-ssh/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用HTTPS协议时需要输入账号密码，比较麻烦，虽然可以配置自动保存密码，但明文保存可能导致安全性的降低。<br>在部署博客时也收到了github的邮件提醒：</p>
@@ -3537,18 +3540,6 @@
       </tags>
   </entry>
   <entry>
-    <title>VSCode 按时间排序</title>
-    <url>/2021/12/07/vscode-sort-by-time/</url>
-    <content><![CDATA[<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p><code>VSCode</code>只能配置按更改时间排序，不能按创建时间排序</p>
-<p>目前笔者的解决方案是：通过python调用系统API，把文件的创建时间赋值给更改时间（不使用git的话，会丢失文件本身的修改时间）</p>
-<h2 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h2><h3 id="法1-手动设置"><a href="#法1-手动设置" class="headerlink" title="法1 手动设置"></a>法1 手动设置</h3><p><code>设置</code>，搜索<code>sortOrder</code>，修改<code>Explorer: Sort Order</code></p>
-<h3 id="法2-配置文件"><a href="#法2-配置文件" class="headerlink" title="法2 配置文件"></a>法2 配置文件</h3><p>创建<code>.vscode</code>文件夹，增加<code>settings.json</code>：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;explorer.sortOrder&quot;</span>: <span class="string">&quot;modified&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>VSCode</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>VS Code 配置LaTeX环境（MikTex）</title>
     <url>/2019/09/14/vscode-latex/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前都是用VNote编辑LaTeX公式，看到网上有人使用VS Code来编辑，故也来折腾一下。</p>
@@ -3567,6 +3558,18 @@
       <tags>
         <tag>VSCode</tag>
         <tag>LaTeX</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VSCode 按时间排序</title>
+    <url>/2021/12/07/vscode-sort-by-time/</url>
+    <content><![CDATA[<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p><code>VSCode</code>只能配置按更改时间排序，不能按创建时间排序</p>
+<p>目前笔者的解决方案是：通过python调用系统API，把文件的创建时间赋值给更改时间（不使用git的话，会丢失文件本身的修改时间）</p>
+<h2 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h2><h3 id="法1-手动设置"><a href="#法1-手动设置" class="headerlink" title="法1 手动设置"></a>法1 手动设置</h3><p><code>设置</code>，搜索<code>sortOrder</code>，修改<code>Explorer: Sort Order</code></p>
+<h3 id="法2-配置文件"><a href="#法2-配置文件" class="headerlink" title="法2 配置文件"></a>法2 配置文件</h3><p>创建<code>.vscode</code>文件夹，增加<code>settings.json</code>：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;explorer.sortOrder&quot;</span>: <span class="string">&quot;modified&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>VSCode</tag>
       </tags>
   </entry>
   <entry>
@@ -3630,6 +3633,17 @@
       </tags>
   </entry>
   <entry>
+    <title>win10 切换诊断数据为完整</title>
+    <url>/2020/04/15/win10-open-diagtask-for-inside/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>安装windows预览版，需要切换诊断数据为<code>完整</code>，而切换到<code>完整</code>后又会自动跳回<code>基本</code>。搜索后找到解决方案。<br>原因是<code>Connected User Experiences and Telemetry</code>服务被禁用</p>
+<h2 id="解决步骤"><a href="#解决步骤" class="headerlink" title="解决步骤"></a>解决步骤</h2><p>Win+R,<code>services.msc</code>,找到<code>Connected User Experiences and Telemetry</code>，设置为<code>自动(延迟启动)</code>，再点击启动此服务即可成功切换</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://tieba.baidu.com/p/6483106526">安装win10预览版，诊断数据无设置成完整</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>WSL(Ubuntu 18.04)编译安卓6.0.0_r1源码</title>
     <url>/2020/04/14/wsl-18-04-android-6-source/</url>
     <content><![CDATA[<h2 id="之前的尝试"><a href="#之前的尝试" class="headerlink" title="之前的尝试"></a>之前的尝试</h2><p>一开始使用wsl1进行编译，即使用了ccache，编译耗时仍难以接受（编译了很久都没结束）<br>之后又使用wsl2进行编译，编译还是需要很久<br>原因猜测：源码位于D盘，wsl访问文件可能需要经过转换，因此IO操作速度慢。<br>搜索发现<a href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-ux-changes">WSL 1 与 WSL 2 之间的用户体验更改</a>中提到：</p>
@@ -3663,17 +3677,6 @@
       <tags>
         <tag>Android</tag>
         <tag>WSL</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>win10 切换诊断数据为完整</title>
-    <url>/2020/04/15/win10-open-diagtask-for-inside/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>安装windows预览版，需要切换诊断数据为<code>完整</code>，而切换到<code>完整</code>后又会自动跳回<code>基本</code>。搜索后找到解决方案。<br>原因是<code>Connected User Experiences and Telemetry</code>服务被禁用</p>
-<h2 id="解决步骤"><a href="#解决步骤" class="headerlink" title="解决步骤"></a>解决步骤</h2><p>Win+R,<code>services.msc</code>,找到<code>Connected User Experiences and Telemetry</code>，设置为<code>自动(延迟启动)</code>，再点击启动此服务即可成功切换</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://tieba.baidu.com/p/6483106526">安装win10预览版，诊断数据无设置成完整</a></p>
-]]></content>
-      <tags>
-        <tag>经验</tag>
       </tags>
   </entry>
   <entry>
