@@ -196,6 +196,75 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/06/08/android-arm-got-hook-rel-plta/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/08/android-arm-got-hook-rel-plta/" class="post-title-link" itemprop="url">GOT Hook中对.rel.plta的处理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-08 13:20:00" itemprop="dateCreated datePublished" datetime="2022-06-08T13:20:00+08:00">2022-06-08</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a>项目中，对于<code>ARM64</code>架构，在重定位表中找不到目标符号，无法基于<code>Segment</code>进行<code>GOT Hook</code>。</p>
+<p>通过打印日志，与<code>readelf -r</code>的结果比对，最终发现，代码错误地解析了重定位表（将<code>.rel.plta</code>处理为了<code>.rel.plt</code>），导致偏移值查找失败。</p>
+<p>查看git历史记录可知，<code>Android</code>的<code>linker</code>从<code>5.0</code>（API等级21）才开始支持<code>DT_RELA</code>。使用宏<code>USE_RELA</code>控制。</p>
+<p><a target="_blank" rel="noopener" href="https://android.googlesource.com/platform/bionic/+/refs/heads/master/linker/linker_common_types.h#38">linker_common_types.h#38</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Android uses RELA for LP64.</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__LP64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> USE_RELA 1</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>解决方案：<code>ARM64</code>架构下使用<code>elf64_rela</code>数据结构。</p>
+<p>PS：也可以通过<code>DT_PLTREL</code>来判断使用的是哪种重定位表。</p>
+<h2 id="相关数据结构"><a href="#相关数据结构" class="headerlink" title="相关数据结构"></a>相关数据结构</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">elf64_rel</span> &#123;</span></span><br><span class="line">  Elf64_Addr r_offset;</span><br><span class="line">  Elf64_Xword r_info;</span><br><span class="line">&#125; Elf64_Rel;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">elf64_rela</span> &#123;</span></span><br><span class="line">  Elf64_Addr r_offset;</span><br><span class="line">  Elf64_Xword r_info;</span><br><span class="line">  Elf64_Sxword r_addend;</span><br><span class="line">&#125; Elf64_Rela;</span><br></pre></td></tr></table></figure>
+
+<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p>抄<code>linker</code>代码即可。</p>
+<p><a target="_blank" rel="noopener" href="https://cs.android.com/android/platform/superproject/+/master:bionic/linker/linker.cpp">linker.cpp</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/06/02/gradle-default-ndk-version/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -234,10 +303,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a>项目中，删除<code>ndkVersion</code>配置后，在<code>arm64</code>环境下，无法基于<code>Segment</code>进行<code>GOT Hook</code>（在重定位表中找不到目标符号）。</p>
-<p>发现是ndk版本原因，默认版本的ndk（<code>21.4.7075529</code>）生成的文件，错误解析了重定位表，无法Hook。（原理探究见后文）</p>
-<p>使用<code>22.1.7171670</code>、<code>23.1.7779620</code>、<code>24.0.8215888</code>版本可以正常Hook。</p>
-<h2 id="NDK默认版本"><a href="#NDK默认版本" class="headerlink" title="NDK默认版本"></a>NDK默认版本</h2><table>
+          <h2 id="NDK默认版本"><a href="#NDK默认版本" class="headerlink" title="NDK默认版本"></a>NDK默认版本</h2><table>
 <thead>
 <tr>
 <th>7.0</th>
@@ -256,7 +322,7 @@
 </tr>
 </tbody></table>
 <h2 id="手动指定版本"><a href="#手动指定版本" class="headerlink" title="手动指定版本"></a>手动指定版本</h2><p>修改<code>build.gradle</code>，设置<code>ndkVersion</code></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    ndkVersion <span class="string">&quot;24.0.8215888&quot;</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    ndkVersion <span class="string">&quot;24.0.8215888&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://developer.android.google.cn/studio/projects/install-ndk?hl=zh-cn#default-ndk-per-agp">每个 AGP 版本对应的默认 NDK 版本</a></p>
 
       
@@ -799,74 +865,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/03/pidof-analisis/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/05/03/pidof-analisis/" class="post-title-link" itemprop="url">pidof 源码分析</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-03 04:00:31" itemprop="dateCreated datePublished" datetime="2022-05-03T04:00:31+08:00">2022-05-03</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>执行<code>ls -all $(which pidof)</code>，结果如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lrwxrwxrwx 1 root root 14 May 19  2021 /usr/bin/pidof -&gt; /sbin/killall5</span><br></pre></td></tr></table></figure>
-
-<h2 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h2><p><a target="_blank" rel="noopener" href="https://github.com/limingth/sysvinit/blob/master/sysvinit-2.88dsf/src/killall5.c">killall5.c</a></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/05/03/pidof-analisis/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -938,7 +936,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-count">146</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
