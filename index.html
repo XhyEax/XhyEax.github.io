@@ -196,7 +196,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/06/08/android-arm-got-hook-rel-plta/">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/06/08/android-arm64-got-hook-rela-plt/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
@@ -210,7 +210,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/06/08/android-arm-got-hook-rel-plta/" class="post-title-link" itemprop="url">GOT Hook中对.rel.plta的处理</a>
+            <a href="/2022/06/08/android-arm64-got-hook-rela-plt/" class="post-title-link" itemprop="url">ARM64 GOT Hook中对.rela.plt的处理</a>
         </h2>
 
         <div class="post-meta">
@@ -235,7 +235,7 @@
 
       
           <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a>项目中，对于<code>ARM64</code>架构，在重定位表中找不到目标符号，无法基于<code>Segment</code>进行<code>GOT Hook</code>。</p>
-<p>通过打印日志，与<code>readelf -r</code>的结果比对，最终发现，代码错误地解析了重定位表（将<code>.rel.plta</code>处理为了<code>.rel.plt</code>），导致偏移值查找失败。</p>
+<p>通过打印日志，与<code>readelf -r</code>的结果比对，最终发现，代码错误地解析了重定位表（将<code>.rela.plt</code>处理为了<code>.rel.plt</code>），导致偏移值查找失败。</p>
 <p>查看git历史记录可知，<code>Android</code>的<code>linker</code>从<code>5.0</code>（API等级21）才开始支持<code>DT_RELA</code>。使用宏<code>USE_RELA</code>控制。</p>
 <p><a target="_blank" rel="noopener" href="https://android.googlesource.com/platform/bionic/+/refs/heads/master/linker/linker_common_types.h#38">linker_common_types.h#38</a></p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Android uses RELA for LP64.</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__LP64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> USE_RELA 1</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
@@ -244,8 +244,8 @@
 <p>PS：也可以通过<code>DT_PLTREL</code>来判断使用的是哪种重定位表。</p>
 <h2 id="相关数据结构"><a href="#相关数据结构" class="headerlink" title="相关数据结构"></a>相关数据结构</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">elf64_rel</span> &#123;</span></span><br><span class="line">  Elf64_Addr r_offset;</span><br><span class="line">  Elf64_Xword r_info;</span><br><span class="line">&#125; Elf64_Rel;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">elf64_rela</span> &#123;</span></span><br><span class="line">  Elf64_Addr r_offset;</span><br><span class="line">  Elf64_Xword r_info;</span><br><span class="line">  Elf64_Sxword r_addend;</span><br><span class="line">&#125; Elf64_Rela;</span><br></pre></td></tr></table></figure>
 
-<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p>抄<code>linker</code>代码即可。</p>
-<p><a target="_blank" rel="noopener" href="https://cs.android.com/android/platform/superproject/+/master:bionic/linker/linker.cpp">linker.cpp</a></p>
+<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p>抄<a target="_blank" rel="noopener" href="https://cs.android.com/android/platform/superproject/+/master:bionic/linker/linker.cpp">linker.cpp</a>代码即可。</p>
+<p>对<code>.rela</code>的适配见<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a></p>
 
       
     </div>
