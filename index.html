@@ -196,6 +196,130 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/07/06/android-12-set-hotpot-ip/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/07/06/android-12-set-hotpot-ip/" class="post-title-link" itemprop="url">安卓12 设置热点固定IP (Xposed)</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-07-06 17:30:36" itemprop="dateCreated datePublished" datetime="2022-07-06T17:30:36+08:00">2022-07-06</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Hook点"><a href="#Hook点" class="headerlink" title="Hook点"></a>Hook点</h2><p>仍然是<code>android.net.ip.IpServer</code>的<code>requestIpv4Address</code>函数。</p>
+<p>源代码：<a target="_blank" rel="noopener" href="http://aospxref.com/android-12.0.0_r3/xref/packages/modules/Connectivity/Tethering/src/android/net/ip/IpServer.java#655">IpServer.java#655</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> LinkAddress <span class="title">requestIpv4Address</span><span class="params">(<span class="keyword">final</span> <span class="keyword">boolean</span> useLastAddress)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>参数增加了一个<code>boolean useLastAddress</code>，加上即可。</p>
+<p>PS：也可以用反射来获取方法，从而适配安卓11和12。这里就直接复制安卓11的代码了。</p>
+<h2 id="Hook代码"><a href="#Hook代码" class="headerlink" title="Hook代码"></a>Hook代码</h2><p>见GitHub：<a target="_blank" rel="noopener" href="https://github.com/XhyEax/SoftApHelper/tree/master/app/src/main/java/com/xhy/xp/softaphelper/MainHook.java">MainHook.java</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/06/14/android-kernel-panic-log/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/14/android-kernel-panic-log/" class="post-title-link" itemprop="url">Android Kernel Panic日志保存位置</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-14 05:40:00" itemprop="dateCreated datePublished" datetime="2022-06-14T05:40:00+08:00">2022-06-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="日志位置"><a href="#日志位置" class="headerlink" title="日志位置"></a>日志位置</h2><p><code>/proc/last_kmsg</code></p>
+<p><code>/sys/fs/pstore/console-ramoops</code></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/9682306/android-how-to-get-kernel-logs-after-kernel-panic">Android: How to get kernel logs after kernel panic?</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/06/08/android-arm64-got-hook-rela-plt/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -236,7 +360,7 @@
       
           <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a>项目中，对于<code>ARM64</code>架构，在重定位表中找不到目标符号，无法基于<code>Segment</code>进行<code>GOT Hook</code>。</p>
 <p>通过打印日志，与<code>readelf -r</code>的结果比对，最终发现，代码错误地解析了重定位表（将<code>.rela.plt</code>处理为了<code>.rel.plt</code>），导致偏移值查找失败。</p>
-<p>查看git历史记录可知，<code>Android</code>的<code>linker</code>从<code>5.0</code>（API等级21）才开始支持<code>DT_RELA</code>。使用宏<code>USE_RELA</code>控制。</p>
+<p>查看git历史记录可知，<code>Android</code>的<code>linker</code>从<code>5.0</code>（API等级21）开始支持<code>DT_RELA</code>。使用宏<code>USE_RELA</code>控制。</p>
 <p><a target="_blank" rel="noopener" href="https://android.googlesource.com/platform/bionic/+/refs/heads/master/linker/linker_common_types.h#38">linker_common_types.h#38</a></p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Android uses RELA for LP64.</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__LP64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> USE_RELA 1</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
 
@@ -245,10 +369,10 @@
 <h2 id="相关数据结构"><a href="#相关数据结构" class="headerlink" title="相关数据结构"></a>相关数据结构</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">elf64_rel</span> &#123;</span></span><br><span class="line">  Elf64_Addr r_offset;</span><br><span class="line">  Elf64_Xword r_info;</span><br><span class="line">&#125; Elf64_Rel;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">elf64_rela</span> &#123;</span></span><br><span class="line">  Elf64_Addr r_offset;</span><br><span class="line">  Elf64_Xword r_info;</span><br><span class="line">  Elf64_Sxword r_addend;</span><br><span class="line">&#125; Elf64_Rela;</span><br></pre></td></tr></table></figure>
 
 <h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p>抄<a target="_blank" rel="noopener" href="https://cs.android.com/android/platform/superproject/+/master:bionic/linker/linker.cpp">linker.cpp</a>代码即可。</p>
-<p>使用宏定义进行条件判断，例如：</p>
+<p>增加对<code>DT_RELA</code>和<code>DT_RELASZ</code>的处理，并使用宏定义进行条件判断，例如：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__LP64__)</span></span><br><span class="line">                rela_plt = (<span class="built_in">ELFW</span>(Rela) *) (moduleBase + dyn.d_un.d_ptr);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">                rel_plt = (<span class="built_in">ELFW</span>(Rel) *) (moduleBase + dyn.d_un.d_ptr);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
 
-<p>对<code>.rela</code>的适配见<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a></p>
+<p>完整代码见<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a></p>
 
       
     </div>
@@ -738,136 +862,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/03/app-access-device-by-selinux-rule/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/05/03/app-access-device-by-selinux-rule/" class="post-title-link" itemprop="url">定制SELinux规则 允许app访问内核模块</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-03 07:46:31" itemprop="dateCreated datePublished" datetime="2022-05-03T07:46:31+08:00">2022-05-03</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>使用<code>insmod</code>安装内核模块后，在<code>app</code>的<code>Native</code>层访问驱动，提示<code>Permission Denied</code>。<br>设置驱动权限，绕过<code>DAC</code>权限检查：<code>chmod 666 /dev/helloworld</code>。<br>再次调用，仍然失败。<br>执行<code>dmesg -w | grep &quot;avc: denied&quot;</code>，查看<code>SELinux</code>日志。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[23292:logd.auditd]type=1400 audit(1651503112.740:5320): avc: denied &#123; read write &#125; for comm=&quot;exp.hellokernel&quot; name=&quot;helloworld&quot; dev=&quot;tmpfs&quot; ino=297747 scontext=u:r:priv_app:s0:c227,c256,c512,c768 tcontext=u:object_r:device:s0 tclass=chr_file permissive=1</span><br></pre></td></tr></table></figure>
-<p>关闭<code>SELinux</code>后，成功调用驱动。</p>
-<p>添加<code>allow</code>规则，调用仍失败，查阅资料得知需要设置为<code>mlstrustedsubject</code>。</p>
-<p>最终基于<code>magiskpolicy</code>，实现了自定义<code>SELinux</code>规则的添加。</p>
-<p>PS：笔者将apk放到了<code>system/priv-app</code>目录下，所以<code>role</code>是<code>priv_app</code>，而非<code>untrusted_app</code>。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/05/03/app-access-device-by-selinux-rule/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/05/03/fix-android-logd-crash/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/05/03/fix-android-logd-crash/" class="post-title-link" itemprop="url">修复安卓Log日志不输出问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-03 07:00:59" itemprop="dateCreated datePublished" datetime="2022-05-03T07:00:59+08:00">2022-05-03</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="报错信息"><a href="#报错信息" class="headerlink" title="报错信息"></a>报错信息</h2><h3 id="Log"><a href="#Log" class="headerlink" title="Log"></a>Log</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">logcat: Unexpected EOF!</span><br><span class="line"></span><br><span class="line">This means that either the device shut down, logd crashed, or this instance of logcat was unable to read log</span><br><span class="line">messages as quickly as they were being produced.</span><br></pre></td></tr></table></figure>
-<h3 id="LSPosed"><a href="#LSPosed" class="headerlink" title="LSPosed"></a>LSPosed</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Logd maybe crashed, retrying in 1s...</span><br><span class="line">Logd crashed too many times, trying manually start...</span><br></pre></td></tr></table></figure>
-<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p><code>开发者选项</code>-<code>日志记录器缓冲区大小</code>修改为<code>16M</code>。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -939,7 +933,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">146</span>
+          <span class="site-state-item-count">148</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
