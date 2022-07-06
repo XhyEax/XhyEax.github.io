@@ -34,21 +34,6 @@
       </tags>
   </entry>
   <entry>
-    <title>2020吾爱破解论坛春节红包前三题 Writeup</title>
-    <url>/2020/01/29/52pojie-2020-red-packet/</url>
-    <content><![CDATA[<p>解题方法并不唯一，仅供参考。</p>
-<h2 id="题目打包下载地址"><a href="#题目打包下载地址" class="headerlink" title="题目打包下载地址"></a>题目打包下载地址</h2><p><a href="https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar">https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar</a></p>
-<h2 id="第一题-送分题"><a href="#第一题-送分题" class="headerlink" title="第一题 送分题"></a>第一题 送分题</h2><p>关注“吾爱破解论坛”微信公众号，回复指定字符串即可获得本题正确口令。</p>
-<h2 id="第二题-Windows-初级题"><a href="#第二题-Windows-初级题" class="headerlink" title="第二题 Windows 初级题"></a>第二题 Windows 初级题</h2><p>使用<code>PEiD</code>查壳，得知该程序是<code>UPX</code>壳，并修改了区段名。于是使用<code>OD</code>脱壳，再用<code>ImportREConstructor</code>修复IAT。<br>再次查壳，得到<code>Borland Delphi v3.0 *</code>。故使用<code>IDR</code>（<a href="https://down.52pojie.cn/Tools/Disassemblers/IDR%20(Interactive%20Delphi%20Reconstructor).rar">爱盘下载地址</a>）进行分析。<br>查看窗体，定位到关键函数<code>TForm1.edtPwdChange</code>：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-1.png"><br>其中对输入字符串进行切片，然后分别进行md5计算，并与以下字符比较：<br><code>E7EE5F4653E31955CACC7CD68E2A7839</code><br><code>ea6b2efbdd4255a9f1b3bbc6399b58f4</code><br><code>c8d46d341bea4fd5bff866a65ff8aea9</code><br>反查md5并拼接即可得到<code>52pojie2019game</code><br>输入进行校验，得到提示：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-2.png"><br>将该字符串回复到公众号即可获得本题正确口令。</p>
-<h2 id="第三题-Android-初级题"><a href="#第三题-Android-初级题" class="headerlink" title="第三题 Android 初级题"></a>第三题 Android 初级题</h2><p>使用<code>AndroidKiller</code>反编译，打开<code>MainActivity.smali</code>，发现<code>checkFlag</code>和<code>onClick</code>方法被nativie化了。<br>于是使用<code>IDA</code>打开<code>libcrack_j2c.so</code>，定位到<code>onClick</code>方法，可以发现是通过JNI反射调用Java方法。由此可以大致分析出程序流程：<br>首先获取输入框文本，对长度进行判断，为30则调用<code>checkFlag</code>方法进行检查<br>在<code>checkFlag</code>方法中，定位到关键位置：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-3.png"><br>由此可知，安装并打开该APP后，输入30位长度的字符串，点击确定就会调用<code>equals</code>方法<br>于是使用<code>Frida</code>进行hook，打印出调用该方法的参数和实例内容，从而得到真码：<br><code>ed61f6308c74bcf35c71729d4db24c</code><br>将该字符串回复到公众号即可获得本题正确口令。<br>Frida脚本如下：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(Java.available)</span><br><span class="line">&#123;</span><br><span class="line">    Java.perform(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">       <span class="keyword">var</span> <span class="built_in">String</span>= Java.use(<span class="string">&#x27;java.lang.String&#x27;</span>);</span><br><span class="line">		<span class="built_in">String</span>.equals.overload(<span class="string">&quot;java.lang.Object&quot;</span>).implementation=<span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="built_in">this</span>.toString());</span><br><span class="line">        <span class="built_in">console</span>.log(obj);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.equals(obj);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="此处应有分割线"><a href="#此处应有分割线" class="headerlink" title="此处应有分割线"></a>此处应有分割线</h2><p>祝各位身体健康，心想事成！</p>
-]]></content>
-      <tags>
-        <tag>CTF</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>2022秋招 安全工程师（安卓方向）面经</title>
     <url>/2021/12/01/2022-autumn-mobile-security-interview-experience/</url>
     <content><![CDATA[<h2 id="认清形势，放弃幻想"><a href="#认清形势，放弃幻想" class="headerlink" title="认清形势，放弃幻想"></a>认清形势，放弃幻想</h2><p>末流985本，计算机科学与技术专业，无国奖，无实习经历。<br>15年开始搞安卓逆向，目前技术一般。</p>
@@ -104,6 +89,43 @@
       </tags>
   </entry>
   <entry>
+    <title>2020吾爱破解论坛春节红包前三题 Writeup</title>
+    <url>/2020/01/29/52pojie-2020-red-packet/</url>
+    <content><![CDATA[<p>解题方法并不唯一，仅供参考。</p>
+<h2 id="题目打包下载地址"><a href="#题目打包下载地址" class="headerlink" title="题目打包下载地址"></a>题目打包下载地址</h2><p><a href="https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar">https://down.52pojie.cn/Challenge/Happy_New_Year_2020_Challenge.rar</a></p>
+<h2 id="第一题-送分题"><a href="#第一题-送分题" class="headerlink" title="第一题 送分题"></a>第一题 送分题</h2><p>关注“吾爱破解论坛”微信公众号，回复指定字符串即可获得本题正确口令。</p>
+<h2 id="第二题-Windows-初级题"><a href="#第二题-Windows-初级题" class="headerlink" title="第二题 Windows 初级题"></a>第二题 Windows 初级题</h2><p>使用<code>PEiD</code>查壳，得知该程序是<code>UPX</code>壳，并修改了区段名。于是使用<code>OD</code>脱壳，再用<code>ImportREConstructor</code>修复IAT。<br>再次查壳，得到<code>Borland Delphi v3.0 *</code>。故使用<code>IDR</code>（<a href="https://down.52pojie.cn/Tools/Disassemblers/IDR%20(Interactive%20Delphi%20Reconstructor).rar">爱盘下载地址</a>）进行分析。<br>查看窗体，定位到关键函数<code>TForm1.edtPwdChange</code>：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-1.png"><br>其中对输入字符串进行切片，然后分别进行md5计算，并与以下字符比较：<br><code>E7EE5F4653E31955CACC7CD68E2A7839</code><br><code>ea6b2efbdd4255a9f1b3bbc6399b58f4</code><br><code>c8d46d341bea4fd5bff866a65ff8aea9</code><br>反查md5并拼接即可得到<code>52pojie2019game</code><br>输入进行校验，得到提示：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-2.png"><br>将该字符串回复到公众号即可获得本题正确口令。</p>
+<h2 id="第三题-Android-初级题"><a href="#第三题-Android-初级题" class="headerlink" title="第三题 Android 初级题"></a>第三题 Android 初级题</h2><p>使用<code>AndroidKiller</code>反编译，打开<code>MainActivity.smali</code>，发现<code>checkFlag</code>和<code>onClick</code>方法被nativie化了。<br>于是使用<code>IDA</code>打开<code>libcrack_j2c.so</code>，定位到<code>onClick</code>方法，可以发现是通过JNI反射调用Java方法。由此可以大致分析出程序流程：<br>首先获取输入框文本，对长度进行判断，为30则调用<code>checkFlag</code>方法进行检查<br>在<code>checkFlag</code>方法中，定位到关键位置：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2020-3.png"><br>由此可知，安装并打开该APP后，输入30位长度的字符串，点击确定就会调用<code>equals</code>方法<br>于是使用<code>Frida</code>进行hook，打印出调用该方法的参数和实例内容，从而得到真码：<br><code>ed61f6308c74bcf35c71729d4db24c</code><br>将该字符串回复到公众号即可获得本题正确口令。<br>Frida脚本如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(Java.available)</span><br><span class="line">&#123;</span><br><span class="line">    Java.perform(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">       <span class="keyword">var</span> <span class="built_in">String</span>= Java.use(<span class="string">&#x27;java.lang.String&#x27;</span>);</span><br><span class="line">		<span class="built_in">String</span>.equals.overload(<span class="string">&quot;java.lang.Object&quot;</span>).implementation=<span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="built_in">this</span>.toString());</span><br><span class="line">        <span class="built_in">console</span>.log(obj);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.equals(obj);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="此处应有分割线"><a href="#此处应有分割线" class="headerlink" title="此处应有分割线"></a>此处应有分割线</h2><p>祝各位身体健康，心想事成！</p>
+]]></content>
+      <tags>
+        <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>送给最好的TA app分析</title>
+    <url>/2019/09/27/andlua-app-reverse/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天群里有人传了个apk文件，名字叫<code>送给最好的TA</code>。这是一个整人app，安装并打开会播放一段音频，并循环调节媒体音量，维持最大值。从后台划掉/卸载/关机都可以停止该程序。<br><strong>网传所谓的截图、获取设备信息并上传等行为均不存在。反编译后看到的截图相关代码实际上并没有被调用，只是打包apk时封装进去的类，关键逻辑位于main.lua中。</strong></p>
+<span id="more"></span>
+<h2 id="apk分析"><a href="#apk分析" class="headerlink" title="apk分析"></a>apk分析</h2><p>拿到样本之后，别急着安装运行，先看看它的目录结构。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-0.png"><br>打开assets文件夹，看到有一个mp3文件以及两个加密后的lua脚本：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-1.png"><br>运行app后会自动播放这个音频文件，先对它进行替换。<br>这里使用AU对该mp3进行静音处理后，重打包并签名。<br>（其实也可以替换成自己想要播放的音频）</p>
+<h2 id="找到加载lua的关键函数"><a href="#找到加载lua的关键函数" class="headerlink" title="找到加载lua的关键函数"></a>找到加载lua的关键函数</h2><p>众所周知，lua脚本需要加载，而在加载之前肯定是要先解密的，所以只要找到解密函数，然后就可以把解密后的lua脚本dump出来。<br>使用<code>IDA</code>打开<code>libluajava.so</code>，经过分析找到函数<code>luaL_loadbufferx</code><br><code>luaL_loadbufferx</code>的第二个参数是加密的字节数组，第三个参数是大小，第四个参数是lua文件位置。<br>程序在这个函数中加载加密lua脚本，其中对脚本进行了解密操作。<br>根据第四个参数我们可以区分目前加载的lua脚本名称，从而选择性地dump<br>（即在函数开头下断点，查看第四个参数内容）<br><code>luaL_loadbufferx</code>函数伪代码如下：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-2.png"><br>首先对输入的字节数组进行判断，如果以1B开头，且第二位不是0C，则进行解密操作，否则直接调用<code>j_lua_load</code>加载lua脚本<br>在第41行下断点即可获取到解密后的字节数组，从而dump</p>
+<h2 id="动态调试进行dump"><a href="#动态调试进行dump" class="headerlink" title="动态调试进行dump"></a>动态调试进行dump</h2><p>具体步骤可以参考我之前写的文章 <a href="https://blog.xhyeax.com/2019/09/14/android-debug-onload/">IDA调试安卓so 在libart.so OpenMemory下断点</a><br><code>IDA</code>在第41行断下之后，运行python脚本dump即可</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> idaapi</span><br><span class="line">data = idaapi.dbg_read_memory(<span class="number">0xf4daff00</span>, <span class="number">0x3000</span>)</span><br><span class="line">fp = <span class="built_in">open</span>(<span class="string">&#x27;d:\\dump.lua&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>)</span><br><span class="line">fp.write(data)</span><br><span class="line">fp.close()</span><br></pre></td></tr></table></figure>
+<p>此处的<code>0xf4daff00, 0x3000</code>需要替换成解密后字节的起始地址和长度<br>长度写大一点也没事，可以再用<code>010Editor</code>删除（所以我这写的<code>0x3000</code>）</p>
+<h2 id="分析lua"><a href="#分析lua" class="headerlink" title="分析lua"></a>分析lua</h2><p>由于dump出来的lua是字节码，并不是源码形式。所以还需要反编译后才能查看源码。（使用<code>unluac_2015_06_13.jar</code>进行反编译）<br><code>init.lua</code>中进行包名、版本号、主题、权限等配置</p>
+<figure class="highlight lua"><table><tr><td class="code"><pre><span class="line"><span class="keyword">local</span> L0_0</span><br><span class="line">appname = <span class="string">&quot;送给最好的TA&quot;</span></span><br><span class="line">appver = <span class="string">&quot;1.0&quot;</span></span><br><span class="line">appcode = <span class="string">&quot;10&quot;</span></span><br><span class="line">appsdk = <span class="string">&quot;15&quot;</span></span><br><span class="line">path_pattern = <span class="string">&quot;&quot;</span></span><br><span class="line">packagename = <span class="string">&quot;com.sgzh.dt&quot;</span></span><br><span class="line">theme = <span class="string">&quot;Theme_DeviceDefault_Dialog_NoActionBar_MinWidth&quot;</span></span><br><span class="line">app_key = <span class="string">&quot;&quot;</span></span><br><span class="line">app_channel = <span class="string">&quot;&quot;</span></span><br><span class="line">developer = <span class="string">&quot;&quot;</span></span><br><span class="line">description = <span class="string">&quot;&quot;</span></span><br><span class="line">debugmode = <span class="literal">false</span></span><br><span class="line">L0_0 = &#123;</span><br><span class="line">  <span class="string">&quot;INTERNET&quot;</span>,</span><br><span class="line">  <span class="string">&quot;WRITE_EXTERNAL_STORAGE&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">user_permission = L0_0</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>主要功能在<code>main.lua</code>中完成:</p>
+<figure class="highlight lua"><table><tr><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">&quot;import&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.app.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.os.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.widget.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.view.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.view.View&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.content.Context&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.media.MediaPlayer&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.media.AudioManager&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;com.androlua.Ticker&quot;</span>)</span><br><span class="line">activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">activity.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE)</span><br><span class="line">m = MediaPlayer()</span><br><span class="line">m.reset()</span><br><span class="line">m.setDataSource(activity.getLuaDir() .. <span class="string">&quot;/0.mp3&quot;</span>)</span><br><span class="line">m.prepare()</span><br><span class="line">m.start()</span><br><span class="line">m.setLooping(<span class="literal">true</span>)</span><br><span class="line">ti = Ticker()</span><br><span class="line">ti.Period = <span class="number">10</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">ti.onTick</span><span class="params">()</span></span></span><br><span class="line">  activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">  activity.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line">ti.start()</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">onKeyDown</span><span class="params">(A0_0, A1_1)</span></span></span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">string</span>.<span class="built_in">find</span>(<span class="built_in">tostring</span>(A1_1), <span class="string">&quot;KEYCODE_BACK&quot;</span>) ~= <span class="literal">nil</span> <span class="keyword">then</span></span><br><span class="line">    activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>首先设置音频源文件路径为0.mp3，使用单曲循环模式播放音频。然后使用<code>Ticker</code>循环调节媒体音量至最大值，同时拦截了返回键。<br>主要功能其实跟以前那个叫目力的app差不多。（不过今天这个apk的音频就太那啥了…）</p>
+<h2 id="静音样本下载"><a href="#静音样本下载" class="headerlink" title="静音样本下载"></a>静音样本下载</h2><p><a href="https://pan.baidu.com/s/1jTUcjknxr-fwETgtEVpQSg">https://pan.baidu.com/s/1jTUcjknxr-fwETgtEVpQSg</a></p>
+<h2 id="dump出来的lua"><a href="#dump出来的lua" class="headerlink" title="dump出来的lua"></a>dump出来的lua</h2><p><a href="https://pan.baidu.com/s/1X0un1jgVB6QAgPRqNu_3Wg">https://pan.baidu.com/s/1X0un1jgVB6QAgPRqNu_3Wg</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>安卓10、11 固定Wifi热点IP (Xposed)</title>
     <url>/2021/12/06/android-10-11-hostpot-set-ip/</url>
     <content><![CDATA[<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p><a href="https://blog.xhyeax.com/2022/07/06/android-12-hostpot-set-ip/">安卓12 固定Wifi热点IP (Xposed)</a></p>
@@ -149,32 +171,11 @@
       </tags>
   </entry>
   <entry>
-    <title>送给最好的TA app分析</title>
-    <url>/2019/09/27/andlua-app-reverse/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天群里有人传了个apk文件，名字叫<code>送给最好的TA</code>。这是一个整人app，安装并打开会播放一段音频，并循环调节媒体音量，维持最大值。从后台划掉/卸载/关机都可以停止该程序。<br><strong>网传所谓的截图、获取设备信息并上传等行为均不存在。反编译后看到的截图相关代码实际上并没有被调用，只是打包apk时封装进去的类，关键逻辑位于main.lua中。</strong></p>
-<span id="more"></span>
-<h2 id="apk分析"><a href="#apk分析" class="headerlink" title="apk分析"></a>apk分析</h2><p>拿到样本之后，别急着安装运行，先看看它的目录结构。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-0.png"><br>打开assets文件夹，看到有一个mp3文件以及两个加密后的lua脚本：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-1.png"><br>运行app后会自动播放这个音频文件，先对它进行替换。<br>这里使用AU对该mp3进行静音处理后，重打包并签名。<br>（其实也可以替换成自己想要播放的音频）</p>
-<h2 id="找到加载lua的关键函数"><a href="#找到加载lua的关键函数" class="headerlink" title="找到加载lua的关键函数"></a>找到加载lua的关键函数</h2><p>众所周知，lua脚本需要加载，而在加载之前肯定是要先解密的，所以只要找到解密函数，然后就可以把解密后的lua脚本dump出来。<br>使用<code>IDA</code>打开<code>libluajava.so</code>，经过分析找到函数<code>luaL_loadbufferx</code><br><code>luaL_loadbufferx</code>的第二个参数是加密的字节数组，第三个参数是大小，第四个参数是lua文件位置。<br>程序在这个函数中加载加密lua脚本，其中对脚本进行了解密操作。<br>根据第四个参数我们可以区分目前加载的lua脚本名称，从而选择性地dump<br>（即在函数开头下断点，查看第四个参数内容）<br><code>luaL_loadbufferx</code>函数伪代码如下：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/andlua-app-2.png"><br>首先对输入的字节数组进行判断，如果以1B开头，且第二位不是0C，则进行解密操作，否则直接调用<code>j_lua_load</code>加载lua脚本<br>在第41行下断点即可获取到解密后的字节数组，从而dump</p>
-<h2 id="动态调试进行dump"><a href="#动态调试进行dump" class="headerlink" title="动态调试进行dump"></a>动态调试进行dump</h2><p>具体步骤可以参考我之前写的文章 <a href="https://blog.xhyeax.com/2019/09/14/android-debug-onload/">IDA调试安卓so 在libart.so OpenMemory下断点</a><br><code>IDA</code>在第41行断下之后，运行python脚本dump即可</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> idaapi</span><br><span class="line">data = idaapi.dbg_read_memory(<span class="number">0xf4daff00</span>, <span class="number">0x3000</span>)</span><br><span class="line">fp = <span class="built_in">open</span>(<span class="string">&#x27;d:\\dump.lua&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>)</span><br><span class="line">fp.write(data)</span><br><span class="line">fp.close()</span><br></pre></td></tr></table></figure>
-<p>此处的<code>0xf4daff00, 0x3000</code>需要替换成解密后字节的起始地址和长度<br>长度写大一点也没事，可以再用<code>010Editor</code>删除（所以我这写的<code>0x3000</code>）</p>
-<h2 id="分析lua"><a href="#分析lua" class="headerlink" title="分析lua"></a>分析lua</h2><p>由于dump出来的lua是字节码，并不是源码形式。所以还需要反编译后才能查看源码。（使用<code>unluac_2015_06_13.jar</code>进行反编译）<br><code>init.lua</code>中进行包名、版本号、主题、权限等配置</p>
-<figure class="highlight lua"><table><tr><td class="code"><pre><span class="line"><span class="keyword">local</span> L0_0</span><br><span class="line">appname = <span class="string">&quot;送给最好的TA&quot;</span></span><br><span class="line">appver = <span class="string">&quot;1.0&quot;</span></span><br><span class="line">appcode = <span class="string">&quot;10&quot;</span></span><br><span class="line">appsdk = <span class="string">&quot;15&quot;</span></span><br><span class="line">path_pattern = <span class="string">&quot;&quot;</span></span><br><span class="line">packagename = <span class="string">&quot;com.sgzh.dt&quot;</span></span><br><span class="line">theme = <span class="string">&quot;Theme_DeviceDefault_Dialog_NoActionBar_MinWidth&quot;</span></span><br><span class="line">app_key = <span class="string">&quot;&quot;</span></span><br><span class="line">app_channel = <span class="string">&quot;&quot;</span></span><br><span class="line">developer = <span class="string">&quot;&quot;</span></span><br><span class="line">description = <span class="string">&quot;&quot;</span></span><br><span class="line">debugmode = <span class="literal">false</span></span><br><span class="line">L0_0 = &#123;</span><br><span class="line">  <span class="string">&quot;INTERNET&quot;</span>,</span><br><span class="line">  <span class="string">&quot;WRITE_EXTERNAL_STORAGE&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">user_permission = L0_0</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>主要功能在<code>main.lua</code>中完成:</p>
-<figure class="highlight lua"><table><tr><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">&quot;import&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.app.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.os.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.widget.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.view.*&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.view.View&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.content.Context&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.media.MediaPlayer&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;android.media.AudioManager&quot;</span>)</span><br><span class="line">import(<span class="string">&quot;com.androlua.Ticker&quot;</span>)</span><br><span class="line">activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">activity.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE)</span><br><span class="line">m = MediaPlayer()</span><br><span class="line">m.reset()</span><br><span class="line">m.setDataSource(activity.getLuaDir() .. <span class="string">&quot;/0.mp3&quot;</span>)</span><br><span class="line">m.prepare()</span><br><span class="line">m.start()</span><br><span class="line">m.setLooping(<span class="literal">true</span>)</span><br><span class="line">ti = Ticker()</span><br><span class="line">ti.Period = <span class="number">10</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">ti.onTick</span><span class="params">()</span></span></span><br><span class="line">  activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">  activity.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line">ti.start()</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">onKeyDown</span><span class="params">(A0_0, A1_1)</span></span></span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">string</span>.<span class="built_in">find</span>(<span class="built_in">tostring</span>(A1_1), <span class="string">&quot;KEYCODE_BACK&quot;</span>) ~= <span class="literal">nil</span> <span class="keyword">then</span></span><br><span class="line">    activity.getSystemService(Context.AUDIO_SERVICE).setStreamVolume(AudioManager.STREAM_MUSIC, <span class="number">15</span>, AudioManager.FLAG_SHOW_UI)</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<p>首先设置音频源文件路径为0.mp3，使用单曲循环模式播放音频。然后使用<code>Ticker</code>循环调节媒体音量至最大值，同时拦截了返回键。<br>主要功能其实跟以前那个叫目力的app差不多。（不过今天这个apk的音频就太那啥了…）</p>
-<h2 id="静音样本下载"><a href="#静音样本下载" class="headerlink" title="静音样本下载"></a>静音样本下载</h2><p><a href="https://pan.baidu.com/s/1jTUcjknxr-fwETgtEVpQSg">https://pan.baidu.com/s/1jTUcjknxr-fwETgtEVpQSg</a></p>
-<h2 id="dump出来的lua"><a href="#dump出来的lua" class="headerlink" title="dump出来的lua"></a>dump出来的lua</h2><p><a href="https://pan.baidu.com/s/1X0un1jgVB6QAgPRqNu_3Wg">https://pan.baidu.com/s/1X0un1jgVB6QAgPRqNu_3Wg</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>安卓9 设置热点固定IP (Xposed)</title>
     <url>/2021/03/01/android-9-set-hotpot-ip/</url>
     <content><![CDATA[<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p><a href="https://blog.xhyeax.com/2022/07/06/android-12-hostpot-set-ip/">安卓12 固定Wifi热点IP (Xposed)</a></p>
 <p><a href="https://blog.xhyeax.com/2021/12/06/android-10-11-hostpot-set-ip/">安卓10、11 固定Wifi热点IP (Xposed)</a></p>
+<h2 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h2><p><a href="https://github.com/XhyEax/SoftApHelper">SoftApHelper</a></p>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定热点IP。</p>
 <span id="more"></span>
 <h2 id="安卓8热点开启流程"><a href="#安卓8热点开启流程" class="headerlink" title="安卓8热点开启流程"></a>安卓8热点开启流程</h2><p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/softap-android-o.png"><br>图源：<a href="https://blog.csdn.net/AurumMann/article/details/103028026">android8.0热点打开流程，从Setting到framework</a></p>
@@ -189,6 +190,21 @@
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>使用Xposed框架Hook该函数（过滤包名android），设置返回值为<code>192.168.43.1</code>即可</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hook</span> <span class="keyword">implements</span> <span class="title">IXposedHookLoadPackage</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String classname = <span class="string">&quot;com.android.server.connectivity.tethering.TetherInterfaceStateMachine&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String methodname = <span class="string">&quot;getRandomWifiIPv4Address&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String WIFI_HOST_IFACE_ADDR = <span class="string">&quot;192.168.43.1&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleLoadPackage</span><span class="params">(XC_LoadPackage.LoadPackageParam lpparam)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (lpparam.packageName.equals(<span class="string">&quot;android&quot;</span>)) &#123;</span><br><span class="line">            Class&lt;?&gt; clz = XposedHelpers.findClass(classname, lpparam.classLoader);</span><br><span class="line"></span><br><span class="line">            findAndHookMethod(clz, methodname, <span class="keyword">new</span> XC_MethodReplacement() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> Object <span class="title">replaceHookedMethod</span><span class="params">(MethodHookParam param)</span> </span>&#123;</span><br><span class="line">                    <span class="keyword">return</span> WIFI_HOST_IFACE_ADDR;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://android.stackexchange.com/questions/213514/how-can-i-permanently-change-my-hotspot-tethering-ip-address">How can I permanently change my hotspot tethering IP address?</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>安卓12 设置热点固定IP (Xposed)</title>
+    <url>/2022/07/06/android-12-hostpot-set-ip/</url>
+    <content><![CDATA[<h2 id="Hook点"><a href="#Hook点" class="headerlink" title="Hook点"></a>Hook点</h2><p>仍然是<code>android.net.ip.IpServer</code>的<code>requestIpv4Address</code>函数。</p>
+<p>源代码：<a href="http://aospxref.com/android-12.0.0_r3/xref/packages/modules/Connectivity/Tethering/src/android/net/ip/IpServer.java#655">IpServer.java#655</a></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> LinkAddress <span class="title">requestIpv4Address</span><span class="params">(<span class="keyword">final</span> <span class="keyword">boolean</span> useLastAddress)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>参数增加了一个<code>boolean useLastAddress</code>，加上即可。</p>
+<p>PS：也可以用反射来获取方法，从而适配安卓11和12。这里就直接复制安卓11的代码了。</p>
+<h2 id="Hook代码"><a href="#Hook代码" class="headerlink" title="Hook代码"></a>Hook代码</h2><p>见GitHub：<a href="https://github.com/XhyEax/SoftApHelper/tree/master/app/src/main/java/com/xhy/xp/softaphelper/MainHook.java">MainHook.java</a></p>
 ]]></content>
       <tags>
         <tag>Android</tag>
@@ -329,6 +345,27 @@
       </tags>
   </entry>
   <entry>
+    <title>IDA调试安卓so 在libart.so OpenMemory下断点</title>
+    <url>/2019/09/14/android-debug-onload/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>如果想要在so加载时就下断点的话，需要以调试模式运行，并使用ddms进行jdb的连接。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>一部打开了调试开关（ro.debuggable=1）的手机或可调试的apk, IDA及android_server, 已启动的ddms（启动<code>AndroidSDK\tools\monitor.bat</code>）</p>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><h3 id="1-开启端口转发并启动android-server"><a href="#1-开启端口转发并启动android-server" class="headerlink" title="1. 开启端口转发并启动android_server"></a>1. 开启端口转发并启动android_server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">adb forward tcp:12345 tcp:12345</span><br><span class="line">adb shell su -c <span class="string">&quot;/data/as&quot;</span></span><br></pre></td></tr></table></figure>
+<p>这里使用的是修改过的android_server，默认端口为12345</p>
+<h3 id="2-以调试模式启动app"><a href="#2-以调试模式启动app" class="headerlink" title="2. 以调试模式启动app"></a>2. 以调试模式启动app</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">adb shell am start -D -n xyz.sysorem.cokey/.CokeyActivity</span><br></pre></td></tr></table></figure>
+<p>这时手机会显示<code>Waiting For Debugger</code></p>
+<h3 id="3-使用IDA附加及下断点"><a href="#3-使用IDA附加及下断点" class="headerlink" title="3. 使用IDA附加及下断点"></a>3. 使用IDA附加及下断点</h3><p>点击确定前先修改<code>Debug options</code>，把Event下前三个Suspend都勾选上，然后连接。<br>选定要调试的app进程后，在模块列表中找到<code>libart.so</code>，并在目标函数位置下断点<br>然后点击运行</p>
+<h3 id="4-使用jdb附加，使程序继续运行"><a href="#4-使用jdb附加，使程序继续运行" class="headerlink" title="4. 使用jdb附加，使程序继续运行"></a>4. 使用jdb附加，使程序继续运行</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700</span><br></pre></td></tr></table></figure>
+<p>此处的8700即ddms中显示的对应端口<br>正常情况下就会在libc.so处暂停了</p>
+<h3 id="5-dump"><a href="#5-dump" class="headerlink" title="5. dump"></a>5. dump</h3><p>在OpenMemory断下时，按shift+F2，运行dump脚本</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> fp, dex_addr, end_addr;</span><br><span class="line">    fp = <span class="built_in">fopen</span>(<span class="string">&quot;D:\\dump.dex&quot;</span>, <span class="string">&quot;wb&quot;</span>);</span><br><span class="line">    end_addr = r0 + r1;</span><br><span class="line">    <span class="keyword">for</span> ( dex_addr = r0; dex_addr &lt; end_addr; dex_addr ++ )</span><br><span class="line">        <span class="built_in">fputc</span>(<span class="built_in">Byte</span>(dex_addr), fp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.jianshu.com/p/341924686e51">安卓 smali启动就附加调试 的正确步骤</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>IDA</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ARM64 GOT Hook中对.rela.plt的处理</title>
     <url>/2022/06/08/android-arm64-got-hook-rela-plt/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在<a href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a>项目中，对于<code>ARM64</code>架构，在重定位表中找不到目标符号，无法基于<code>Segment</code>进行<code>GOT Hook</code>。</p>
@@ -349,27 +386,6 @@
 ]]></content>
       <tags>
         <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>IDA调试安卓so 在libart.so OpenMemory下断点</title>
-    <url>/2019/09/14/android-debug-onload/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>如果想要在so加载时就下断点的话，需要以调试模式运行，并使用ddms进行jdb的连接。</p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>一部打开了调试开关（ro.debuggable=1）的手机或可调试的apk, IDA及android_server, 已启动的ddms（启动<code>AndroidSDK\tools\monitor.bat</code>）</p>
-<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><h3 id="1-开启端口转发并启动android-server"><a href="#1-开启端口转发并启动android-server" class="headerlink" title="1. 开启端口转发并启动android_server"></a>1. 开启端口转发并启动android_server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">adb forward tcp:12345 tcp:12345</span><br><span class="line">adb shell su -c <span class="string">&quot;/data/as&quot;</span></span><br></pre></td></tr></table></figure>
-<p>这里使用的是修改过的android_server，默认端口为12345</p>
-<h3 id="2-以调试模式启动app"><a href="#2-以调试模式启动app" class="headerlink" title="2. 以调试模式启动app"></a>2. 以调试模式启动app</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">adb shell am start -D -n xyz.sysorem.cokey/.CokeyActivity</span><br></pre></td></tr></table></figure>
-<p>这时手机会显示<code>Waiting For Debugger</code></p>
-<h3 id="3-使用IDA附加及下断点"><a href="#3-使用IDA附加及下断点" class="headerlink" title="3. 使用IDA附加及下断点"></a>3. 使用IDA附加及下断点</h3><p>点击确定前先修改<code>Debug options</code>，把Event下前三个Suspend都勾选上，然后连接。<br>选定要调试的app进程后，在模块列表中找到<code>libart.so</code>，并在目标函数位置下断点<br>然后点击运行</p>
-<h3 id="4-使用jdb附加，使程序继续运行"><a href="#4-使用jdb附加，使程序继续运行" class="headerlink" title="4. 使用jdb附加，使程序继续运行"></a>4. 使用jdb附加，使程序继续运行</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700</span><br></pre></td></tr></table></figure>
-<p>此处的8700即ddms中显示的对应端口<br>正常情况下就会在libc.so处暂停了</p>
-<h3 id="5-dump"><a href="#5-dump" class="headerlink" title="5. dump"></a>5. dump</h3><p>在OpenMemory断下时，按shift+F2，运行dump脚本</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> fp, dex_addr, end_addr;</span><br><span class="line">    fp = <span class="built_in">fopen</span>(<span class="string">&quot;D:\\dump.dex&quot;</span>, <span class="string">&quot;wb&quot;</span>);</span><br><span class="line">    end_addr = r0 + r1;</span><br><span class="line">    <span class="keyword">for</span> ( dex_addr = r0; dex_addr &lt; end_addr; dex_addr ++ )</span><br><span class="line">        <span class="built_in">fputc</span>(<span class="built_in">Byte</span>(dex_addr), fp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.jianshu.com/p/341924686e51">安卓 smali启动就附加调试 的正确步骤</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-        <tag>IDA</tag>
       </tags>
   </entry>
   <entry>
@@ -415,31 +431,6 @@
       </tags>
   </entry>
   <entry>
-    <title>修复反编译资源文件报错问题(resource spec)</title>
-    <url>/2019/02/28/android-reverse-fix-arsc/</url>
-    <content><![CDATA[<h2 id="关于0x01010540错误"><a href="#关于0x01010540错误" class="headerlink" title="关于0x01010540错误"></a>关于<code>0x01010540</code>错误</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code><br>具体方法见后文</p>
-<h2 id="关于0x01010543错误"><a href="#关于0x01010543错误" class="headerlink" title="关于0x01010543错误"></a>关于<code>0x01010543</code>错误</h2><p>如果只有</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
-<p>没有<code>UndefinedResObject</code><br>则更换<code>apktool</code>后再试<br><code>apktool</code>可以在<a href="https://down.52pojie.cn/Tools/Android_Tools/">爱盘</a>下载</p>
-<p>实在要修复的话，往下看：（都是修改<code>resources.arsc</code>）</p>
-<h2 id="修复UndefinedResObject错误"><a href="#修复UndefinedResObject错误" class="headerlink" title="修复UndefinedResObject错误"></a>修复UndefinedResObject错误</h2><p>报错信息：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; brut.androlib.err.UndefinedResObject: resource spec: 0x7f000006</span><br></pre></td></tr></table></figure>
-
-<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><code>aapt dump</code>查看apk的资源信息，并保存到文件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">aapt d --values resources test.apk &gt;1.txt</span><br></pre></td></tr></table></figure>
-<p>找到<code>DataType</code>数据类型不正确的值（搜索<code>attribute</code>即可）对应的描述符（一般是把7f改成00，<code>0x00000006</code>）<br>文件中没有识别出正确的数据类型，显示的是<code>(attribute) 0x00000006</code><br>使用<code>010Editor</code>，Ctrl+F，字节形式搜索对应描述的16进制数的小端字节（就是<code>00000006</code>写成<code>06000000</code>）<br>然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
-<h2 id="修复resource-spec-0x01010543"><a href="#修复resource-spec-0x01010543" class="headerlink" title="修复resource spec: 0x01010543"></a>修复resource spec: 0x01010543</h2><p>报错信息：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
-<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>12345678</code>写成<code>78564312</code>）<br>这里我们搜索<code>43050101</code>，然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
-<h2 id="修复resource-spec-0x01010540"><a href="#修复resource-spec-0x01010540" class="headerlink" title="修复resource spec: 0x01010540"></a>修复resource spec: 0x01010540</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code></p>
-<h3 id="解决方法-2"><a href="#解决方法-2" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>40050101</code>换成<code>8f040101</code>）</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u012400885/article/details/80409689">记录Android Killer反编译时遇到的异常</a><br><a href="http://blog.csdn.net/pwelyn/article/details/50620136">保护Android resources文件不被反编译原理分析</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>逆向修改安卓内核 x64 过TracerPID反调试</title>
     <url>/2019/09/13/android-kernel-reverse-anti-antidebug/</url>
     <content><![CDATA[<h2 id="建议在git-bash下操作"><a href="#建议在git-bash下操作" class="headerlink" title="建议在git bash下操作"></a>建议在git bash下操作</h2><p>由于解压<code>kernel.gz</code>时使用的不是命令行，导致没有看到输出信息<code>gzip trailing garbage ignored</code>，进而没有对这些数据进行处理，浪费了很多时间。</p>
@@ -476,6 +467,31 @@
       <tags>
         <tag>Android</tag>
         <tag>Kernel</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>修复反编译资源文件报错问题(resource spec)</title>
+    <url>/2019/02/28/android-reverse-fix-arsc/</url>
+    <content><![CDATA[<h2 id="关于0x01010540错误"><a href="#关于0x01010540错误" class="headerlink" title="关于0x01010540错误"></a>关于<code>0x01010540</code>错误</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code><br>具体方法见后文</p>
+<h2 id="关于0x01010543错误"><a href="#关于0x01010543错误" class="headerlink" title="关于0x01010543错误"></a>关于<code>0x01010543</code>错误</h2><p>如果只有</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
+<p>没有<code>UndefinedResObject</code><br>则更换<code>apktool</code>后再试<br><code>apktool</code>可以在<a href="https://down.52pojie.cn/Tools/Android_Tools/">爱盘</a>下载</p>
+<p>实在要修复的话，往下看：（都是修改<code>resources.arsc</code>）</p>
+<h2 id="修复UndefinedResObject错误"><a href="#修复UndefinedResObject错误" class="headerlink" title="修复UndefinedResObject错误"></a>修复UndefinedResObject错误</h2><p>报错信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; brut.androlib.err.UndefinedResObject: resource spec: 0x7f000006</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><code>aapt dump</code>查看apk的资源信息，并保存到文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">aapt d --values resources test.apk &gt;1.txt</span><br></pre></td></tr></table></figure>
+<p>找到<code>DataType</code>数据类型不正确的值（搜索<code>attribute</code>即可）对应的描述符（一般是把7f改成00，<code>0x00000006</code>）<br>文件中没有识别出正确的数据类型，显示的是<code>(attribute) 0x00000006</code><br>使用<code>010Editor</code>，Ctrl+F，字节形式搜索对应描述的16进制数的小端字节（就是<code>00000006</code>写成<code>06000000</code>）<br>然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
+<h2 id="修复resource-spec-0x01010543"><a href="#修复resource-spec-0x01010543" class="headerlink" title="修复resource spec: 0x01010543"></a>修复resource spec: 0x01010543</h2><p>报错信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; b.a.a.e: resource spec: 0x01010543</span><br></pre></td></tr></table></figure>
+<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>12345678</code>写成<code>78564312</code>）<br>这里我们搜索<code>43050101</code>，然后把它前面的字节<code>0x02</code>修改为<code>0x03</code>，保存后替换进apk即可</p>
+<h2 id="修复resource-spec-0x01010540"><a href="#修复resource-spec-0x01010540" class="headerlink" title="修复resource spec: 0x01010540"></a>修复resource spec: 0x01010540</h2><p><code>0x01010540</code>是因为SDK版本太高，反编译工具识别不出来，需要替换成<code>0x0101048f</code></p>
+<h3 id="解决方法-2"><a href="#解决方法-2" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用<code>010Editor</code>，Ctrl+F，字节形式搜索报错的16进制数的小端字节（就是<code>40050101</code>换成<code>8f040101</code>）</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u012400885/article/details/80409689">记录Android Killer反编译时遇到的异常</a><br><a href="http://blog.csdn.net/pwelyn/article/details/50620136">保护Android resources文件不被反编译原理分析</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
       </tags>
   </entry>
   <entry>
@@ -775,6 +791,20 @@
       </tags>
   </entry>
   <entry>
+    <title>修复Mac Android Studio无法调试问题</title>
+    <url>/2021/12/06/android-studio-stuck-at-debug/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Mac版<code>Android Studio</code>调试，提示<code>Invalid argument : Argument invalid [port]</code><br>搜索得到解决方案，原因是找不到<code>localhost</code>，在<code>/etc/hosts</code>中配置即可（之前不小心覆盖了）</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p><code>sudo vim /etc/hosts</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">##</span><br><span class="line"># Host Database</span><br><span class="line">#</span><br><span class="line"># localhost is used to configure the loopback interface</span><br><span class="line"># when the system is booting.  Do not change this entry.</span><br><span class="line">##</span><br><span class="line">127.0.0.1       localhost</span><br><span class="line">255.255.255.255 broadcasthost</span><br><span class="line">::1             localhost</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.jianshu.com/p/43f2e362857f">Android Studio因为hosts变更无法debug调试问题</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>修复Android Studio代码修改不生效问题</title>
     <url>/2021/12/01/android-studio-install-old-apk-on-android-11/</url>
     <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>重新编译<code>Xposed</code>模块并点击<code>Run</code>安装后，修改不生效。卸载重装后才生效。</p>
@@ -789,16 +819,23 @@
       </tags>
   </entry>
   <entry>
-    <title>修复Mac Android Studio无法调试问题</title>
-    <url>/2021/12/06/android-studio-stuck-at-debug/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Mac版<code>Android Studio</code>调试，提示<code>Invalid argument : Argument invalid [port]</code><br>搜索得到解决方案，原因是找不到<code>localhost</code>，在<code>/etc/hosts</code>中配置即可（之前不小心覆盖了）</p>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p><code>sudo vim /etc/hosts</code></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">##</span><br><span class="line"># Host Database</span><br><span class="line">#</span><br><span class="line"># localhost is used to configure the loopback interface</span><br><span class="line"># when the system is booting.  Do not change this entry.</span><br><span class="line">##</span><br><span class="line">127.0.0.1       localhost</span><br><span class="line">255.255.255.255 broadcasthost</span><br><span class="line">::1             localhost</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.jianshu.com/p/43f2e362857f">Android Studio因为hosts变更无法debug调试问题</a></p>
+    <title>绕过网站js中的debugger反调试</title>
+    <url>/2019/09/28/anti-web-js-debugger-code/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用开发者工具(F12)分析一个网站时发现：<br>每隔一段时间就会有js代码主动触发调试器断点，妨碍分析。<br>问之度娘，遂得解法。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h2 id="1-使用控制台对方法进行nop"><a href="#1-使用控制台对方法进行nop" class="headerlink" title="1. 使用控制台对方法进行nop"></a>1. 使用控制台对方法进行nop</h2><p>有两种情况，一种是直接调用debugger，如：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_$gy</span>(<span class="params"></span>)</span>&#123;<span class="keyword">debugger</span>;&#125;</span><br></pre></td></tr></table></figure>
+<p>那么控制台执行以下语句即可：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_$gy</span>(<span class="params"></span>)</span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>另一种是匿名函数，代码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;<span class="keyword">var</span> a = <span class="keyword">new</span> <span class="built_in">Date</span>(); <span class="keyword">debugger</span>; <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>() - a &gt; <span class="number">100</span>;&#125;())</span><br></pre></td></tr></table></figure>
+<p>需要查看调用栈，找到调用进行重定义。具体操作为：<br>双击调用栈中的主调函数，找到函数名，控制台进行nop。</p>
+<h2 id="2-禁用所有断点"><a href="#2-禁用所有断点" class="headerlink" title="2. 禁用所有断点"></a>2. 禁用所有断点</h2><blockquote>
+<p>这个问题解决起来还是蛮简单的，问题解决只需要一句话：禁止断点。<br>而对应的操作是在Chrome控制台的Source Tab页点击Deactivate breakpoints按钮或者按下Ctrl + f8。</p>
+</blockquote>
+<p>来自<a href="https://segmentfault.com/a/1190000012359015">突破前端反调试–阻止页面不断debugger</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/weixin_42856601/article/details/100758943">如何解决出现debugger无法调试</a><br><a href="https://segmentfault.com/a/1190000012359015">突破前端反调试–阻止页面不断debugger</a></p>
 ]]></content>
       <tags>
-        <tag>Android</tag>
         <tag>经验</tag>
       </tags>
   </entry>
@@ -862,39 +899,6 @@
       </tags>
   </entry>
   <entry>
-    <title>绕过网站js中的debugger反调试</title>
-    <url>/2019/09/28/anti-web-js-debugger-code/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用开发者工具(F12)分析一个网站时发现：<br>每隔一段时间就会有js代码主动触发调试器断点，妨碍分析。<br>问之度娘，遂得解法。</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h2 id="1-使用控制台对方法进行nop"><a href="#1-使用控制台对方法进行nop" class="headerlink" title="1. 使用控制台对方法进行nop"></a>1. 使用控制台对方法进行nop</h2><p>有两种情况，一种是直接调用debugger，如：</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_$gy</span>(<span class="params"></span>)</span>&#123;<span class="keyword">debugger</span>;&#125;</span><br></pre></td></tr></table></figure>
-<p>那么控制台执行以下语句即可：</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_$gy</span>(<span class="params"></span>)</span>&#123;&#125;</span><br></pre></td></tr></table></figure>
-<p>另一种是匿名函数，代码如下：</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;<span class="keyword">var</span> a = <span class="keyword">new</span> <span class="built_in">Date</span>(); <span class="keyword">debugger</span>; <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>() - a &gt; <span class="number">100</span>;&#125;())</span><br></pre></td></tr></table></figure>
-<p>需要查看调用栈，找到调用进行重定义。具体操作为：<br>双击调用栈中的主调函数，找到函数名，控制台进行nop。</p>
-<h2 id="2-禁用所有断点"><a href="#2-禁用所有断点" class="headerlink" title="2. 禁用所有断点"></a>2. 禁用所有断点</h2><blockquote>
-<p>这个问题解决起来还是蛮简单的，问题解决只需要一句话：禁止断点。<br>而对应的操作是在Chrome控制台的Source Tab页点击Deactivate breakpoints按钮或者按下Ctrl + f8。</p>
-</blockquote>
-<p>来自<a href="https://segmentfault.com/a/1190000012359015">突破前端反调试–阻止页面不断debugger</a></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/weixin_42856601/article/details/100758943">如何解决出现debugger无法调试</a><br><a href="https://segmentfault.com/a/1190000012359015">突破前端反调试–阻止页面不断debugger</a></p>
-]]></content>
-      <tags>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>apt update 报错 the public key is not available</title>
-    <url>/2020/04/16/apt-pk-not-available/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><code>apt-get update</code>出现<code>The following signatures couldn&#39;t be verified because the public key is not available</code>错误，则需要手动添加key</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>执行以下命令：(<code>B02C46DF417A0893</code>替换为报错信息中显示的值)</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo gpg --keyserver keyserver.ubuntu.com --recv B02C46DF417A0893</span><br><span class="line">sudo gpg --export --armor B02C46DF417A0893 | sudo apt-key add -</span><br><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/zhuiqiuzhuoyue583/article/details/90597499">解决GPG error: The following signatures couldn’t be verified because the public key is not available</a></p>
-]]></content>
-      <tags>
-        <tag>Linux</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>定制SELinux规则 允许app访问内核模块</title>
     <url>/2022/05/03/app-access-device-by-selinux-rule/</url>
     <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>使用<code>insmod</code>安装内核模块后，在<code>app</code>的<code>Native</code>层访问驱动，提示<code>Permission Denied</code>。<br>设置驱动权限，绕过<code>DAC</code>权限检查：<code>chmod 666 /dev/helloworld</code>。<br>再次调用，仍然失败。<br>执行<code>dmesg -w | grep &quot;avc: denied&quot;</code>，查看<code>SELinux</code>日志。</p>
@@ -916,6 +920,18 @@
         <tag>Android</tag>
         <tag>Kernel</tag>
         <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>apt update 报错 the public key is not available</title>
+    <url>/2020/04/16/apt-pk-not-available/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><code>apt-get update</code>出现<code>The following signatures couldn&#39;t be verified because the public key is not available</code>错误，则需要手动添加key</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>执行以下命令：(<code>B02C46DF417A0893</code>替换为报错信息中显示的值)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo gpg --keyserver keyserver.ubuntu.com --recv B02C46DF417A0893</span><br><span class="line">sudo gpg --export --armor B02C46DF417A0893 | sudo apt-key add -</span><br><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/zhuiqiuzhuoyue583/article/details/90597499">解决GPG error: The following signatures couldn’t be verified because the public key is not available</a></p>
+]]></content>
+      <tags>
+        <tag>Linux</tag>
       </tags>
   </entry>
   <entry>
@@ -1089,20 +1105,6 @@
       </tags>
   </entry>
   <entry>
-    <title>使用油猴脚本自动加载JQuery</title>
-    <url>/2021/12/06/auto-load-jquery-by-tampermonkey/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>如题，使用油猴脚本实现<code>JQuery</code>自动加载。</p>
-<h2 id="脚本"><a href="#脚本" class="headerlink" title="脚本"></a>脚本</h2><p><a href="https://github.com/XhyEax/JQueryAutoLoad">XhyEax/JQueryAutoLoad</a></p>
-<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><h3 id="被重写"><a href="#被重写" class="headerlink" title="$被重写"></a>$被重写</h3><p>网站重写了<code>$</code>，直接加载<code>JQuery</code>的话会发生覆盖，部分组件可能无法正常使用。（例如<a href="https://www.52pojie.cn/">吾爱破解</a>）</p>
-<h4 id="修复方式"><a href="#修复方式" class="headerlink" title="修复方式"></a>修复方式</h4><p>只判断<code>$</code>，存在则不覆盖</p>
-<p>PS：似乎js也有命名空间的概念？之后有空再看看</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/dolin88/article/details/80043504">区别 (function($){…})(jQuery)、$(function(){ })和$.fn</a></p>
-]]></content>
-      <tags>
-        <tag>Web</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>caddy配置反向代理</title>
     <url>/2020/04/11/caddy-reverse-proxy/</url>
     <content><![CDATA[<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p><a href="https://blog.xhyeax.com/2022/05/26/caddy2-reverse-proxy/">caddy2配置反向代理</a></p>
@@ -1121,6 +1123,20 @@
       </tags>
   </entry>
   <entry>
+    <title>使用油猴脚本自动加载JQuery</title>
+    <url>/2021/12/06/auto-load-jquery-by-tampermonkey/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>如题，使用油猴脚本实现<code>JQuery</code>自动加载。</p>
+<h2 id="脚本"><a href="#脚本" class="headerlink" title="脚本"></a>脚本</h2><p><a href="https://github.com/XhyEax/JQueryAutoLoad">XhyEax/JQueryAutoLoad</a></p>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><h3 id="被重写"><a href="#被重写" class="headerlink" title="$被重写"></a>$被重写</h3><p>网站重写了<code>$</code>，直接加载<code>JQuery</code>的话会发生覆盖，部分组件可能无法正常使用。（例如<a href="https://www.52pojie.cn/">吾爱破解</a>）</p>
+<h4 id="修复方式"><a href="#修复方式" class="headerlink" title="修复方式"></a>修复方式</h4><p>只判断<code>$</code>，存在则不覆盖</p>
+<p>PS：似乎js也有命名空间的概念？之后有空再看看</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/dolin88/article/details/80043504">区别 (function($){…})(jQuery)、$(function(){ })和$.fn</a></p>
+]]></content>
+      <tags>
+        <tag>Web</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>caddy2配置反向代理</title>
     <url>/2022/05/26/caddy2-reverse-proxy/</url>
     <content><![CDATA[<h2 id="编辑CaddyFile"><a href="#编辑CaddyFile" class="headerlink" title="编辑CaddyFile"></a>编辑CaddyFile</h2><h3 id="v2"><a href="#v2" class="headerlink" title="v2"></a>v2</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">https://bd.xxx.com &#123;</span><br><span class="line">	reverse_proxy https://www.baidu.com &#123;</span><br><span class="line">		header_up Host &#123;http.reverse_proxy.upstream.hostport&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -1130,14 +1146,14 @@
       </tags>
   </entry>
   <entry>
-    <title>Hexo主题增加鼠标点击效果</title>
-    <url>/2018/11/30/click-word/</url>
-    <content><![CDATA[<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p>将以下代码放到主题源文件目录下，如 <code>/themes/yilia/source/js/</code> 下新建文件 <code>click-word.js</code>，代码见下文。<br>下载jquery文件（<a href="https://code.jquery.com/jquery-3.3.1.min.js">目前最新版本</a>），放到同一目录下（个人喜好）。<br>修改布局文件，<code>/themes/next/layout/_layout.ejs</code>，在末尾body中添加</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 页面点击特效 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span> <span class="attr">src</span>=<span class="string">&quot;/js/jquery-3.3.1.min.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span> <span class="attr">src</span>=<span class="string">&quot;/js/click-word.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>保存后重新生成即可</p>
-<h2 id="js代码"><a href="#js代码" class="headerlink" title="js代码"></a>js代码</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> a_idx = <span class="number">0</span>;</span><br><span class="line">jQuery(<span class="built_in">document</span>).ready(<span class="function"><span class="keyword">function</span>(<span class="params">$</span>) </span>&#123;</span><br><span class="line">    $(<span class="string">&quot;body&quot;</span>).click(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> a = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="string">&quot;富强&quot;</span>, <span class="string">&quot;民主&quot;</span>, <span class="string">&quot;文明&quot;</span>, <span class="string">&quot;和谐&quot;</span>, <span class="string">&quot;自由&quot;</span>, <span class="string">&quot;平等&quot;</span>, <span class="string">&quot;公正&quot;</span> ,<span class="string">&quot;法治&quot;</span>, <span class="string">&quot;爱国&quot;</span>, <span class="string">&quot;敬业&quot;</span>, <span class="string">&quot;诚信&quot;</span>, <span class="string">&quot;友善&quot;</span>);</span><br><span class="line">        <span class="keyword">var</span> $i = $(<span class="string">&quot;&lt;span /&gt;&quot;</span>).text(a[a_idx]);</span><br><span class="line">        a_idx = (a_idx + <span class="number">1</span>) % a.length;</span><br><span class="line">        <span class="keyword">var</span> x = e.pageX,</span><br><span class="line">        y = e.pageY;</span><br><span class="line">        $i.css(&#123;</span><br><span class="line">            <span class="string">&quot;z-index&quot;</span>: <span class="number">999999999999999999999999999999999999999999999999999999999999999999999</span>,</span><br><span class="line">            <span class="string">&quot;top&quot;</span>: y - <span class="number">20</span>,</span><br><span class="line">            <span class="string">&quot;left&quot;</span>: x,</span><br><span class="line">            <span class="string">&quot;position&quot;</span>: <span class="string">&quot;absolute&quot;</span>,</span><br><span class="line">            <span class="string">&quot;font-weight&quot;</span>: <span class="string">&quot;bold&quot;</span>,</span><br><span class="line">            <span class="string">&quot;color&quot;</span>: <span class="string">&quot;#ff6651&quot;</span></span><br><span class="line">        &#125;);</span><br><span class="line">        $(<span class="string">&quot;body&quot;</span>).append($i);</span><br><span class="line">        $i.animate(&#123;</span><br><span class="line">            <span class="string">&quot;top&quot;</span>: y - <span class="number">180</span>,</span><br><span class="line">            <span class="string">&quot;opacity&quot;</span>: <span class="number">0</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="number">1500</span>,</span><br><span class="line">        <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            $i.remove();</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://www.wujunjie.net/2018/03/03/jquery%E5%AF%8C%E5%BC%BA%E3%80%81%E6%B0%91%E4%B8%BB%E3%80%81%E6%96%87%E6%98%8E%E3%80%81%E5%92%8C%E8%B0%90%E7%89%B9%E6%95%88%E4%BB%A3%E7%A0%81/">jquery”富强、民主、文明、和谐”特效代码</a><br><a href="https://asdfv1929.github.io/2018/01/26/click-love/">Hexo NexT主题添加点击爱心效果</a></p>
+    <title>Microsoft Edge (Chromium内核)安装IDM插件</title>
+    <url>/2019/09/16/chromium-edge-idm-support/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天从<code>Chrome</code>迁移到了<code>Microsoft Edge, based on Chromium</code><br>期间发现谷歌应用商店居然没有IDM拓展，只有<a href="https://chrome.google.com/webstore/detail/open-with-internet-downlo/epgilldoipfbdlneomlmegekaoonchcj">Open With Internet Download Manager</a><br>而这个插件需要打<code>native messaging host</code>补丁，补丁不适用于<code>Edge</code>，于是自己研究了一下解决方法</p>
+<h2 id="解决方法："><a href="#解决方法：" class="headerlink" title="解决方法："></a>解决方法：</h2><p>修改配置文件，手动添加授权拓展</p>
+<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><p>定位到注册表<code>计算机\HKEY_CURRENT_USER\Software\Google\Chrome\NativeMessagingHosts\com.microsoft.browsercore</code><br>项目值为<code>C:\Program Files\Windows Security\BrowserCore\manifest.json</code><br>定位到该文件，修改文件权限后，在<code>allowed_origins</code>中添加:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;chrome-extension://epgilldoipfbdlneomlmegekaoonchcj/&quot;,</span><br></pre></td></tr></table></figure>
+<p>重启<code>Edge</code>即可正常调用<code>IDM</code><br>PS: 需要手动修改下拓展设置，配置为本地IDM路径</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/alexmarcoo/open-in-native-client">Open-in Native Client</a><br><a href="https://www.cnblogs.com/champagne/p/4861209.html">Chrome浏览器扩展开发系列之十四：本地消息机制Native messaging</a></p>
 ]]></content>
       <tags>
         <tag>经验</tag>
@@ -1160,17 +1176,31 @@
       </tags>
   </entry>
   <entry>
-    <title>Microsoft Edge (Chromium内核)安装IDM插件</title>
-    <url>/2019/09/16/chromium-edge-idm-support/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天从<code>Chrome</code>迁移到了<code>Microsoft Edge, based on Chromium</code><br>期间发现谷歌应用商店居然没有IDM拓展，只有<a href="https://chrome.google.com/webstore/detail/open-with-internet-downlo/epgilldoipfbdlneomlmegekaoonchcj">Open With Internet Download Manager</a><br>而这个插件需要打<code>native messaging host</code>补丁，补丁不适用于<code>Edge</code>，于是自己研究了一下解决方法</p>
-<h2 id="解决方法："><a href="#解决方法：" class="headerlink" title="解决方法："></a>解决方法：</h2><p>修改配置文件，手动添加授权拓展</p>
-<h2 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h2><p>定位到注册表<code>计算机\HKEY_CURRENT_USER\Software\Google\Chrome\NativeMessagingHosts\com.microsoft.browsercore</code><br>项目值为<code>C:\Program Files\Windows Security\BrowserCore\manifest.json</code><br>定位到该文件，修改文件权限后，在<code>allowed_origins</code>中添加:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;chrome-extension://epgilldoipfbdlneomlmegekaoonchcj/&quot;,</span><br></pre></td></tr></table></figure>
-<p>重启<code>Edge</code>即可正常调用<code>IDM</code><br>PS: 需要手动修改下拓展设置，配置为本地IDM路径</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/alexmarcoo/open-in-native-client">Open-in Native Client</a><br><a href="https://www.cnblogs.com/champagne/p/4861209.html">Chrome浏览器扩展开发系列之十四：本地消息机制Native messaging</a></p>
+    <title>Hexo主题增加鼠标点击效果</title>
+    <url>/2018/11/30/click-word/</url>
+    <content><![CDATA[<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p>将以下代码放到主题源文件目录下，如 <code>/themes/yilia/source/js/</code> 下新建文件 <code>click-word.js</code>，代码见下文。<br>下载jquery文件（<a href="https://code.jquery.com/jquery-3.3.1.min.js">目前最新版本</a>），放到同一目录下（个人喜好）。<br>修改布局文件，<code>/themes/next/layout/_layout.ejs</code>，在末尾body中添加</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 页面点击特效 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span> <span class="attr">src</span>=<span class="string">&quot;/js/jquery-3.3.1.min.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span> <span class="attr">src</span>=<span class="string">&quot;/js/click-word.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>保存后重新生成即可</p>
+<h2 id="js代码"><a href="#js代码" class="headerlink" title="js代码"></a>js代码</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> a_idx = <span class="number">0</span>;</span><br><span class="line">jQuery(<span class="built_in">document</span>).ready(<span class="function"><span class="keyword">function</span>(<span class="params">$</span>) </span>&#123;</span><br><span class="line">    $(<span class="string">&quot;body&quot;</span>).click(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> a = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="string">&quot;富强&quot;</span>, <span class="string">&quot;民主&quot;</span>, <span class="string">&quot;文明&quot;</span>, <span class="string">&quot;和谐&quot;</span>, <span class="string">&quot;自由&quot;</span>, <span class="string">&quot;平等&quot;</span>, <span class="string">&quot;公正&quot;</span> ,<span class="string">&quot;法治&quot;</span>, <span class="string">&quot;爱国&quot;</span>, <span class="string">&quot;敬业&quot;</span>, <span class="string">&quot;诚信&quot;</span>, <span class="string">&quot;友善&quot;</span>);</span><br><span class="line">        <span class="keyword">var</span> $i = $(<span class="string">&quot;&lt;span /&gt;&quot;</span>).text(a[a_idx]);</span><br><span class="line">        a_idx = (a_idx + <span class="number">1</span>) % a.length;</span><br><span class="line">        <span class="keyword">var</span> x = e.pageX,</span><br><span class="line">        y = e.pageY;</span><br><span class="line">        $i.css(&#123;</span><br><span class="line">            <span class="string">&quot;z-index&quot;</span>: <span class="number">999999999999999999999999999999999999999999999999999999999999999999999</span>,</span><br><span class="line">            <span class="string">&quot;top&quot;</span>: y - <span class="number">20</span>,</span><br><span class="line">            <span class="string">&quot;left&quot;</span>: x,</span><br><span class="line">            <span class="string">&quot;position&quot;</span>: <span class="string">&quot;absolute&quot;</span>,</span><br><span class="line">            <span class="string">&quot;font-weight&quot;</span>: <span class="string">&quot;bold&quot;</span>,</span><br><span class="line">            <span class="string">&quot;color&quot;</span>: <span class="string">&quot;#ff6651&quot;</span></span><br><span class="line">        &#125;);</span><br><span class="line">        $(<span class="string">&quot;body&quot;</span>).append($i);</span><br><span class="line">        $i.animate(&#123;</span><br><span class="line">            <span class="string">&quot;top&quot;</span>: y - <span class="number">180</span>,</span><br><span class="line">            <span class="string">&quot;opacity&quot;</span>: <span class="number">0</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="number">1500</span>,</span><br><span class="line">        <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            $i.remove();</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://www.wujunjie.net/2018/03/03/jquery%E5%AF%8C%E5%BC%BA%E3%80%81%E6%B0%91%E4%B8%BB%E3%80%81%E6%96%87%E6%98%8E%E3%80%81%E5%92%8C%E8%B0%90%E7%89%B9%E6%95%88%E4%BB%A3%E7%A0%81/">jquery”富强、民主、文明、和谐”特效代码</a><br><a href="https://asdfv1929.github.io/2018/01/26/click-love/">Hexo NexT主题添加点击爱心效果</a></p>
 ]]></content>
       <tags>
         <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>命令行运行java class文件提示“找不到或无法加载主类”的解决方法</title>
+    <url>/2020/03/30/cmd-java-class-file/</url>
+    <content><![CDATA[<h2 id="报错原因"><a href="#报错原因" class="headerlink" title="报错原因"></a>报错原因</h2><blockquote>
+<p>1.java指令默认在寻找class文件的地址是通过CLASSPATH环境变量中指定的目录中寻找的。<br>2.忽略了package的影响。加载一个类，是需要完整的类名，所以必须要把包名带上</p>
+</blockquote>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>指定生成class文件的文件夹为classpath，执行java指令，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">java -classpath &quot;D:\source\Java\Painter\bin&quot; app.OpenGLApp</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/IToBeNo_1/article/details/90115468">控制台中运行java类提示”找不到或无法加载主类”错误的原因及解决方案</a></p>
+]]></content>
+      <tags>
+        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
@@ -1201,20 +1231,6 @@
 ]]></content>
       <tags>
         <tag>CPP</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>命令行运行java class文件提示“找不到或无法加载主类”的解决方法</title>
-    <url>/2020/03/30/cmd-java-class-file/</url>
-    <content><![CDATA[<h2 id="报错原因"><a href="#报错原因" class="headerlink" title="报错原因"></a>报错原因</h2><blockquote>
-<p>1.java指令默认在寻找class文件的地址是通过CLASSPATH环境变量中指定的目录中寻找的。<br>2.忽略了package的影响。加载一个类，是需要完整的类名，所以必须要把包名带上</p>
-</blockquote>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>指定生成class文件的文件夹为classpath，执行java指令，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">java -classpath &quot;D:\source\Java\Painter\bin&quot; app.OpenGLApp</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/IToBeNo_1/article/details/90115468">控制台中运行java类提示”找不到或无法加载主类”错误的原因及解决方案</a></p>
-]]></content>
-      <tags>
-        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
@@ -1357,6 +1373,14 @@
       </tags>
   </entry>
   <entry>
+    <title>导出sqlite3数据库为sql</title>
+    <url>/2019/10/15/db-sqlite3-to-sql/</url>
+    <content><![CDATA[<h2 id="执行以下语句即可"><a href="#执行以下语句即可" class="headerlink" title="执行以下语句即可"></a>执行以下语句即可</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sqlite3 db.sqlite3 &quot;.dump&quot; &gt; new.sql</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Linux通过环境变量设置curl代理</title>
     <url>/2020/04/16/curl-set-proxy-by-pathvar/</url>
     <content><![CDATA[<h2 id="Docker、Git代理配置"><a href="#Docker、Git代理配置" class="headerlink" title="Docker、Git代理配置"></a>Docker、Git代理配置</h2><p>见<a href="https://blog.xhyeax.com/2021/10/03/set-proxy-of-docker-git-and-others/">在Linux下设置代理</a></p>
@@ -1405,38 +1429,6 @@
         <tag>Android</tag>
         <tag>ARM</tag>
         <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>导出sqlite3数据库为sql</title>
-    <url>/2019/10/15/db-sqlite3-to-sql/</url>
-    <content><![CDATA[<h2 id="执行以下语句即可"><a href="#执行以下语句即可" class="headerlink" title="执行以下语句即可"></a>执行以下语句即可</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sqlite3 db.sqlite3 &quot;.dump&quot; &gt; new.sql</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>构建自己的Docker镜像（用于编译Lineage 18.1）</title>
-    <url>/2021/10/04/docker-lineage-18.1/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://github.com.cnpmjs.org/lineageos4microg/docker-lineage-cicd">docker-lineage-cicd</a>启动后会自动同步代码并编译，需要指定的参数也比较多，于是考虑制作自己的<code>Docker</code>镜像，用于编译<code>Lineage 18.1</code>。</p>
-<p>项目见<a href="https://github.com/XhyEax/docker-lineage">docker-lineage</a></p>
-<span id="more"></span>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h3><p>参考<a href="https://github.com/lineageos4microg/docker-lineage-cicd/blob/master/Dockerfile">docker-lineage-cicd/Dockerfile</a><br>仅保留<code>source</code>和<code>ccache</code>两个目录映射，精简不必要的依赖，替换<code>cron</code>为<code>vim</code>，使用<code>TUNA</code>的<code>repo</code>，最后执行<code>entrypoint</code>设置的脚本</p>
-<h3 id="docker-entrypoint-sh"><a href="#docker-entrypoint-sh" class="headerlink" title="docker_entrypoint.sh"></a>docker_entrypoint.sh</h3><p>设置<code>ccache</code>大小和<code>git</code>帐号，最后进入<code>bash</code></p>
-<h3 id="build"><a href="#build" class="headerlink" title="build"></a>build</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker build --network=host \</span><br><span class="line">-t xhyeax/docker-lineage:v18.1 .</span><br></pre></td></tr></table></figure>
-<p>为使用本地的http代理安装依赖，网络选择<code>host</code>模式</p>
-<h3 id="run"><a href="#run" class="headerlink" title="run"></a>run</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export ANDROID_VOL=/media/xhy/a5d37cc9-d3a3-43c8-909d-178d70a6598c/Android</span><br><span class="line">docker run --privileged -it \</span><br><span class="line">-v &quot;$ANDROID_VOL/source:/srv/src&quot; \</span><br><span class="line">-v &quot;$ANDROID_VOL/ccache:/srv/ccache&quot; \</span><br><span class="line">xhyeax/docker-lineage:v18.1</span><br></pre></td></tr></table></figure>
-<h3 id="push"><a href="#push" class="headerlink" title="push"></a>push</h3><p>可以使用<code>VSCode</code>的<code>Docker</code>插件，将镜像上传到<code>Docker Hub</code></p>
-<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><h3 id="build-卡在-tzdata-Geographic-area"><a href="#build-卡在-tzdata-Geographic-area" class="headerlink" title="build 卡在 tzdata Geographic area:"></a>build 卡在 tzdata Geographic area:</h3><p>在<code>Dockerfile</code>中设置环境变量：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ENV DEBIAN_FRONTEND=noninteractive</span><br></pre></td></tr></table></figure>
-<h3 id="docker-entrypoint-sh-Permission-denied"><a href="#docker-entrypoint-sh-Permission-denied" class="headerlink" title="docker_entrypoint.sh Permission denied"></a>docker_entrypoint.sh Permission denied</h3><p>给脚本增加可执行权限，重新<code>build</code></p>
-<h3 id="编译时permission-denied"><a href="#编译时permission-denied" class="headerlink" title="编译时permission denied"></a>编译时permission denied</h3><p>启动容器时增加<code>--privileged</code></p>
-<h3 id="docker-entrypoint-sh执行后退出"><a href="#docker-entrypoint-sh执行后退出" class="headerlink" title="docker_entrypoint.sh执行后退出"></a>docker_entrypoint.sh执行后退出</h3><p>原因：未运行前台应用，容器自动关闭<br>可增加<code>-d</code>参数启动容器<br>或在<code>docker_entrypoint.sh</code>脚本末尾增加进入<code>Shell</code>的命令</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">args=&quot;$@&quot;</span><br><span class="line">if [ -z &quot;$args&quot; ]; then</span><br><span class="line">  args=&quot;bash&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">exec sudo -E args</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://techoverflow.net/2019/05/18/how-to-fix-configuring-tzdata-interactive-input-when-building-docker-images/">How to fix ‘Configuring tzdata’ interactive input when building Docker images</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
       </tags>
   </entry>
   <entry>
@@ -1489,6 +1481,30 @@
         <tag>Kernel</tag>
         <tag>Linux</tag>
         <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>构建自己的Docker镜像（用于编译Lineage 18.1）</title>
+    <url>/2021/10/04/docker-lineage-18.1/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://github.com.cnpmjs.org/lineageos4microg/docker-lineage-cicd">docker-lineage-cicd</a>启动后会自动同步代码并编译，需要指定的参数也比较多，于是考虑制作自己的<code>Docker</code>镜像，用于编译<code>Lineage 18.1</code>。</p>
+<p>项目见<a href="https://github.com/XhyEax/docker-lineage">docker-lineage</a></p>
+<span id="more"></span>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h3><p>参考<a href="https://github.com/lineageos4microg/docker-lineage-cicd/blob/master/Dockerfile">docker-lineage-cicd/Dockerfile</a><br>仅保留<code>source</code>和<code>ccache</code>两个目录映射，精简不必要的依赖，替换<code>cron</code>为<code>vim</code>，使用<code>TUNA</code>的<code>repo</code>，最后执行<code>entrypoint</code>设置的脚本</p>
+<h3 id="docker-entrypoint-sh"><a href="#docker-entrypoint-sh" class="headerlink" title="docker_entrypoint.sh"></a>docker_entrypoint.sh</h3><p>设置<code>ccache</code>大小和<code>git</code>帐号，最后进入<code>bash</code></p>
+<h3 id="build"><a href="#build" class="headerlink" title="build"></a>build</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker build --network=host \</span><br><span class="line">-t xhyeax/docker-lineage:v18.1 .</span><br></pre></td></tr></table></figure>
+<p>为使用本地的http代理安装依赖，网络选择<code>host</code>模式</p>
+<h3 id="run"><a href="#run" class="headerlink" title="run"></a>run</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export ANDROID_VOL=/media/xhy/a5d37cc9-d3a3-43c8-909d-178d70a6598c/Android</span><br><span class="line">docker run --privileged -it \</span><br><span class="line">-v &quot;$ANDROID_VOL/source:/srv/src&quot; \</span><br><span class="line">-v &quot;$ANDROID_VOL/ccache:/srv/ccache&quot; \</span><br><span class="line">xhyeax/docker-lineage:v18.1</span><br></pre></td></tr></table></figure>
+<h3 id="push"><a href="#push" class="headerlink" title="push"></a>push</h3><p>可以使用<code>VSCode</code>的<code>Docker</code>插件，将镜像上传到<code>Docker Hub</code></p>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><h3 id="build-卡在-tzdata-Geographic-area"><a href="#build-卡在-tzdata-Geographic-area" class="headerlink" title="build 卡在 tzdata Geographic area:"></a>build 卡在 tzdata Geographic area:</h3><p>在<code>Dockerfile</code>中设置环境变量：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ENV DEBIAN_FRONTEND=noninteractive</span><br></pre></td></tr></table></figure>
+<h3 id="docker-entrypoint-sh-Permission-denied"><a href="#docker-entrypoint-sh-Permission-denied" class="headerlink" title="docker_entrypoint.sh Permission denied"></a>docker_entrypoint.sh Permission denied</h3><p>给脚本增加可执行权限，重新<code>build</code></p>
+<h3 id="编译时permission-denied"><a href="#编译时permission-denied" class="headerlink" title="编译时permission denied"></a>编译时permission denied</h3><p>启动容器时增加<code>--privileged</code></p>
+<h3 id="docker-entrypoint-sh执行后退出"><a href="#docker-entrypoint-sh执行后退出" class="headerlink" title="docker_entrypoint.sh执行后退出"></a>docker_entrypoint.sh执行后退出</h3><p>原因：未运行前台应用，容器自动关闭<br>可增加<code>-d</code>参数启动容器<br>或在<code>docker_entrypoint.sh</code>脚本末尾增加进入<code>Shell</code>的命令</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">args=&quot;$@&quot;</span><br><span class="line">if [ -z &quot;$args&quot; ]; then</span><br><span class="line">  args=&quot;bash&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">exec sudo -E args</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://techoverflow.net/2019/05/18/how-to-fix-configuring-tzdata-interactive-input-when-building-docker-images/">How to fix ‘Configuring tzdata’ interactive input when building Docker images</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
       </tags>
   </entry>
   <entry>
@@ -1579,22 +1595,6 @@
       </tags>
   </entry>
   <entry>
-    <title>emui9安装Magisk框架</title>
-    <url>/2019/04/02/emui9-magisk-install/</url>
-    <content><![CDATA[<h2 id="准备条件"><a href="#准备条件" class="headerlink" title="准备条件"></a>准备条件</h2><p>(设备已解锁BL，电脑fastboot环境正常是前提条件)<br>已下载magisk框架rec安装包（<a href="https://github.com/topjohnwu/Magisk/releases/">github下载</a>），有sd卡（<code>adb sideload</code>未测试是否可安装，建议用内存卡），并已安装第三方recovery（以下简称rec）<br>或<br>已安装magisk框架app，且有原厂<code>recovery_ramdisk</code>镜像</p>
-<h2 id="安装方式"><a href="#安装方式" class="headerlink" title="安装方式"></a>安装方式</h2><p>fastboot刷入命令（华为没有boot分区，所以rec也是通过这个指令刷入）<br>(BOOT.img请自行替换为对应镜像名)</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">fastboot flash recovery_ramdisk BOOT.img</span><br></pre></td></tr></table></figure>
-<h3 id="rec安装法"><a href="#rec安装法" class="headerlink" title="rec安装法"></a>rec安装法</h3><p>启动至第三方rec，从sd卡选择magisk卡刷包，安装。<br>安装完成后选择重启到rec模式，即可进入带面具的系统</p>
-<h3 id="修补镜像直接刷入法"><a href="#修补镜像直接刷入法" class="headerlink" title="修补镜像直接刷入法"></a>修补镜像直接刷入法</h3><p>参考<a href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a>，个人未测试，应该可行<br>提取出原厂<code>recovery_ramdisk</code>镜像（从官方线刷包或其他地方获得），并发送到手机（模拟器应该也行）<br>使用magisk框架app，选择安装，修补boot镜像，选择提取出的原厂镜像<br>修补完成后传回电脑，手机进入fastboot模式，刷入即可</p>
-<h2 id="启动方式"><a href="#启动方式" class="headerlink" title="启动方式"></a>启动方式</h2><p>由于修补的镜像其实是rec分区，所以要按照进入rec的方式进入带面具的系统。<br>（个人测试，在带magisk的系统下重启仍然是有root的，等价于启动到rec）<br>具体操作如图（图源自参考帖）<br><img src="https://clubimg.club.vmall.com/data/attachment/forum/201902/11/221928oai3dhzxzbbrd42d.jpg"></p>
-<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>如果安装了不适配的模块，还是需要刷入第三方rec，进入后删除<code>/data/adb</code>文件夹，然后即可正常开机（magisk要重刷）。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a></p>
-]]></content>
-      <tags>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>饥荒联机版 Linux(CentOS) 开服、mod安装</title>
     <url>/2020/08/18/dst-server-linux/</url>
     <content><![CDATA[<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>腾讯云服务器，CentOS 7.7 64位， 1核CPU，1G内存，1G交换空间</p>
@@ -1645,19 +1645,19 @@
       </tags>
   </entry>
   <entry>
-    <title>VS Code修复pylint报错E1101</title>
-    <url>/2018/12/18/fix-VSCODE-E1101-Error/</url>
-    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>使用pygame开发游戏（完成作业时），VS Code总是在pygame处报E1101错误，刚开始设置的<code>python.linting.mypyArgs</code>毫无用处</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;python.linting.mypyArgs&quot;</span>: [<span class="string">&quot;--disable=E1101&quot;</span>,]</span><br></pre></td></tr></table></figure>
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>继续谷歌一下，找到<a href="https://www.jianshu.com/p/ab72e830b2a9">vs code中pylint报错E1101问题的解决</a><br>于是设置<code>python.linting.pylintArgs</code>参数，值为”–generate-members”，总算解决了这个问题</p>
-<h2 id="修改settings-json代码"><a href="#修改settings-json代码" class="headerlink" title="修改settings.json代码"></a>修改settings.json代码</h2><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;python.linting.pylintArgs&quot;</span>: [<span class="string">&quot;--generate-members&quot;</span>,],</span><br></pre></td></tr></table></figure>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><blockquote>
-<p>函数或值是动态被设置的，而pylint的推断系统里没有该值，因此触发了E1101报错。可以通过配置 generate-members 参数来避免此类报错。</p>
-</blockquote>
+    <title>emui9安装Magisk框架</title>
+    <url>/2019/04/02/emui9-magisk-install/</url>
+    <content><![CDATA[<h2 id="准备条件"><a href="#准备条件" class="headerlink" title="准备条件"></a>准备条件</h2><p>(设备已解锁BL，电脑fastboot环境正常是前提条件)<br>已下载magisk框架rec安装包（<a href="https://github.com/topjohnwu/Magisk/releases/">github下载</a>），有sd卡（<code>adb sideload</code>未测试是否可安装，建议用内存卡），并已安装第三方recovery（以下简称rec）<br>或<br>已安装magisk框架app，且有原厂<code>recovery_ramdisk</code>镜像</p>
+<h2 id="安装方式"><a href="#安装方式" class="headerlink" title="安装方式"></a>安装方式</h2><p>fastboot刷入命令（华为没有boot分区，所以rec也是通过这个指令刷入）<br>(BOOT.img请自行替换为对应镜像名)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">fastboot flash recovery_ramdisk BOOT.img</span><br></pre></td></tr></table></figure>
+<h3 id="rec安装法"><a href="#rec安装法" class="headerlink" title="rec安装法"></a>rec安装法</h3><p>启动至第三方rec，从sd卡选择magisk卡刷包，安装。<br>安装完成后选择重启到rec模式，即可进入带面具的系统</p>
+<h3 id="修补镜像直接刷入法"><a href="#修补镜像直接刷入法" class="headerlink" title="修补镜像直接刷入法"></a>修补镜像直接刷入法</h3><p>参考<a href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a>，个人未测试，应该可行<br>提取出原厂<code>recovery_ramdisk</code>镜像（从官方线刷包或其他地方获得），并发送到手机（模拟器应该也行）<br>使用magisk框架app，选择安装，修补boot镜像，选择提取出的原厂镜像<br>修补完成后传回电脑，手机进入fastboot模式，刷入即可</p>
+<h2 id="启动方式"><a href="#启动方式" class="headerlink" title="启动方式"></a>启动方式</h2><p>由于修补的镜像其实是rec分区，所以要按照进入rec的方式进入带面具的系统。<br>（个人测试，在带magisk的系统下重启仍然是有root的，等价于启动到rec）<br>具体操作如图（图源自参考帖）<br><img src="https://clubimg.club.vmall.com/data/attachment/forum/201902/11/221928oai3dhzxzbbrd42d.jpg"></p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>如果安装了不适配的模块，还是需要刷入第三方rec，进入后删除<code>/data/adb</code>文件夹，然后即可正常开机（magisk要重刷）。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://club.huawei.com/thread-18856510-1-1.html">【荣耀v10】EMui9.0.0.181刷magisk框架及root教程</a></p>
 ]]></content>
       <tags>
-        <tag>Python</tag>
-        <tag>VSCode</tag>
+        <tag>经验</tag>
       </tags>
   </entry>
   <entry>
@@ -1685,18 +1685,6 @@
       </tags>
   </entry>
   <entry>
-    <title>修复安卓Log日志不输出问题</title>
-    <url>/2022/05/03/fix-android-logd-crash/</url>
-    <content><![CDATA[<h2 id="报错信息"><a href="#报错信息" class="headerlink" title="报错信息"></a>报错信息</h2><h3 id="Log"><a href="#Log" class="headerlink" title="Log"></a>Log</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">logcat: Unexpected EOF!</span><br><span class="line"></span><br><span class="line">This means that either the device shut down, logd crashed, or this instance of logcat was unable to read log</span><br><span class="line">messages as quickly as they were being produced.</span><br></pre></td></tr></table></figure>
-<h3 id="LSPosed"><a href="#LSPosed" class="headerlink" title="LSPosed"></a>LSPosed</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Logd maybe crashed, retrying in 1s...</span><br><span class="line">Logd crashed too many times, trying manually start...</span><br></pre></td></tr></table></figure>
-<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p><code>开发者选项</code>-<code>日志记录器缓冲区大小</code>修改为<code>16M</code>。</p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>修复crypto模块import失败（Python2）</title>
     <url>/2019/01/26/fix-crypto-py2/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>使用Python2.7安装好pycrypto模块后，还是报错，搜索得到解决方案</p>
@@ -1708,19 +1696,30 @@
       </tags>
   </entry>
   <entry>
-    <title>修复Flash插件提示地区不符的问题</title>
-    <url>/2019/01/26/fix-flash/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Adobe Flash Player 从 30 版本开始，中国大陆地区用户只能使用特供版<br>后台存在广告服务、弹出广告窗口、捆绑流氓软件的行为。<br>由于有的网站只能用flash，而安装国际版flash又提示地区不符，所以需要找个办法解决。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="安装直装版（由roustar31制作）"><a href="#安装直装版（由roustar31制作）" class="headerlink" title="安装直装版（由roustar31制作）"></a>安装直装版（由roustar31制作）</h3><p>运行程序后，会卸载原版flash再自动安装。</p>
-<blockquote>
-<p>IE浏览器使用AX版本<br>Chrome系浏览器及QQ使用PPAPI版本<br>Firefox或其他使用NPAPI版本</p>
+    <title>VS Code修复pylint报错E1101</title>
+    <url>/2018/12/18/fix-VSCODE-E1101-Error/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>使用pygame开发游戏（完成作业时），VS Code总是在pygame处报E1101错误，刚开始设置的<code>python.linting.mypyArgs</code>毫无用处</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;python.linting.mypyArgs&quot;</span>: [<span class="string">&quot;--disable=E1101&quot;</span>,]</span><br></pre></td></tr></table></figure>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>继续谷歌一下，找到<a href="https://www.jianshu.com/p/ab72e830b2a9">vs code中pylint报错E1101问题的解决</a><br>于是设置<code>python.linting.pylintArgs</code>参数，值为”–generate-members”，总算解决了这个问题</p>
+<h2 id="修改settings-json代码"><a href="#修改settings-json代码" class="headerlink" title="修改settings.json代码"></a>修改settings.json代码</h2><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;python.linting.pylintArgs&quot;</span>: [<span class="string">&quot;--generate-members&quot;</span>,],</span><br></pre></td></tr></table></figure>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><blockquote>
+<p>函数或值是动态被设置的，而pylint的推断系统里没有该值，因此触发了E1101报错。可以通过配置 generate-members 参数来避免此类报错。</p>
 </blockquote>
-<p>PS：若安装后仍无效，请使用压缩包中的文件替换系统及浏览器的<code>pepflashplayer.dll</code>（具体路径自行搜索）</p>
-<h3 id="下载地址"><a href="#下载地址" class="headerlink" title="下载地址"></a>下载地址</h3><h4 id="直装版"><a href="#直装版" class="headerlink" title="直装版"></a>直装版</h4><p><a href="https://lanzous.com/b00e2zxej">https://lanzous.com/b00e2zxej</a><br>密码:gz09</p>
-<h4 id="补丁"><a href="#补丁" class="headerlink" title="补丁"></a>补丁</h4><p><a href="https://lanzous.com/b00dx336j">https://lanzous.com/b00dx336j</a><br>密码:f0ph</p>
-<h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p><a href="https://www.repaik.com/forum.php?mod=viewthread&tid=340482">Adobe Flash Player AX/NP/PP 特别版</a></p>
 ]]></content>
       <tags>
+        <tag>Python</tag>
+        <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>修复安卓Log日志不输出问题</title>
+    <url>/2022/05/03/fix-android-logd-crash/</url>
+    <content><![CDATA[<h2 id="报错信息"><a href="#报错信息" class="headerlink" title="报错信息"></a>报错信息</h2><h3 id="Log"><a href="#Log" class="headerlink" title="Log"></a>Log</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">logcat: Unexpected EOF!</span><br><span class="line"></span><br><span class="line">This means that either the device shut down, logd crashed, or this instance of logcat was unable to read log</span><br><span class="line">messages as quickly as they were being produced.</span><br></pre></td></tr></table></figure>
+<h3 id="LSPosed"><a href="#LSPosed" class="headerlink" title="LSPosed"></a>LSPosed</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Logd maybe crashed, retrying in 1s...</span><br><span class="line">Logd crashed too many times, trying manually start...</span><br></pre></td></tr></table></figure>
+<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p><code>开发者选项</code>-<code>日志记录器缓冲区大小</code>修改为<code>16M</code>。</p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
         <tag>经验</tag>
       </tags>
   </entry>
@@ -1762,6 +1761,23 @@
       </tags>
   </entry>
   <entry>
+    <title>修复Flash插件提示地区不符的问题</title>
+    <url>/2019/01/26/fix-flash/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Adobe Flash Player 从 30 版本开始，中国大陆地区用户只能使用特供版<br>后台存在广告服务、弹出广告窗口、捆绑流氓软件的行为。<br>由于有的网站只能用flash，而安装国际版flash又提示地区不符，所以需要找个办法解决。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="安装直装版（由roustar31制作）"><a href="#安装直装版（由roustar31制作）" class="headerlink" title="安装直装版（由roustar31制作）"></a>安装直装版（由roustar31制作）</h3><p>运行程序后，会卸载原版flash再自动安装。</p>
+<blockquote>
+<p>IE浏览器使用AX版本<br>Chrome系浏览器及QQ使用PPAPI版本<br>Firefox或其他使用NPAPI版本</p>
+</blockquote>
+<p>PS：若安装后仍无效，请使用压缩包中的文件替换系统及浏览器的<code>pepflashplayer.dll</code>（具体路径自行搜索）</p>
+<h3 id="下载地址"><a href="#下载地址" class="headerlink" title="下载地址"></a>下载地址</h3><h4 id="直装版"><a href="#直装版" class="headerlink" title="直装版"></a>直装版</h4><p><a href="https://lanzous.com/b00e2zxej">https://lanzous.com/b00e2zxej</a><br>密码:gz09</p>
+<h4 id="补丁"><a href="#补丁" class="headerlink" title="补丁"></a>补丁</h4><p><a href="https://lanzous.com/b00dx336j">https://lanzous.com/b00dx336j</a><br>密码:f0ph</p>
+<h2 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h2><p><a href="https://www.repaik.com/forum.php?mod=viewthread&tid=340482">Adobe Flash Player AX/NP/PP 特别版</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>修复双系统（Win+Linux）时间不同步问题</title>
     <url>/2019/02/16/fix-linux-time/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>笔记本装了win10+Ubuntu18.04双系统，但是两个系统的时间并不同步，相差8小时（正好是时区数）。于是搜索之，找到解决方案</p>
@@ -1780,17 +1796,6 @@
       </tags>
   </entry>
   <entry>
-    <title>gcc编译Python模块失败(找不到Python.h)</title>
-    <url>/2018/12/07/fix-python-h/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>服务器恢复快照以后，一大堆东西都要重新安装。<br>安装PyCrypto时发生错误，提示<br><code>Python.h: No such file or directory</code><br>于是 首先执行 <code>yum upgrade</code>，升级下试试<br>然而还是编译错误，所以肯定是没有安装依赖</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>查了一下是没安装开发环境（然而之前好像是可以直接编译的。。）<br>而<code>python-devel</code>已安装，然而搜不到<code>python3-devel</code><br>于是搜索<code>python3</code>,找到了<code>python36u-devel</code><br><code>yum install python36u-devel</code><br>安装后编译成功</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u013414502/article/details/79531509">Centos7 “fatal error: Python.h: No such file or directory “commmand ‘gcc’ failed with exit status 1</a></p>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>修复 AOSP QSEECOMD 错误日志</title>
     <url>/2019/11/20/fix_error_log_qseecomd_aosp/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>刷入自己编译的AOSP系统，一直有日志输出，TAG为<code>QSEECOMD</code>，日志内容如下</p>
@@ -1800,6 +1805,17 @@
 ]]></content>
       <tags>
         <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>gcc编译Python模块失败(找不到Python.h)</title>
+    <url>/2018/12/07/fix-python-h/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>服务器恢复快照以后，一大堆东西都要重新安装。<br>安装PyCrypto时发生错误，提示<br><code>Python.h: No such file or directory</code><br>于是 首先执行 <code>yum upgrade</code>，升级下试试<br>然而还是编译错误，所以肯定是没有安装依赖</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>查了一下是没安装开发环境（然而之前好像是可以直接编译的。。）<br>而<code>python-devel</code>已安装，然而搜不到<code>python3-devel</code><br>于是搜索<code>python3</code>,找到了<code>python36u-devel</code><br><code>yum install python36u-devel</code><br>安装后编译成功</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/u013414502/article/details/79531509">Centos7 “fatal error: Python.h: No such file or directory “commmand ‘gcc’ failed with exit status 1</a></p>
+]]></content>
+      <tags>
+        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -1828,6 +1844,23 @@
 <h3 id="编译结果"><a href="#编译结果" class="headerlink" title="编译结果"></a>编译结果</h3><p><code>Java</code>：<code>MainActivity$1</code><br><code>Kotlin</code>：<code>MainActivity$ExternalSyntheticLambda0</code></p>
 <h2 id="Hook"><a href="#Hook" class="headerlink" title="Hook"></a>Hook</h2><p><code>Frida</code>Hook内部类名即可，如<code>MainActivity$1</code></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/chenssy/p/3390871.html">java提高篇(十)—–详解匿名内部类</a><br><a href="https://kevinspider.github.io/fridahookjava/">frida hook java</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Frida在无Root机器上的使用方案 (基于VirtualApp)</title>
+    <url>/2021/08/06/frida-no-root/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，因此也就无法通过Magisk获取Root权限。<br>本文基于<a href="https://github.com/asLody/VirtualApp">VirtualApp框架</a>及<a href="https://github.com/frida/frida">Frida-Gadget</a>，实现不修改apk使用Frida。</p>
+<span id="more"></span>
+<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><h3 id="修改框架源码"><a href="#修改框架源码" class="headerlink" title="修改框架源码"></a>修改框架源码</h3><p>阅读<code>VirtualApp</code>源码可知，在<a href="https://github.com/asLody/VirtualApp/blob/bd6f03cfd7cbf3ad63ec6198777a102c18112c2d/VirtualApp/lib/src/main/jni/Foundation/IOUniformer.cpp"><code>lib/src/main/jni/Foundation/IOUniformer.cpp</code></a>中hook了<code>dlopen</code>，并实现了<code>onSoLoaded</code>函数，可在该函数中通过传入的<code>filename</code>获取加载的动态库路径。</p>
+<p>由此，可以在<code>libart.so</code>加载后，手动调用<code>dlopen</code>加载<code>Frida-Gadget</code></p>
+<p>具体操作为：</p>
+<p>将arm版本的so文件及配置文件添加到<code>lib\src\main\jniLibs\armeabi-v7a</code>，并配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code></p>
+<h3 id="编写Xposed模块"><a href="#编写Xposed模块" class="headerlink" title="编写Xposed模块"></a>编写Xposed模块</h3><p>除了修改源码，也可以自己编写一个Xposed模块，实现<code>Frida-Gadget</code>的加载。</p>
+<p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，调用<code>System.load</code>或<code>System.loadLibrary</code>加载<code>Frida-Gadget</code>。</p>
+<p>注意：如果hook系统应用（<code>PLATFORM_APP</code>），且未关闭<code>SELinux</code>，则无法从<code>data</code>目录下加载so文件。</p>
 ]]></content>
       <tags>
         <tag>Android</tag>
@@ -1864,23 +1897,6 @@
         <tag>Android</tag>
         <tag>Frida</tag>
         <tag>PyCharm</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Frida在无Root机器上的使用方案 (基于VirtualApp)</title>
-    <url>/2021/08/06/frida-no-root/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>大多数国产手机厂商出于安全考虑，禁止用户解锁BootLoader，因此也就无法通过Magisk获取Root权限。<br>本文基于<a href="https://github.com/asLody/VirtualApp">VirtualApp框架</a>及<a href="https://github.com/frida/frida">Frida-Gadget</a>，实现不修改apk使用Frida。</p>
-<span id="more"></span>
-<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><h3 id="修改框架源码"><a href="#修改框架源码" class="headerlink" title="修改框架源码"></a>修改框架源码</h3><p>阅读<code>VirtualApp</code>源码可知，在<a href="https://github.com/asLody/VirtualApp/blob/bd6f03cfd7cbf3ad63ec6198777a102c18112c2d/VirtualApp/lib/src/main/jni/Foundation/IOUniformer.cpp"><code>lib/src/main/jni/Foundation/IOUniformer.cpp</code></a>中hook了<code>dlopen</code>，并实现了<code>onSoLoaded</code>函数，可在该函数中通过传入的<code>filename</code>获取加载的动态库路径。</p>
-<p>由此，可以在<code>libart.so</code>加载后，手动调用<code>dlopen</code>加载<code>Frida-Gadget</code></p>
-<p>具体操作为：</p>
-<p>将arm版本的so文件及配置文件添加到<code>lib\src\main\jniLibs\armeabi-v7a</code>，并配置<code>build.gradle</code>的<code>android.defaultConfig</code>中的<code>ndk.abiFilters</code></p>
-<h3 id="编写Xposed模块"><a href="#编写Xposed模块" class="headerlink" title="编写Xposed模块"></a>编写Xposed模块</h3><p>除了修改源码，也可以自己编写一个Xposed模块，实现<code>Frida-Gadget</code>的加载。</p>
-<p>hook <code>ContextWrapper.attachBaseContext</code>函数，在其执行后，调用<code>System.load</code>或<code>System.loadLibrary</code>加载<code>Frida-Gadget</code>。</p>
-<p>注意：如果hook系统应用（<code>PLATFORM_APP</code>），且未关闭<code>SELinux</code>，则无法从<code>data</code>目录下加载so文件。</p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
       </tags>
   </entry>
   <entry>
@@ -1979,18 +1995,6 @@
       </tags>
   </entry>
   <entry>
-    <title>git删除历史Commit</title>
-    <url>/2018/11/30/git-clean/</url>
-    <content><![CDATA[<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>把库克隆到本地后，创建新分支，删除原master分支后，将临时分支更名<br>在库目录下执行以下代码</p>
-<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git checkout --orphan tmp</span><br><span class="line">git add -A</span><br><span class="line">git commit -m <span class="string">&quot;clean project&quot;</span></span><br><span class="line">git branch -D master</span><br><span class="line">git branch -m master</span><br><span class="line">git push -f origin master</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/dounine/article/details/77840416">Gitlab删除历史commit清理空间</a></p>
-]]></content>
-      <tags>
-        <tag>Git</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Gradle配置版本号自动增加</title>
     <url>/2021/10/07/gradle-auto-version-code/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通过搜索引擎，学习一下如何配置版本号自增。</p>
@@ -2005,6 +2009,43 @@
 ]]></content>
       <tags>
         <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>git删除历史Commit</title>
+    <url>/2018/11/30/git-clean/</url>
+    <content><![CDATA[<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>把库克隆到本地后，创建新分支，删除原master分支后，将临时分支更名<br>在库目录下执行以下代码</p>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git checkout --orphan tmp</span><br><span class="line">git add -A</span><br><span class="line">git commit -m <span class="string">&quot;clean project&quot;</span></span><br><span class="line">git branch -D master</span><br><span class="line">git branch -m master</span><br><span class="line">git push -f origin master</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/dounine/article/details/77840416">Gitlab删除历史commit清理空间</a></p>
+]]></content>
+      <tags>
+        <tag>Git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Gradle app模块构建顺序探究</title>
+    <url>/2021/09/01/gradle-module-build-order-error/</url>
+    <content><![CDATA[<h2 id="错误提示"><a href="#错误提示" class="headerlink" title="错误提示"></a>错误提示</h2><p>使用<code>Gradle</code>构建安卓项目，第一次构建时报错：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Task :app:buildCMakeDebug FAILED</span><br><span class="line">C/C++: ninja: error: missing and no known rule to make it</span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+<h2 id="查看项目依赖"><a href="#查看项目依赖" class="headerlink" title="查看项目依赖"></a>查看项目依赖</h2><p><code>app</code>模块和<code>inject</code>模块都位于父项目下，在文件夹上属于平行关系。<br>在<code>Project Structure</code>中查看，<code>app</code>依赖于<code>inject</code>（在<code>build.gradle</code>中设置为依赖）。<br>理应先执行<code>inject:buildCMakeDebug</code>再执行<code>app:buildCMakeDebug</code></p>
+<h2 id="查看构建顺序"><a href="#查看构建顺序" class="headerlink" title="查看构建顺序"></a>查看构建顺序</h2><p>点击下方<code>Build</code>-<code>Build Output</code>查看顺序，发现<code>app</code>模块先于<code>inject</code>模块构建。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="重命名项目"><a href="#重命名项目" class="headerlink" title="重命名项目"></a>重命名项目</h3><p>将<code>app</code>模块重命名为<code>victim_app</code>后，构建顺序正常。<br>具体操作：<br><code>Clean Project</code>后，删除模块内的<code>.cxx</code>文件夹（方便重命名）。<br>重命名<code>app</code>模块为<code>victim_app</code>，并修改<code>setting.gradle</code>及依赖，使其保持一致。<br>最后<code>Sync with Gradle Files</code>，<code>Rebuild Project</code>。</p>
+<h3 id="手动按顺序构建"><a href="#手动按顺序构建" class="headerlink" title="手动按顺序构建"></a>手动按顺序构建</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gradlew inject:build</span><br><span class="line">gradlew app:build</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="推论"><a href="#推论" class="headerlink" title="推论"></a>推论</h2><p>在<code>Gradle</code>执行<code>Tasks</code>时，<code>app</code>模块比<code>inject</code>模块具有更高优先级，导致不按照依赖顺序构建。</p>
+<p>推测<code>Gradle</code>会对<code>setting.gradle</code>中的模块按字典序排序，然后构建。</p>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>将<code>inject</code>模块名改为<code>abc</code>，修改依赖项目名，<code>Rebuild Project</code>，发现构建顺序正常。</p>
+<p>将<code>inject</code>改为<code>bcd</code>，出现同样错误，说明确实是按字典序构建。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><blockquote>
+<p>However, ./gradlew run will run applications in lexicographical order. Instead, explicitly specify which subproject to run</p>
+</blockquote>
+<p><a href="https://github.com/kissaten/gradle-multi-project-example">gradle-multi-project-example</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
       </tags>
   </entry>
   <entry>
@@ -2074,31 +2115,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Gradle app模块构建顺序探究</title>
-    <url>/2021/09/01/gradle-module-build-order-error/</url>
-    <content><![CDATA[<h2 id="错误提示"><a href="#错误提示" class="headerlink" title="错误提示"></a>错误提示</h2><p>使用<code>Gradle</code>构建安卓项目，第一次构建时报错：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Task :app:buildCMakeDebug FAILED</span><br><span class="line">C/C++: ninja: error: missing and no known rule to make it</span><br></pre></td></tr></table></figure>
-<span id="more"></span>
-<h2 id="查看项目依赖"><a href="#查看项目依赖" class="headerlink" title="查看项目依赖"></a>查看项目依赖</h2><p><code>app</code>模块和<code>inject</code>模块都位于父项目下，在文件夹上属于平行关系。<br>在<code>Project Structure</code>中查看，<code>app</code>依赖于<code>inject</code>（在<code>build.gradle</code>中设置为依赖）。<br>理应先执行<code>inject:buildCMakeDebug</code>再执行<code>app:buildCMakeDebug</code></p>
-<h2 id="查看构建顺序"><a href="#查看构建顺序" class="headerlink" title="查看构建顺序"></a>查看构建顺序</h2><p>点击下方<code>Build</code>-<code>Build Output</code>查看顺序，发现<code>app</code>模块先于<code>inject</code>模块构建。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="重命名项目"><a href="#重命名项目" class="headerlink" title="重命名项目"></a>重命名项目</h3><p>将<code>app</code>模块重命名为<code>victim_app</code>后，构建顺序正常。<br>具体操作：<br><code>Clean Project</code>后，删除模块内的<code>.cxx</code>文件夹（方便重命名）。<br>重命名<code>app</code>模块为<code>victim_app</code>，并修改<code>setting.gradle</code>及依赖，使其保持一致。<br>最后<code>Sync with Gradle Files</code>，<code>Rebuild Project</code>。</p>
-<h3 id="手动按顺序构建"><a href="#手动按顺序构建" class="headerlink" title="手动按顺序构建"></a>手动按顺序构建</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gradlew inject:build</span><br><span class="line">gradlew app:build</span><br></pre></td></tr></table></figure>
-
-
-<h2 id="推论"><a href="#推论" class="headerlink" title="推论"></a>推论</h2><p>在<code>Gradle</code>执行<code>Tasks</code>时，<code>app</code>模块比<code>inject</code>模块具有更高优先级，导致不按照依赖顺序构建。</p>
-<p>推测<code>Gradle</code>会对<code>setting.gradle</code>中的模块按字典序排序，然后构建。</p>
-<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>将<code>inject</code>模块名改为<code>abc</code>，修改依赖项目名，<code>Rebuild Project</code>，发现构建顺序正常。</p>
-<p>将<code>inject</code>改为<code>bcd</code>，出现同样错误，说明确实是按字典序构建。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><blockquote>
-<p>However, ./gradlew run will run applications in lexicographical order. Instead, explicitly specify which subproject to run</p>
-</blockquote>
-<p><a href="https://github.com/kissaten/gradle-multi-project-example">gradle-multi-project-example</a></p>
-]]></content>
-      <tags>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hackersgame 2019 的一些失败尝试及复现</title>
     <url>/2019/10/22/hackersgame-2019-fails/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在之前比赛时尝试的基础上，参考<a href="https://github.com/ustclug/hackergame2019-writeups/">官方题解</a>进行复现</p>
@@ -2163,6 +2179,18 @@
       </tags>
   </entry>
   <entry>
+    <title>Hexo&#39;s Usage</title>
+    <url>/2018/11/28/hello-world/</url>
+    <content><![CDATA[<h2 id="My-Usage-After-changing-some-files"><a href="#My-Usage-After-changing-some-files" class="headerlink" title="My Usage (After changing some files)"></a>My Usage (After changing some files)</h2><h3 id="On-local-server"><a href="#On-local-server" class="headerlink" title="On local server"></a>On local server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</span><br></pre></td></tr></table></figure>
+<h3 id="Deploy-to-Github-After-checking"><a href="#Deploy-to-Github-After-checking" class="headerlink" title="Deploy to Github(After checking)"></a>Deploy to Github(After checking)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo d</span><br></pre></td></tr></table></figure>
+
+<p>Reference: <a href="https://blog.ctftools.com/2017/12/post233/">Hexo安装配置并托管至github</a></p>
+]]></content>
+      <tags>
+        <tag>经验</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>手动修复Windows打开方式（修改注册表）</title>
     <url>/2018/11/29/how-to-fix-fileExts/</url>
     <content><![CDATA[<p>由于不小心把.gitignore设置成了以文本形式打开，导致在Explorer中显示为空文件名的文本文件（非常不顺眼）<br>（Windows的默认设置中无法删除打开方式）<br>而且有的文件手动设置了默认打开方式后也不管用<br>于是通过修改注册表实现</p>
@@ -2183,18 +2211,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Hexo&#39;s Usage</title>
-    <url>/2018/11/28/hello-world/</url>
-    <content><![CDATA[<h2 id="My-Usage-After-changing-some-files"><a href="#My-Usage-After-changing-some-files" class="headerlink" title="My Usage (After changing some files)"></a>My Usage (After changing some files)</h2><h3 id="On-local-server"><a href="#On-local-server" class="headerlink" title="On local server"></a>On local server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</span><br></pre></td></tr></table></figure>
-<h3 id="Deploy-to-Github-After-checking"><a href="#Deploy-to-Github-After-checking" class="headerlink" title="Deploy to Github(After checking)"></a>Deploy to Github(After checking)</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo d</span><br></pre></td></tr></table></figure>
-
-<p>Reference: <a href="https://blog.ctftools.com/2017/12/post233/">Hexo安装配置并托管至github</a></p>
-]]></content>
-      <tags>
-        <tag>经验</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何支持博主？</title>
     <url>/2018/12/01/how-to-support-me/</url>
     <content><![CDATA[<p>众所周知，支持主要分为经济上和精神上的支持。</p>
@@ -2206,24 +2222,6 @@
 ]]></content>
       <tags>
         <tag>支持</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>i春秋 第二届春秋欢乐赛 ReCreators&amp;Hello World Writeup</title>
-    <url>/2019/01/26/icq-2nd-happy-rec/</url>
-    <content><![CDATA[<h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h2><h3 id="观察"><a href="#观察" class="headerlink" title="观察"></a>观察</h3><p>浏览器打开，只有一个<code>Hello, World!</code><br>查看源代码看到有个</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;flag.xmas.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>结果没有该文件，尝试打开<code>flag.js</code>，看到混淆过的js，全选复制，放到控制台运行，得到</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> Key = <span class="string">&quot;7a57a5a743894a0e&quot;</span>;</span><br><span class="line">CryptoJS.pad.Iso10126 = &#123;</span><br><span class="line">    <span class="attr">pad</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data, blockSize</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> blockSizeBytes = blockSize * <span class="number">4</span>;</span><br><span class="line">        <span class="keyword">var</span> nPaddingBytes = blockSizeBytes - data.sigBytes % blockSizeBytes;</span><br><span class="line">        data.concat(CryptoJS.lib.WordArray.random(nPaddingBytes - <span class="number">1</span>)).concat(CryptoJS.lib.WordArray.create([nPaddingBytes &lt;&lt; <span class="number">24</span>], <span class="number">1</span>))</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">unpad</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> nPaddingBytes = data.words[(data.sigBytes - <span class="number">1</span>) &gt;&gt;&gt; <span class="number">2</span>] &amp; <span class="number">0xff</span>;</span><br><span class="line">        data.sigBytes -= nPaddingBytes</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> aesEncrypt = <span class="function"><span class="keyword">function</span>(<span class="params">data, keyStr, ivStr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> sendData = CryptoJS.enc.Utf8.parse(data);</span><br><span class="line">    <span class="keyword">var</span> key = CryptoJS.enc.Utf8.parse(keyStr);</span><br><span class="line">    <span class="keyword">var</span> iv = CryptoJS.enc.Utf8.parse(ivStr);</span><br><span class="line">    <span class="keyword">var</span> encrypted = CryptoJS.AES.encrypt(sendData, key, &#123;</span><br><span class="line">        <span class="attr">iv</span>: iv,</span><br><span class="line">        <span class="attr">mode</span>: CryptoJS.mode.CBC,</span><br><span class="line">        <span class="attr">padding</span>: CryptoJS.pad.Iso10126</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> CryptoJS.enc.Base64.stringify(encrypted.ciphertext)</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> aesDecrypt = <span class="function"><span class="keyword">function</span>(<span class="params">data, keyStr, ivStr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> key = CryptoJS.enc.Utf8.parse(keyStr);</span><br><span class="line">    <span class="keyword">var</span> iv = CryptoJS.enc.Utf8.parse(ivStr);</span><br><span class="line">    <span class="keyword">var</span> decrypted = CryptoJS.AES.decrypt(data, key, &#123;</span><br><span class="line">        <span class="attr">iv</span>: iv,</span><br><span class="line">        <span class="attr">mode</span>: CryptoJS.mode.CBC,</span><br><span class="line">        <span class="attr">padding</span>: CryptoJS.pad.Iso10126</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> decrypted.toString(CryptoJS.enc.Utf8)</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> hint = <span class="string">&quot;SSNRTPIuHLUxqtJmq8mDDPtexRU7RTjNO34tLqz+Tpw=&quot;</span>;</span><br></pre></td></tr></table></figure>
-<span id="more"></span>
-<p>然而，这并没有什么用。。。。<br>得到的提示是<code>flag is not here</code></p>
-<h3 id="使用工具进行git泄露"><a href="#使用工具进行git泄露" class="headerlink" title="使用工具进行git泄露"></a>使用工具进行git泄露</h3><p>搜索该题得到提示<code>git泄露</code>，于是再次搜索<code>git泄露</code>，发现例题就是这题。。。。<br>使用<a href="https://github.com/gakki429/Git_Extract">Git_Extract</a>提取（注意：需使用Python2）<br>对比flag文件的差异得到flag(有修改和删除字符)</p>
-<h2 id="ReCreators"><a href="#ReCreators" class="headerlink" title="ReCreators"></a>ReCreators</h2><p>下回来一个没有后缀的文件，所以先要判断它是什么文件</p>
-<h3 id="修复文件后缀"><a href="#修复文件后缀" class="headerlink" title="修复文件后缀"></a>修复文件后缀</h3><p>使用<code>010Editor</code>打开，发现是<code>.vmdk</code>文件，于是加上后缀，使用<code>FTK Imager</code>打开<br>发现有一个<code>misc.mp4</code>，提取出来，使用<code>010Editor</code>打开，在靠近末尾处发现一大串数字字符，推测是16进制<br>（mp4是Re:CREATORS的片头）<br>(字符串在本文最后)</p>
-<h3 id="解密"><a href="#解密" class="headerlink" title="解密"></a>解密</h3><p>发现其实就是几种方式混合在一起，不断解密即可得到flag<br>具体顺序如下：<br>HexDecode两次<br>Base32Decode三次<br>Base64Decode两次<br>HexDecode一次<br>Base32Decode一次<br>Base64Decode两次<br>得到flag：<code>flag&#123;wh4t_a_w0nderfu1_d4y&#125;</code></p>
-<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">3441344134383435353535323533344534423541344135353334353333323446344134453433353533323536343335343441354134343535353535343433343634423335344334363437353634333443344235413434343534443536344235343439344534433535353535363533344234393541343435363435353533323531343933353443343534443536344234453442353634363436344235333442344634413445343335363446353533323534344233353436353634353532353335373439353634413534343535363332344234413541343634353442353234423533344134413442353535393532353334383439353535413436343735333332353734413532343434353539353234423534344135353541343534393533354135363439353634433436344235353532353334423335343634353334353334333536344233353441343634373534343334443441344134343436344235343442353334413445344235353446353335333444344235363441353634463535333234443441353234323435353335363533344534423444354134363531353335333446343935413433353634423535353235333441353234343535353535343533343734413536344135353537353633323442344234413433343534423535333235363441344534423435353735343533343734423541344235363435353133323438344134453443343535333536343334363442354134363535333635333332344234393541343335353332353634333443344235363436343533343532343334363441333534433436343735373533344334433441343434363444353434423532343734413435343535353533344135333442353634443536343535333332344434393335343535363535353635333534344234443541343634373533353335373439353634333535343735363533344234423445343635353535353334333436343734413437353634373536353334423442354134373435343935323442353834413445343934353533353335333436343935413437353634393533333235343441344534383435344435363442353434423541344135353539353334413536344135363443343535373536344135333443343234363435353535343433343634393335344334353437353634333443344334413434343634443534333235353439344534323535353935323533343434423532343735363444353533323535344134363445343534393536344234363441353535413436344635333533343734393335344235353446353634413533344135323436343635353532353334363441344534413534343535343332344234413541343334363442353633323534344234453437343535333536353334383442354134353535333234443533343834413441344534353535353234423538344233353432353634393533333233323439344534333536353335353541353334413445343634363435353133323535343935363442353634373536343334423441354134343436344435343442353534393445343435353537353234413533343935363434353634423531333234443441353234363435343535363533353034423541344534363444353233323442344135323433353434393536344235343441344534353536353535333433353734413445344234353437353434423441343735363437343534423533344235333442344534363435353735373533343334423536343435363437353535333537344134453438343535393536353335343442353634413536343735333541353634393541344334353442353635323533343933353435353634443534343334373439333534423436343735343433344334423541343735363444353534423532343734413443353535373534353334453442353533323436344235353332344134413445344534353437353635333445344234453441353634353533353235353437344134423536344635353533343434393532343635363444353335333536343735413442343535373536333234423441354134363535344235363332353734423445343734353539353135333437344235413433353634333535333234383441343533323535333235363442354134423532343235353531353334423536344334413442353533323535333234423442344534343535353535343433353634423445344335363437353334333443344334413434343634423445343335353439344534413535353535343533344434393541343735363444353335333536344134453439353635353532353335303442344435413436344635333533344634413536343434353437353635333534343935323437343534443533343335363439353634423435343735323533343834413441343734353442353634423537344234453436343535393533353334373442354134373536343735333332353434413445343834353535353634423538344233353441353534393533333235333439344134423534343935363441353334423541343634363535353335333436344334363441343535373534353334433442344134343436344235343332353434413444354134353539353235333444343935353541343634443535333234353441344134383435344435323433344334423445344135353446353335333445344334413433343534463536333234343441353234363535353535343433353634413536344134353537353635333443344135413435343534423536333235373441344534453435353735353533343834423541343735363433344435333537344134413434343534443532344235323442343935413435353935323332344634393441344334353332353535323533343934453436343533343532343335373441333534433435353735363442344334413541343434353444353434423534343734413442353535333534344135333439353634433536344435353332344534413436343634353537353634423443344135413441353634463533333234463439353234423536343735363533353334423536343535363535353234423537344133353441343534373535353334423441343535413436344235363442353334423445343734353535353635333434343935413439353634373444353335383441344134433435344235323442343434423541343634363437353333323442343935413443343534373536333234433439353634363535333234453533353534373441343934353533353034393344</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>CTF</tag>
       </tags>
   </entry>
   <entry>
@@ -2247,6 +2245,24 @@
       </tags>
   </entry>
   <entry>
+    <title>i春秋 第二届春秋欢乐赛 ReCreators&amp;Hello World Writeup</title>
+    <url>/2019/01/26/icq-2nd-happy-rec/</url>
+    <content><![CDATA[<h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h2><h3 id="观察"><a href="#观察" class="headerlink" title="观察"></a>观察</h3><p>浏览器打开，只有一个<code>Hello, World!</code><br>查看源代码看到有个</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;flag.xmas.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果没有该文件，尝试打开<code>flag.js</code>，看到混淆过的js，全选复制，放到控制台运行，得到</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> Key = <span class="string">&quot;7a57a5a743894a0e&quot;</span>;</span><br><span class="line">CryptoJS.pad.Iso10126 = &#123;</span><br><span class="line">    <span class="attr">pad</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data, blockSize</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> blockSizeBytes = blockSize * <span class="number">4</span>;</span><br><span class="line">        <span class="keyword">var</span> nPaddingBytes = blockSizeBytes - data.sigBytes % blockSizeBytes;</span><br><span class="line">        data.concat(CryptoJS.lib.WordArray.random(nPaddingBytes - <span class="number">1</span>)).concat(CryptoJS.lib.WordArray.create([nPaddingBytes &lt;&lt; <span class="number">24</span>], <span class="number">1</span>))</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">unpad</span>: <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> nPaddingBytes = data.words[(data.sigBytes - <span class="number">1</span>) &gt;&gt;&gt; <span class="number">2</span>] &amp; <span class="number">0xff</span>;</span><br><span class="line">        data.sigBytes -= nPaddingBytes</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> aesEncrypt = <span class="function"><span class="keyword">function</span>(<span class="params">data, keyStr, ivStr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> sendData = CryptoJS.enc.Utf8.parse(data);</span><br><span class="line">    <span class="keyword">var</span> key = CryptoJS.enc.Utf8.parse(keyStr);</span><br><span class="line">    <span class="keyword">var</span> iv = CryptoJS.enc.Utf8.parse(ivStr);</span><br><span class="line">    <span class="keyword">var</span> encrypted = CryptoJS.AES.encrypt(sendData, key, &#123;</span><br><span class="line">        <span class="attr">iv</span>: iv,</span><br><span class="line">        <span class="attr">mode</span>: CryptoJS.mode.CBC,</span><br><span class="line">        <span class="attr">padding</span>: CryptoJS.pad.Iso10126</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> CryptoJS.enc.Base64.stringify(encrypted.ciphertext)</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> aesDecrypt = <span class="function"><span class="keyword">function</span>(<span class="params">data, keyStr, ivStr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> key = CryptoJS.enc.Utf8.parse(keyStr);</span><br><span class="line">    <span class="keyword">var</span> iv = CryptoJS.enc.Utf8.parse(ivStr);</span><br><span class="line">    <span class="keyword">var</span> decrypted = CryptoJS.AES.decrypt(data, key, &#123;</span><br><span class="line">        <span class="attr">iv</span>: iv,</span><br><span class="line">        <span class="attr">mode</span>: CryptoJS.mode.CBC,</span><br><span class="line">        <span class="attr">padding</span>: CryptoJS.pad.Iso10126</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> decrypted.toString(CryptoJS.enc.Utf8)</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> hint = <span class="string">&quot;SSNRTPIuHLUxqtJmq8mDDPtexRU7RTjNO34tLqz+Tpw=&quot;</span>;</span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+<p>然而，这并没有什么用。。。。<br>得到的提示是<code>flag is not here</code></p>
+<h3 id="使用工具进行git泄露"><a href="#使用工具进行git泄露" class="headerlink" title="使用工具进行git泄露"></a>使用工具进行git泄露</h3><p>搜索该题得到提示<code>git泄露</code>，于是再次搜索<code>git泄露</code>，发现例题就是这题。。。。<br>使用<a href="https://github.com/gakki429/Git_Extract">Git_Extract</a>提取（注意：需使用Python2）<br>对比flag文件的差异得到flag(有修改和删除字符)</p>
+<h2 id="ReCreators"><a href="#ReCreators" class="headerlink" title="ReCreators"></a>ReCreators</h2><p>下回来一个没有后缀的文件，所以先要判断它是什么文件</p>
+<h3 id="修复文件后缀"><a href="#修复文件后缀" class="headerlink" title="修复文件后缀"></a>修复文件后缀</h3><p>使用<code>010Editor</code>打开，发现是<code>.vmdk</code>文件，于是加上后缀，使用<code>FTK Imager</code>打开<br>发现有一个<code>misc.mp4</code>，提取出来，使用<code>010Editor</code>打开，在靠近末尾处发现一大串数字字符，推测是16进制<br>（mp4是Re:CREATORS的片头）<br>(字符串在本文最后)</p>
+<h3 id="解密"><a href="#解密" class="headerlink" title="解密"></a>解密</h3><p>发现其实就是几种方式混合在一起，不断解密即可得到flag<br>具体顺序如下：<br>HexDecode两次<br>Base32Decode三次<br>Base64Decode两次<br>HexDecode一次<br>Base32Decode一次<br>Base64Decode两次<br>得到flag：<code>flag&#123;wh4t_a_w0nderfu1_d4y&#125;</code></p>
+<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">3441344134383435353535323533344534423541344135353334353333323446344134453433353533323536343335343441354134343535353535343433343634423335344334363437353634333443344235413434343534443536344235343439344534433535353535363533344234393541343435363435353533323531343933353443343534443536344234453442353634363436344235333442344634413445343335363446353533323534344233353436353634353532353335373439353634413534343535363332344234413541343634353442353234423533344134413442353535393532353334383439353535413436343735333332353734413532343434353539353234423534344135353541343534393533354135363439353634433436344235353532353334423335343634353334353334333536344233353441343634373534343334443441344134343436344235343442353334413445344235353446353335333444344235363441353634463535333234443441353234323435353335363533344534423444354134363531353335333446343935413433353634423535353235333441353234343535353535343533343734413536344135353537353633323442344234413433343534423535333235363441344534423435353735343533343734423541344235363435353133323438344134453443343535333536343334363442354134363535333635333332344234393541343335353332353634333443344235363436343533343532343334363441333534433436343735373533344334433441343434363444353434423532343734413435343535353533344135333442353634443536343535333332344434393335343535363535353635333534344234443541343634373533353335373439353634333535343735363533344234423445343635353535353334333436343734413437353634373536353334423442354134373435343935323442353834413445343934353533353335333436343935413437353634393533333235343441344534383435344435363442353434423541344135353539353334413536344135363443343535373536344135333443343234363435353535343433343634393335344334353437353634333443344334413434343634443534333235353439344534323535353935323533343434423532343735363444353533323535344134363445343534393536344234363441353535413436344635333533343734393335344235353446353634413533344135323436343635353532353334363441344534413534343535343332344234413541343334363442353633323534344234453437343535333536353334383442354134353535333234443533343834413441344534353535353234423538344233353432353634393533333233323439344534333536353335353541353334413445343634363435353133323535343935363442353634373536343334423441354134343436344435343442353534393445343435353537353234413533343935363434353634423531333234443441353234363435343535363533353034423541344534363444353233323442344135323433353434393536344235343441344534353536353535333433353734413445344234353437353434423441343735363437343534423533344235333442344534363435353735373533343334423536343435363437353535333537344134453438343535393536353335343442353634413536343735333541353634393541344334353442353635323533343933353435353634443534343334373439333534423436343735343433344334423541343735363444353534423532343734413443353535373534353334453442353533323436344235353332344134413445344534353437353635333445344234453441353634353533353235353437344134423536344635353533343434393532343635363444353335333536343735413442343535373536333234423441354134363535344235363332353734423445343734353539353135333437344235413433353634333535333234383441343533323535333235363442354134423532343235353531353334423536344334413442353533323535333234423442344534343535353535343433353634423445344335363437353334333443344334413434343634423445343335353439344534413535353535343533344434393541343735363444353335333536344134453439353635353532353335303442344435413436344635333533344634413536343434353437353635333534343935323437343534443533343335363439353634423435343735323533343834413441343734353442353634423537344234453436343535393533353334373442354134373536343735333332353434413445343834353535353634423538344233353441353534393533333235333439344134423534343935363441353334423541343634363535353335333436344334363441343535373534353334433442344134343436344235343332353434413444354134353539353235333444343935353541343634443535333234353441344134383435344435323433344334423445344135353446353335333445344334413433343534463536333234343441353234363535353535343433353634413536344134353537353635333443344135413435343534423536333235373441344534453435353735353533343834423541343735363433344435333537344134413434343534443532344235323442343935413435353935323332344634393441344334353332353535323533343934453436343533343532343335373441333534433435353735363442344334413541343434353444353434423534343734413442353535333534344135333439353634433536344435353332344534413436343634353537353634423443344135413441353634463533333234463439353234423536343735363533353334423536343535363535353234423537344133353441343534373535353334423441343535413436344235363442353334423445343734353535353635333434343935413439353634373444353335383441344134433435344235323442343434423541343634363437353333323442343935413443343534373536333234433439353634363535333234453533353534373441343934353533353034393344</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>修改IDA android_server默认端口</title>
     <url>/2019/09/13/ida-as-port-reverse/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>有的反调试会检测<code>23946</code>端口是否占用，使用其他端口即可绕过此反调试。<br>可以使用<code>./android_server -p12345</code>指定端口，也可以使用<code>IDA</code>逆向，修改默认端口。</p>
@@ -2254,6 +2270,19 @@
 <h2 id="patch"><a href="#patch" class="headerlink" title="patch"></a>patch</h2><p>使用<code>IDA</code>打开<code>android_server</code>，搜索字符串<code>Listening on</code>，定位到引用位置。<br>按下F5反编译，重命名端口号变量。按下x，向上搜索找到赋值位置（可能有多处），patch即可。<br>附上偏移值：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0xAFE0 LDR     R2, =23946</span><br><span class="line">0xB220 LDR     R1, =23946</span><br></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.cnblogs.com/jiaoxiake/p/6801093.html">浅谈android反调试之 转发端口</a></p>
+]]></content>
+      <tags>
+        <tag>IDA</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>IDA不能F5查看伪代码的解决方法（positive sp value）</title>
+    <url>/2018/11/30/ida-positive-sp/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-30-12.png"><br>在函数中F5失败，提示堆栈指针为正数，故需要修复堆栈平衡</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>去设置中打开堆栈指针（Stack pointer）显示（也就是sp）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-33-01.png"></p>
+<p>按G定位到4012B9，发现return时的指针是-10（hex）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-34-15.png"></p>
+<p>找到最接近的call（401295），在该行修改sp值（按alt+K或者右键修改）,设置偏移值为-0x10<br>（目的就是使return前的sp为0）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_09-55-41.png"><br>修复后：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-35-09.png"><br>然后就可以愉快地F5了</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://bbs.pediy.com/thread-158896.htm">IDA sp-analysis failed 不能F5的 解决方案之(二)</a><br><a href="https://bbs.pediy.com/thread-140002.htm">IDA sp-analysis failed 不能F5的 解决方案之(一)</a></p>
 ]]></content>
       <tags>
         <tag>IDA</tag>
@@ -2270,19 +2299,6 @@
 <h3 id="方法2-修改参数个数"><a href="#方法2-修改参数个数" class="headerlink" title="方法2 - 修改参数个数"></a>方法2 - 修改参数个数</h3><p>定位到报错的代码位置，鼠标点击调用的函数，按下Y键，修改参数个数。<br>比如将<code>(_JNIEnv *, int, int, int, int, int, int, int);</code>改为<code>(_JNIEnv *, int, int, int);</code></p>
 <p>具体参数个数，需要根据函数调用约定及汇编代码确定（看它传入了几个参数）。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://bbs.pediy.com/thread-158896.htm">IDA sp-analysis failed 不能F5的 解决方案之(二)</a><br><a href="https://blog.csdn.net/xiangshangbashaonian/article/details/82889924">解决IDA出现Decompilation failure: call analysis failed不可以F5的问题</a><br><a href="https://www.cnblogs.com/echo579/p/6564433.html">IDA反编译失败-call analysis failed</a></p>
-]]></content>
-      <tags>
-        <tag>IDA</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>IDA不能F5查看伪代码的解决方法（positive sp value）</title>
-    <url>/2018/11/30/ida-positive-sp/</url>
-    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-30-12.png"><br>在函数中F5失败，提示堆栈指针为正数，故需要修复堆栈平衡</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>去设置中打开堆栈指针（Stack pointer）显示（也就是sp）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-33-01.png"></p>
-<p>按G定位到4012B9，发现return时的指针是-10（hex）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-34-15.png"></p>
-<p>找到最接近的call（401295），在该行修改sp值（按alt+K或者右键修改）,设置偏移值为-0x10<br>（目的就是使return前的sp为0）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_09-55-41.png"><br>修复后：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/ida_2018-11-30_08-35-09.png"><br>然后就可以愉快地F5了</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://bbs.pediy.com/thread-158896.htm">IDA sp-analysis failed 不能F5的 解决方案之(二)</a><br><a href="https://bbs.pediy.com/thread-140002.htm">IDA sp-analysis failed 不能F5的 解决方案之(一)</a></p>
 ]]></content>
       <tags>
         <tag>IDA</tag>
@@ -2576,17 +2592,6 @@
       </tags>
   </entry>
   <entry>
-    <title>使用Magisk指令修改 ro.debuggable（不刷机）</title>
-    <url>/2019/09/15/magisk-set-debuggable/</url>
-    <content><![CDATA[<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><h3 id="使用magisk指令修改："><a href="#使用magisk指令修改：" class="headerlink" title="使用magisk指令修改："></a>使用magisk指令修改：</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">magisk resetprop ro.debuggable 1</span><br><span class="line">stop;start;</span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.renyiwei.com/archives/1704.html">Android修改ro.debuggable 华为真机adb调试所有进程</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>MIPS冒泡排序 计算机组成原理与设计（第五版）</title>
     <url>/2020/03/28/mips-bubble-sort/</url>
     <content><![CDATA[<h2 id="代码如下"><a href="#代码如下" class="headerlink" title="代码如下"></a>代码如下</h2><p>（非递减排序）</p>
@@ -2595,6 +2600,17 @@
 ]]></content>
       <tags>
         <tag>MIPS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用Magisk指令修改 ro.debuggable（不刷机）</title>
+    <url>/2019/09/15/magisk-set-debuggable/</url>
+    <content><![CDATA[<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><h3 id="使用magisk指令修改："><a href="#使用magisk指令修改：" class="headerlink" title="使用magisk指令修改："></a>使用magisk指令修改：</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">magisk resetprop ro.debuggable 1</span><br><span class="line">stop;start;</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.renyiwei.com/archives/1704.html">Android修改ro.debuggable 华为真机adb调试所有进程</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
       </tags>
   </entry>
   <entry>
@@ -2780,6 +2796,22 @@
       </tags>
   </entry>
   <entry>
+    <title>使用9008模式、LG FlashTool救砖（Nexus 5）</title>
+    <url>/2021/09/07/nexus5-9008/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前买来调试用的<code>Nexus 5</code>坏了，雪花屏并且无限重启。记录一下刷机的过程。</p>
+<p>PS：刷机后仍雪花屏，怀疑是硬件问题。</p>
+<h2 id="禁用驱动程序强制签名"><a href="#禁用驱动程序强制签名" class="headerlink" title="禁用驱动程序强制签名"></a>禁用驱动程序强制签名</h2><p>安装完驱动后，需要禁用驱动程序强制签名（刷机完成后记得恢复）</p>
+<h2 id="9008"><a href="#9008" class="headerlink" title="9008"></a>9008</h2><p><a href="https://forum.xda-developers.com/t/fix-unbrick-nexus-5-stucked-in-qualcomm-hs-usb-qdloader-9008-mode.3043301/">Unbrick Nexus 5 stucked in Qualcomm HS-USB QDLoader 9008 mode</a></p>
+<h3 id="BoardDiag黑屏"><a href="#BoardDiag黑屏" class="headerlink" title="BoardDiag黑屏"></a>BoardDiag黑屏</h3><blockquote>
+<p>Hold down SHIFT key and right click on a running program icon on the taskbar, a popup menu should appear, click on Move then use the Left/Right Arrow key to move it.<br>Do the same for the rest of the running programs.<br><a href="https://forum.xda-developers.com/t/boarddiag-v2-99a-by-willthecracker-opened-once-crashed-opens-but-only-in-taskbar.3407996/post-82425715">https://forum.xda-developers.com/t/boarddiag-v2-99a-by-willthecracker-opened-once-crashed-opens-but-only-in-taskbar.3407996/post-82425715</a><br>右键任务栏的<code>BoardDiag</code>图标，选择移动，然后按方向键移动窗口</p>
+</blockquote>
+<h2 id="LG-FlashTool"><a href="#LG-FlashTool" class="headerlink" title="LG FlashTool"></a>LG FlashTool</h2><p><a href="https://forum.xda-developers.com/t/tutorial-how-to-flash-factory-images-with-lg-flashtool.2713833/">[Tutorial] How to flash factory images with LG Flashtool</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>npm package.json scripts 传递参数</title>
     <url>/2021/11/21/npm-package-json-scripts-args/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>直接加参数运行（如：<code>npm run view test</code>），实际上是拼接字符串到末尾，不够灵活。</p>
@@ -2804,22 +2836,6 @@
 ]]></content>
       <tags>
         <tag>Node.js</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用9008模式、LG FlashTool救砖（Nexus 5）</title>
-    <url>/2021/09/07/nexus5-9008/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>之前买来调试用的<code>Nexus 5</code>坏了，雪花屏并且无限重启。记录一下刷机的过程。</p>
-<p>PS：刷机后仍雪花屏，怀疑是硬件问题。</p>
-<h2 id="禁用驱动程序强制签名"><a href="#禁用驱动程序强制签名" class="headerlink" title="禁用驱动程序强制签名"></a>禁用驱动程序强制签名</h2><p>安装完驱动后，需要禁用驱动程序强制签名（刷机完成后记得恢复）</p>
-<h2 id="9008"><a href="#9008" class="headerlink" title="9008"></a>9008</h2><p><a href="https://forum.xda-developers.com/t/fix-unbrick-nexus-5-stucked-in-qualcomm-hs-usb-qdloader-9008-mode.3043301/">Unbrick Nexus 5 stucked in Qualcomm HS-USB QDLoader 9008 mode</a></p>
-<h3 id="BoardDiag黑屏"><a href="#BoardDiag黑屏" class="headerlink" title="BoardDiag黑屏"></a>BoardDiag黑屏</h3><blockquote>
-<p>Hold down SHIFT key and right click on a running program icon on the taskbar, a popup menu should appear, click on Move then use the Left/Right Arrow key to move it.<br>Do the same for the rest of the running programs.<br><a href="https://forum.xda-developers.com/t/boarddiag-v2-99a-by-willthecracker-opened-once-crashed-opens-but-only-in-taskbar.3407996/post-82425715">https://forum.xda-developers.com/t/boarddiag-v2-99a-by-willthecracker-opened-once-crashed-opens-but-only-in-taskbar.3407996/post-82425715</a><br>右键任务栏的<code>BoardDiag</code>图标，选择移动，然后按方向键移动窗口</p>
-</blockquote>
-<h2 id="LG-FlashTool"><a href="#LG-FlashTool" class="headerlink" title="LG FlashTool"></a>LG FlashTool</h2><p><a href="https://forum.xda-developers.com/t/tutorial-how-to-flash-factory-images-with-lg-flashtool.2713833/">[Tutorial] How to flash factory images with LG Flashtool</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
       </tags>
   </entry>
   <entry>
@@ -3138,46 +3154,23 @@
       </tags>
   </entry>
   <entry>
-    <title>在Linux下设置代理（docker、git、repo、wget等）</title>
-    <url>/2021/10/03/set-proxy-of-docker-git-and-others/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>记录一下<code>Docker</code>、<code>Git</code>和其他命令（如<code>repo</code>）的代理配置。</p>
-<span id="more"></span>
-
-<h2 id="Docker-版本-gt-17-07"><a href="#Docker-版本-gt-17-07" class="headerlink" title="Docker (版本&gt;=17.07)"></a>Docker (版本&gt;=17.07)</h2><h3 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h3><p>打开<code>~/.docker/config.json</code>：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line"> &quot;proxies&quot;:</span><br><span class="line"> &#123;</span><br><span class="line">   &quot;default&quot;:</span><br><span class="line">   &#123;</span><br><span class="line">     &quot;httpProxy&quot;: &quot;http://localhost:8080&quot;,</span><br><span class="line">     &quot;httpsProxy&quot;: &quot;http://localhost:8080&quot;,</span><br><span class="line">     &quot;noProxy&quot;: &quot;localhost,127.0.0.1&quot;</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>运行<code>docker run</code>和<code>docker build</code>时增加<code>--network=host</code>参数</p>
-<p>注意：apt只支持http代理</p>
-<h3 id="取消"><a href="#取消" class="headerlink" title="取消"></a>取消</h3><p>删除配置即可</p>
-<h2 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h2><h3 id="设置-1"><a href="#设置-1" class="headerlink" title="设置"></a>设置</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export PROXY_URL=http://localhost:8080</span><br><span class="line">git config --global http.proxy $PROXY_URL</span><br><span class="line">git config --global https.proxy $PROXY_URL</span><br></pre></td></tr></table></figure>
-<h3 id="取消-1"><a href="#取消-1" class="headerlink" title="取消"></a>取消</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">unset PROXY_URL</span><br><span class="line">git config --global --unset http.proxy</span><br><span class="line">git config --global --unset https.proxy</span><br></pre></td></tr></table></figure>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p><code>repo</code> <code>wget</code> <code>curl</code>等</p>
-<h3 id="设置-2"><a href="#设置-2" class="headerlink" title="设置"></a>设置</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export PROXY_URL=http://localhost:8080</span><br><span class="line">export https_proxy=$PROXY_URL</span><br><span class="line">export http_proxy=$PROXY_URL</span><br></pre></td></tr></table></figure>
-<p>查询ip地址，检测代理是否连接成功：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl cip.cc</span><br></pre></td></tr></table></figure>
-<h3 id="取消-2"><a href="#取消-2" class="headerlink" title="取消"></a>取消</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">unset PROXY_URL</span><br><span class="line">unset https_proxy</span><br><span class="line">unset http_proxy</span><br></pre></td></tr></table></figure>
-
+    <title>Linux设置默认Python版本</title>
+    <url>/2020/09/19/set-python-version-in-linux/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>由于默认的python版本为2.7，执行命令时需要改为python3，比较麻烦。所以将python3设置为默认版本。(执行<code>apt-get install python3-pip</code>安装python3)</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>原理：使用update-alternatives进行配置</p>
+<h3 id="查看python位置"><a href="#查看python位置" class="headerlink" title="查看python位置"></a>查看python位置</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ls /usr/bin/python*</span><br></pre></td></tr></table></figure>
+<p>一般是<code>/usr/bin/python2</code>和<code>/usr/bin/python3</code></p>
+<h3 id="查询当前配置"><a href="#查询当前配置" class="headerlink" title="查询当前配置"></a>查询当前配置</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">update-alternatives --list python</span><br></pre></td></tr></table></figure>
+<p>没有配置过的话会返回<code>update-alternatives: error: no alternatives for python</code></p>
+<h3 id="配置默认版本"><a href="#配置默认版本" class="headerlink" title="配置默认版本"></a>配置默认版本</h3><p>通过设置优先级来实现默认使用python3</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1</span><br><span class="line">sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 2</span><br></pre></td></tr></table></figure>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>查询默认版本号</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">python --version</span><br></pre></td></tr></table></figure>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>有些脚本需要手动修改python版本（如yum），将<code>/usr/bin/python</code>改为<code>/usr/bin/python2</code></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/fang_chuan/article/details/60958329">更改Ubuntu默认python版本的两种方法</a></p>
 ]]></content>
       <tags>
-        <tag>经验</tag>
-        <tag>Linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>第三届上海市大学生网络安全大赛 Classical Writeup</title>
-    <url>/2019/01/26/shanghai-3rd-classic/</url>
-    <content><![CDATA[<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>cipher.txt内容如下</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Ld hcrakewcfaxr, f hofjjlhfo hlaxuc lj f krau ev hlaxuc kxfk zfj tjui xljkeclhfoor gtk dez xfj vfooud, vec kxu pejk afck, ldke iljtju. Ld hedkcfjk ke peiucd hcrakewcfaxlh foweclkxpj, pejk hofjjlhfo hlaxucj hfd gu acfhklhfoor hepatkui fdi jeoyui gr xfdi. Xezuyuc, OrmkO3vydJCoe2qyNLmcN2qlpJXnM3SxM2Xke3q9 kxur fcu foje tjtfoor yucr jlpaou ke gcufn zlkx peiucd kuhxdeoewr. Kxu kucp ldhotiuj kxu jlpaou jrjkupj tjui jldhu Wcuun fdi Cepfd klpuj, kxu uofgecfku Cudfljjfdhu hlaxucj, Zecoi Zfc LL hcrakewcfaxr jthx fj kxu Udlwpf pfhxldu fdi guredi. F btlhn gcezd veq mtpa eyuc kxu ofsr iew.</span><br></pre></td></tr></table></figure>
-<p>推测是移位的密码，使用<code>WinCrypto</code>分析得到（也可以使用<a href="https://quipqiup.com/">quip</a>在线分析并修复）</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">In cryptography, a classical cipher is a type of cipher that was used historically but now has fallen, for the most part, into disuse. In contrast to modern cryptographic algorithms, most classical ciphers can be practically computed and solved by hand. However, LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9 they are also usually very simple to break with modern technology. The term includes the simple systems used since Greek and Roman times, the elaborate Renaissance ciphers, World War II cryptography such as the Enigma machine and beyond. A quick brown fox jump over the lazy dog.</span><br></pre></td></tr></table></figure>
-<p>发现该句子其实来源于英文维基百科的经典加密（Classical cipher）<br>发现最后一句话其实就是<code>A quick brown fox jumps over the lazy dog.</code><br>（包含26个字母的最短句子）并去掉s<br>由此可以得到对照表然后恢复（当然使用<code>WinCrypto</code>就直接是这个字符串了）<br>所以可以得到原本的字符是<code>LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9</code></p>
-<h2 id="解密"><a href="#解密" class="headerlink" title="解密"></a>解密</h2><p>直接解base64发现行不通<br>移位爆破<br>得到<code>ZmxhZ3tjbGFzc2ljYWxfY2lwaGVyX3NvX2Vhc3l9</code>是可以解的</p>
-<h2 id="爆破代码"><a href="#爆破代码" class="headerlink" title="爆破代码"></a>爆破代码</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">toAlpha</span>(<span class="params">c,i</span>):</span></span><br><span class="line">    num = <span class="built_in">ord</span>(c)</span><br><span class="line">    <span class="keyword">if</span> num &gt;= <span class="number">65</span> <span class="keyword">and</span> num &lt;= <span class="number">90</span>:</span><br><span class="line">        num = <span class="number">65</span> + ((num - <span class="number">65</span>) + i) % <span class="number">26</span></span><br><span class="line">    <span class="keyword">elif</span> num &gt;= <span class="number">97</span> <span class="keyword">and</span> num &lt;= <span class="number">122</span>:</span><br><span class="line">        num = <span class="number">97</span> + ((num - <span class="number">97</span>) + i) % <span class="number">26</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">chr</span>(num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encrypt</span>(<span class="params">string,i</span>):</span></span><br><span class="line">    string_new = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">for</span> s <span class="keyword">in</span> string:</span><br><span class="line">        string_new += <span class="built_in">str</span>(toAlpha(s,i))</span><br><span class="line">    <span class="built_in">print</span>(string_new)</span><br><span class="line">    <span class="keyword">return</span> string_new</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decrypt</span>(<span class="params">string</span>):</span></span><br><span class="line">     <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">26</span>):</span><br><span class="line">         encrypt(string, -i)</span><br><span class="line">encode = <span class="string">&quot;LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9&quot;</span></span><br><span class="line">decrypt(encode)</span><br></pre></td></tr></table></figure>
-<p>在<code>encrypt</code>函数中加上base64解密代码即可爆破</p>
-<h3 id="增加代码"><a href="#增加代码" class="headerlink" title="增加代码"></a>增加代码</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">s = <span class="built_in">str</span>(base64.b64decode(string_new))</span><br><span class="line"><span class="keyword">if</span> <span class="string">&quot;flag&quot;</span> <span class="keyword">in</span> s:</span><br><span class="line">    <span class="built_in">print</span>(s)</span><br></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/Erice_s/article/details/79732499">凯撒密码与python实现</a></p>
-]]></content>
-      <tags>
-        <tag>CTF</tag>
+        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -3213,23 +3206,46 @@
       </tags>
   </entry>
   <entry>
-    <title>Linux设置默认Python版本</title>
-    <url>/2020/09/19/set-python-version-in-linux/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>由于默认的python版本为2.7，执行命令时需要改为python3，比较麻烦。所以将python3设置为默认版本。(执行<code>apt-get install python3-pip</code>安装python3)</p>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>原理：使用update-alternatives进行配置</p>
-<h3 id="查看python位置"><a href="#查看python位置" class="headerlink" title="查看python位置"></a>查看python位置</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ls /usr/bin/python*</span><br></pre></td></tr></table></figure>
-<p>一般是<code>/usr/bin/python2</code>和<code>/usr/bin/python3</code></p>
-<h3 id="查询当前配置"><a href="#查询当前配置" class="headerlink" title="查询当前配置"></a>查询当前配置</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">update-alternatives --list python</span><br></pre></td></tr></table></figure>
-<p>没有配置过的话会返回<code>update-alternatives: error: no alternatives for python</code></p>
-<h3 id="配置默认版本"><a href="#配置默认版本" class="headerlink" title="配置默认版本"></a>配置默认版本</h3><p>通过设置优先级来实现默认使用python3</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1</span><br><span class="line">sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 2</span><br></pre></td></tr></table></figure>
-<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>查询默认版本号</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">python --version</span><br></pre></td></tr></table></figure>
-<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>有些脚本需要手动修改python版本（如yum），将<code>/usr/bin/python</code>改为<code>/usr/bin/python2</code></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/fang_chuan/article/details/60958329">更改Ubuntu默认python版本的两种方法</a></p>
+    <title>第三届上海市大学生网络安全大赛 Classical Writeup</title>
+    <url>/2019/01/26/shanghai-3rd-classic/</url>
+    <content><![CDATA[<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>cipher.txt内容如下</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Ld hcrakewcfaxr, f hofjjlhfo hlaxuc lj f krau ev hlaxuc kxfk zfj tjui xljkeclhfoor gtk dez xfj vfooud, vec kxu pejk afck, ldke iljtju. Ld hedkcfjk ke peiucd hcrakewcfaxlh foweclkxpj, pejk hofjjlhfo hlaxucj hfd gu acfhklhfoor hepatkui fdi jeoyui gr xfdi. Xezuyuc, OrmkO3vydJCoe2qyNLmcN2qlpJXnM3SxM2Xke3q9 kxur fcu foje tjtfoor yucr jlpaou ke gcufn zlkx peiucd kuhxdeoewr. Kxu kucp ldhotiuj kxu jlpaou jrjkupj tjui jldhu Wcuun fdi Cepfd klpuj, kxu uofgecfku Cudfljjfdhu hlaxucj, Zecoi Zfc LL hcrakewcfaxr jthx fj kxu Udlwpf pfhxldu fdi guredi. F btlhn gcezd veq mtpa eyuc kxu ofsr iew.</span><br></pre></td></tr></table></figure>
+<p>推测是移位的密码，使用<code>WinCrypto</code>分析得到（也可以使用<a href="https://quipqiup.com/">quip</a>在线分析并修复）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">In cryptography, a classical cipher is a type of cipher that was used historically but now has fallen, for the most part, into disuse. In contrast to modern cryptographic algorithms, most classical ciphers can be practically computed and solved by hand. However, LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9 they are also usually very simple to break with modern technology. The term includes the simple systems used since Greek and Roman times, the elaborate Renaissance ciphers, World War II cryptography such as the Enigma machine and beyond. A quick brown fox jump over the lazy dog.</span><br></pre></td></tr></table></figure>
+<p>发现该句子其实来源于英文维基百科的经典加密（Classical cipher）<br>发现最后一句话其实就是<code>A quick brown fox jumps over the lazy dog.</code><br>（包含26个字母的最短句子）并去掉s<br>由此可以得到对照表然后恢复（当然使用<code>WinCrypto</code>就直接是这个字符串了）<br>所以可以得到原本的字符是<code>LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9</code></p>
+<h2 id="解密"><a href="#解密" class="headerlink" title="解密"></a>解密</h2><p>直接解base64发现行不通<br>移位爆破<br>得到<code>ZmxhZ3tjbGFzc2ljYWxfY2lwaGVyX3NvX2Vhc3l9</code>是可以解的</p>
+<h2 id="爆破代码"><a href="#爆破代码" class="headerlink" title="爆破代码"></a>爆破代码</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">toAlpha</span>(<span class="params">c,i</span>):</span></span><br><span class="line">    num = <span class="built_in">ord</span>(c)</span><br><span class="line">    <span class="keyword">if</span> num &gt;= <span class="number">65</span> <span class="keyword">and</span> num &lt;= <span class="number">90</span>:</span><br><span class="line">        num = <span class="number">65</span> + ((num - <span class="number">65</span>) + i) % <span class="number">26</span></span><br><span class="line">    <span class="keyword">elif</span> num &gt;= <span class="number">97</span> <span class="keyword">and</span> num &lt;= <span class="number">122</span>:</span><br><span class="line">        num = <span class="number">97</span> + ((num - <span class="number">97</span>) + i) % <span class="number">26</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">chr</span>(num)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encrypt</span>(<span class="params">string,i</span>):</span></span><br><span class="line">    string_new = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">for</span> s <span class="keyword">in</span> string:</span><br><span class="line">        string_new += <span class="built_in">str</span>(toAlpha(s,i))</span><br><span class="line">    <span class="built_in">print</span>(string_new)</span><br><span class="line">    <span class="keyword">return</span> string_new</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decrypt</span>(<span class="params">string</span>):</span></span><br><span class="line">     <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">26</span>):</span><br><span class="line">         encrypt(string, -i)</span><br><span class="line">encode = <span class="string">&quot;LyjtL3fvnSRlo2xvKIjrK2ximSHkJ3ZhJ2Hto3x9&quot;</span></span><br><span class="line">decrypt(encode)</span><br></pre></td></tr></table></figure>
+<p>在<code>encrypt</code>函数中加上base64解密代码即可爆破</p>
+<h3 id="增加代码"><a href="#增加代码" class="headerlink" title="增加代码"></a>增加代码</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">s = <span class="built_in">str</span>(base64.b64decode(string_new))</span><br><span class="line"><span class="keyword">if</span> <span class="string">&quot;flag&quot;</span> <span class="keyword">in</span> s:</span><br><span class="line">    <span class="built_in">print</span>(s)</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/Erice_s/article/details/79732499">凯撒密码与python实现</a></p>
 ]]></content>
       <tags>
-        <tag>Python</tag>
+        <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在Linux下设置代理（docker、git、repo、wget等）</title>
+    <url>/2021/10/03/set-proxy-of-docker-git-and-others/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>记录一下<code>Docker</code>、<code>Git</code>和其他命令（如<code>repo</code>）的代理配置。</p>
+<span id="more"></span>
+
+<h2 id="Docker-版本-gt-17-07"><a href="#Docker-版本-gt-17-07" class="headerlink" title="Docker (版本&gt;=17.07)"></a>Docker (版本&gt;=17.07)</h2><h3 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h3><p>打开<code>~/.docker/config.json</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line"> &quot;proxies&quot;:</span><br><span class="line"> &#123;</span><br><span class="line">   &quot;default&quot;:</span><br><span class="line">   &#123;</span><br><span class="line">     &quot;httpProxy&quot;: &quot;http://localhost:8080&quot;,</span><br><span class="line">     &quot;httpsProxy&quot;: &quot;http://localhost:8080&quot;,</span><br><span class="line">     &quot;noProxy&quot;: &quot;localhost,127.0.0.1&quot;</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行<code>docker run</code>和<code>docker build</code>时增加<code>--network=host</code>参数</p>
+<p>注意：apt只支持http代理</p>
+<h3 id="取消"><a href="#取消" class="headerlink" title="取消"></a>取消</h3><p>删除配置即可</p>
+<h2 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h2><h3 id="设置-1"><a href="#设置-1" class="headerlink" title="设置"></a>设置</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export PROXY_URL=http://localhost:8080</span><br><span class="line">git config --global http.proxy $PROXY_URL</span><br><span class="line">git config --global https.proxy $PROXY_URL</span><br></pre></td></tr></table></figure>
+<h3 id="取消-1"><a href="#取消-1" class="headerlink" title="取消"></a>取消</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">unset PROXY_URL</span><br><span class="line">git config --global --unset http.proxy</span><br><span class="line">git config --global --unset https.proxy</span><br></pre></td></tr></table></figure>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p><code>repo</code> <code>wget</code> <code>curl</code>等</p>
+<h3 id="设置-2"><a href="#设置-2" class="headerlink" title="设置"></a>设置</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export PROXY_URL=http://localhost:8080</span><br><span class="line">export https_proxy=$PROXY_URL</span><br><span class="line">export http_proxy=$PROXY_URL</span><br></pre></td></tr></table></figure>
+<p>查询ip地址，检测代理是否连接成功：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl cip.cc</span><br></pre></td></tr></table></figure>
+<h3 id="取消-2"><a href="#取消-2" class="headerlink" title="取消"></a>取消</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">unset PROXY_URL</span><br><span class="line">unset https_proxy</span><br><span class="line">unset http_proxy</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>经验</tag>
+        <tag>Linux</tag>
       </tags>
   </entry>
   <entry>
@@ -3662,42 +3678,6 @@
       </tags>
   </entry>
   <entry>
-    <title>WSL(Ubuntu 18.04)编译安卓6.0.0_r1源码</title>
-    <url>/2020/04/14/wsl-18-04-android-6-source/</url>
-    <content><![CDATA[<h2 id="之前的尝试"><a href="#之前的尝试" class="headerlink" title="之前的尝试"></a>之前的尝试</h2><p>一开始使用wsl1进行编译，即使用了ccache，编译耗时仍难以接受（编译了很久都没结束）<br>之后又使用wsl2进行编译，编译还是需要很久<br>原因猜测：源码位于D盘，wsl访问文件可能需要经过转换，因此IO操作速度慢。<br>搜索发现<a href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-ux-changes">WSL 1 与 WSL 2 之间的用户体验更改</a>中提到：</p>
-<blockquote>
-<p>请确保将你要使用 Linux 应用程序频繁访问的文件放在 Linux 根文件系统中，以享受文件性能优势。 这些文件必须位于 Linux 根文件系统内，以便较快地访问文件系统。<br>验证：使用wsl在d盘解压源码，速度远慢于直接在wsl文件系统中解压<br>由此确定最终方案</p>
-</blockquote>
-<h2 id="最终方案"><a href="#最终方案" class="headerlink" title="最终方案"></a>最终方案</h2><p>将源码压缩包移动到linux文件系统下，再解压<br>或者使用repo工具下载源码到linux文件系统</p>
-<span id="more"></span>
-<h2 id="方法一-使用docker-aosp-建议"><a href="#方法一-使用docker-aosp-建议" class="headerlink" title="方法一 使用docker-aosp(建议)"></a>方法一 使用docker-aosp(建议)</h2><p>见<a href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">使用docker编译安卓源码</a></p>
-<h2 id="方法二-直接使用wsl系统进行编译"><a href="#方法二-直接使用wsl系统进行编译" class="headerlink" title="方法二 直接使用wsl系统进行编译"></a>方法二 直接使用wsl系统进行编译</h2><p>如果使用wsl2，步骤与<a href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">Ubuntu 19.10 编译安卓6.0.0_r1源码</a>一致<br>wsl1则需要先进行以下配置</p>
-<h2 id="wsl1需要进行的操作"><a href="#wsl1需要进行的操作" class="headerlink" title="wsl1需要进行的操作"></a>wsl1需要进行的操作</h2><h3 id="配置大小写敏感"><a href="#配置大小写敏感" class="headerlink" title="配置大小写敏感"></a>配置大小写敏感</h3><h4 id="方法一-配置wsl自动挂载"><a href="#方法一-配置wsl自动挂载" class="headerlink" title="方法一 配置wsl自动挂载"></a>方法一 配置wsl自动挂载</h4><p>编辑<code>/etc/wsl.conf</code>，写入：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[automount]</span><br><span class="line">enabled = true</span><br><span class="line">options = &quot;metadata,umask=0000,uid=0,gid=0,case=force&quot;</span><br><span class="line">mountFsTab = false</span><br></pre></td></tr></table></figure>
-<p>保存后重启PC</p>
-<h4 id="方法二-指定文件夹"><a href="#方法二-指定文件夹" class="headerlink" title="方法二 指定文件夹"></a>方法二 指定文件夹</h4><p><code>Win+X</code>,打开PowerShell(管理员)<br>执行（<code>D:\AOSP</code>替换为源码将要被解压的目录）:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">fsutil.exe file setCaseSensitiveInfo D:\AOSP enable</span><br></pre></td></tr></table></figure>
-<p>注意：<strong>必须使用管理员权限执行该命令</strong></p>
-<h3 id="使bash支持32位程序运行"><a href="#使bash支持32位程序运行" class="headerlink" title="使bash支持32位程序运行"></a>使bash支持32位程序运行</h3><p>如果报错：<code>cannot execute binary file: Exec format error</code>，说明运行了32位程序。</p>
-<h3 id="方法一-使用binfmt"><a href="#方法一-使用binfmt" class="headerlink" title="方法一 使用binfmt"></a>方法一 使用binfmt</h3><h4 id="安装qemu并设置binfmt"><a href="#安装qemu并设置binfmt" class="headerlink" title="安装qemu并设置binfmt"></a>安装qemu并设置binfmt</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install qemu-user-static</span><br></pre></td></tr></table></figure>
-<h4 id="设置binfmt"><a href="#设置binfmt" class="headerlink" title="设置binfmt"></a>设置binfmt</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo update-binfmts --install i386 /usr/bin/qemu-i386-static --magic &#x27;\x7fELF\x01\x01\x01\x03\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\x03\x00\x01\x00\x00\x00&#x27; --mask &#x27;\xff\xff\xff\xff\xff\xff\xff\xfc\xff\xff\xff\xff\xff\xff\xff\xff\xf8\xff\xff\xff\xff\xff\xff\xff&#x27;</span><br></pre></td></tr></table></figure>
-<h4 id="启动服务"><a href="#启动服务" class="headerlink" title="启动服务"></a>启动服务</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo service binfmt-support start</span><br></pre></td></tr></table></figure>
-<p>注意：<strong>binfmt服务在每次启动bash控制台时都需要启动</strong>，否则在运行32位程序时会报错<code>cannot execute binary file: Exec format error</code><br>PS：可以实现自启动该服务</p>
-<h4 id="测试程序"><a href="#测试程序" class="headerlink" title="测试程序"></a>测试程序</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main()&#123;</span><br><span class="line">    printf(&quot;Hello world!\n&quot;);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>编译运行</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gcc -o hello hello.c -m32</span><br><span class="line">./hello</span><br></pre></td></tr></table></figure>
-<h2 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h2><p>使用系统自带的程序覆盖32位程序（哪个文件报错就替换哪个）</p>
-<blockquote>
-<p>报错&lt;1&gt;：bin/bash: prebuilts/misc/linux-x86/bison/bison: cannot execute binary file<br>报错原因：在x86 64位系统执行32位程序<br><code>sudo cp /usr/bin/bison prebuilts/misc/linux-x86/bison</code><br>参考：<a href="https://mp.weixin.qq.com/s/lxR3kIKHY_gshdpDVNP7OA">Win10之WSL编译Android源码</a></p>
-</blockquote>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/tangjie134/article/details/102796330">Ubuntu18.04 (WSL) 编译RK3399 Android8.1源码</a><br><a href="https://blog.csdn.net/u010164190/article/details/102585931">WSL配置C/D盘大小写敏感</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
-        <tag>WSL</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>WSL中使用adb</title>
     <url>/2020/04/14/wsl-adb/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>尝试在wsl中使用adb，发现找不到设备。搜索一番发现是因为adb版本不统一导致的。<br>注意：wsl2中adb无法查询到usb设备，可以通过使用ip地址连接(需要root权限)，或降级到wsl1</p>
@@ -3735,6 +3715,42 @@
 ]]></content>
       <tags>
         <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>WSL(Ubuntu 18.04)编译安卓6.0.0_r1源码</title>
+    <url>/2020/04/14/wsl-18-04-android-6-source/</url>
+    <content><![CDATA[<h2 id="之前的尝试"><a href="#之前的尝试" class="headerlink" title="之前的尝试"></a>之前的尝试</h2><p>一开始使用wsl1进行编译，即使用了ccache，编译耗时仍难以接受（编译了很久都没结束）<br>之后又使用wsl2进行编译，编译还是需要很久<br>原因猜测：源码位于D盘，wsl访问文件可能需要经过转换，因此IO操作速度慢。<br>搜索发现<a href="https://docs.microsoft.com/zh-cn/windows/wsl/wsl2-ux-changes">WSL 1 与 WSL 2 之间的用户体验更改</a>中提到：</p>
+<blockquote>
+<p>请确保将你要使用 Linux 应用程序频繁访问的文件放在 Linux 根文件系统中，以享受文件性能优势。 这些文件必须位于 Linux 根文件系统内，以便较快地访问文件系统。<br>验证：使用wsl在d盘解压源码，速度远慢于直接在wsl文件系统中解压<br>由此确定最终方案</p>
+</blockquote>
+<h2 id="最终方案"><a href="#最终方案" class="headerlink" title="最终方案"></a>最终方案</h2><p>将源码压缩包移动到linux文件系统下，再解压<br>或者使用repo工具下载源码到linux文件系统</p>
+<span id="more"></span>
+<h2 id="方法一-使用docker-aosp-建议"><a href="#方法一-使用docker-aosp-建议" class="headerlink" title="方法一 使用docker-aosp(建议)"></a>方法一 使用docker-aosp(建议)</h2><p>见<a href="https://blog.xhyeax.com/2020/04/16/aosp-docker/">使用docker编译安卓源码</a></p>
+<h2 id="方法二-直接使用wsl系统进行编译"><a href="#方法二-直接使用wsl系统进行编译" class="headerlink" title="方法二 直接使用wsl系统进行编译"></a>方法二 直接使用wsl系统进行编译</h2><p>如果使用wsl2，步骤与<a href="https://blog.xhyeax.com/2019/12/29/ubuntu-1910-android-6-source/">Ubuntu 19.10 编译安卓6.0.0_r1源码</a>一致<br>wsl1则需要先进行以下配置</p>
+<h2 id="wsl1需要进行的操作"><a href="#wsl1需要进行的操作" class="headerlink" title="wsl1需要进行的操作"></a>wsl1需要进行的操作</h2><h3 id="配置大小写敏感"><a href="#配置大小写敏感" class="headerlink" title="配置大小写敏感"></a>配置大小写敏感</h3><h4 id="方法一-配置wsl自动挂载"><a href="#方法一-配置wsl自动挂载" class="headerlink" title="方法一 配置wsl自动挂载"></a>方法一 配置wsl自动挂载</h4><p>编辑<code>/etc/wsl.conf</code>，写入：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[automount]</span><br><span class="line">enabled = true</span><br><span class="line">options = &quot;metadata,umask=0000,uid=0,gid=0,case=force&quot;</span><br><span class="line">mountFsTab = false</span><br></pre></td></tr></table></figure>
+<p>保存后重启PC</p>
+<h4 id="方法二-指定文件夹"><a href="#方法二-指定文件夹" class="headerlink" title="方法二 指定文件夹"></a>方法二 指定文件夹</h4><p><code>Win+X</code>,打开PowerShell(管理员)<br>执行（<code>D:\AOSP</code>替换为源码将要被解压的目录）:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">fsutil.exe file setCaseSensitiveInfo D:\AOSP enable</span><br></pre></td></tr></table></figure>
+<p>注意：<strong>必须使用管理员权限执行该命令</strong></p>
+<h3 id="使bash支持32位程序运行"><a href="#使bash支持32位程序运行" class="headerlink" title="使bash支持32位程序运行"></a>使bash支持32位程序运行</h3><p>如果报错：<code>cannot execute binary file: Exec format error</code>，说明运行了32位程序。</p>
+<h3 id="方法一-使用binfmt"><a href="#方法一-使用binfmt" class="headerlink" title="方法一 使用binfmt"></a>方法一 使用binfmt</h3><h4 id="安装qemu并设置binfmt"><a href="#安装qemu并设置binfmt" class="headerlink" title="安装qemu并设置binfmt"></a>安装qemu并设置binfmt</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install qemu-user-static</span><br></pre></td></tr></table></figure>
+<h4 id="设置binfmt"><a href="#设置binfmt" class="headerlink" title="设置binfmt"></a>设置binfmt</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo update-binfmts --install i386 /usr/bin/qemu-i386-static --magic &#x27;\x7fELF\x01\x01\x01\x03\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\x03\x00\x01\x00\x00\x00&#x27; --mask &#x27;\xff\xff\xff\xff\xff\xff\xff\xfc\xff\xff\xff\xff\xff\xff\xff\xff\xf8\xff\xff\xff\xff\xff\xff\xff&#x27;</span><br></pre></td></tr></table></figure>
+<h4 id="启动服务"><a href="#启动服务" class="headerlink" title="启动服务"></a>启动服务</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo service binfmt-support start</span><br></pre></td></tr></table></figure>
+<p>注意：<strong>binfmt服务在每次启动bash控制台时都需要启动</strong>，否则在运行32位程序时会报错<code>cannot execute binary file: Exec format error</code><br>PS：可以实现自启动该服务</p>
+<h4 id="测试程序"><a href="#测试程序" class="headerlink" title="测试程序"></a>测试程序</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int main()&#123;</span><br><span class="line">    printf(&quot;Hello world!\n&quot;);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译运行</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gcc -o hello hello.c -m32</span><br><span class="line">./hello</span><br></pre></td></tr></table></figure>
+<h2 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h2><p>使用系统自带的程序覆盖32位程序（哪个文件报错就替换哪个）</p>
+<blockquote>
+<p>报错&lt;1&gt;：bin/bash: prebuilts/misc/linux-x86/bison/bison: cannot execute binary file<br>报错原因：在x86 64位系统执行32位程序<br><code>sudo cp /usr/bin/bison prebuilts/misc/linux-x86/bison</code><br>参考：<a href="https://mp.weixin.qq.com/s/lxR3kIKHY_gshdpDVNP7OA">Win10之WSL编译Android源码</a></p>
+</blockquote>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/tangjie134/article/details/102796330">Ubuntu18.04 (WSL) 编译RK3399 Android8.1源码</a><br><a href="https://blog.csdn.net/u010164190/article/details/102585931">WSL配置C/D盘大小写敏感</a></p>
+]]></content>
+      <tags>
+        <tag>Android</tag>
+        <tag>WSL</tag>
       </tags>
   </entry>
   <entry>
@@ -13193,21 +13209,6 @@
 ]]></content>
       <tags>
         <tag>ARM</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>安卓12 设置热点固定IP (Xposed)</title>
-    <url>/2022/07/06/android-12-set-hotpot-ip/</url>
-    <content><![CDATA[<h2 id="Hook点"><a href="#Hook点" class="headerlink" title="Hook点"></a>Hook点</h2><p>仍然是<code>android.net.ip.IpServer</code>的<code>requestIpv4Address</code>函数。</p>
-<p>源代码：<a href="http://aospxref.com/android-12.0.0_r3/xref/packages/modules/Connectivity/Tethering/src/android/net/ip/IpServer.java#655">IpServer.java#655</a></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> LinkAddress <span class="title">requestIpv4Address</span><span class="params">(<span class="keyword">final</span> <span class="keyword">boolean</span> useLastAddress)</span></span></span><br></pre></td></tr></table></figure>
-
-<p>参数增加了一个<code>boolean useLastAddress</code>，加上即可。</p>
-<p>PS：也可以用反射来获取方法，从而适配安卓11和12。这里就直接复制安卓11的代码了。</p>
-<h2 id="Hook代码"><a href="#Hook代码" class="headerlink" title="Hook代码"></a>Hook代码</h2><p>见GitHub：<a href="https://github.com/XhyEax/SoftApHelper/tree/master/app/src/main/java/com/xhy/xp/softaphelper/MainHook.java">MainHook.java</a></p>
-]]></content>
-      <tags>
-        <tag>Android</tag>
       </tags>
   </entry>
 </search>
