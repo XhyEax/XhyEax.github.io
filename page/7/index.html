@@ -304,6 +304,9 @@
 <p><a href="https://blog.xhyeax.com/2021/12/06/android-10-11-hostpot-set-ip/">安卓10、11 固定Wifi热点IP (Xposed)</a></p>
 <h2 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h2><p><a target="_blank" rel="noopener" href="https://github.com/XhyEax/SoftApHelper">SoftApHelper</a></p>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>手机系统升级到安卓9之后，开热点的主机IP地址是随机的。其他设备设置代理很不方便，于是考虑固定热点IP。</p>
+<h2 id="Hook点"><a href="#Hook点" class="headerlink" title="Hook点"></a>Hook点</h2><h3 id="安卓9"><a href="#安卓9" class="headerlink" title="安卓9"></a>安卓9</h3><p><code>com.android.server.connectivity.tethering.TetherInterfaceStateMachine</code>的<code>getRandomWifiIPv4Address</code>函数。</p>
+<p><a target="_blank" rel="noopener" href="http://aospxref.com/android-9.0.0_r61/xref/frameworks/base/services/core/java/com/android/server/connectivity/tethering/TetherInterfaceStateMachine.java#259">TetherInterfaceStateMachine.java#259</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> String <span class="title">getRandomWifiIPv4Address</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/03/01/android-9-set-hotpot-ip/#more" rel="contents">

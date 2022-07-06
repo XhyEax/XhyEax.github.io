@@ -889,11 +889,17 @@
 
       
           <h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p><a href="https://blog.xhyeax.com/2022/07/06/android-12-hostpot-set-ip/">安卓12 固定Wifi热点IP (Xposed)</a></p>
+<h2 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h2><p><a target="_blank" rel="noopener" href="https://github.com/XhyEax/SoftApHelper">SoftApHelper</a></p>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><a href="https://blog.xhyeax.com/2021/03/01/android-9-set-hotpot-ip/">前文</a>通过分析<code>Android 9</code>源码，定位到Hook点，然后使用<code>Xposed Hook</code>，实现了Wifi热点IP的固定。</p>
 <p>系统升级到<code>Android 11</code>后，发现源码有变化，插件不起作用了。于是再来操作一波。</p>
-<p>Xposed模块：<a target="_blank" rel="noopener" href="https://github.com/XhyEax/SoftApHelper">SoftApHelper</a></p>
-<h2 id="Hook点"><a href="#Hook点" class="headerlink" title="Hook点"></a>Hook点</h2><h2 id="安卓10"><a href="#安卓10" class="headerlink" title="安卓10"></a>安卓10</h2><p><code>android.net.ip.IpServer</code>的<code>getRandomWifiIPv4Address</code>函数</p>
-<h2 id="安卓11"><a href="#安卓11" class="headerlink" title="安卓11"></a>安卓11</h2><p><code>android.net.ip.IpServer</code>的<code>requestIpv4Address</code>函数。由于该函数还被用于分配下游IP地址，所以需要先判断调用者（遍历堆栈即可），再进行替换。</p>
+<h2 id="Hook点"><a href="#Hook点" class="headerlink" title="Hook点"></a>Hook点</h2><h3 id="安卓10"><a href="#安卓10" class="headerlink" title="安卓10"></a>安卓10</h3><p><code>android.net.ip.IpServer</code>的<code>getRandomWifiIPv4Address</code>函数。</p>
+<p><a target="_blank" rel="noopener" href="http://aospxref.com/android-10.0.0_r47/xref/frameworks/base/services/net/java/android/net/ip/IpServer.java#469">IpServer.java#469</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> String <span class="title">getRandomWifiIPv4Address</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+<h3 id="安卓11"><a href="#安卓11" class="headerlink" title="安卓11"></a>安卓11</h3><p><code>android.net.ip.IpServer</code>的<code>requestIpv4Address</code>函数。</p>
+<p><a target="_blank" rel="noopener" href="http://aospxref.com/android-11.0.0_r21/xref/frameworks/base/packages/Tethering/src/android/net/ip/IpServer.java#645">IpServer.java#645</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> LinkAddress <span class="title">requestIpv4Address</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+
+<p>注意：由于该函数还被用于分配下游IP地址，所以需要先判断调用者（遍历堆栈即可），再进行替换。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/12/06/android-10-11-hostpot-set-ip/#more" rel="contents">

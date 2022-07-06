@@ -234,8 +234,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="Hook点"><a href="#Hook点" class="headerlink" title="Hook点"></a>Hook点</h2><p>仍然是<code>android.net.ip.IpServer</code>的<code>requestIpv4Address</code>函数。</p>
-<p>源代码：<a target="_blank" rel="noopener" href="http://aospxref.com/android-12.0.0_r3/xref/packages/modules/Connectivity/Tethering/src/android/net/ip/IpServer.java#655">IpServer.java#655</a></p>
+          <h2 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h2><p><a target="_blank" rel="noopener" href="https://github.com/XhyEax/SoftApHelper">SoftApHelper</a></p>
+<h2 id="Hook点"><a href="#Hook点" class="headerlink" title="Hook点"></a>Hook点</h2><p>仍然是<code>android.net.ip.IpServer</code>的<code>requestIpv4Address</code>函数。</p>
+<p><a target="_blank" rel="noopener" href="http://aospxref.com/android-12.0.0_r3/xref/packages/modules/Connectivity/Tethering/src/android/net/ip/IpServer.java#655">IpServer.java#655</a></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> LinkAddress <span class="title">requestIpv4Address</span><span class="params">(<span class="keyword">final</span> <span class="keyword">boolean</span> useLastAddress)</span></span></span><br></pre></td></tr></table></figure>
 
 <p>参数增加了一个<code>boolean useLastAddress</code>，加上即可。</p>
