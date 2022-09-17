@@ -930,6 +930,10 @@
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">magiskpolicy --live &quot;allow priv_app device chr_file &#123; read write ioctl open getattr map &#125;&quot;</span><br><span class="line">magiskpolicy --live &quot;attradd priv_app mlstrustedsubject&quot;</span><br></pre></td></tr></table></figure>
 
 <h4 id="untrusted-app"><a href="#untrusted-app" class="headerlink" title="untrusted_app"></a>untrusted_app</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">magiskpolicy --live &quot;allow untrusted_app device chr_file &#123; read write ioctl open getattr map &#125;&quot;</span><br><span class="line">magiskpolicy --live &quot;attradd untrusted_app mlstrustedsubject&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="方法三：重编译Magisk"><a href="#方法三：重编译Magisk" class="headerlink" title="方法三：重编译Magisk"></a>方法三：重编译Magisk</h3><p>修改<code>Magisk</code>源代码，内置<code>SELinux</code>规则</p>
+<p>具体可参考<a href="https://pshocker.github.io/2022/08/05/Magisk%E5%86%85%E5%B5%8C%E9%A9%B1%E5%8A%A8%E6%A8%A1%E5%9D%97%E4%B8%94%E5%90%AF%E5%8A%A8%E5%8A%A0%E8%BD%BD/">Magisk内嵌驱动模块且启动加载</a></p>
+<h3 id="方法四：重编译内核和系统"><a href="#方法四：重编译内核和系统" class="headerlink" title="方法四：重编译内核和系统"></a>方法四：重编译内核和系统</h3><p>内置内核模块，修改系统的<code>SELinux</code>规则（理论可行，笔者未测试）</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.jianshu.com/p/806a055b50b3">AOSP 8.1 新增/dev设备节点 Selinux的权限设置</a><br><a href="https://www.likecs.com/show-305821532.html">Android/SELinux 添加 AVC 权限</a><br><a href="https://www.jianshu.com/p/9374e4421d38">SELinux 添加一个权限</a><br><a href="https://github.com/Magisk-Modules-Repo/vold-posix/blob/master/common/post-fs-data.sh">vold-posix_post-fs-data.sh</a></p>
 ]]></content>
       <tags>
@@ -1415,6 +1419,7 @@
     <content><![CDATA[<h2 id="命令对照表"><a href="#命令对照表" class="headerlink" title="命令对照表"></a>命令对照表</h2><p><a href="https://lldb.llvm.org/use/map.html">GDB to LLDB command map</a></p>
 <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>PC: <code>Windows 10</code><br>NDK: <code>22.1.7171670</code></p>
 <h3 id="程序位置"><a href="#程序位置" class="headerlink" title="程序位置"></a>程序位置</h3><p><code>GDB 8.3</code>（位于<code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\bin</code>）<br><code>lldb version 11.0.5</code>（位于<code>&lt;ndk&gt;\prebuilt\windows-x86_64\bin</code>）</p>
+<p>注意：如果找不到NDK内置的对应server，则在Android Studio中下载旧版本。</p>
 <h3 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h3><h4 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h4><p><code>&lt;ndk&gt;\prebuilt\android-arm64\gdbserver</code><br><code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\arm\lldb-server</code></p>
 <h4 id="ARM64"><a href="#ARM64" class="headerlink" title="ARM64"></a>ARM64</h4><p><code>&lt;ndk&gt;\prebuilt\android-arm\gdbserver</code><br><code>&lt;ndk&gt;\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\11.0.5\lib\linux\aarch64\lldb-server</code></p>
 <span id="more"></span>
@@ -1422,9 +1427,9 @@
 <h4 id="PC连接"><a href="#PC连接" class="headerlink" title="PC连接"></a>PC连接</h4><p>进入<code>gdb</code>命令行，执行以下命令连接：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">target remote :9999</span><br></pre></td></tr></table></figure>
 <p>调试器自动断在<code>__dl__start () from target:/system/bin/linker</code></p>
-<h3 id="lldb"><a href="#lldb" class="headerlink" title="lldb"></a>lldb</h3><h4 id="server"><a href="#server" class="headerlink" title="server"></a>server</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:9090 tcp:9090</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:9090&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="lldb"><a href="#lldb" class="headerlink" title="lldb"></a>lldb</h3><h4 id="server"><a href="#server" class="headerlink" title="server"></a>server</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:1234 tcp:1234</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:1234&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
 <h4 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h4><p>进入<code>lldb</code>命令行，执行以下命令连接：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:9090</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:1234</span><br></pre></td></tr></table></figure>
 <h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p>设置工作目录，指定文件后执行：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform settings -w /data/local/tmp</span><br><span class="line">file victim</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
 <h2 id="Attach模式"><a href="#Attach模式" class="headerlink" title="Attach模式"></a>Attach模式</h2><p>可使用<code>pidof</code>获取进程<code>pid</code></p>
@@ -1433,9 +1438,9 @@
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">target remote :9999</span><br></pre></td></tr></table></figure>
 
 <h3 id="lldb-1"><a href="#lldb-1" class="headerlink" title="lldb"></a>lldb</h3><h4 id="server-2"><a href="#server-2" class="headerlink" title="server"></a>server</h4><p>转发端口，并以后台模式启动：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:4321 tcp:4321</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:4321&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:1234 tcp:1234</span><br><span class="line">adb shell su -c &quot;/data/local/tmp/lldb-server platform --listen &#x27;*:1234&#x27; --server &amp;&quot;</span><br></pre></td></tr></table></figure>
 <h4 id="连接-1"><a href="#连接-1" class="headerlink" title="连接"></a>连接</h4><p>进入<code>lldb</code>命令行，执行以下命令连接：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:4321</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">platform select remote-android</span><br><span class="line">platform connect connect://:1234</span><br></pre></td></tr></table></figure>
 <h4 id="附加"><a href="#附加" class="headerlink" title="附加"></a>附加</h4><p>可使用进程名或<code>pid</code>附加</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">attach -name victim</span><br><span class="line">attach -p 18600</span><br></pre></td></tr></table></figure>
 
@@ -3079,7 +3084,8 @@
 
 <h2 id="Linux安装"><a href="#Linux安装" class="headerlink" title="Linux安装"></a>Linux安装</h2><h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p>系统：<code>Kali Linux 2021.2</code><br>软件：<code>Node.js 12.22.5</code>、<code>Frida 15.1.3</code><br>安装目标：<code>Radare2 5.4.2</code>、<code>r2frida 5.4.4</code></p>
 <h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><h4 id="radare2"><a href="#radare2" class="headerlink" title="radare2"></a>radare2</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/radareorg/radare2</span><br><span class="line">radare2/sys/install.sh</span><br></pre></td></tr></table></figure>
-<h4 id="r2frida"><a href="#r2frida" class="headerlink" title="r2frida"></a>r2frida</h4><h5 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt install -y make gcc libzip-dev nodejs npm curl pkg-config git</span><br></pre></td></tr></table></figure>
+<h4 id="r2frida"><a href="#r2frida" class="headerlink" title="r2frida"></a>r2frida</h4><p>可直接到<a href="https://github.com/nowsecure/r2frida/releases">Release页</a>下载，以下是自行编译流程</p>
+<h5 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt install -y make gcc libzip-dev nodejs npm curl pkg-config git</span><br></pre></td></tr></table></figure>
 <h5 id="更换npm源（可选）"><a href="#更换npm源（可选）" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
 <h5 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
 <h5 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h5><p>编辑<code>Makefile</code>，修改<code>frida_version</code>为frida安装版本</p>
@@ -3091,7 +3097,8 @@
 <h2 id="Windows安装"><a href="#Windows安装" class="headerlink" title="Windows安装"></a>Windows安装</h2><h2 id="环境-1"><a href="#环境-1" class="headerlink" title="环境"></a>环境</h2><p>系统：<code>Windows 10 20H2 x64</code><br>软件：<code>Visual Studio 2019</code>、<code>Node.js 14.17.4</code>、<code>Cygwin 3.2.0</code>(记得选择<code>wget</code>)、<code>Frida 15.1.2</code><br>（提前安装好以上环境，VS版本至少为2015）</p>
 <p>安装目标：<code>Radare2 5.4.2</code>、<code>r2frida 5.4.4</code></p>
 <h2 id="准备-1"><a href="#准备-1" class="headerlink" title="准备"></a>准备</h2><h3 id="radare2-1"><a href="#radare2-1" class="headerlink" title="radare2"></a>radare2</h3><p>前往<a href="https://github.com/radareorg/radare2/releases">Releases · radareorg/radare2</a>下载<code>radare2-5.4.2-w64.zip</code>，解压到任意目录。<br>将<code>..\radare2\bin</code>目录添加到<code>PATH</code>环境变量后，执行<code>r2 -v</code>查看版本号</p>
-<h3 id="r2frida-1"><a href="#r2frida-1" class="headerlink" title="r2frida"></a>r2frida</h3><h4 id="更换npm源（可选）-1"><a href="#更换npm源（可选）-1" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+<h3 id="r2frida-1"><a href="#r2frida-1" class="headerlink" title="r2frida"></a>r2frida</h3><p>可直接到<a href="https://github.com/nowsecure/r2frida/releases">Release页</a>下载，以下是自行编译流程</p>
+<h4 id="更换npm源（可选）-1"><a href="#更换npm源（可选）-1" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
 <h4 id="克隆仓库-1"><a href="#克隆仓库-1" class="headerlink" title="克隆仓库"></a>克隆仓库</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
 <h4 id="修改-1"><a href="#修改-1" class="headerlink" title="修改"></a>修改</h4><p>编辑<code>build.bat</code>，修改<code>frida_version</code>为frida安装版本，修改<code>R2_BASE</code>为<code>radare2</code>安装目录（不需要<code>bin</code>）</p>
 <p>将<code>..\radare2\include\libr\r_cons.h</code>以<code>UTF-8 with BOM</code>编码重新保存（防止编译出错）</p>
