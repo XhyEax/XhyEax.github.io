@@ -3991,7 +3991,9 @@
   <entry>
     <title>iOS syscall table</title>
     <url>/2022/11/21/ios-syscall-table/</url>
-    <content><![CDATA[<h2 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h2><p>Copy From: <a href="https://opensource.apple.com/source/xnu/xnu-1228/bsd/sys/syscall.h.auto.html">syscall.h - Apple Open Source</a></p>
+    <content><![CDATA[<h2 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h2><p>From: <a href="https://opensource.apple.com/source/xnu/xnu-1228/bsd/sys/syscall.h.auto.html">syscall.h - Apple Open Source</a></p>
+<span id="more"></span>
+
 <h2 id="Table"><a href="#Table" class="headerlink" title="Table"></a>Table</h2><table>
 <thead>
 <tr>
