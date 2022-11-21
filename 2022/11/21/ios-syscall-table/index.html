@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="NoteCopy From: syscall.h - Apple Open Source Table   NR syscall name %x8    0 SYS_syscall 0x0   1 SYS_exit 0x1   2 SYS_fork 0x2   3 SYS_read 0x3   4 SYS_write 0x4   5 SYS_open 0x5   6 SYS_close 0x6">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS syscall table">
+<meta property="og:url" content="https://blog.xhyeax.com/2022/11/21/ios-syscall-table/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="NoteCopy From: syscall.h - Apple Open Source Table   NR syscall name %x8    0 SYS_syscall 0x0   1 SYS_exit 0x1   2 SYS_fork 0x2   3 SYS_read 0x3   4 SYS_write 0x4   5 SYS_open 0x5   6 SYS_close 0x6">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-11-21T13:00:28.430Z">
+<meta property="article:modified_time" content="2022-11-21T13:59:50.405Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="iOS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2022/11/21/ios-syscall-table/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>iOS syscall table | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2022/11/21/ios-syscall-table/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS syscall table
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-11-21 21:00:28" itemprop="dateCreated datePublished" datetime="2022-11-21T21:00:28+08:00">2022-11-21</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h2><p>Copy From: <a target="_blank" rel="noopener" href="https://opensource.apple.com/source/xnu/xnu-1228/bsd/sys/syscall.h.auto.html">syscall.h - Apple Open Source</a></p>
+<h2 id="Table"><a href="#Table" class="headerlink" title="Table"></a>Table</h2><table>
+<thead>
+<tr>
+<th align="center">NR</th>
+<th>syscall name</th>
+<th align="center">%x8</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0</td>
+<td>SYS_syscall</td>
+<td align="center">0x0</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td>SYS_exit</td>
+<td align="center">0x1</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td>SYS_fork</td>
+<td align="center">0x2</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td>SYS_read</td>
+<td align="center">0x3</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td>SYS_write</td>
+<td align="center">0x4</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td>SYS_open</td>
+<td align="center">0x5</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td>SYS_close</td>
+<td align="center">0x6</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td>SYS_wait4</td>
+<td align="center">0x7</td>
+</tr>
+<tr>
+<td align="center">9</td>
+<td>SYS_link</td>
+<td align="center">0x9</td>
+</tr>
+<tr>
+<td align="center">10</td>
+<td>SYS_unlink</td>
+<td align="center">0xa</td>
+</tr>
+<tr>
+<td align="center">12</td>
+<td>SYS_chdir</td>
+<td align="center">0xc</td>
+</tr>
+<tr>
+<td align="center">13</td>
+<td>SYS_fchdir</td>
+<td align="center">0xd</td>
+</tr>
+<tr>
+<td align="center">14</td>
+<td>SYS_mknod</td>
+<td align="center">0xe</td>
+</tr>
+<tr>
+<td align="center">15</td>
+<td>SYS_chmod</td>
+<td align="center">0xf</td>
+</tr>
+<tr>
+<td align="center">16</td>
+<td>SYS_chown</td>
+<td align="center">0x10</td>
+</tr>
+<tr>
+<td align="center">17</td>
+<td>SYS_obreak</td>
+<td align="center">0x11</td>
+</tr>
+<tr>
+<td align="center">18</td>
+<td>SYS_ogetfsstat</td>
+<td align="center">0x12</td>
+</tr>
+<tr>
+<td align="center">18</td>
+<td>SYS_getfsstat</td>
+<td align="center">0x12</td>
+</tr>
+<tr>
+<td align="center">20</td>
+<td>SYS_getpid</td>
+<td align="center">0x14</td>
+</tr>
+<tr>
+<td align="center">23</td>
+<td>SYS_setuid</td>
+<td align="center">0x17</td>
+</tr>
+<tr>
+<td align="center">24</td>
+<td>SYS_getuid</td>
+<td align="center">0x18</td>
+</tr>
+<tr>
+<td align="center">25</td>
+<td>SYS_geteuid</td>
+<td align="center">0x19</td>
+</tr>
+<tr>
+<td align="center">26</td>
+<td>SYS_ptrace</td>
+<td align="center">0x1a</td>
+</tr>
+<tr>
+<td align="center">27</td>
+<td>SYS_recvmsg</td>
+<td align="center">0x1b</td>
+</tr>
+<tr>
+<td align="center">28</td>
+<td>SYS_sendmsg</td>
+<td align="center">0x1c</td>
+</tr>
+<tr>
+<td align="center">29</td>
+<td>SYS_recvfrom</td>
+<td align="center">0x1d</td>
+</tr>
+<tr>
+<td align="center">30</td>
+<td>SYS_accept</td>
+<td align="center">0x1e</td>
+</tr>
+<tr>
+<td align="center">31</td>
+<td>SYS_getpeername</td>
+<td align="center">0x1f</td>
+</tr>
+<tr>
+<td align="center">32</td>
+<td>SYS_getsockname</td>
+<td align="center">0x20</td>
+</tr>
+<tr>
+<td align="center">33</td>
+<td>SYS_access</td>
+<td align="center">0x21</td>
+</tr>
+<tr>
+<td align="center">34</td>
+<td>SYS_chflags</td>
+<td align="center">0x22</td>
+</tr>
+<tr>
+<td align="center">35</td>
+<td>SYS_fchflags</td>
+<td align="center">0x23</td>
+</tr>
+<tr>
+<td align="center">36</td>
+<td>SYS_sync</td>
+<td align="center">0x24</td>
+</tr>
+<tr>
+<td align="center">37</td>
+<td>SYS_kill</td>
+<td align="center">0x25</td>
+</tr>
+<tr>
+<td align="center">39</td>
+<td>SYS_getppid</td>
+<td align="center">0x27</td>
+</tr>
+<tr>
+<td align="center">41</td>
+<td>SYS_dup</td>
+<td align="center">0x29</td>
+</tr>
+<tr>
+<td align="center">42</td>
+<td>SYS_pipe</td>
+<td align="center">0x2a</td>
+</tr>
+<tr>
+<td align="center">43</td>
+<td>SYS_getegid</td>
+<td align="center">0x2b</td>
+</tr>
+<tr>
+<td align="center">44</td>
+<td>SYS_profil</td>
+<td align="center">0x2c</td>
+</tr>
+<tr>
+<td align="center">46</td>
+<td>SYS_sigaction</td>
+<td align="center">0x2e</td>
+</tr>
+<tr>
+<td align="center">47</td>
+<td>SYS_getgid</td>
+<td align="center">0x2f</td>
+</tr>
+<tr>
+<td align="center">48</td>
+<td>SYS_sigprocmask</td>
+<td align="center">0x30</td>
+</tr>
+<tr>
+<td align="center">49</td>
+<td>SYS_getlogin</td>
+<td align="center">0x31</td>
+</tr>
+<tr>
+<td align="center">50</td>
+<td>SYS_setlogin</td>
+<td align="center">0x32</td>
+</tr>
+<tr>
+<td align="center">51</td>
+<td>SYS_acct</td>
+<td align="center">0x33</td>
+</tr>
+<tr>
+<td align="center">52</td>
+<td>SYS_sigpending</td>
+<td align="center">0x34</td>
+</tr>
+<tr>
+<td align="center">53</td>
+<td>SYS_sigaltstack</td>
+<td align="center">0x35</td>
+</tr>
+<tr>
+<td align="center">54</td>
+<td>SYS_ioctl</td>
+<td align="center">0x36</td>
+</tr>
+<tr>
+<td align="center">55</td>
+<td>SYS_reboot</td>
+<td align="center">0x37</td>
+</tr>
+<tr>
+<td align="center">56</td>
+<td>SYS_revoke</td>
+<td align="center">0x38</td>
+</tr>
+<tr>
+<td align="center">57</td>
+<td>SYS_symlink</td>
+<td align="center">0x39</td>
+</tr>
+<tr>
+<td align="center">58</td>
+<td>SYS_readlink</td>
+<td align="center">0x3a</td>
+</tr>
+<tr>
+<td align="center">59</td>
+<td>SYS_execve</td>
+<td align="center">0x3b</td>
+</tr>
+<tr>
+<td align="center">60</td>
+<td>SYS_umask</td>
+<td align="center">0x3c</td>
+</tr>
+<tr>
+<td align="center">61</td>
+<td>SYS_chroot</td>
+<td align="center">0x3d</td>
+</tr>
+<tr>
+<td align="center">65</td>
+<td>SYS_msync</td>
+<td align="center">0x41</td>
+</tr>
+<tr>
+<td align="center">66</td>
+<td>SYS_vfork</td>
+<td align="center">0x42</td>
+</tr>
+<tr>
+<td align="center">69</td>
+<td>SYS_sbrk</td>
+<td align="center">0x45</td>
+</tr>
+<tr>
+<td align="center">70</td>
+<td>SYS_sstk</td>
+<td align="center">0x46</td>
+</tr>
+<tr>
+<td align="center">72</td>
+<td>SYS_ovadvise</td>
+<td align="center">0x48</td>
+</tr>
+<tr>
+<td align="center">73</td>
+<td>SYS_munmap</td>
+<td align="center">0x49</td>
+</tr>
+<tr>
+<td align="center">74</td>
+<td>SYS_mprotect</td>
+<td align="center">0x4a</td>
+</tr>
+<tr>
+<td align="center">75</td>
+<td>SYS_madvise</td>
+<td align="center">0x4b</td>
+</tr>
+<tr>
+<td align="center">78</td>
+<td>SYS_mincore</td>
+<td align="center">0x4e</td>
+</tr>
+<tr>
+<td align="center">79</td>
+<td>SYS_getgroups</td>
+<td align="center">0x4f</td>
+</tr>
+<tr>
+<td align="center">80</td>
+<td>SYS_setgroups</td>
+<td align="center">0x50</td>
+</tr>
+<tr>
+<td align="center">81</td>
+<td>SYS_getpgrp</td>
+<td align="center">0x51</td>
+</tr>
+<tr>
+<td align="center">82</td>
+<td>SYS_setpgid</td>
+<td align="center">0x52</td>
+</tr>
+<tr>
+<td align="center">83</td>
+<td>SYS_setitimer</td>
+<td align="center">0x53</td>
+</tr>
+<tr>
+<td align="center">85</td>
+<td>SYS_swapon</td>
+<td align="center">0x55</td>
+</tr>
+<tr>
+<td align="center">86</td>
+<td>SYS_getitimer</td>
+<td align="center">0x56</td>
+</tr>
+<tr>
+<td align="center">89</td>
+<td>SYS_getdtablesize</td>
+<td align="center">0x59</td>
+</tr>
+<tr>
+<td align="center">90</td>
+<td>SYS_dup2</td>
+<td align="center">0x5a</td>
+</tr>
+<tr>
+<td align="center">92</td>
+<td>SYS_fcntl</td>
+<td align="center">0x5c</td>
+</tr>
+<tr>
+<td align="center">93</td>
+<td>SYS_select</td>
+<td align="center">0x5d</td>
+</tr>
+<tr>
+<td align="center">95</td>
+<td>SYS_fsync</td>
+<td align="center">0x5f</td>
+</tr>
+<tr>
+<td align="center">96</td>
+<td>SYS_setpriority</td>
+<td align="center">0x60</td>
+</tr>
+<tr>
+<td align="center">97</td>
+<td>SYS_socket</td>
+<td align="center">0x61</td>
+</tr>
+<tr>
+<td align="center">98</td>
+<td>SYS_connect</td>
+<td align="center">0x62</td>
+</tr>
+<tr>
+<td align="center">100</td>
+<td>SYS_getpriority</td>
+<td align="center">0x64</td>
+</tr>
+<tr>
+<td align="center">104</td>
+<td>SYS_bind</td>
+<td align="center">0x68</td>
+</tr>
+<tr>
+<td align="center">105</td>
+<td>SYS_setsockopt</td>
+<td align="center">0x69</td>
+</tr>
+<tr>
+<td align="center">106</td>
+<td>SYS_listen</td>
+<td align="center">0x6a</td>
+</tr>
+<tr>
+<td align="center">111</td>
+<td>SYS_sigsuspend</td>
+<td align="center">0x6f</td>
+</tr>
+<tr>
+<td align="center">116</td>
+<td>SYS_gettimeofday</td>
+<td align="center">0x74</td>
+</tr>
+<tr>
+<td align="center">117</td>
+<td>SYS_getrusage</td>
+<td align="center">0x75</td>
+</tr>
+<tr>
+<td align="center">118</td>
+<td>SYS_getsockopt</td>
+<td align="center">0x76</td>
+</tr>
+<tr>
+<td align="center">120</td>
+<td>SYS_readv</td>
+<td align="center">0x78</td>
+</tr>
+<tr>
+<td align="center">121</td>
+<td>SYS_writev</td>
+<td align="center">0x79</td>
+</tr>
+<tr>
+<td align="center">122</td>
+<td>SYS_settimeofday</td>
+<td align="center">0x7a</td>
+</tr>
+<tr>
+<td align="center">123</td>
+<td>SYS_fchown</td>
+<td align="center">0x7b</td>
+</tr>
+<tr>
+<td align="center">124</td>
+<td>SYS_fchmod</td>
+<td align="center">0x7c</td>
+</tr>
+<tr>
+<td align="center">126</td>
+<td>SYS_setreuid</td>
+<td align="center">0x7e</td>
+</tr>
+<tr>
+<td align="center">127</td>
+<td>SYS_setregid</td>
+<td align="center">0x7f</td>
+</tr>
+<tr>
+<td align="center">128</td>
+<td>SYS_rename</td>
+<td align="center">0x80</td>
+</tr>
+<tr>
+<td align="center">131</td>
+<td>SYS_flock</td>
+<td align="center">0x83</td>
+</tr>
+<tr>
+<td align="center">132</td>
+<td>SYS_mkfifo</td>
+<td align="center">0x84</td>
+</tr>
+<tr>
+<td align="center">133</td>
+<td>SYS_sendto</td>
+<td align="center">0x85</td>
+</tr>
+<tr>
+<td align="center">134</td>
+<td>SYS_shutdown</td>
+<td align="center">0x86</td>
+</tr>
+<tr>
+<td align="center">135</td>
+<td>SYS_socketpair</td>
+<td align="center">0x87</td>
+</tr>
+<tr>
+<td align="center">136</td>
+<td>SYS_mkdir</td>
+<td align="center">0x88</td>
+</tr>
+<tr>
+<td align="center">137</td>
+<td>SYS_rmdir</td>
+<td align="center">0x89</td>
+</tr>
+<tr>
+<td align="center">138</td>
+<td>SYS_utimes</td>
+<td align="center">0x8a</td>
+</tr>
+<tr>
+<td align="center">139</td>
+<td>SYS_futimes</td>
+<td align="center">0x8b</td>
+</tr>
+<tr>
+<td align="center">140</td>
+<td>SYS_adjtime</td>
+<td align="center">0x8c</td>
+</tr>
+<tr>
+<td align="center">142</td>
+<td>SYS_gethostuuid</td>
+<td align="center">0x8e</td>
+</tr>
+<tr>
+<td align="center">147</td>
+<td>SYS_setsid</td>
+<td align="center">0x93</td>
+</tr>
+<tr>
+<td align="center">151</td>
+<td>SYS_getpgid</td>
+<td align="center">0x97</td>
+</tr>
+<tr>
+<td align="center">152</td>
+<td>SYS_setprivexec</td>
+<td align="center">0x98</td>
+</tr>
+<tr>
+<td align="center">153</td>
+<td>SYS_pread</td>
+<td align="center">0x99</td>
+</tr>
+<tr>
+<td align="center">154</td>
+<td>SYS_pwrite</td>
+<td align="center">0x9a</td>
+</tr>
+<tr>
+<td align="center">155</td>
+<td>SYS_nfssvc</td>
+<td align="center">0x9b</td>
+</tr>
+<tr>
+<td align="center">157</td>
+<td>SYS_statfs</td>
+<td align="center">0x9d</td>
+</tr>
+<tr>
+<td align="center">158</td>
+<td>SYS_fstatfs</td>
+<td align="center">0x9e</td>
+</tr>
+<tr>
+<td align="center">159</td>
+<td>SYS_unmount</td>
+<td align="center">0x9f</td>
+</tr>
+<tr>
+<td align="center">161</td>
+<td>SYS_getfh</td>
+<td align="center">0xa1</td>
+</tr>
+<tr>
+<td align="center">165</td>
+<td>SYS_quotactl</td>
+<td align="center">0xa5</td>
+</tr>
+<tr>
+<td align="center">167</td>
+<td>SYS_mount</td>
+<td align="center">0xa7</td>
+</tr>
+<tr>
+<td align="center">169</td>
+<td>SYS_csops</td>
+<td align="center">0xa9</td>
+</tr>
+<tr>
+<td align="center">170</td>
+<td>SYS_table</td>
+<td align="center">0xaa</td>
+</tr>
+<tr>
+<td align="center">173</td>
+<td>SYS_waitid</td>
+<td align="center">0xad</td>
+</tr>
+<tr>
+<td align="center">176</td>
+<td>SYS_add_profil</td>
+<td align="center">0xb0</td>
+</tr>
+<tr>
+<td align="center">180</td>
+<td>SYS_kdebug_trace</td>
+<td align="center">0xb4</td>
+</tr>
+<tr>
+<td align="center">181</td>
+<td>SYS_setgid</td>
+<td align="center">0xb5</td>
+</tr>
+<tr>
+<td align="center">182</td>
+<td>SYS_setegid</td>
+<td align="center">0xb6</td>
+</tr>
+<tr>
+<td align="center">183</td>
+<td>SYS_seteuid</td>
+<td align="center">0xb7</td>
+</tr>
+<tr>
+<td align="center">184</td>
+<td>SYS_sigreturn</td>
+<td align="center">0xb8</td>
+</tr>
+<tr>
+<td align="center">185</td>
+<td>SYS_chud</td>
+<td align="center">0xb9</td>
+</tr>
+<tr>
+<td align="center">188</td>
+<td>SYS_stat</td>
+<td align="center">0xbc</td>
+</tr>
+<tr>
+<td align="center">189</td>
+<td>SYS_fstat</td>
+<td align="center">0xbd</td>
+</tr>
+<tr>
+<td align="center">190</td>
+<td>SYS_lstat</td>
+<td align="center">0xbe</td>
+</tr>
+<tr>
+<td align="center">191</td>
+<td>SYS_pathconf</td>
+<td align="center">0xbf</td>
+</tr>
+<tr>
+<td align="center">192</td>
+<td>SYS_fpathconf</td>
+<td align="center">0xc0</td>
+</tr>
+<tr>
+<td align="center">194</td>
+<td>SYS_getrlimit</td>
+<td align="center">0xc2</td>
+</tr>
+<tr>
+<td align="center">195</td>
+<td>SYS_setrlimit</td>
+<td align="center">0xc3</td>
+</tr>
+<tr>
+<td align="center">196</td>
+<td>SYS_getdirentries</td>
+<td align="center">0xc4</td>
+</tr>
+<tr>
+<td align="center">197</td>
+<td>SYS_mmap</td>
+<td align="center">0xc5</td>
+</tr>
+<tr>
+<td align="center">199</td>
+<td>SYS_lseek</td>
+<td align="center">0xc7</td>
+</tr>
+<tr>
+<td align="center">200</td>
+<td>SYS_truncate</td>
+<td align="center">0xc8</td>
+</tr>
+<tr>
+<td align="center">201</td>
+<td>SYS_ftruncate</td>
+<td align="center">0xc9</td>
+</tr>
+<tr>
+<td align="center">202</td>
+<td>SYS___sysctl</td>
+<td align="center">0xca</td>
+</tr>
+<tr>
+<td align="center">203</td>
+<td>SYS_mlock</td>
+<td align="center">0xcb</td>
+</tr>
+<tr>
+<td align="center">204</td>
+<td>SYS_munlock</td>
+<td align="center">0xcc</td>
+</tr>
+<tr>
+<td align="center">205</td>
+<td>SYS_undelete</td>
+<td align="center">0xcd</td>
+</tr>
+<tr>
+<td align="center">206</td>
+<td>SYS_ATsocket</td>
+<td align="center">0xce</td>
+</tr>
+<tr>
+<td align="center">207</td>
+<td>SYS_ATgetmsg</td>
+<td align="center">0xcf</td>
+</tr>
+<tr>
+<td align="center">208</td>
+<td>SYS_ATputmsg</td>
+<td align="center">0xd0</td>
+</tr>
+<tr>
+<td align="center">209</td>
+<td>SYS_ATPsndreq</td>
+<td align="center">0xd1</td>
+</tr>
+<tr>
+<td align="center">210</td>
+<td>SYS_ATPsndrsp</td>
+<td align="center">0xd2</td>
+</tr>
+<tr>
+<td align="center">211</td>
+<td>SYS_ATPgetreq</td>
+<td align="center">0xd3</td>
+</tr>
+<tr>
+<td align="center">212</td>
+<td>SYS_ATPgetrsp</td>
+<td align="center">0xd4</td>
+</tr>
+<tr>
+<td align="center">214</td>
+<td>SYS_kqueue_from_portset_np</td>
+<td align="center">0xd6</td>
+</tr>
+<tr>
+<td align="center">215</td>
+<td>SYS_kqueue_portset_np</td>
+<td align="center">0xd7</td>
+</tr>
+<tr>
+<td align="center">216</td>
+<td>SYS_mkcomplex</td>
+<td align="center">0xd8</td>
+</tr>
+<tr>
+<td align="center">217</td>
+<td>SYS_statv</td>
+<td align="center">0xd9</td>
+</tr>
+<tr>
+<td align="center">218</td>
+<td>SYS_lstatv</td>
+<td align="center">0xda</td>
+</tr>
+<tr>
+<td align="center">219</td>
+<td>SYS_fstatv</td>
+<td align="center">0xdb</td>
+</tr>
+<tr>
+<td align="center">220</td>
+<td>SYS_getattrlist</td>
+<td align="center">0xdc</td>
+</tr>
+<tr>
+<td align="center">221</td>
+<td>SYS_setattrlist</td>
+<td align="center">0xdd</td>
+</tr>
+<tr>
+<td align="center">222</td>
+<td>SYS_getdirentriesattr</td>
+<td align="center">0xde</td>
+</tr>
+<tr>
+<td align="center">223</td>
+<td>SYS_exchangedata</td>
+<td align="center">0xdf</td>
+</tr>
+<tr>
+<td align="center">225</td>
+<td>SYS_searchfs</td>
+<td align="center">0xe1</td>
+</tr>
+<tr>
+<td align="center">226</td>
+<td>SYS_delete</td>
+<td align="center">0xe2</td>
+</tr>
+<tr>
+<td align="center">227</td>
+<td>SYS_copyfile</td>
+<td align="center">0xe3</td>
+</tr>
+<tr>
+<td align="center">230</td>
+<td>SYS_poll</td>
+<td align="center">0xe6</td>
+</tr>
+<tr>
+<td align="center">231</td>
+<td>SYS_watchevent</td>
+<td align="center">0xe7</td>
+</tr>
+<tr>
+<td align="center">232</td>
+<td>SYS_waitevent</td>
+<td align="center">0xe8</td>
+</tr>
+<tr>
+<td align="center">233</td>
+<td>SYS_modwatch</td>
+<td align="center">0xe9</td>
+</tr>
+<tr>
+<td align="center">234</td>
+<td>SYS_getxattr</td>
+<td align="center">0xea</td>
+</tr>
+<tr>
+<td align="center">235</td>
+<td>SYS_fgetxattr</td>
+<td align="center">0xeb</td>
+</tr>
+<tr>
+<td align="center">236</td>
+<td>SYS_setxattr</td>
+<td align="center">0xec</td>
+</tr>
+<tr>
+<td align="center">237</td>
+<td>SYS_fsetxattr</td>
+<td align="center">0xed</td>
+</tr>
+<tr>
+<td align="center">238</td>
+<td>SYS_removexattr</td>
+<td align="center">0xee</td>
+</tr>
+<tr>
+<td align="center">239</td>
+<td>SYS_fremovexattr</td>
+<td align="center">0xef</td>
+</tr>
+<tr>
+<td align="center">240</td>
+<td>SYS_listxattr</td>
+<td align="center">0xf0</td>
+</tr>
+<tr>
+<td align="center">241</td>
+<td>SYS_flistxattr</td>
+<td align="center">0xf1</td>
+</tr>
+<tr>
+<td align="center">242</td>
+<td>SYS_fsctl</td>
+<td align="center">0xf2</td>
+</tr>
+<tr>
+<td align="center">243</td>
+<td>SYS_initgroups</td>
+<td align="center">0xf3</td>
+</tr>
+<tr>
+<td align="center">244</td>
+<td>SYS_posix_spawn</td>
+<td align="center">0xf4</td>
+</tr>
+<tr>
+<td align="center">247</td>
+<td>SYS_nfsclnt</td>
+<td align="center">0xf7</td>
+</tr>
+<tr>
+<td align="center">248</td>
+<td>SYS_fhopen</td>
+<td align="center">0xf8</td>
+</tr>
+<tr>
+<td align="center">250</td>
+<td>SYS_minherit</td>
+<td align="center">0xfa</td>
+</tr>
+<tr>
+<td align="center">251</td>
+<td>SYS_semsys</td>
+<td align="center">0xfb</td>
+</tr>
+<tr>
+<td align="center">252</td>
+<td>SYS_msgsys</td>
+<td align="center">0xfc</td>
+</tr>
+<tr>
+<td align="center">253</td>
+<td>SYS_shmsys</td>
+<td align="center">0xfd</td>
+</tr>
+<tr>
+<td align="center">254</td>
+<td>SYS_semctl</td>
+<td align="center">0xfe</td>
+</tr>
+<tr>
+<td align="center">255</td>
+<td>SYS_semget</td>
+<td align="center">0xff</td>
+</tr>
+<tr>
+<td align="center">256</td>
+<td>SYS_semop</td>
+<td align="center">0x100</td>
+</tr>
+<tr>
+<td align="center">258</td>
+<td>SYS_msgctl</td>
+<td align="center">0x102</td>
+</tr>
+<tr>
+<td align="center">259</td>
+<td>SYS_msgget</td>
+<td align="center">0x103</td>
+</tr>
+<tr>
+<td align="center">260</td>
+<td>SYS_msgsnd</td>
+<td align="center">0x104</td>
+</tr>
+<tr>
+<td align="center">261</td>
+<td>SYS_msgrcv</td>
+<td align="center">0x105</td>
+</tr>
+<tr>
+<td align="center">262</td>
+<td>SYS_shmat</td>
+<td align="center">0x106</td>
+</tr>
+<tr>
+<td align="center">263</td>
+<td>SYS_shmctl</td>
+<td align="center">0x107</td>
+</tr>
+<tr>
+<td align="center">264</td>
+<td>SYS_shmdt</td>
+<td align="center">0x108</td>
+</tr>
+<tr>
+<td align="center">265</td>
+<td>SYS_shmget</td>
+<td align="center">0x109</td>
+</tr>
+<tr>
+<td align="center">266</td>
+<td>SYS_shm_open</td>
+<td align="center">0x10a</td>
+</tr>
+<tr>
+<td align="center">267</td>
+<td>SYS_shm_unlink</td>
+<td align="center">0x10b</td>
+</tr>
+<tr>
+<td align="center">268</td>
+<td>SYS_sem_open</td>
+<td align="center">0x10c</td>
+</tr>
+<tr>
+<td align="center">269</td>
+<td>SYS_sem_close</td>
+<td align="center">0x10d</td>
+</tr>
+<tr>
+<td align="center">270</td>
+<td>SYS_sem_unlink</td>
+<td align="center">0x10e</td>
+</tr>
+<tr>
+<td align="center">271</td>
+<td>SYS_sem_wait</td>
+<td align="center">0x10f</td>
+</tr>
+<tr>
+<td align="center">272</td>
+<td>SYS_sem_trywait</td>
+<td align="center">0x110</td>
+</tr>
+<tr>
+<td align="center">273</td>
+<td>SYS_sem_post</td>
+<td align="center">0x111</td>
+</tr>
+<tr>
+<td align="center">274</td>
+<td>SYS_sem_getvalue</td>
+<td align="center">0x112</td>
+</tr>
+<tr>
+<td align="center">275</td>
+<td>SYS_sem_init</td>
+<td align="center">0x113</td>
+</tr>
+<tr>
+<td align="center">276</td>
+<td>SYS_sem_destroy</td>
+<td align="center">0x114</td>
+</tr>
+<tr>
+<td align="center">277</td>
+<td>SYS_open_extended</td>
+<td align="center">0x115</td>
+</tr>
+<tr>
+<td align="center">278</td>
+<td>SYS_umask_extended</td>
+<td align="center">0x116</td>
+</tr>
+<tr>
+<td align="center">279</td>
+<td>SYS_stat_extended</td>
+<td align="center">0x117</td>
+</tr>
+<tr>
+<td align="center">280</td>
+<td>SYS_lstat_extended</td>
+<td align="center">0x118</td>
+</tr>
+<tr>
+<td align="center">281</td>
+<td>SYS_fstat_extended</td>
+<td align="center">0x119</td>
+</tr>
+<tr>
+<td align="center">282</td>
+<td>SYS_chmod_extended</td>
+<td align="center">0x11a</td>
+</tr>
+<tr>
+<td align="center">283</td>
+<td>SYS_fchmod_extended</td>
+<td align="center">0x11b</td>
+</tr>
+<tr>
+<td align="center">284</td>
+<td>SYS_access_extended</td>
+<td align="center">0x11c</td>
+</tr>
+<tr>
+<td align="center">285</td>
+<td>SYS_settid</td>
+<td align="center">0x11d</td>
+</tr>
+<tr>
+<td align="center">286</td>
+<td>SYS_gettid</td>
+<td align="center">0x11e</td>
+</tr>
+<tr>
+<td align="center">287</td>
+<td>SYS_setsgroups</td>
+<td align="center">0x11f</td>
+</tr>
+<tr>
+<td align="center">288</td>
+<td>SYS_getsgroups</td>
+<td align="center">0x120</td>
+</tr>
+<tr>
+<td align="center">289</td>
+<td>SYS_setwgroups</td>
+<td align="center">0x121</td>
+</tr>
+<tr>
+<td align="center">290</td>
+<td>SYS_getwgroups</td>
+<td align="center">0x122</td>
+</tr>
+<tr>
+<td align="center">291</td>
+<td>SYS_mkfifo_extended</td>
+<td align="center">0x123</td>
+</tr>
+<tr>
+<td align="center">292</td>
+<td>SYS_mkdir_extended</td>
+<td align="center">0x124</td>
+</tr>
+<tr>
+<td align="center">293</td>
+<td>SYS_identitysvc</td>
+<td align="center">0x125</td>
+</tr>
+<tr>
+<td align="center">294</td>
+<td>SYS_shared_region_check_np</td>
+<td align="center">0x126</td>
+</tr>
+<tr>
+<td align="center">295</td>
+<td>SYS_shared_region_map_np</td>
+<td align="center">0x127</td>
+</tr>
+<tr>
+<td align="center">301</td>
+<td>SYS___pthread_mutex_destroy</td>
+<td align="center">0x12d</td>
+</tr>
+<tr>
+<td align="center">302</td>
+<td>SYS___pthread_mutex_init</td>
+<td align="center">0x12e</td>
+</tr>
+<tr>
+<td align="center">303</td>
+<td>SYS___pthread_mutex_lock</td>
+<td align="center">0x12f</td>
+</tr>
+<tr>
+<td align="center">304</td>
+<td>SYS___pthread_mutex_trylock</td>
+<td align="center">0x130</td>
+</tr>
+<tr>
+<td align="center">305</td>
+<td>SYS___pthread_mutex_unlock</td>
+<td align="center">0x131</td>
+</tr>
+<tr>
+<td align="center">306</td>
+<td>SYS___pthread_cond_init</td>
+<td align="center">0x132</td>
+</tr>
+<tr>
+<td align="center">307</td>
+<td>SYS___pthread_cond_destroy</td>
+<td align="center">0x133</td>
+</tr>
+<tr>
+<td align="center">308</td>
+<td>SYS___pthread_cond_broadcast</td>
+<td align="center">0x134</td>
+</tr>
+<tr>
+<td align="center">309</td>
+<td>SYS___pthread_cond_signal</td>
+<td align="center">0x135</td>
+</tr>
+<tr>
+<td align="center">310</td>
+<td>SYS_getsid</td>
+<td align="center">0x136</td>
+</tr>
+<tr>
+<td align="center">311</td>
+<td>SYS_settid_with_pid</td>
+<td align="center">0x137</td>
+</tr>
+<tr>
+<td align="center">312</td>
+<td>SYS___pthread_cond_timedwait</td>
+<td align="center">0x138</td>
+</tr>
+<tr>
+<td align="center">313</td>
+<td>SYS_aio_fsync</td>
+<td align="center">0x139</td>
+</tr>
+<tr>
+<td align="center">314</td>
+<td>SYS_aio_return</td>
+<td align="center">0x13a</td>
+</tr>
+<tr>
+<td align="center">315</td>
+<td>SYS_aio_suspend</td>
+<td align="center">0x13b</td>
+</tr>
+<tr>
+<td align="center">316</td>
+<td>SYS_aio_cancel</td>
+<td align="center">0x13c</td>
+</tr>
+<tr>
+<td align="center">317</td>
+<td>SYS_aio_error</td>
+<td align="center">0x13d</td>
+</tr>
+<tr>
+<td align="center">318</td>
+<td>SYS_aio_read</td>
+<td align="center">0x13e</td>
+</tr>
+<tr>
+<td align="center">319</td>
+<td>SYS_aio_write</td>
+<td align="center">0x13f</td>
+</tr>
+<tr>
+<td align="center">320</td>
+<td>SYS_lio_listio</td>
+<td align="center">0x140</td>
+</tr>
+<tr>
+<td align="center">321</td>
+<td>SYS___pthread_cond_wait</td>
+<td align="center">0x141</td>
+</tr>
+<tr>
+<td align="center">322</td>
+<td>SYS_iopolicysys</td>
+<td align="center">0x142</td>
+</tr>
+<tr>
+<td align="center">324</td>
+<td>SYS_mlockall</td>
+<td align="center">0x144</td>
+</tr>
+<tr>
+<td align="center">325</td>
+<td>SYS_munlockall</td>
+<td align="center">0x145</td>
+</tr>
+<tr>
+<td align="center">327</td>
+<td>SYS_issetugid</td>
+<td align="center">0x147</td>
+</tr>
+<tr>
+<td align="center">328</td>
+<td>SYS___pthread_kill</td>
+<td align="center">0x148</td>
+</tr>
+<tr>
+<td align="center">329</td>
+<td>SYS___pthread_sigmask</td>
+<td align="center">0x149</td>
+</tr>
+<tr>
+<td align="center">330</td>
+<td>SYS___sigwait</td>
+<td align="center">0x14a</td>
+</tr>
+<tr>
+<td align="center">331</td>
+<td>SYS___disable_threadsignal</td>
+<td align="center">0x14b</td>
+</tr>
+<tr>
+<td align="center">332</td>
+<td>SYS___pthread_markcancel</td>
+<td align="center">0x14c</td>
+</tr>
+<tr>
+<td align="center">333</td>
+<td>SYS___pthread_canceled</td>
+<td align="center">0x14d</td>
+</tr>
+<tr>
+<td align="center">334</td>
+<td>SYS___semwait_signal</td>
+<td align="center">0x14e</td>
+</tr>
+<tr>
+<td align="center">336</td>
+<td>SYS_proc_info</td>
+<td align="center">0x150</td>
+</tr>
+<tr>
+<td align="center">337</td>
+<td>SYS_sendfile</td>
+<td align="center">0x151</td>
+</tr>
+<tr>
+<td align="center">338</td>
+<td>SYS_stat64</td>
+<td align="center">0x152</td>
+</tr>
+<tr>
+<td align="center">339</td>
+<td>SYS_fstat64</td>
+<td align="center">0x153</td>
+</tr>
+<tr>
+<td align="center">340</td>
+<td>SYS_lstat64</td>
+<td align="center">0x154</td>
+</tr>
+<tr>
+<td align="center">341</td>
+<td>SYS_stat64_extended</td>
+<td align="center">0x155</td>
+</tr>
+<tr>
+<td align="center">342</td>
+<td>SYS_lstat64_extended</td>
+<td align="center">0x156</td>
+</tr>
+<tr>
+<td align="center">343</td>
+<td>SYS_fstat64_extended</td>
+<td align="center">0x157</td>
+</tr>
+<tr>
+<td align="center">344</td>
+<td>SYS_getdirentries64</td>
+<td align="center">0x158</td>
+</tr>
+<tr>
+<td align="center">345</td>
+<td>SYS_statfs64</td>
+<td align="center">0x159</td>
+</tr>
+<tr>
+<td align="center">346</td>
+<td>SYS_fstatfs64</td>
+<td align="center">0x15a</td>
+</tr>
+<tr>
+<td align="center">347</td>
+<td>SYS_getfsstat64</td>
+<td align="center">0x15b</td>
+</tr>
+<tr>
+<td align="center">348</td>
+<td>SYS___pthread_chdir</td>
+<td align="center">0x15c</td>
+</tr>
+<tr>
+<td align="center">349</td>
+<td>SYS___pthread_fchdir</td>
+<td align="center">0x15d</td>
+</tr>
+<tr>
+<td align="center">350</td>
+<td>SYS_audit</td>
+<td align="center">0x15e</td>
+</tr>
+<tr>
+<td align="center">351</td>
+<td>SYS_auditon</td>
+<td align="center">0x15f</td>
+</tr>
+<tr>
+<td align="center">353</td>
+<td>SYS_getauid</td>
+<td align="center">0x161</td>
+</tr>
+<tr>
+<td align="center">354</td>
+<td>SYS_setauid</td>
+<td align="center">0x162</td>
+</tr>
+<tr>
+<td align="center">355</td>
+<td>SYS_getaudit</td>
+<td align="center">0x163</td>
+</tr>
+<tr>
+<td align="center">356</td>
+<td>SYS_setaudit</td>
+<td align="center">0x164</td>
+</tr>
+<tr>
+<td align="center">357</td>
+<td>SYS_getaudit_addr</td>
+<td align="center">0x165</td>
+</tr>
+<tr>
+<td align="center">358</td>
+<td>SYS_setaudit_addr</td>
+<td align="center">0x166</td>
+</tr>
+<tr>
+<td align="center">359</td>
+<td>SYS_auditctl</td>
+<td align="center">0x167</td>
+</tr>
+<tr>
+<td align="center">360</td>
+<td>SYS_bsdthread_create</td>
+<td align="center">0x168</td>
+</tr>
+<tr>
+<td align="center">361</td>
+<td>SYS_bsdthread_terminate</td>
+<td align="center">0x169</td>
+</tr>
+<tr>
+<td align="center">362</td>
+<td>SYS_kqueue</td>
+<td align="center">0x16a</td>
+</tr>
+<tr>
+<td align="center">363</td>
+<td>SYS_kevent</td>
+<td align="center">0x16b</td>
+</tr>
+<tr>
+<td align="center">364</td>
+<td>SYS_lchown</td>
+<td align="center">0x16c</td>
+</tr>
+<tr>
+<td align="center">365</td>
+<td>SYS_stack_snapshot</td>
+<td align="center">0x16d</td>
+</tr>
+<tr>
+<td align="center">366</td>
+<td>SYS_bsdthread_register</td>
+<td align="center">0x16e</td>
+</tr>
+<tr>
+<td align="center">367</td>
+<td>SYS_workq_open</td>
+<td align="center">0x16f</td>
+</tr>
+<tr>
+<td align="center">368</td>
+<td>SYS_workq_ops</td>
+<td align="center">0x170</td>
+</tr>
+<tr>
+<td align="center">380</td>
+<td>SYS___mac_execve</td>
+<td align="center">0x17c</td>
+</tr>
+<tr>
+<td align="center">381</td>
+<td>SYS___mac_syscall</td>
+<td align="center">0x17d</td>
+</tr>
+<tr>
+<td align="center">382</td>
+<td>SYS___mac_get_file</td>
+<td align="center">0x17e</td>
+</tr>
+<tr>
+<td align="center">383</td>
+<td>SYS___mac_set_file</td>
+<td align="center">0x17f</td>
+</tr>
+<tr>
+<td align="center">384</td>
+<td>SYS___mac_get_link</td>
+<td align="center">0x180</td>
+</tr>
+<tr>
+<td align="center">385</td>
+<td>SYS___mac_set_link</td>
+<td align="center">0x181</td>
+</tr>
+<tr>
+<td align="center">386</td>
+<td>SYS___mac_get_proc</td>
+<td align="center">0x182</td>
+</tr>
+<tr>
+<td align="center">387</td>
+<td>SYS___mac_set_proc</td>
+<td align="center">0x183</td>
+</tr>
+<tr>
+<td align="center">388</td>
+<td>SYS___mac_get_fd</td>
+<td align="center">0x184</td>
+</tr>
+<tr>
+<td align="center">389</td>
+<td>SYS___mac_set_fd</td>
+<td align="center">0x185</td>
+</tr>
+<tr>
+<td align="center">390</td>
+<td>SYS___mac_get_pid</td>
+<td align="center">0x186</td>
+</tr>
+<tr>
+<td align="center">391</td>
+<td>SYS___mac_get_lcid</td>
+<td align="center">0x187</td>
+</tr>
+<tr>
+<td align="center">392</td>
+<td>SYS___mac_get_lctx</td>
+<td align="center">0x188</td>
+</tr>
+<tr>
+<td align="center">393</td>
+<td>SYS___mac_set_lctx</td>
+<td align="center">0x189</td>
+</tr>
+<tr>
+<td align="center">394</td>
+<td>SYS_setlcid</td>
+<td align="center">0x18a</td>
+</tr>
+<tr>
+<td align="center">395</td>
+<td>SYS_getlcid</td>
+<td align="center">0x18b</td>
+</tr>
+<tr>
+<td align="center">396</td>
+<td>SYS_read_nocancel</td>
+<td align="center">0x18c</td>
+</tr>
+<tr>
+<td align="center">397</td>
+<td>SYS_write_nocancel</td>
+<td align="center">0x18d</td>
+</tr>
+<tr>
+<td align="center">398</td>
+<td>SYS_open_nocancel</td>
+<td align="center">0x18e</td>
+</tr>
+<tr>
+<td align="center">399</td>
+<td>SYS_close_nocancel</td>
+<td align="center">0x18f</td>
+</tr>
+<tr>
+<td align="center">400</td>
+<td>SYS_wait4_nocancel</td>
+<td align="center">0x190</td>
+</tr>
+<tr>
+<td align="center">401</td>
+<td>SYS_recvmsg_nocancel</td>
+<td align="center">0x191</td>
+</tr>
+<tr>
+<td align="center">402</td>
+<td>SYS_sendmsg_nocancel</td>
+<td align="center">0x192</td>
+</tr>
+<tr>
+<td align="center">403</td>
+<td>SYS_recvfrom_nocancel</td>
+<td align="center">0x193</td>
+</tr>
+<tr>
+<td align="center">404</td>
+<td>SYS_accept_nocancel</td>
+<td align="center">0x194</td>
+</tr>
+<tr>
+<td align="center">405</td>
+<td>SYS_msync_nocancel</td>
+<td align="center">0x195</td>
+</tr>
+<tr>
+<td align="center">406</td>
+<td>SYS_fcntl_nocancel</td>
+<td align="center">0x196</td>
+</tr>
+<tr>
+<td align="center">407</td>
+<td>SYS_select_nocancel</td>
+<td align="center">0x197</td>
+</tr>
+<tr>
+<td align="center">408</td>
+<td>SYS_fsync_nocancel</td>
+<td align="center">0x198</td>
+</tr>
+<tr>
+<td align="center">409</td>
+<td>SYS_connect_nocancel</td>
+<td align="center">0x199</td>
+</tr>
+<tr>
+<td align="center">410</td>
+<td>SYS_sigsuspend_nocancel</td>
+<td align="center">0x19a</td>
+</tr>
+<tr>
+<td align="center">411</td>
+<td>SYS_readv_nocancel</td>
+<td align="center">0x19b</td>
+</tr>
+<tr>
+<td align="center">412</td>
+<td>SYS_writev_nocancel</td>
+<td align="center">0x19c</td>
+</tr>
+<tr>
+<td align="center">413</td>
+<td>SYS_sendto_nocancel</td>
+<td align="center">0x19d</td>
+</tr>
+<tr>
+<td align="center">414</td>
+<td>SYS_pread_nocancel</td>
+<td align="center">0x19e</td>
+</tr>
+<tr>
+<td align="center">415</td>
+<td>SYS_pwrite_nocancel</td>
+<td align="center">0x19f</td>
+</tr>
+<tr>
+<td align="center">416</td>
+<td>SYS_waitid_nocancel</td>
+<td align="center">0x1a0</td>
+</tr>
+<tr>
+<td align="center">417</td>
+<td>SYS_poll_nocancel</td>
+<td align="center">0x1a1</td>
+</tr>
+<tr>
+<td align="center">418</td>
+<td>SYS_msgsnd_nocancel</td>
+<td align="center">0x1a2</td>
+</tr>
+<tr>
+<td align="center">419</td>
+<td>SYS_msgrcv_nocancel</td>
+<td align="center">0x1a3</td>
+</tr>
+<tr>
+<td align="center">420</td>
+<td>SYS_sem_wait_nocancel</td>
+<td align="center">0x1a4</td>
+</tr>
+<tr>
+<td align="center">421</td>
+<td>SYS_aio_suspend_nocancel</td>
+<td align="center">0x1a5</td>
+</tr>
+<tr>
+<td align="center">422</td>
+<td>SYS___sigwait_nocancel</td>
+<td align="center">0x1a6</td>
+</tr>
+<tr>
+<td align="center">423</td>
+<td>SYS___semwait_signal_nocancel</td>
+<td align="center">0x1a7</td>
+</tr>
+<tr>
+<td align="center">424</td>
+<td>SYS427___mac_mount</td>
+<td align="center">0x1a8</td>
+</tr>
+<tr>
+<td align="center">425</td>
+<td>SYS___mac_get_mount</td>
+<td align="center">0x1a9</td>
+</tr>
+<tr>
+<td align="center">426</td>
+<td>SYS___mac_getfsstat</td>
+<td align="center">0x1aa</td>
+</tr>
+<tr>
+<td align="center">427</td>
+<td>SYS_MAXSYSCALL</td>
+<td align="center">0x1ab</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/06/android-12-hostpot-set-ip/" rel="prev" title="安卓12 设置热点固定IP (Xposed)">
+      <i class="fa fa-chevron-left"></i> 安卓12 设置热点固定IP (Xposed)
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Note"><span class="nav-number">1.</span> <span class="nav-text">Note</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Table"><span class="nav-number">2.</span> <span class="nav-text">Table</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">Blog of XhyEax</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">149</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

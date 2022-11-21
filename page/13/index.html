@@ -196,6 +196,71 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/07/2019-hzwas-wp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="Blog of XhyEax">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/04/07/2019-hzwas-wp/" class="post-title-link" itemprop="url">2019中国杭州网络安全技能大赛 预选赛 哈夫曼之谜 & EasyCpp Writeup</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-07 12:03:45" itemprop="dateCreated datePublished" datetime="2019-04-07T12:03:45+08:00">2019-04-07</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Reverse-EasyCpp"><a href="#Reverse-EasyCpp" class="headerlink" title="Reverse EasyCpp"></a>Reverse EasyCpp</h2><p>[2019/10/25更新]<br>首先读入16个数字，然后生成一个斐波那契数组，长度也为16<br>然后对输入数组进行操作，从第二位开始，都加上第一位的值（<code>transform</code>）<br>动态调试可知<code>accumulate</code>的匿名函数对运算完的数组做反转操作<br>然后与斐波那契数组比较，相同则输出flag<br>也就是说输入的第一个数字是不会变的，所以就是987<br>后面的数字直接脚本跑一下就可以得到结果了</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/04/07/2019-hzwas-wp/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/04/02/emui9-magisk-install/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -832,75 +897,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/01/26/icq-2nd-happy-rsa256/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/img/avatar.jpg">
-      <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xhy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/01/26/icq-2nd-happy-rsa256/" class="post-title-link" itemprop="url">i春秋 第二届春秋欢乐赛 RSA256 Writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-01-26 11:59:21" itemprop="dateCreated datePublished" datetime="2019-01-26T11:59:21+08:00">2019-01-26</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="解压"><a href="#解压" class="headerlink" title="解压"></a>解压</h2><p>解压得到四个文件，有一个<code>public.key</code>和三个加密过的文件，于是先把p和q解出来</p>
-<h2 id="得到e和n"><a href="#得到e和n" class="headerlink" title="得到e和n"></a>得到e和n</h2><p><code>openssl rsa -pubin -text -modulus -in warmup -in public.key</code><br>得到</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Exponent: 65537 (0x10001)</span><br><span class="line">Modulus=D99E952296A6D960DFC2504ABA545B9442D60A7B9E930AFF451C78EC55D555EB</span><br></pre></td></tr></table></figure>
-<h2 id="使用yafu分解，得到p和q"><a href="#使用yafu分解，得到p和q" class="headerlink" title="使用yafu分解，得到p和q"></a>使用yafu分解，得到p和q</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p = 302825536744096741518546212761194311477</span><br><span class="line">q = 325045504186436346209877301320131277983</span><br></pre></td></tr></table></figure>
-<h2 id="求出d"><a href="#求出d" class="headerlink" title="求出d"></a>求出d</h2><p>使用gmpy</p>
-<h2 id="解密并打印出flag"><a href="#解密并打印出flag" class="headerlink" title="解密并打印出flag"></a>解密并打印出flag</h2><h3 id="使用rsa模块"><a href="#使用rsa模块" class="headerlink" title="使用rsa模块"></a>使用rsa模块</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> rsa</span><br><span class="line"></span><br><span class="line">n = <span class="number">0xD99E952296A6D960DFC2504ABA545B9442D60A7B9E930AFF451C78EC55D555EB</span></span><br><span class="line">e = <span class="number">0x10001</span></span><br><span class="line">p = <span class="number">302825536744096741518546212761194311477</span></span><br><span class="line">q = <span class="number">325045504186436346209877301320131277983</span></span><br><span class="line">d = <span class="number">0x4547B732CBC3527104CB57C4728D6899B44C4994FAE2713D6B594BC0F522A41</span></span><br><span class="line">ret = <span class="string">&quot;&quot;</span></span><br><span class="line">privatekey = rsa.PrivateKey(n , e , d , p , q)</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message1&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message2&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;encrypted.message3&quot;</span> , <span class="string">&quot;rb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    ret += (rsa.decrypt(f.read(), privatekey).decode())</span><br><span class="line"><span class="built_in">print</span>(ret)</span><br></pre></td></tr></table></figure>
-<p>得到</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flag&#123;3b6d3806-4b2b</span><br><span class="line">-11e7-95a0-</span><br><span class="line">000c29d7e93d&#125;</span><br></pre></td></tr></table></figure>
-<p>去掉回车得到最终flag</p>
-<h3 id="不使用rsa模块"><a href="#不使用rsa模块" class="headerlink" title="不使用rsa模块"></a>不使用rsa模块</h3><p>其实就是自己实现<code>rsa.decrypt</code>中的转换16进制操作<br>以第一个文件为例，解密出来转化为16进制：<br><code>25a8007e9ad2809abbf5a00666c61677b33623664333830362d346232620a</code><br>位数为奇数，所以左边补0，得到<br><code>025a8007e9ad2809abbf5a00666c61677b33623664333830362d346232620a</code><br>转换为ascii码得到<br><code>Z��(    ��Z�flag&#123;3b6d3806-4b2b</code></p>
-<p>剩下文件同理</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiangshangbashaonian/article/details/79575062">i春秋第二届春秋欢乐赛RSA256writeup</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -972,14 +968,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">148</span>
+          <span class="site-state-item-count">149</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-count">31</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
