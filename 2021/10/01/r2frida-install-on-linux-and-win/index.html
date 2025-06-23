@@ -28,7 +28,7 @@
 <meta property="og:description" content="概述之前了解到r2frida这一工具，由于环境问题，并未安装成功。 在Kali Linux和Windows上安装r2frida成功，记录一下。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-09-30T18:55:07.000Z">
-<meta property="article:modified_time" content="2022-09-11T06:05:28.327Z">
+<meta property="article:modified_time" content="2025-06-23T11:20:44.336Z">
 <meta property="article:author" content="Xhy">
 <meta property="article:tag" content="Android">
 <meta property="article:tag" content="经验">
@@ -205,7 +205,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/assets/img/avatar.jpg">
       <meta itemprop="name" content="Xhy">
-      <meta itemprop="description" content="Blog of XhyEax">
+      <meta itemprop="description" content="南冥有熊也 (XhyEax)">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -252,7 +252,7 @@
 <h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><h4 id="radare2"><a href="#radare2" class="headerlink" title="radare2"></a>radare2</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/radareorg/radare2</span><br><span class="line">radare2/sys/install.sh</span><br></pre></td></tr></table></figure>
 <h4 id="r2frida"><a href="#r2frida" class="headerlink" title="r2frida"></a>r2frida</h4><p>可直接到<a target="_blank" rel="noopener" href="https://github.com/nowsecure/r2frida/releases">Release页</a>下载，以下是自行编译流程</p>
 <h5 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install -y make gcc libzip-dev nodejs npm curl pkg-config git</span><br></pre></td></tr></table></figure>
-<h5 id="更换npm源（可选）"><a href="#更换npm源（可选）" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+<h5 id="更换npm源（可选）"><a href="#更换npm源（可选）" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm config set registry http://registry.npmmirror.com</span><br></pre></td></tr></table></figure>
 <h5 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
 <h5 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h5><p>编辑<code>Makefile</code>，修改<code>frida_version</code>为frida安装版本</p>
 <h5 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo make</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
@@ -264,7 +264,7 @@
 <p>安装目标：<code>Radare2 5.4.2</code>、<code>r2frida 5.4.4</code></p>
 <h2 id="准备-1"><a href="#准备-1" class="headerlink" title="准备"></a>准备</h2><h3 id="radare2-1"><a href="#radare2-1" class="headerlink" title="radare2"></a>radare2</h3><p>前往<a target="_blank" rel="noopener" href="https://github.com/radareorg/radare2/releases">Releases · radareorg/radare2</a>下载<code>radare2-5.4.2-w64.zip</code>，解压到任意目录。<br>将<code>..\radare2\bin</code>目录添加到<code>PATH</code>环境变量后，执行<code>r2 -v</code>查看版本号</p>
 <h3 id="r2frida-1"><a href="#r2frida-1" class="headerlink" title="r2frida"></a>r2frida</h3><p>可直接到<a target="_blank" rel="noopener" href="https://github.com/nowsecure/r2frida/releases">Release页</a>下载，以下是自行编译流程</p>
-<h4 id="更换npm源（可选）-1"><a href="#更换npm源（可选）-1" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm config set registry http://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+<h4 id="更换npm源（可选）-1"><a href="#更换npm源（可选）-1" class="headerlink" title="更换npm源（可选）"></a>更换npm源（可选）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm config set registry http://registry.npmmirror.com</span><br></pre></td></tr></table></figure>
 <h4 id="克隆仓库-1"><a href="#克隆仓库-1" class="headerlink" title="克隆仓库"></a>克隆仓库</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/nowsecure/r2frida</span><br></pre></td></tr></table></figure>
 <h4 id="修改-1"><a href="#修改-1" class="headerlink" title="修改"></a>修改</h4><p>编辑<code>build.bat</code>，修改<code>frida_version</code>为frida安装版本，修改<code>R2_BASE</code>为<code>radare2</code>安装目录（不需要<code>bin</code>）</p>
 <p>将<code>..\radare2\include\libr\r_cons.h</code>以<code>UTF-8 with BOM</code>编码重新保存（防止编译出错）</p>
@@ -408,7 +408,7 @@
     <img class="site-author-image" itemprop="image" alt="Xhy"
       src="/assets/img/avatar.jpg">
   <p class="site-author-name" itemprop="name">Xhy</p>
-  <div class="site-description" itemprop="description">Blog of XhyEax</div>
+  <div class="site-description" itemprop="description">南冥有熊也 (XhyEax)</div>
 </div>
 <div class="site-state-wrap motion-element">
   <nav class="site-state">
@@ -467,7 +467,7 @@
 <div class="copyright">
   
   &copy; 2018 – 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
