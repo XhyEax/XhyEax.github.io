@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="概述在Linux系统中，需要对文件所在目录有读写权限和可执行权限，才可以删除文件。读写权限很好理解，因为需要读取和修改文件夹内容信息。而可执行权限感觉有点奇怪，谷歌+分析内核源码，得到答案。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为什么Linux删除文件需要文件夹的可执行权限">
+<meta property="og:url" content="https://blog.xhyeax.com/2021/08/25/why-linux-rm-dirfile-need-x/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="概述在Linux系统中，需要对文件所在目录有读写权限和可执行权限，才可以删除文件。读写权限很好理解，因为需要读取和修改文件夹内容信息。而可执行权限感觉有点奇怪，谷歌+分析内核源码，得到答案。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-08-25T03:01:13.000Z">
+<meta property="article:modified_time" content="2025-06-07T10:33:25.809Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="Kernel">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="源码分析">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2021/08/25/why-linux-rm-dirfile-need-x/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>为什么Linux删除文件需要文件夹的可执行权限 | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/08/25/why-linux-rm-dirfile-need-x/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="南冥有熊也 (XhyEax)">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          为什么Linux删除文件需要文件夹的可执行权限
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-08-25 11:01:13" itemprop="dateCreated datePublished" datetime="2021-08-25T11:01:13+08:00">2021-08-25</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在Linux系统中，需要对文件所在目录有读写权限和可执行权限，才可以删除文件。读写权限很好理解，因为需要读取和修改文件夹内容信息。而可执行权限感觉有点奇怪，谷歌+分析内核源码，得到答案。</p>
+<span id="more"></span>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>注意：需要使用普通用户进行以下操作</p>
+<p>首先使用<code>mkdir</code>创建一个目录，查看其权限，为<code>drwxr-xr-x</code>(755)<br>然后在该目录下创建文件，查看权限为<code>-rw-r--r--</code>(644)<br>可以看到文件夹和文件的默认权限是不同的，文件夹具有可执行权限</p>
+<p>使用chmod命令设置文件夹权限为600，使用<code>ls</code>命令列出文件，或者<code>rm</code>直接删除文件，都提示权限不足。（要删除的话首先要列出文件，合理）</p>
+<p>使用chmod命令设置文件夹权限为100，使用<code>cd</code>命令（通过<code>chdir</code>这一系统调用），正常打开该目录，但无法列出文件。</p>
+<p>由此可知，<code>chdir</code>仅检测可执行权限，不检测读权限。而列出文件则需要读和可执行权限。</p>
+<p>r：列出文件夹下的文件名（其他信息则需要x）<br>x：切换该目录为工作目录</p>
+<h2 id="探究"><a href="#探究" class="headerlink" title="探究"></a>探究</h2><h3 id="为什么需要可执行权限"><a href="#为什么需要可执行权限" class="headerlink" title="为什么需要可执行权限"></a>为什么需要可执行权限</h3><p>见<a target="_blank" rel="noopener" href="https://web.archive.org/web/20150108210426/http://content.hccfl.edu/pollock/aunix1/filepermissions.htm">Unix File and Directory Permissions and Modes</a></p>
+<blockquote>
+<p>Because directories are not used in the same way as regular files, the permissions work slightly (but only slightly) differently.  An attempt to list the files in a directory requires read permission for the directory, but not on the files within.  An attempt to add a file to a directory, delete a file from a directory, or to rename a file, all require write permission for the directory, but (perhaps surprisingly) not for the files within.  Execute permission doesn’t apply to directories (a directory can’t also be a program).  But that permission bit is reused for directories for other purposes.</p>
+</blockquote>
+<blockquote>
+<p>Execute permission is needed on a directory to be able to cd into it (that is, to make some directory your current working directory).</p>
+</blockquote>
+<blockquote>
+<p>Execute is needed on a directory to access the inode information of the files within.  You need this to search a directory to read the inodes of the files within.  For this reason the execute permission on a directory is often called search permission instead.</p>
+</blockquote>
+<blockquote>
+<p>You can think of read and execute on directories this way:  directories are data files that hold two pieces of information for each file within, the file’s name and it’s inode number.  Read permission is needed to access the names of files in a directory.  Execute (a.k.a. search) permission is needed to access the inodes of files in a directory, if you already know the file’s name.</p>
+</blockquote>
+<p>文件夹的可执行权限被用于chdir，也用于访问目录内文件的inode信息（因此对于文件夹而言，可执行权限通常被称为搜索权限）</p>
+<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><h4 id="rm源码"><a href="#rm源码" class="headerlink" title="rm源码"></a>rm源码</h4><p><code>rm</code>是<a target="_blank" rel="noopener" href="https://www.gnu.org/software/coreutils/coreutils.html">GNU coreutils</a>里的一个命令，源码见：<br><a target="_blank" rel="noopener" href="https://github.com/coreutils/coreutils/blob/00ea4bacf6063ccc125209d5186f8f2382c6f0d4/src/remove.c">remove.c</a><br>最终调用<code>excise</code>函数删除文件</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Remove the file system object specified by ENT.  IS_DIR specifies</span></span><br><span class="line"><span class="comment">   whether it is expected to be a directory or non-directory.</span></span><br><span class="line"><span class="comment">   Return RM_OK upon success, else RM_ERROR.  */</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">enum</span> RM_status</span></span><br><span class="line"><span class="function"><span class="title">excise</span> <span class="params">(FTS *fts, FTSENT *ent, struct rm_options <span class="keyword">const</span> *x, <span class="keyword">bool</span> is_dir)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> flag = is_dir ? AT_REMOVEDIR : <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">unlinkat</span> (fts-&gt;fts_cwd_fd, ent-&gt;fts_accpath, flag) == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> (x-&gt;verbose)</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="built_in">printf</span> ((is_dir</span><br><span class="line">                   ? _(<span class="string">&quot;removed directory %s\n&quot;</span>)</span><br><span class="line">                   : _(<span class="string">&quot;removed %s\n&quot;</span>)), <span class="built_in">quoteaf</span> (ent-&gt;fts_path));</span><br><span class="line">        &#125;</span><br><span class="line">      <span class="keyword">return</span> RM_OK;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* The unlinkat from kernels like linux-2.6.32 reports EROFS even for</span></span><br><span class="line"><span class="comment">     nonexistent files.  When the file is indeed missing, map that to ENOENT,</span></span><br><span class="line"><span class="comment">     so that rm -f ignores it, as required.  Even without -f, this is useful</span></span><br><span class="line"><span class="comment">     because it makes rm print the more precise diagnostic.  */</span></span><br><span class="line">  <span class="keyword">if</span> (errno == EROFS)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">st</span>;</span></span><br><span class="line">      <span class="keyword">if</span> ( ! (<span class="built_in">lstatat</span> (fts-&gt;fts_cwd_fd, ent-&gt;fts_accpath, &amp;st)</span><br><span class="line">                       &amp;&amp; errno == ENOENT))</span><br><span class="line">        errno = EROFS;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">ignorable_missing</span> (x, errno))</span><br><span class="line">    <span class="keyword">return</span> RM_OK;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* When failing to rmdir an unreadable directory, we see errno values</span></span><br><span class="line"><span class="comment">     like EISDIR or ENOTDIR (or, on Solaris 10, EEXIST), but they would be</span></span><br><span class="line"><span class="comment">     meaningless in a diagnostic.  When that happens and the errno value</span></span><br><span class="line"><span class="comment">     from the failed open is EPERM or EACCES, use the earlier, more</span></span><br><span class="line"><span class="comment">     descriptive errno value.  */</span></span><br><span class="line">  <span class="keyword">if</span> (ent-&gt;fts_info == FTS_DNR</span><br><span class="line">      &amp;&amp; (errno == ENOTEMPTY || errno == EISDIR || errno == ENOTDIR</span><br><span class="line">          || errno == EEXIST)</span><br><span class="line">      &amp;&amp; (ent-&gt;fts_errno == EPERM || ent-&gt;fts_errno == EACCES))</span><br><span class="line">    errno = ent-&gt;fts_errno;</span><br><span class="line">  <span class="built_in">error</span> (<span class="number">0</span>, errno, _(<span class="string">&quot;cannot remove %s&quot;</span>), <span class="built_in">quoteaf</span> (ent-&gt;fts_path));</span><br><span class="line">  <span class="built_in">mark_ancestor_dirs</span> (ent);</span><br><span class="line">  <span class="keyword">return</span> RM_ERROR;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到是通过<code>unlinkat</code>系统调用删除文件（也可使用<code>strace</code>跟踪系统调用）</p>
+<h4 id="内核源码"><a href="#内核源码" class="headerlink" title="内核源码"></a>内核源码</h4><p><a target="_blank" rel="noopener" href="https://github.com/torvalds/linux/blob/303392fd5c160822bf778270b28ec5ea50cab2b4/fs/namei.c">fs/namei.c</a></p>
+<p>其中定义了<code>unlinkat</code>和<code>unlink</code>系统调用：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">SYSCALL_DEFINE3</span>(unlinkat, <span class="keyword">int</span>, dfd, <span class="keyword">const</span> <span class="keyword">char</span> __user *, pathname, <span class="keyword">int</span>, flag)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> ((flag &amp; ~AT_REMOVEDIR) != <span class="number">0</span>)</span><br><span class="line">		<span class="keyword">return</span> -EINVAL;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (flag &amp; AT_REMOVEDIR)</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">do_rmdir</span>(dfd, <span class="built_in">getname</span>(pathname));</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">do_unlinkat</span>(dfd, <span class="built_in">getname</span>(pathname));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">SYSCALL_DEFINE1</span>(unlink, <span class="keyword">const</span> <span class="keyword">char</span> __user *, pathname)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">do_unlinkat</span>(AT_FDCWD, <span class="built_in">getname</span>(pathname));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>删除文件时，是调用<code>do_unlinkat</code>函数，跟踪内部第一个函数<code>filename_parentat</code>的调用链：<code>path_parentat</code>-<code>link_path_walk</code>-<code>may_lookup</code>-<code>inode_permission</code></p>
+<p>调用<code>inode_permission</code>时传入了<code>MAY_EXEC</code>，如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keyword">int</span> <span class="title">may_lookup</span><span class="params">(struct user_namespace *mnt_userns,</span></span></span><br><span class="line"><span class="params"><span class="function">			     struct nameidata *nd)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (nd-&gt;flags &amp; LOOKUP_RCU) &#123;</span><br><span class="line">		<span class="keyword">int</span> err = <span class="built_in">inode_permission</span>(mnt_userns, nd-&gt;inode, MAY_EXEC|MAY_NOT_BLOCK);</span><br><span class="line">		<span class="keyword">if</span> (err != -ECHILD || !<span class="built_in">try_to_unlazy</span>(nd))</span><br><span class="line">			<span class="keyword">return</span> err;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">inode_permission</span>(mnt_userns, nd-&gt;inode, MAY_EXEC);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>MAY_EXEC</code>定义于<a target="_blank" rel="noopener" href="https://github.com/torvalds/linux/blob/79160a603bdb51916226caf4a6616cc4e1c58a58/include/linux/fs.h">include/linux/fs.h</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAY_EXEC		0x00000001</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAY_WRITE		0x00000002</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAY_READ		0x00000004</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAY_APPEND		0x00000008</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAY_ACCESS		0x00000010</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAY_OPEN		0x00000020</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAY_CHDIR		0x00000040</span></span><br><span class="line"><span class="comment">/* called from RCU mode, don&#x27;t block */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAY_NOT_BLOCK		0x00000080</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到是通过调用<code>inode_permission</code>函数，对可执行权限进行判断，代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">inode_permission</span><span class="params">(struct user_namespace *mnt_userns,</span></span></span><br><span class="line"><span class="params"><span class="function">		     struct inode *inode, <span class="keyword">int</span> mask)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> retval;</span><br><span class="line"></span><br><span class="line">	retval = <span class="built_in">sb_permission</span>(inode-&gt;i_sb, inode, mask);</span><br><span class="line">	<span class="keyword">if</span> (retval)</span><br><span class="line">		<span class="keyword">return</span> retval;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (<span class="built_in">unlikely</span>(mask &amp; MAY_WRITE)) &#123;</span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * Nobody gets write access to an immutable file.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">IS_IMMUTABLE</span>(inode))</span><br><span class="line">			<span class="keyword">return</span> -EPERM;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * Updating mtime will likely cause i_uid and i_gid to be</span></span><br><span class="line"><span class="comment">		 * written back improperly if their true value is unknown</span></span><br><span class="line"><span class="comment">		 * to the vfs.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">HAS_UNMAPPED_ID</span>(mnt_userns, inode))</span><br><span class="line">			<span class="keyword">return</span> -EACCES;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	retval = <span class="built_in">do_inode_permission</span>(mnt_userns, inode, mask);</span><br><span class="line">	<span class="keyword">if</span> (retval)</span><br><span class="line">		<span class="keyword">return</span> retval;</span><br><span class="line"></span><br><span class="line">	retval = <span class="built_in">devcgroup_inode_permission</span>(inode, mask);</span><br><span class="line">	<span class="keyword">if</span> (retval)</span><br><span class="line">		<span class="keyword">return</span> retval;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">security_inode_permission</span>(inode, mask);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">EXPORT_SYMBOL</span>(inode_permission);</span><br></pre></td></tr></table></figure>
+<p>查看<code>do_inode_permission</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keyword">int</span> <span class="title">do_inode_permission</span><span class="params">(struct user_namespace *mnt_userns,</span></span></span><br><span class="line"><span class="params"><span class="function">				      struct inode *inode, <span class="keyword">int</span> mask)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (<span class="built_in">unlikely</span>(!(inode-&gt;i_opflags &amp; IOP_FASTPERM))) &#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">likely</span>(inode-&gt;i_op-&gt;permission))</span><br><span class="line">			<span class="keyword">return</span> inode-&gt;i_op-&gt;<span class="built_in">permission</span>(mnt_userns, inode, mask);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* This gets set once for the inode lifetime */</span></span><br><span class="line">		<span class="built_in">spin_lock</span>(&amp;inode-&gt;i_lock);</span><br><span class="line">		inode-&gt;i_opflags |= IOP_FASTPERM;</span><br><span class="line">		<span class="built_in">spin_unlock</span>(&amp;inode-&gt;i_lock);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">generic_permission</span>(mnt_userns, inode, mask);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最终调用<code>generic_permission</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">generic_permission</span><span class="params">(struct user_namespace *mnt_userns, struct inode *inode,</span></span></span><br><span class="line"><span class="params"><span class="function">		       <span class="keyword">int</span> mask)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> ret;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Do the basic permission checks.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	ret = <span class="built_in">acl_permission_check</span>(mnt_userns, inode, mask);</span><br><span class="line">	<span class="keyword">if</span> (ret != -EACCES)</span><br><span class="line">		<span class="keyword">return</span> ret;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (<span class="built_in">S_ISDIR</span>(inode-&gt;i_mode)) &#123;</span><br><span class="line">		<span class="comment">/* DACs are overridable for directories */</span></span><br><span class="line">		<span class="keyword">if</span> (!(mask &amp; MAY_WRITE))</span><br><span class="line">			<span class="keyword">if</span> (<span class="built_in">capable_wrt_inode_uidgid</span>(mnt_userns, inode,</span><br><span class="line">						     CAP_DAC_READ_SEARCH))</span><br><span class="line">				<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">capable_wrt_inode_uidgid</span>(mnt_userns, inode,</span><br><span class="line">					     CAP_DAC_OVERRIDE))</span><br><span class="line">			<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">return</span> -EACCES;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Searching includes executable on directories, else just read.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	mask &amp;= MAY_READ | MAY_WRITE | MAY_EXEC;</span><br><span class="line">	<span class="keyword">if</span> (mask == MAY_READ)</span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">capable_wrt_inode_uidgid</span>(mnt_userns, inode,</span><br><span class="line">					     CAP_DAC_READ_SEARCH))</span><br><span class="line">			<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Read/write DACs are always overridable.</span></span><br><span class="line"><span class="comment">	 * Executable DACs are overridable when there is</span></span><br><span class="line"><span class="comment">	 * at least one exec bit set.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">if</span> (!(mask &amp; MAY_EXEC) || (inode-&gt;i_mode &amp; S_IXUGO))</span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">capable_wrt_inode_uidgid</span>(mnt_userns, inode,</span><br><span class="line">					     CAP_DAC_OVERRIDE))</span><br><span class="line">			<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> -EACCES;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">EXPORT_SYMBOL</span>(generic_permission);</span><br></pre></td></tr></table></figure>
+<p>看到注释<code>Searching includes executable on directories, else just read.</code></p>
+<p>（具体是不是这里检测，并不是非常确定，还有待进一步调试内核）</p>
+<p>PS：<code>capable_wrt_inode_uidgid</code>函数用于判断用户是否具有忽略DAC访问限制的能力，详见<a target="_blank" rel="noopener" href="https://www.cnblogs.com/iamfy/archive/2012/09/20/2694977.html">[转载] Linux的capability深入分析</a></p>
+<blockquote>
+<p>CAP_DAC_OVERRIDE 1 忽略对文件的所有DAC访问限制<br>CAP_DAC_READ_SEARCH 2 忽略所有对读、搜索操作的限制 </p>
+</blockquote>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://askubuntu.com/questions/862289/difference-between-executable-directory-vs-executable-files">Difference between executable directory vs executable files</a><br><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/54622606/what-permissions-are-needed-to-delete-a-file-in-unix">What permissions are needed to delete a file in unix?</a><br><a target="_blank" rel="noopener" href="https://www.linuxquestions.org/questions/linux-software-2/where-can-i-get-the-source-code-of-rm-command-754249/">Where can i get the source code of rm command</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lwyeric/p/13603959.html">Linux删除文件过程解析</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/iamfy/archive/2012/09/20/2694977.html">[转载] Linux的capability深入分析</a></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Kernel/" rel="tag"># Kernel</a>
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="tag"># 源码分析</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/08/24/ndk-warning-dt-flags/" rel="prev" title="解决WARNING linker unsupported flags DT_FLAGS_1">
+      <i class="fa fa-chevron-left"></i> 解决WARNING linker unsupported flags DT_FLAGS_1
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/08/30/android-arm-plt-hook/" rel="next" title="简易Android ARM&ARM64 GOT Hook (二)">
+      简易Android ARM&ARM64 GOT Hook (二) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95"><span class="nav-number">2.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A2%E7%A9%B6"><span class="nav-number">3.</span> <span class="nav-text">探究</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%9D%83%E9%99%90"><span class="nav-number">3.1.</span> <span class="nav-text">为什么需要可执行权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">3.2.</span> <span class="nav-text">源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#rm%E6%BA%90%E7%A0%81"><span class="nav-number">3.2.1.</span> <span class="nav-text">rm源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E6%BA%90%E7%A0%81"><span class="nav-number">3.2.2.</span> <span class="nav-text">内核源码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">南冥有熊也 (XhyEax)</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://xhyeax.cn/" title="生活博客 → https:&#x2F;&#x2F;xhyeax.cn" rel="noopener" target="_blank"><i class="fa fa-user fa-fw"></i>生活博客</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.cyyself.name/" title="https:&#x2F;&#x2F;blog.cyyself.name" rel="noopener" target="_blank">cyyself's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

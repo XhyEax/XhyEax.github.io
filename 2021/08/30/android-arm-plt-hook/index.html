@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="更新ARM64 GOT Hook中对.rel.plta的处理 概述前文简易Android ARM&amp;ARM64 GOT Hook (一)，基于链接视图，解析section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。 本文基于ELF的执行视图(Execution View)，讨论Android ARM&amp;ARM64架构的GOT&#x2F;PLT Hook（仍以Hook公共库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简易Android ARM&amp;ARM64 GOT Hook (二)">
+<meta property="og:url" content="https://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="更新ARM64 GOT Hook中对.rel.plta的处理 概述前文简易Android ARM&amp;ARM64 GOT Hook (一)，基于链接视图，解析section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。 本文基于ELF的执行视图(Execution View)，讨论Android ARM&amp;ARM64架构的GOT&#x2F;PLT Hook（仍以Hook公共库">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-elf-header.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-ph-dynamic.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-relplt.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-reldyn.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-dynsym-str.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-hash.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-log.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-plt-hook-log.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-so-plt-hook-log.png">
+<meta property="article:published_time" content="2021-08-30T02:56:25.000Z">
+<meta property="article:modified_time" content="2025-06-07T10:33:25.778Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="Android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-elf-header.png">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>简易Android ARM&ARM64 GOT Hook (二) | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="南冥有熊也 (XhyEax)">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          简易Android ARM&ARM64 GOT Hook (二)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-08-30 10:56:25" itemprop="dateCreated datePublished" datetime="2021-08-30T10:56:25+08:00">2021-08-30</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p><a href="http://blog.xhyeax.com/2022/06/08/android-arm64-got-hook-rel-plta/">ARM64 GOT Hook中对.rel.plta的处理</a></p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>前文<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">简易Android ARM&amp;ARM64 GOT Hook (一)</a>，基于链接视图，解析section查找GOT表偏移值，无法应对section被处理过的情况（如加固）。</p>
+<p>本文基于ELF的执行视图(<code>Execution View</code>)，讨论<code>Android</code> <code>ARM&amp;ARM64</code>架构的<code>GOT/PLT Hook</code>（仍以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例）。</p>
+<span id="more"></span>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><ol>
+<li>通过maps文件获取模块基址，解析内存中的ELF。</li>
+<li>查找并解析<code>.dynamic</code>段，得到<code>.rel.plt</code>、<code>.rel.dyn</code>、<code>.dynsym</code>、<code>.dynstr</code>和<code>.hash</code>表。</li>
+<li>通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找导入符号，再遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，得到函数偏移。</li>
+<li>基址加上偏移得到内存地址，修改函数地址即可。</li>
+</ol>
+<p>注入方式及编译环境同<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">前文</a>，不再赘述。</p>
+<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><h3 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 基于执行视图解析ELF</span></span><br><span class="line"><span class="function"><span class="keyword">uintptr_t</span> <span class="title">hackBySegment</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *module_name, <span class="keyword">const</span> <span class="keyword">char</span> *target_lib, <span class="keyword">const</span> <span class="keyword">char</span> *target_func,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">uintptr_t</span> replace)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">LOGE</span>(<span class="string">&quot;hackBySegment start.\n&quot;</span>);</span><br><span class="line">    <span class="comment">// 获取目标函数地址</span></span><br><span class="line">    <span class="keyword">void</span> *handle = <span class="built_in">dlopen</span>(target_lib, RTLD_LAZY);</span><br><span class="line">    <span class="keyword">auto</span> ori = (<span class="keyword">uintptr_t</span>) <span class="built_in">dlsym</span>(handle, target_func);</span><br><span class="line">    <span class="built_in">LOGE</span>(<span class="string">&quot;ori addr: %&quot;</span> SCNxPTR <span class="string">&quot;\n&quot;</span>, ori);</span><br><span class="line">    <span class="comment">// 获取符号地址 (解析Segment)</span></span><br><span class="line">    <span class="keyword">uintptr_t</span> replaceAddr = <span class="built_in">getSymAddrDynamic</span>(module_name, target_func);</span><br><span class="line">    <span class="comment">// 替换地址</span></span><br><span class="line">    <span class="built_in">replaceFunction</span>(replaceAddr, replace, ori);</span><br><span class="line">    <span class="keyword">return</span> ori;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整代码见<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a></p>
+<h3 id="获取-dynamic段"><a href="#获取-dynamic段" class="headerlink" title="获取.dynamic段"></a>获取.dynamic段</h3><p>解析maps文件获取到模块地址后，基于执行视图解析ELF。</p>
+<p>从<code>elf header</code>中得到<code>program header table</code>的起始偏移（<code>e_phoff</code>）、<code>program header</code>大小(<code>e_phentsize</code>)和总<code>program header</code>个数（<code>e_phnum</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-elf-header.png"></p>
+<p>遍历<code>program header table</code>，查找<code>p_type</code>为<code>PT_DYNAMIC</code>的<code>program header</code>，得到<code>.dynamic</code>段在内存中的偏移值（<code>p_vaddr</code>）和大小（<code>p_memsz</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-ph-dynamic.png"></p>
+<p>将模块基址与<code>.dynamic</code>偏移值相加，得到<code>.dynamic</code>段的起始地址。</p>
+<h3 id="解析-dynamic段"><a href="#解析-dynamic段" class="headerlink" title="解析.dynamic段"></a>解析.dynamic段</h3><p>遍历<code>.dynamic</code>段，根据<code>d_tag</code>解析不同的表。<br><code>.rel.plt</code>：<code>DT_JMPREL</code>（大小储存在<code>DT_PLTRELSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-relplt.png"><br><code>.rel.dyn</code>：<code>DT_REL</code>（大小储存在<code>DT_RELSZ</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-reldyn.png"><br><code>.dynsym</code>：<code>DT_SYMTAB</code><br><code>.dynstr</code>：<code>DT_STRTAB</code><br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-dynsym-str.png"><br><code>.hash</code>：<code>DT_HASH</code><br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-hash.png"></p>
+<p>注：解析<code>.dynamic</code>的ELF模板来自<a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-948942-1-1.html">Android7.0以上命名空间详解(dlopen限制)附上010editor模块</a></p>
+<h3 id="查找符号"><a href="#查找符号" class="headerlink" title="查找符号"></a>查找符号</h3><p>通过<code>.hash -&gt; .dynsym -&gt; .dynstr</code>查找符号。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ELFW</span>(Sym) *target = <span class="literal">nullptr</span>;</span><br><span class="line"><span class="keyword">uint32_t</span> hash = <span class="built_in">elf_sysv_hash</span>((<span class="keyword">const</span> <span class="keyword">uint8_t</span> *) symName);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">uint32_t</span> i = buckets[hash % buckets_cnt];</span><br><span class="line">        <span class="number">0</span> != i; i = chains[i]) &#123;</span><br><span class="line">    <span class="built_in">ELFW</span>(Sym) *sym = dynsym + i;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> type = <span class="built_in">ELF_ST_TYPE</span>(sym-&gt;st_info);</span><br><span class="line">    <span class="keyword">if</span> (STT_FUNC != type &amp;&amp; STT_GNU_IFUNC != type &amp;&amp; STT_NOTYPE != type)</span><br><span class="line">        <span class="keyword">continue</span>; <span class="comment">// find function only, allow no-type</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> == <span class="built_in">strcmp</span>(dynstr + sym-&gt;st_name, symName)) &#123;</span><br><span class="line">        target = sym;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体操作为：</p>
+<ol>
+<li><p>计算符号名称的哈希值，然后从<code>.hash</code>获取符号在<code>.dynsym</code>中的索引。</p>
+<blockquote>
+<p>接受符号名称的散列函数会返回一个值，用于计算 bucket 索引。因此，如果散列函数为某个名称返回值 x，则 bucket [x% nbucket] 将会计算出索引 y。此索引为符号表和链表的索引。如果符号表项不是需要的名称，则 chain[y] 将使用相同的散列值计算出符号表的下一项。</p>
+</blockquote>
+</li>
+<li><p>通过索引从<code>.dynsym</code>获取符号，根据符号类型和符号名（通过<code>st_name</code>从<code>.dynstr</code>获取字符串），判断与目标函数是否匹配。</p>
+</li>
+</ol>
+<p>PS：也可直接遍历<code>.dynsym</code>并比对字符串，时间复杂度更高</p>
+<blockquote>
+<p>.hash -&gt; .dynsym -&gt; .dynstr，时间复杂度：O(x) + O(1) + O(1)<br>.dynsym -&gt; .dynstr，时间复杂度：O(n) + O(1)</p>
+</blockquote>
+<h3 id="计算内存地址"><a href="#计算内存地址" class="headerlink" title="计算内存地址"></a>计算内存地址</h3><p>遍历<code>.rel.plt</code>和<code>.rel.dyn</code>，比对符号和重定位类型，获取函数偏移值（<code>r_offset</code>）。与模块基址相加得到内存地址。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; rel_plt_cnt; i++) &#123;</span><br><span class="line">        <span class="built_in">ELFW</span>(Rel) &amp;rel = rel_plt[i];</span><br><span class="line">        <span class="keyword">if</span> (&amp;(dynsym[<span class="built_in">ELF_R_SYM</span>(rel.r_info)]) == target &amp;&amp;</span><br><span class="line">            <span class="built_in">ELF_R_TYPE</span>(rel.r_info) == ELF_R_JUMP_SLOT) &#123;</span><br><span class="line"><span class="comment">//            LOGI(&quot;target r_offset: %lX&quot;, rel.r_offset);</span></span><br><span class="line">            <span class="keyword">return</span> moduleBase + rel.r_offset;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; rel_dyn_cnt; i++) &#123;</span><br><span class="line">        <span class="built_in">ELFW</span>(Rel) &amp;rel = rel_dyn[i];</span><br><span class="line">        <span class="keyword">if</span> (&amp;(dynsym[<span class="built_in">ELF_R_SYM</span>(rel.r_info)]) == target &amp;&amp;</span><br><span class="line">            (<span class="built_in">ELF_R_TYPE</span>(rel.r_info) == ELF_R_ABS</span><br><span class="line">             || <span class="built_in">ELF_R_TYPE</span>(rel.r_info) == ELF_R_GLOB_DAT)) &#123;</span><br><span class="line"><span class="comment">//            LOGI(&quot;target r_offset: %lX&quot;, rel.r_offset);</span></span><br><span class="line">            <span class="keyword">return</span> moduleBase + rel.r_offset;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后替换该内存地址对应的函数即可，同<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">前文</a>。</p>
+<h3 id="适配ARM64"><a href="#适配ARM64" class="headerlink" title="适配ARM64"></a>适配ARM64</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__LP64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELFW(what) Elf64_ ## what</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_TYPE(what) ELF64_R_TYPE(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_SYM(what) ELF64_R_SYM(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELFW(what) Elf32_ ## what</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_TYPE(what) ELF32_R_TYPE(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_SYM(what) ELF32_R_SYM(what)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__arm__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_JUMP_SLOT R_ARM_JUMP_SLOT     <span class="comment">//.rel.plt</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_GLOB_DAT  R_ARM_GLOB_DAT      <span class="comment">//.rel.dyn</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_ABS       R_ARM_ABS32         <span class="comment">//.rel.dyn</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">elif</span> defined(__aarch64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_JUMP_SLOT R_AARCH64_JUMP_SLOT</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_GLOB_DAT  R_AARCH64_GLOB_DAT</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELF_R_ABS       R_AARCH64_ABS64</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>注意：除了宏定义不同，<code>ARM64</code>下使用的是带有<code>addend</code>的<code>.rela</code>表，需要做进一步适配。适配过程见<a href="http://blog.xhyeax.com/2022/06/08/android-arm64-got-hook-rel-plta/">ARM64 GOT Hook中对.rel.plta的处理</a>。</p>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>同<a href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">前文</a>，替换动态库即可测试。</p>
+<h2 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h2><h3 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h3><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-plt-hook-log.png"></p>
+<h3 id="ARM64"><a href="#ARM64" class="headerlink" title="ARM64"></a>ARM64</h3><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-plt-hook-log.png"></p>
+<h2 id="作为动态链接库"><a href="#作为动态链接库" class="headerlink" title="作为动态链接库"></a>作为动态链接库</h2><p>详见<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGOTHook">项目</a>的<code>vitcim_app</code>模块。</p>
+<p>通过配置<code>CMakeLists.txt</code>将<code>libinject.so</code>作为动态库链接，在<code>JNI_OnLoad</code>调用<code>hackBySegment</code>替换<code>getpid</code>函数。</p>
+<p>日志如下：<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-so-plt-hook-log.png"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>主要学习了<code>.dynamic</code>段的解析和导入符号的查找方式。虽然实现了基于执行视图解析ELF，但仍存在许多不足。不过这次是真的短期内不会再改动了。（<strong>不要重复造轮子</strong>）</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/L173864930/article/details/40507359">基于Android的ELF PLT/GOT符号和重定向过程ELF Hook实现</a><br><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-267842.htm">ELF文件格式与got表hook简单实现</a><br><a target="_blank" rel="noopener" href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-54839.html">重定位节 - 链接程序和库指南</a><br><a target="_blank" rel="noopener" href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-79797.html">符号表节 - 链接程序和库指南</a><br><a target="_blank" rel="noopener" href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-48031.html">散列表节 - 链接程序和库指南</a><br><a target="_blank" rel="noopener" href="https://docs.oracle.com/cd/E26926_01/html/E25910/chapter6-42444.html">动态节 - 链接程序和库指南</a><br><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-255670.htm">ELF文件结构详解</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/269441842">PLT HOOK</a><br><a target="_blank" rel="noopener" href="https://github.com/bytedance/bhook">bhook</a><br><a target="_blank" rel="noopener" href="https://github.com/iqiyi/xhook">xhook</a></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"># Android</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/08/25/why-linux-rm-dirfile-need-x/" rel="prev" title="为什么Linux删除文件需要文件夹的可执行权限">
+      <i class="fa fa-chevron-left"></i> 为什么Linux删除文件需要文件夹的可执行权限
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/09/01/gradle-module-build-order-error/" rel="next" title="Gradle app模块构建顺序探究">
+      Gradle app模块构建顺序探究 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0"><span class="nav-number">1.</span> <span class="nav-text">更新</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">3.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.</span> <span class="nav-text">具体实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81"><span class="nav-number">4.1.</span> <span class="nav-text">核心代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96-dynamic%E6%AE%B5"><span class="nav-number">4.2.</span> <span class="nav-text">获取.dynamic段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E6%9E%90-dynamic%E6%AE%B5"><span class="nav-number">4.3.</span> <span class="nav-text">解析.dynamic段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E6%89%BE%E7%AC%A6%E5%8F%B7"><span class="nav-number">4.4.</span> <span class="nav-text">查找符号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E5%86%85%E5%AD%98%E5%9C%B0%E5%9D%80"><span class="nav-number">4.5.</span> <span class="nav-text">计算内存地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%82%E9%85%8DARM64"><span class="nav-number">4.6.</span> <span class="nav-text">适配ARM64</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95"><span class="nav-number">5.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%BF%97"><span class="nav-number">6.</span> <span class="nav-text">日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ARM"><span class="nav-number">6.1.</span> <span class="nav-text">ARM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ARM64"><span class="nav-number">6.2.</span> <span class="nav-text">ARM64</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%9C%E4%B8%BA%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93"><span class="nav-number">7.</span> <span class="nav-text">作为动态链接库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">9.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">南冥有熊也 (XhyEax)</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://xhyeax.cn/" title="生活博客 → https:&#x2F;&#x2F;xhyeax.cn" rel="noopener" target="_blank"><i class="fa fa-user fa-fw"></i>生活博客</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.cyyself.name/" title="https:&#x2F;&#x2F;blog.cyyself.name" rel="noopener" target="_blank">cyyself's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

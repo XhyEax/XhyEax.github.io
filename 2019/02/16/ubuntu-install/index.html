@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="第一步，分区Linux只有分区挂载目录的概念，所以需要在Windows下分出一块较大的未分配空间，不需要格式化 下载镜像并写入U盘下载完镜像以后，使用软碟通将镜像写入U盘，然后重启。PS: 如果U盘本身就支持efi启动的话，可以直接把镜像解压到U盘开机后把握时机进入Boot Menu，选择从USB启动。注意：需要在BIOS中关闭安全启动（Secure Boot）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ubuntu18.04安装记录(与Win10双系统共存)">
+<meta property="og:url" content="https://blog.xhyeax.com/2019/02/16/ubuntu-install/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="第一步，分区Linux只有分区挂载目录的概念，所以需要在Windows下分出一块较大的未分配空间，不需要格式化 下载镜像并写入U盘下载完镜像以后，使用软碟通将镜像写入U盘，然后重启。PS: 如果U盘本身就支持efi启动的话，可以直接把镜像解压到U盘开机后把握时机进入Boot Menu，选择从USB启动。注意：需要在BIOS中关闭安全启动（Secure Boot）">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-02-16T06:37:23.606Z">
+<meta property="article:modified_time" content="2025-06-07T10:33:25.806Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2019/02/16/ubuntu-install/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Ubuntu18.04安装记录(与Win10双系统共存) | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/16/ubuntu-install/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="南冥有熊也 (XhyEax)">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Ubuntu18.04安装记录(与Win10双系统共存)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-02-16 14:37:23" itemprop="dateCreated datePublished" datetime="2019-02-16T14:37:23+08:00">2019-02-16</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="第一步，分区"><a href="#第一步，分区" class="headerlink" title="第一步，分区"></a>第一步，分区</h2><p>Linux只有分区挂载目录的概念，所以需要在Windows下分出一块较大的未分配空间，不需要格式化</p>
+<h2 id="下载镜像并写入U盘"><a href="#下载镜像并写入U盘" class="headerlink" title="下载镜像并写入U盘"></a>下载镜像并写入U盘</h2><p>下载完镜像以后，使用软碟通将镜像写入U盘，然后重启。<br>PS: 如果U盘本身就支持efi启动的话，可以直接把镜像解压到U盘<br>开机后把握时机进入Boot Menu，选择从USB启动。<br>注意：需要在BIOS中关闭安全启动（Secure Boot）</p>
+<span id="more"></span>
+<h2 id="安装Ubuntu"><a href="#安装Ubuntu" class="headerlink" title="安装Ubuntu"></a>安装Ubuntu</h2><h3 id="进入安装程序"><a href="#进入安装程序" class="headerlink" title="进入安装程序"></a>进入安装程序</h3><p>正常情况下，启动后会出现grub引导菜单，选择第二个即可进入Ubuntu安装程序。<br>然而，由于我的显卡是Nvidia的，无法进入安装界面。</p>
+<h4 id="英伟达显卡解决方案"><a href="#英伟达显卡解决方案" class="headerlink" title="英伟达显卡解决方案"></a>英伟达显卡解决方案</h4><p>在grub菜单画面时，按<code>e</code>编辑开机指令，<code>quite splash</code>改为<code>nomodeset</code><br>安装完毕重启后，同样方法进入系统，打开终端执行<br><code>sudo gedit /etc/default/grub</code><br>找到<code>quiet splash</code>将其改为<code>nomodeset</code>即可，更新grub后重启<br><code>sudo update-grub</code></p>
+<h3 id="按步骤安装即可"><a href="#按步骤安装即可" class="headerlink" title="按步骤安装即可"></a>按步骤安装即可</h3><p>安装步骤参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/ysy950803/article/details/52643737">亲测UEFI启动模式的电脑安装Win10和Ubuntu双系统</a><br>以下步骤皆来自该博文<br>// 复制开始</p>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项:"></a>注意事项:</h4><p>如果你选择了安装更新和第三方软件，那么一定要记得联网，否则会卡死在最后的进度条上，所以最好不要勾选。另外，不要选择“与其它系统共存”那一项，而选择最后那个“其它选项（创建自己的分区）”。<br>最最最关键的就是分区这一步，这一步直接影响你安装双系统是否成功！找到刚才分割出的未分配空间，点”+“按钮来挂载分区。选择的时候一定要看清楚，一般来说根据大小就能判断，不要手滑把Win所在的空间给格式化掉了。并且，可能会看到一些几十MB或者一百来MB的已用空间，不要去动它们，可能是分区恢复盘之类的：</p>
+<h4 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h4><p>swap和efi建议放在固态盘上</p>
+<p>swap交换空间，这个也就是虚拟内存的地方，选择主分区和空间起始位置。如果你给Ubuntu系统分区容量足够的话，最好是能给到你物理内存的2倍大小，像我8GB内存，就可以给个16GB的空间给它，这个看个人使用情况，太小也不好，太大也没用。（其实我只给了8GB，没什么问题）</p>
+<p>新建 efi系统分区 ， 选中逻辑分区 （这里不是主分区，请勿怀疑，老式的boot挂载才是主分区）和空间起始位置，大小最好不要小于256MB，系统引导文件都会在里面，如果这分区满了可能会带来未知问题。我给的512MB，它的作用和boot引导分区一样，只是引导方式不同。不要按照那些老教程去选boot引导分区，也就是最后你的挂载点里没有“/boot”这一项，否则你就没办法UEFI启动两个系统了。</p>
+<p>挂载“/home” ， 类型为EXT4日志文件系统，选中逻辑分区和空间起始位置，这个相当于你的个人文件夹，类似Windows里的User，如果你是个娱乐向的用户，我建议最好能分配稍微大点，因为你的图片、视频、下载内容基本都在这里面，这些东西可不像在Win上面你想移动就能移动的。<br>总的来说，最好不要低于8GB，我Ubuntu分区的总大小是64GB，这里我给了12GB给home。<br>（这里特别提醒一下，Ubuntu最新发行版不建议强制获取Root权限，因为我已经玩崩过一次。所以你以后很多文档、图片、包括免安装软件等资源不得不直接放在home分支下面。你作为图形界面用户，只对home分支有完全的读写执行权限，其余分支例如usr你只能在终端使用sudo命令来操作文件，不利于存放一些直接解压使用的免安装软件。因此，建议home分支多分配一点空间，32GB最好……）</p>
+<p>挂载“/usr” （也可以不挂，就直接包括在“/”当中），类型为EXT4日志文件系统，选中逻辑分区和空间起始位置，这个相当于你的软件安装位置，Linux下一般来说安装第三方软件你是没办法更改安装目录的，系统都会统一地安装到/usr目录下面，因此你就知道了，这个分区必须要大，我给了32GB。</p>
+<p>最后，挂载“/” ，类型为EXT4日志文件系统，选中逻辑分区和空间起始位置，<br>因为除了home和usr还有很多别的目录，但那些都不是最重要的，“/”就把除了之前你挂载的home和usr外的全部杂项囊括了，大小也不要太小，最好不低于8GB。如果你非要挨个仔细分配空间，那么你需要知道这些各个分区的含义（Linux(ubuntu)分区挂载点介绍）<br>不过就算你把所有目录都自定义分配了空间也必须要给“/”挂载点分配一定的空间。</p>
+<h4 id="重要提示"><a href="#重要提示" class="headerlink" title="重要提示"></a>重要提示</h4><p>分配好各个挂载点后，还有一个至关重要的步骤，那就是选择“安装引导启动器的设备”，默认是错误的，既然我们为Ubuntu分配了efi系统引导分区，那么显然，这里应该把它改成刚刚分配efi引导的那个分区。<br>// 复制结束</p>
+<h4 id="安装完成"><a href="#安装完成" class="headerlink" title="安装完成"></a>安装完成</h4><p>安装成功后，会提示重启（记得拔掉U盘）。</p>
+<h3 id="个人经验"><a href="#个人经验" class="headerlink" title="个人经验"></a>个人经验</h3><p>由于初始分辨率太低了，我分完区以后点击不了下一步= =（使用Tab和方向键也切换不过去）。<br>最后把安装语言设置成了英文，下一步显示出来了。<br>安装过程中可能会黑屏，只是系统关闭了显示器的正常现象，不必惊慌。<br>我的是Ubuntu所有分区都在机械硬盘上，然后重启后还是显示出了windows系统</p>
+<h2 id="其他问题"><a href="#其他问题" class="headerlink" title="其他问题"></a>其他问题</h2><h3 id="未安装驱动，分辨率太低"><a href="#未安装驱动，分辨率太低" class="headerlink" title="未安装驱动，分辨率太低"></a>未安装驱动，分辨率太低</h3><h4 id="临时解决方案"><a href="#临时解决方案" class="headerlink" title="临时解决方案"></a>临时解决方案</h4><p><code>sudo gedit /etc/default/grub</code><br>找到文件中的分辨率相关内容，将其分辨率改为你屏幕的分辨率，例如<code>1920X1080</code><br><code>sudo update-grub</code><br>更新后重启</p>
+<h4 id="安装驱动"><a href="#安装驱动" class="headerlink" title="安装驱动"></a>安装驱动</h4><p>自行搜索自己显卡驱动在Linux下的安装方法（手动滑稽）</p>
+<h2 id="引导界面美化"><a href="#引导界面美化" class="headerlink" title="引导界面美化"></a>引导界面美化</h2><p>可以使用<code>burg</code>替代<code>grub</code>引导界面（似乎是通过修改grub文件实现）<br>也可以直接在<a target="_blank" rel="noopener" href="https://www.gnome-look.org/browse/cat/109/ord/latest/">GRUB Themes </a>上下载自己喜欢的主题，解压后执行<code>install.sh</code>安装即可。<br>安装完成后可以在<code>/boot/grub/themes/</code>中找到新生成的对应主题文件夹<br>如果无效请修改引导文件<code>/etc/default/grub</code><br><code>GRUB_THEME</code>改成自己下载的主题路径</p>
+<h2 id="修改引导顺序及选项"><a href="#修改引导顺序及选项" class="headerlink" title="修改引导顺序及选项"></a>修改引导顺序及选项</h2><h3 id="1-纯命令行方式修改顺序"><a href="#1-纯命令行方式修改顺序" class="headerlink" title="1. 纯命令行方式修改顺序"></a>1. 纯命令行方式修改顺序</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo mv /etc/grub.d/30_os-prober /etc/grub.d/08_os-prober</span><br><span class="line">sudo update-grub</span><br></pre></td></tr></table></figure>
+<p>该命令是将etc文件夹下的grub.d文件夹下的<code>30_os-prober</code>文件改名为<code>08_os-prober</code>。（08可以改为06~09都可以，只要更小）。Ubuntu的启动项相关文件名为“10_….”这样就可以将windows的启动项放在Ubuntu前面，即启动项列表的第一个。由于引导程序默认启动第一个启动项，所以这样就可以先启动windows了。注意修改完后更新一下grub才能生效（即命令sudo update-grub）。</p>
+<h3 id="2-通过修改-boot-grub文件修改名字（简单粗暴）"><a href="#2-通过修改-boot-grub文件修改名字（简单粗暴）" class="headerlink" title="2. 通过修改/boot/grub文件修改名字（简单粗暴）"></a>2. 通过修改/boot/grub文件修改名字（简单粗暴）</h3><p><code>sudo gedit /boot/grub/grub.cfg</code><br>找到对应的选项名字编辑后保存即可，不需要<code>sudo update-grub</code></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_35379989/article/details/78934486">ubuntu安装后出现的问题（安装时分辨率不对/错误界面过大、nvdia显卡无法进入）</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/as371418912/article/details/23452259">Ubuntu和Windows启动项名称、顺序修改</a><br><a target="_blank" rel="noopener" href="https://tianyijian.github.io/2018/04/05/ubuntu-grub-beautify/">Ubuntu grub 引导界面美化</a></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/02/16/ida-call-analysis-fail/" rel="prev" title="IDA不能F5查看伪代码的解决方法(call analysis failed)">
+      <i class="fa fa-chevron-left"></i> IDA不能F5查看伪代码的解决方法(call analysis failed)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/19/52pojie-2019-red-packet/" rel="next" title="2019吾爱破解论坛春节红包四题Writeup">
+      2019吾爱破解论坛春节红包四题Writeup <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%8C%E5%88%86%E5%8C%BA"><span class="nav-number">1.</span> <span class="nav-text">第一步，分区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E9%95%9C%E5%83%8F%E5%B9%B6%E5%86%99%E5%85%A5U%E7%9B%98"><span class="nav-number">2.</span> <span class="nav-text">下载镜像并写入U盘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Ubuntu"><span class="nav-number">3.</span> <span class="nav-text">安装Ubuntu</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E5%85%A5%E5%AE%89%E8%A3%85%E7%A8%8B%E5%BA%8F"><span class="nav-number">3.1.</span> <span class="nav-text">进入安装程序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8B%B1%E4%BC%9F%E8%BE%BE%E6%98%BE%E5%8D%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">3.1.1.</span> <span class="nav-text">英伟达显卡解决方案</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%89%E6%AD%A5%E9%AA%A4%E5%AE%89%E8%A3%85%E5%8D%B3%E5%8F%AF"><span class="nav-number">3.2.</span> <span class="nav-text">按步骤安装即可</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">3.2.1.</span> <span class="nav-text">注意事项:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E5%8C%BA"><span class="nav-number">3.2.2.</span> <span class="nav-text">分区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E8%A6%81%E6%8F%90%E7%A4%BA"><span class="nav-number">3.2.3.</span> <span class="nav-text">重要提示</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E5%AE%8C%E6%88%90"><span class="nav-number">3.2.4.</span> <span class="nav-text">安装完成</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AA%E4%BA%BA%E7%BB%8F%E9%AA%8C"><span class="nav-number">3.3.</span> <span class="nav-text">个人经验</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E9%97%AE%E9%A2%98"><span class="nav-number">4.</span> <span class="nav-text">其他问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AA%E5%AE%89%E8%A3%85%E9%A9%B1%E5%8A%A8%EF%BC%8C%E5%88%86%E8%BE%A8%E7%8E%87%E5%A4%AA%E4%BD%8E"><span class="nav-number">4.1.</span> <span class="nav-text">未安装驱动，分辨率太低</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%B4%E6%97%B6%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">4.1.1.</span> <span class="nav-text">临时解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E9%A9%B1%E5%8A%A8"><span class="nav-number">4.1.2.</span> <span class="nav-text">安装驱动</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E5%AF%BC%E7%95%8C%E9%9D%A2%E7%BE%8E%E5%8C%96"><span class="nav-number">5.</span> <span class="nav-text">引导界面美化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E5%BC%95%E5%AF%BC%E9%A1%BA%E5%BA%8F%E5%8F%8A%E9%80%89%E9%A1%B9"><span class="nav-number">6.</span> <span class="nav-text">修改引导顺序及选项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%BA%AF%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%96%B9%E5%BC%8F%E4%BF%AE%E6%94%B9%E9%A1%BA%E5%BA%8F"><span class="nav-number">6.1.</span> <span class="nav-text">1. 纯命令行方式修改顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9-boot-grub%E6%96%87%E4%BB%B6%E4%BF%AE%E6%94%B9%E5%90%8D%E5%AD%97%EF%BC%88%E7%AE%80%E5%8D%95%E7%B2%97%E6%9A%B4%EF%BC%89"><span class="nav-number">6.2.</span> <span class="nav-text">2. 通过修改&#x2F;boot&#x2F;grub文件修改名字（简单粗暴）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">南冥有熊也 (XhyEax)</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://xhyeax.cn/" title="生活博客 → https:&#x2F;&#x2F;xhyeax.cn" rel="noopener" target="_blank"><i class="fa fa-user fa-fw"></i>生活博客</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.cyyself.name/" title="https:&#x2F;&#x2F;blog.cyyself.name" rel="noopener" target="_blank">cyyself's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

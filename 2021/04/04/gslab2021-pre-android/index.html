@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="最终效果成功实现RocketMouse直装破解版 app分析文件结构首先查看apk文件结构，发现是mono引擎的unity3d游戏，且Assembly-CSharp.dll已加密。并且存在assets&#x2F;filelist文件，测试发现是apk中各个文件的crc32校验值。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gslab2021 初赛 - 安卓客户端安全">
+<meta property="og:url" content="https://blog.xhyeax.com/2021/04/04/gslab2021-pre-android/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="最终效果成功实现RocketMouse直装破解版 app分析文件结构首先查看apk文件结构，发现是mono引擎的unity3d游戏，且Assembly-CSharp.dll已加密。并且存在assets&#x2F;filelist文件，测试发现是apk中各个文件的crc32校验值。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-1.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-2.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-3.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-4.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-5.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-6.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-7.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-8.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-10.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-11.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-12.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-13.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-14.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-15.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-16.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-17.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-18.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-19.png">
+<meta property="article:published_time" content="2021-04-04T13:28:32.366Z">
+<meta property="article:modified_time" content="2025-06-07T10:33:25.794Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="CTF">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-1.png">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2021/04/04/gslab2021-pre-android/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>gslab2021 初赛 - 安卓客户端安全 | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/04/04/gslab2021-pre-android/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="南冥有熊也 (XhyEax)">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gslab2021 初赛 - 安卓客户端安全
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-04 21:28:32" itemprop="dateCreated datePublished" datetime="2021-04-04T21:28:32+08:00">2021-04-04</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="最终效果"><a href="#最终效果" class="headerlink" title="最终效果"></a>最终效果</h2><p>成功实现RocketMouse直装破解版</p>
+<h3 id="app分析"><a href="#app分析" class="headerlink" title="app分析"></a>app分析</h3><h4 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h4><p>首先查看apk文件结构，发现是<code>mono</code>引擎的unity3d游戏，且<code>Assembly-CSharp.dll</code>已加密。<br>并且存在<code>assets/filelist</code>文件，测试发现是apk中各个文件的crc32校验值。</p>
+<span id="more"></span>
+<h4 id="java层"><a href="#java层" class="headerlink" title="java层"></a>java层</h4><p>使用frida的spawn模式启动app，弹出对话框，点击对话框会退出进程，于是使用jeb打开该apk文件。<br>发现<code>com.tencent.games.sec2021.Sec2021MsgBox</code>的<code>onDismiss</code>函数存在退出代码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDismiss</span><span class="params">(DialogInterface arg4)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!<span class="keyword">this</span>.m_str.contains(<span class="string">&quot;。&quot;</span>)) &#123;</span><br><span class="line">        System.exit(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Sec2021MsgBox.m_showed = <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可使用frida hook该退出函数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (Java.available) &#123;</span><br><span class="line">    Java.perform(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        Java.use(<span class="string">&quot;java.lang.System&quot;</span>).exit</span><br><span class="line">            .overload(<span class="string">&#x27;int&#x27;</span>)</span><br><span class="line">            .implementation = <span class="function"><span class="keyword">function</span> (<span class="params">code</span>) </span>&#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查看<code>show</code>函数的交叉引用，最终跟踪至<code>Sec2021IPC</code>的<code>onNativeEngineResponse</code>函数，推测native层会通过JNI来调用该函数，从而弹出对话框。</p>
+<h4 id="hook-native层退出函数"><a href="#hook-native层退出函数" class="headerlink" title="hook native层退出函数"></a>hook native层退出函数</h4><p>使用frida或ida附加后，除了java层弹出对话框，native层也会调用函数使程序退出。所以想要好好调试的话，得先找到这些函数。<br>使用IDA打开<code>libsec2021.so</code>，查看<code>kill</code>函数的交叉引用，发现有3个函数会调用它，如下图：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-1.png"><br>分别查看对应函数的交叉引用，发现<code>55EC</code>没有被调用，<code>1F120</code>被多次调用，而<code>1F788</code>仅被一个函数(<code>1F6F0</code>)调用，向上寻找调用链找到<code>1FAA8</code>，该函数最终只被调用了5次，将其命名为<code>my_kill</code>。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-2.png"><br>可以看到在kill之前调用了sleep函数，根据经验，<code>1F6F0</code>是退出函数的可能性更大一些。<br>使用frida hook<code>kill</code>函数，并打印堆栈查看：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">print_c_stack</span>(<span class="params">context, str_tag</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;=============================&quot;</span> + str_tag + <span class="string">&quot; Stack strat=======================&quot;</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(Thread.backtrace(context, Backtracer.ACCURATE).map(DebugSymbol.fromAddress).join(<span class="string">&#x27;\n&#x27;</span>));</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;=============================&quot;</span> + str_tag + <span class="string">&quot; Stack end  =======================&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hook_kill</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> addr = Module.findExportByName(<span class="string">&quot;libc.so&quot;</span>, <span class="string">&quot;kill&quot;</span>);</span><br><span class="line">    Interceptor.replace(addr, <span class="keyword">new</span> NativeCallback(<span class="function"><span class="keyword">function</span> (<span class="params">pid, sig</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;fake_kill() called!&quot;</span>);</span><br><span class="line">        print_c_stack(<span class="built_in">this</span>.context);</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;, <span class="string">&#x27;int&#x27;</span>, [<span class="string">&#x27;int&#x27;</span>, <span class="string">&#x27;int&#x27;</span>]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">=============================undefined Stack strat=======================</span><br><span class="line">0xb3624a38 libsec2021.so!0x1fa38</span><br><span class="line">0xb3624a38 libsec2021.so!0x1fa38</span><br><span class="line">=============================undefined Stack end  =======================</span><br></pre></td></tr></table></figure>
+<p>IDA定位到该偏移值，发现位于<code>1F788</code>函数中，且程序崩溃，使用<code>Android Studio</code>查看日志：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">backtrace:</span><br><span class="line">    #00 pc 00013ec8  /data/app/com.personal.rocketmouse-1/lib/arm/libsec2021.so</span><br><span class="line">    #01 pc 0001fa50  /data/app/com.personal.rocketmouse-1/lib/arm/libsec2021.so</span><br><span class="line">    #02 pc 00020920  /data/app/com.personal.rocketmouse-1/lib/arm/libsec2021.so</span><br><span class="line">    #03 pc 000060e0  /data/app/com.personal.rocketmouse-1/lib/arm/libsec2021.so</span><br><span class="line">    #04 pc 000224c7  /system/lib/libc.so (offset 0x1d000)</span><br></pre></td></tr></table></figure>
+<p>相关代码：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-3.png"></p>
+<p>查看代码发现<code>13EC4</code>是一个内存拷贝函数，而它的目标地址是0x0，所以导致程序崩溃。由此可以确定<code>1F788</code>是退出函数，同时我们发现<code>1F120</code>被调用作为参数传入<code>13EC4</code>。使用frida hook看看<code>13EC4</code>的第二个参数是什么，具体思路为：<br>hook dlopen，然后在<code>libsec2021.so</code>加载后立即hook该函数，发现程序卡住，猜测有crc32校验，于是在<code>libmono</code>加载后再hook</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hook_dlopen</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> dlopenAddr = Module.findExportByName(<span class="literal">null</span>, <span class="string">&quot;dlopen&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (dlopenAddr == <span class="literal">null</span>) &#123;</span><br><span class="line">        dlopenAddr = Module.findExportByName(<span class="literal">null</span>, <span class="string">&quot;android_dlopen_ext&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Interceptor.attach(dlopenAddr, &#123;</span><br><span class="line">        <span class="attr">onEnter</span>: <span class="function"><span class="keyword">function</span> (<span class="params">args</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">var</span> pathptr = args[<span class="number">0</span>];</span><br><span class="line">            <span class="keyword">if</span> (pathptr !== <span class="literal">undefined</span> &amp;&amp; pathptr != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">var</span> path = ptr(pathptr).readCString();</span><br><span class="line">                <span class="comment">// console.log(&quot;[dlopen]&quot;, path);</span></span><br><span class="line">                <span class="built_in">this</span>.can_hook_lib = <span class="literal">false</span>;</span><br><span class="line">                <span class="built_in">this</span>.can_hook_libmono = <span class="literal">false</span>;</span><br><span class="line">                <span class="keyword">if</span> (path.indexOf(<span class="string">&quot;libsec2021.so&quot;</span>) &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="built_in">this</span>.can_hook_lib = <span class="literal">true</span>;</span><br><span class="line">                &#125; <span class="keyword">if</span> (path.indexOf(<span class="string">&quot;libmono.so&quot;</span>) &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="built_in">this</span>.can_hook_libmono = <span class="literal">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">onLeave</span>: <span class="function"><span class="keyword">function</span> (<span class="params">retval</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">this</span>.can_hook_lib) &#123;</span><br><span class="line">                <span class="comment">// hook_sec2021();</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">this</span>.can_hook_libmono) &#123;</span><br><span class="line">                hook_sec2021();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">setImmediate(hook_dlopen);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hook_sec2021</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> libbase = Module.findBaseAddress(<span class="string">&quot;libsec2021.so&quot;</span>);</span><br><span class="line">    <span class="keyword">var</span> addr = libbase.add(<span class="number">0x13EC4</span>);</span><br><span class="line">    <span class="keyword">var</span> memcpy_ori = <span class="keyword">new</span> NativeFunction(addr, <span class="string">&#x27;pointer&#x27;</span>, [<span class="string">&#x27;int&#x27;</span>, <span class="string">&#x27;pointer&#x27;</span>]);</span><br><span class="line">    Interceptor.replace(addr, <span class="keyword">new</span> NativeCallback(<span class="function"><span class="keyword">function</span> (<span class="params">dst, src</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (dst == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">var</span> zero_replace_ptr = Memory.alloc(<span class="number">10</span>);</span><br><span class="line">            dst = zero_replace_ptr;</span><br><span class="line">            <span class="built_in">console</span>.log(Memory.readByteArray(src, <span class="number">0x10</span>));</span><br><span class="line">            <span class="keyword">return</span> dst;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> memcpy_ori(dst, src);</span><br><span class="line">    &#125;, <span class="string">&#x27;pointer&#x27;</span>, [<span class="string">&#x27;int&#x27;</span>, <span class="string">&#x27;pointer&#x27;</span>]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出<code>diediedie</code>，由此可以得知<code>1F120</code>是一个获取字符串的函数，将其命名为<code>getstring</code>，hook看看字符串：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> string_maps = &#123;&#125;;</span><br><span class="line"><span class="keyword">var</span> key = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hook_getstring</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> libso_address = Module.findBaseAddress(<span class="string">&quot;libsec2021.so&quot;</span>)</span><br><span class="line">    <span class="built_in">console</span>.log(libso_address);</span><br><span class="line">    <span class="keyword">var</span> addr = libso_address.add(<span class="number">0x1F120</span>);</span><br><span class="line"></span><br><span class="line">    Interceptor.attach(addr, &#123;</span><br><span class="line">        <span class="attr">onEnter</span>: <span class="function"><span class="keyword">function</span> (<span class="params">args</span>) </span>&#123;</span><br><span class="line">            key = args[<span class="number">0</span>];</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">onLeave</span>: <span class="function"><span class="keyword">function</span> (<span class="params">retval</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">var</span> str = Memory.readUtf8String(ptr(retval));</span><br><span class="line">            <span class="keyword">if</span> (string_maps[key] == <span class="literal">null</span>) &#123;</span><br><span class="line">                string_maps[key] = str;</span><br><span class="line">                <span class="built_in">console</span>.log(<span class="string">&quot;getstring: &quot;</span>, key, str);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出一系列字符串，比如tcp端口检测，过签名校验类的检测，动态链接库的检测，apk签名、资源文件等。配合堆栈打印，可快速定位相关函数。当然，不需要一个一个分析，笔者是将退出函数nop掉从而实现破解。</p>
+<h5 id="对话框"><a href="#对话框" class="headerlink" title="对话框"></a>对话框</h5><p>如<code>0xa44 no heart beat</code>，打印堆栈可定位到<code>1574C</code>函数：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-4.png"><br>查看<code>14FE0</code>，分析得知是在调用<code>onNativeEngineResponse</code>函数显示对话框：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-5.png"></p>
+<h5 id="dll加载"><a href="#dll加载" class="headerlink" title="dll加载"></a>dll加载</h5><p>日志<code>0x338 Assembly-CSharp.dll</code>，可定位到<code>0x1D29C</code>函数（具体分析见下文）</p>
+<h4 id="native层"><a href="#native层" class="headerlink" title="native层"></a>native层</h4><p>使用IDA打开<code>libmono.so</code>，发现关键函数<code>mono_image_open_with_name</code>被加密。程序运行起来后，使用frida对其进行内存dump，发现该函数已被解密。修复so文件结构后，使用IDA查看：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-6.png"><br>与正常的<code>libmono.dll</code>函数对比，发现区别在于第一条B指令，于是使用IDA下断点进行动态调试，执行到了<code>libsec2021.so</code>的<code>0x1D29C</code>函数。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-7.png"><br>其中对文件头和文件名进行了判断，如果是<code>MZ</code>开头且路径不包含<code>Assembly-CSharp.dll</code>，则跳转至<code>0x1CF88</code>执行。否则初始化指针，并调用<code>0x1CF4C</code>中的解密算法，将<code>sec2021.png</code>的<code>0x410B</code>至末尾的数据解密，解密结果即为真正加载的<code>Assembly-CSharp.dll</code>。解密函数为<code>0x1D2A0</code>（查看调用发现也是解密so的函数）</p>
+<p><code>0x1CF88</code>位置：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-8.png"><br>这里的<code>1FAA8</code>是之前分析的<code>my_kill</code>函数，2048即状态码，用来区分检测点。<br><code>18B00</code>函数初始化了一个数组，其中存有dll文件的crc32校验码，<code>18CEC</code>函数获取dll索引，并对其进行crc32校验（<code>F3B4</code>函数），正常则返回0。（<code>18CEC</code>函数部分内容如下，修改该函数返回值即可通过该检测点）<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-10.png"><br>查看crc32校验函数（<code>F3B4</code>）的交叉引用，可定位到<code>159A0</code>函数，修改其返回值为0即可绕过相关检测点。</p>
+<p>由于 <code>mono_image_open_from_data_with_name</code>函数的第一条指令会完成解密操作，所以可以hook下一条指令（此时已完成解密），当读取到真正的<code>Assembly-CSharp.dll</code>时（通过大小判断），将其dump出来。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dump_memory</span>(<span class="params">base,size</span>) </span>&#123;</span><br><span class="line">    Java.perform(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> currentApplication = Java.use(<span class="string">&quot;android.app.ActivityThread&quot;</span>).currentApplication();</span><br><span class="line">        <span class="keyword">var</span> dir = currentApplication.getApplicationContext().getFilesDir().getPath();</span><br><span class="line">        <span class="keyword">var</span> file_path = dir + <span class="string">&quot;/dumpmemory.bin&quot;</span>;</span><br><span class="line">        <span class="keyword">var</span> file_handle = <span class="keyword">new</span> File(file_path, <span class="string">&quot;wb&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (file_handle &amp;&amp; file_handle != <span class="literal">null</span>) &#123;</span><br><span class="line">            Memory.protect(ptr(base),size, <span class="string">&#x27;rwx&#x27;</span>);</span><br><span class="line">            <span class="keyword">var</span> libso_buffer = ptr(base).readByteArray(size);</span><br><span class="line">            file_handle.write(libso_buffer);</span><br><span class="line">            file_handle.flush();</span><br><span class="line">            file_handle.close();</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">&quot;[dump]:&quot;</span>, file_path);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hook_mono</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> libbase = Module.findBaseAddress(<span class="string">&quot;libmono.so&quot;</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;libbase&quot;</span>, libbase);</span><br><span class="line">    <span class="keyword">var</span> addr = Module.findExportByName(<span class="string">&quot;libmono.so&quot;</span>, <span class="string">&quot;mono_image_open_from_data_with_name&quot;</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;mono_image_open_from_data_with_name&quot;</span>, addr);</span><br><span class="line"></span><br><span class="line">    Interceptor.attach(Module.findExportByName(<span class="string">&quot;libmono.so&quot;</span>, <span class="string">&quot;mono_image_open_from_data_with_name&quot;</span>).add(<span class="number">4</span>), &#123;</span><br><span class="line">        <span class="attr">onEnter</span>: <span class="function"><span class="keyword">function</span> (<span class="params">args</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">var</span> data = args[<span class="number">0</span>];</span><br><span class="line">            <span class="keyword">var</span> data_len = args[<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">if</span> (data_len == <span class="number">0x2800</span>) &#123;</span><br><span class="line">               dump_memory(data, data_len);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">&quot;mono_image_open_from_data_with_name_ori() called!&quot;</span>, data, data_len);</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">onLeave</span>: <span class="function"><span class="keyword">function</span> (<span class="params">retval</span>) </span>&#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="分析-dll"><a href="#分析-dll" class="headerlink" title="分析 dll"></a>分析 dll</h3><p>使用DnSpy打开该dll，注意到<code>MouseController</code>类的碰撞检测函数<code>OnTriggerEnter2D</code>中对碰撞物体进行了判断，如果不是金币则调用<code>HitByLaser</code>函数<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-11.png"><br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-12.png"><br>该函数将dead属性以及对话框赋值为true，所以只需要将赋值改为false即可实现无敌</p>
+<p>即将il语句<code>ldc.i4.1</code>改为<code>ldc.i4.0</code>（对应16进制的<code>17</code>改为<code>16</code>），如下图：</p>
+<p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-13.png"><br>静态patch即可得到一个破解版的<code>Assembly-CSharp.dll</code></p>
+<h3 id="修改方法"><a href="#修改方法" class="headerlink" title="修改方法"></a>修改方法</h3><p>最终采用的是方法1（不需要额外文件）</p>
+<h4 id="法1-直装破解"><a href="#法1-直装破解" class="headerlink" title="法1 - 直装破解"></a>法1 - 直装破解</h4><p>替换<code>Assembly-CSharp.dll</code>文件为破解版，patch掉<code>libsec2021.so</code>的检测，使<code>mono_image_open_from_data_with_name</code>函数走正常流程，不对<code>Assembly-CSharp.dll</code>进行替换。</p>
+<p>修改方法：<br>修改<code>libsec2021.so</code>，将<code>1D0BC</code>偏移处<code>BEQ loc_1CF88</code>指令替换为<code>B loc_1CF88</code>，使得非<code>MZ</code>开头的dll才去执行解密函数。而因为我们替换了dll为破解版，所以是正常的文件头，从而不会执行解密函数。</p>
+<p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-14.png"><br>修改crc32检测函数返回值：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-15.png"><br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-16.png"><br>查找<code>my_kill</code>函数（<code>1FAA8</code>）的交叉引用，并将其nop<br>（测试发现nop以下两处即可）<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-17.png"><br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-18.png"></p>
+<h4 id="法2-frida-gadget"><a href="#法2-frida-gadget" class="headerlink" title="法2 - frida-gadget"></a>法2 - frida-gadget</h4><h5 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h5><p>使用<code>lief</code>为<code>libmono.so</code>添加<code>frida-gadget</code>依赖</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lief</span><br><span class="line"><span class="built_in">bin</span> = lief.parse(<span class="string">&quot;libmono.so&quot;</span>)</span><br><span class="line"><span class="built_in">bin</span>.add_library(<span class="string">&quot;libgadget.so&quot;</span>)</span><br><span class="line"><span class="built_in">bin</span>.write(<span class="string">&quot;libmono-patch.so&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>配置文件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;interaction&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;script&quot;</span>,</span><br><span class="line">    <span class="string">&quot;path&quot;</span>: <span class="string">&quot;/data/data/com.personal.rocketmouse/files/script.js&quot;</span>,</span><br><span class="line">    <span class="string">&quot;on_change&quot;</span>: <span class="string">&quot;reload&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>释放脚本文件到 <code>/data/data/com.personal.rocketmouse/files/script.js</code>。（无root环境需要自己编写一个so文件，并将其编辑为<code>libgadget.so</code>的依赖，释放脚本文件）</p>
+<p>hook <code>mono_image_open_from_data_with_name</code>函数的下一条指令（此时已完成解密），当读取到真正的<code>Assembly-CSharp.dll</code>时（通过数据大小判断），修改<code>MouseController</code>的<code>HitByLaser</code>函数</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hook_mono</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> libbase = Module.findBaseAddress(<span class="string">&quot;libmono.so&quot;</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;libbase&quot;</span>, libbase);</span><br><span class="line">    <span class="keyword">var</span> addr = Module.findExportByName(<span class="string">&quot;libmono.so&quot;</span>, <span class="string">&quot;mono_image_open_from_data_with_name&quot;</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;mono_image_open_from_data_with_name&quot;</span>, addr);</span><br><span class="line"></span><br><span class="line">    Interceptor.attach(Module.findExportByName(<span class="string">&quot;libmono.so&quot;</span>, <span class="string">&quot;mono_image_open_from_data_with_name&quot;</span>).add(<span class="number">4</span>), &#123;</span><br><span class="line">        <span class="attr">onEnter</span>: <span class="function"><span class="keyword">function</span> (<span class="params">args</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">var</span> data = args[<span class="number">0</span>];</span><br><span class="line">            <span class="keyword">var</span> data_len = args[<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">if</span> (data_len == <span class="number">0x2800</span>) &#123;</span><br><span class="line">                <span class="keyword">var</span> arr = [<span class="number">0x16</span>];</span><br><span class="line">                Memory.writeByteArray(data.add(<span class="number">0x9e4</span>), arr);</span><br><span class="line">                Memory.writeByteArray(data.add(<span class="number">0x9f5</span>), arr);</span><br><span class="line">                Memory.writeByteArray(data.add(<span class="number">0xa01</span>), arr);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">&quot;mono_image_open_from_data_with_name_ori() called!&quot;</span>, data, data_len);</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">onLeave</span>: <span class="function"><span class="keyword">function</span> (<span class="params">retval</span>) </span>&#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>去检测（<code>libsec2021.so</code>加载后立即hook）：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hook_sec2021</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> libbase = Module.findBaseAddress(<span class="string">&quot;libsec2021.so&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> addr = libbase.add(<span class="number">0x1F6F0</span>);</span><br><span class="line">    Interceptor.replace(addr, <span class="keyword">new</span> NativeCallback(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;my_kill called&quot;</span>);</span><br><span class="line">    &#125;, <span class="string">&#x27;void&#x27;</span>, []));</span><br><span class="line"></span><br><span class="line">    addr = libbase.add(<span class="number">0x159A0</span>);</span><br><span class="line">    Interceptor.replace(addr, <span class="keyword">new</span> NativeCallback(<span class="function"><span class="keyword">function</span> (<span class="params">src</span>) </span>&#123;</span><br><span class="line">        <span class="comment">// console.log(&quot;crc check&quot;);</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;, <span class="string">&#x27;int&#x27;</span>, [<span class="string">&#x27;pointer&#x27;</span>]));</span><br><span class="line"></span><br><span class="line">    addr = libbase.add(<span class="number">0x14FE0</span>);</span><br><span class="line">    Interceptor.replace(addr, <span class="keyword">new</span> NativeCallback(<span class="function"><span class="keyword">function</span> (<span class="params">jni, mode, cstr</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&quot;show msg:&quot;</span>, Memory.readCString(cstr));</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;, <span class="string">&#x27;void&#x27;</span>, [<span class="string">&#x27;pointer&#x27;</span>, <span class="string">&#x27;int&#x27;</span>, <span class="string">&#x27;pointer&#x27;</span>]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="法3-dll注入"><a href="#法3-dll注入" class="headerlink" title="法3 - dll注入"></a>法3 - dll注入</h4><p>笔者还尝试了通过native hook的方式，使用mono api来进行dll注入。步骤如下：<br>将<code>UnityEngine.dll</code>和<code>Assembly-CSharp.dll</code>作为引用，编写一个注入dll，从而拦截<code>HitByLaser</code>方法（使用<a target="_blank" rel="noopener" href="https://github.com/Misaka-Mikoto-Tech/MonoHook">MonoHook</a>，其原理为替换函数地址）</p>
+<p>在native层hook <code>dlopen</code>函数，过掉<code>libsec2021.so</code>的检测，并获取<code>libmono</code>句柄，然后导出mono的api，在<code>Assembly-CSharp.dll</code>加载后，调用api加载注入dll（使用<code>VitualApp</code> 及 <code>Cydia Substrate</code>框架）</p>
+<h5 id="关键代码（native层）"><a href="#关键代码（native层）" class="headerlink" title="关键代码（native层）"></a>关键代码（native层）</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> *image = orig_mono_image_open_with_name(r.c_str(), file_size(path), need_copy, status, refonly, name);</span><br><span class="line"><span class="keyword">void</span> *assembly = mono_assembly_load_from_full(image, <span class="string">&quot;UNUSED&quot;</span>, status, refonly);</span><br><span class="line">image = mono_assembly_get_image(assembly);</span><br><span class="line"><span class="keyword">void</span> *pClass = mono_class_from_name(image, <span class="string">&quot;UnityHack&quot;</span>, <span class="string">&quot;HackLoad&quot;</span>);</span><br><span class="line">hookload_method = mono_class_get_method_from_name(pClass, <span class="string">&quot;HookLoad&quot;</span>, <span class="number">0</span>);</span><br><span class="line">mono_runtime_invoke(hookload_method, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure>
+<p>根据路径打开注入dll文件，并将其加载，之后根据类名和函数名获取相应函数，进行调用。</p>
+<h5 id="关键代码（C-层）"><a href="#关键代码（C-层）" class="headerlink" title="关键代码（C#层）"></a>关键代码（C#层）</h5><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">HookLoad</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    Type tTarget = <span class="keyword">typeof</span>(MouseController);</span><br><span class="line">    Type tProxy = MethodBase.GetCurrentMethod().DeclaringType;</span><br><span class="line">    <span class="comment">//反射获取函数的`MethodInfo`</span></span><br><span class="line">    <span class="built_in">string</span> methodName = <span class="string">&quot;HitByLaser&quot;</span>;</span><br><span class="line">    MethodInfo miTarget = tTarget.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);</span><br><span class="line">    MethodInfo miReplace = tProxy.GetMethod(methodName + <span class="string">&quot;Replace&quot;</span>);</span><br><span class="line">    MethodInfo miProxy = tProxy.GetMethod(methodName + <span class="string">&quot;Proxy&quot;</span>);</span><br><span class="line">    <span class="keyword">new</span> MethodHook(miTarget, miReplace, miProxy).Install();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">HitByLaserReplace</span>(<span class="params">Collider2D laserCollider</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">     UnityEngine.Debug.Log(<span class="string">&quot;HitByLaserReplace&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">HitByLaserProxy</span>(<span class="params">Collider2D laserCollider</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">     UnityEngine.Debug.Log(<span class="string">&quot;HitByLaserProxy&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="破解效果"><a href="#破解效果" class="headerlink" title="破解效果"></a>破解效果</h3><p>安装apk后，启动游戏即可。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-pre-19.png"></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"># Android</a>
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/01/android-9-set-hotpot-ip/" rel="prev" title="安卓9 设置热点固定IP (Xposed)">
+      <i class="fa fa-chevron-left"></i> 安卓9 设置热点固定IP (Xposed)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/10/gslab2021-final-android/" rel="next" title="gslab2021 决赛 - 安卓客户端安全">
+      gslab2021 决赛 - 安卓客户端安全 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E6%95%88%E6%9E%9C"><span class="nav-number">1.</span> <span class="nav-text">最终效果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#app%E5%88%86%E6%9E%90"><span class="nav-number">1.1.</span> <span class="nav-text">app分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.1.</span> <span class="nav-text">文件结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#java%E5%B1%82"><span class="nav-number">1.1.2.</span> <span class="nav-text">java层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hook-native%E5%B1%82%E9%80%80%E5%87%BA%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.3.</span> <span class="nav-text">hook native层退出函数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AF%B9%E8%AF%9D%E6%A1%86"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">对话框</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#dll%E5%8A%A0%E8%BD%BD"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">dll加载</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#native%E5%B1%82"><span class="nav-number">1.1.4.</span> <span class="nav-text">native层</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90-dll"><span class="nav-number">1.2.</span> <span class="nav-text">分析 dll</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.</span> <span class="nav-text">修改方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%951-%E7%9B%B4%E8%A3%85%E7%A0%B4%E8%A7%A3"><span class="nav-number">1.3.1.</span> <span class="nav-text">法1 - 直装破解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%952-frida-gadget"><span class="nav-number">1.3.2.</span> <span class="nav-text">法2 - frida-gadget</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">准备工作</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%953-dll%E6%B3%A8%E5%85%A5"><span class="nav-number">1.3.3.</span> <span class="nav-text">法3 - dll注入</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E4%BB%A3%E7%A0%81%EF%BC%88native%E5%B1%82%EF%BC%89"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">关键代码（native层）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E4%BB%A3%E7%A0%81%EF%BC%88C-%E5%B1%82%EF%BC%89"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">关键代码（C#层）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A0%B4%E8%A7%A3%E6%95%88%E6%9E%9C"><span class="nav-number">1.4.</span> <span class="nav-text">破解效果</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">南冥有熊也 (XhyEax)</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://xhyeax.cn/" title="生活博客 → https:&#x2F;&#x2F;xhyeax.cn" rel="noopener" target="_blank"><i class="fa fa-user fa-fw"></i>生活博客</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.cyyself.name/" title="https:&#x2F;&#x2F;blog.cyyself.name" rel="noopener" target="_blank">cyyself's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

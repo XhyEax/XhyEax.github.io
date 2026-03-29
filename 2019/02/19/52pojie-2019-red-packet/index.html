@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="解题方法并不唯一，仅供参考。 题目打包下载地址https:&#x2F;&#x2F;down.52pojie.cn&#x2F;Challenge&#x2F;Happy_New_Year_2019_Challenge.rar 第一题 签到题关注“吾爱破解论坛”公众号，回复指定字符串即可获得本题正确口令和第二题题目下载地址。 第二题 CrackMe（本题我做的时候是无壳的，因为碰巧发现了内测时的题。公测时加了个upx的壳，故需要先脱壳，esp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2019吾爱破解论坛春节红包四题Writeup">
+<meta property="og:url" content="https://blog.xhyeax.com/2019/02/19/52pojie-2019-red-packet/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="解题方法并不唯一，仅供参考。 题目打包下载地址https:&#x2F;&#x2F;down.52pojie.cn&#x2F;Challenge&#x2F;Happy_New_Year_2019_Challenge.rar 第一题 签到题关注“吾爱破解论坛”公众号，回复指定字符串即可获得本题正确口令和第二题题目下载地址。 第二题 CrackMe（本题我做的时候是无壳的，因为碰巧发现了内测时的题。公测时加了个upx的壳，故需要先脱壳，esp">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-1.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-2.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-3.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-4.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-5.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-6.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-7.png">
+<meta property="article:published_time" content="2019-02-19T08:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-07T10:33:25.775Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="CTF">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-1.png">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2019/02/19/52pojie-2019-red-packet/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>2019吾爱破解论坛春节红包四题Writeup | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/02/19/52pojie-2019-red-packet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="南冥有熊也 (XhyEax)">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2019吾爱破解论坛春节红包四题Writeup
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-02-19 16:00:00" itemprop="dateCreated datePublished" datetime="2019-02-19T16:00:00+08:00">2019-02-19</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>解题方法并不唯一，仅供参考。</p>
+<h2 id="题目打包下载地址"><a href="#题目打包下载地址" class="headerlink" title="题目打包下载地址"></a>题目打包下载地址</h2><p><a target="_blank" rel="noopener" href="https://down.52pojie.cn/Challenge/Happy_New_Year_2019_Challenge.rar">https://down.52pojie.cn/Challenge/Happy_New_Year_2019_Challenge.rar</a></p>
+<h2 id="第一题-签到题"><a href="#第一题-签到题" class="headerlink" title="第一题 签到题"></a>第一题 签到题</h2><p>关注“吾爱破解论坛”公众号，回复指定字符串即可获得本题正确口令和第二题题目下载地址。</p>
+<h2 id="第二题-CrackMe"><a href="#第二题-CrackMe" class="headerlink" title="第二题 CrackMe"></a>第二题 CrackMe</h2><p>（本题我做的时候是无壳的，因为碰巧发现了内测时的题。公测时加了个upx的壳，故需要先脱壳，esp定律即可）<br>（这题用OD其实更方便些，个人习惯用IDA）<br>脱壳后IDA打开，<code>Shift+F12</code>查看字符串，找到关键字符串<code>正确!!!回复你输入的内容到吾爱破解论坛公众号</code><br>按X查看引用，定位到判断代码<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-1.png"><br>按F5查看伪代码<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-2.png"><br>上面有个长度判断，输入字符串长度为16<br>然后下面有个strcmp判断，相等则返回0，不过加了个<code>!</code>就变成相等返回真了</p>
+<p>所以在strcmp下个断点查看寄存器(v2)即可得到密码<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-3.png"></p>
+<span id="more"></span>
+<h2 id="第三题-逆向题"><a href="#第三题-逆向题" class="headerlink" title="第三题 逆向题"></a>第三题 逆向题</h2><p>IDA打开，搜索<code>main</code>，找到程序主入口，定位到关键代码（前面还有个sha1算法的，应该和AES的key有关）<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-4.png"><br>逻辑是base64解码，然后再用aes解密，跟<code>HappyNewYearFrom52PoJie.Cn</code>比对，相同则通过校验<br>而aes的key应该跟输入的uid有关，虽然不知道他怎么生成，但是可以在使用它的时候断下，直接提取<br>所以点开<code>main_AesDecrypt</code>，给NewCipher下断点（查看go语言源码可知，传入参数的是key）<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-5.png"><br>在IDA中运行程序，输入uid，然后口令输入一个<code>base64Encode</code>过的字符串（比如<code>MQ==</code>），通过第一个解码校验<br>然后会在解码时断下，查看传入的第一个参数（其实是key的指针）<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-6.png"><br>在Hex View中按G定位，输入<code>12858120</code>，找到对应的值，提取之（key是十六位的，所以提取前十六位即可）<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/52pojie-2019-7.png"><br>得到<code>EF2D8BFA0C30AB270B92CC73A563AFA3</code><br>其实这一串数据就是我的uid对应的sha1散列值(<code>ef2d8bfa0c30ab270b92cc73a563afa3b04faa75</code>)的字节数组形式，取前16位<br>AES加密方式为CBC（<code>main_AesDecrypt</code>函数中可以直接看出），补码方式为<code>PKCS5Padding</code>（AES解密错误时，会退出程序，但是有异常信息一闪而过，给报错函数下断点即可查看异常信息）<br>所以把<code>EF2D8BFA0C30AB270B92CC73A563AFA3</code>转化成字节数组，使用<code>AES/CBC/PKCS5Padding</code>方式，<br>加密<code>HappyNewYearFrom52PoJie.Cn</code>，再进行<code>base64Encode</code>就可以得到口令了<br>（至此，程序逻辑完全清晰了）</p>
+<h3 id="go语言代码"><a href="#go语言代码" class="headerlink" title="go语言代码"></a>go语言代码</h3><p>之前为了验证golang生成的exe程序结构，从网上抄了个aes加解密的go语言的代码，改一改正好用的上（现学现用）</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;bytes&quot;</span></span><br><span class="line">    <span class="string">&quot;crypto/cipher&quot;</span></span><br><span class="line">    <span class="string">&quot;crypto/sha1&quot;</span></span><br><span class="line">    <span class="string">&quot;crypto/aes&quot;</span></span><br><span class="line">    <span class="string">&quot;encoding/base64&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">PKCS5Padding</span><span class="params">(ciphertext []<span class="keyword">byte</span>, blockSize <span class="keyword">int</span>)</span> []<span class="title">byte</span></span> &#123;</span><br><span class="line">    padding := blockSize - <span class="built_in">len</span>(ciphertext)%blockSize</span><br><span class="line">    padtext := bytes.Repeat([]<span class="keyword">byte</span>&#123;<span class="keyword">byte</span>(padding)&#125;, padding)</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">append</span>(ciphertext, padtext...)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">PKCS5UnPadding</span><span class="params">(origData []<span class="keyword">byte</span>)</span> []<span class="title">byte</span></span> &#123;</span><br><span class="line">    length := <span class="built_in">len</span>(origData)</span><br><span class="line">    unpadding := <span class="keyword">int</span>(origData[length<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> origData[:(length - unpadding)]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AesEncrypt</span><span class="params">(origData, key []<span class="keyword">byte</span>)</span> <span class="params">([]<span class="keyword">byte</span>, error)</span></span> &#123;</span><br><span class="line">    block, err := aes.NewCipher(key)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    blockSize := block.BlockSize()</span><br><span class="line">    origData = PKCS5Padding(origData, blockSize)</span><br><span class="line">    blockMode := cipher.NewCBCEncrypter(block, key[:blockSize])</span><br><span class="line">    crypted := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="built_in">len</span>(origData))</span><br><span class="line">    blockMode.CryptBlocks(crypted, origData)</span><br><span class="line">    <span class="keyword">return</span> crypted, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AesDecrypt</span><span class="params">(crypted, key []<span class="keyword">byte</span>)</span> <span class="params">([]<span class="keyword">byte</span>, error)</span></span> &#123;</span><br><span class="line">    block, err := aes.NewCipher(key)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    blockSize := block.BlockSize()</span><br><span class="line">    blockMode := cipher.NewCBCDecrypter(block, key[:blockSize])</span><br><span class="line">    origData := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="built_in">len</span>(crypted))</span><br><span class="line">    blockMode.CryptBlocks(origData, crypted)</span><br><span class="line">    origData = PKCS5UnPadding(origData)</span><br><span class="line">    <span class="keyword">return</span> origData, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    uid := <span class="string">&quot;351649&quot;</span></span><br><span class="line">    h := sha1.New()</span><br><span class="line">    h.Write([]<span class="keyword">byte</span>(uid))</span><br><span class="line">    bs := h.Sum(<span class="literal">nil</span>)</span><br><span class="line">    <span class="keyword">var</span> aeskey = bs[<span class="number">0</span>:<span class="number">16</span>]</span><br><span class="line">    pass := []<span class="keyword">byte</span>(<span class="string">&quot;HappyNewYearFrom52PoJie.Cn&quot;</span>)</span><br><span class="line">    xpass, err := AesEncrypt(pass, aeskey)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    pass64 := base64.StdEncoding.EncodeToString(xpass)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;加密后:%v\n&quot;</span>,pass64)</span><br><span class="line">    bytesPass, err := base64.StdEncoding.DecodeString(pass64)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    tpass, err := AesDecrypt(bytesPass, aeskey)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    fmt.Printf(<span class="string">&quot;解密后:%s\n&quot;</span>, tpass)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="第四题-RCNB"><a href="#第四题-RCNB" class="headerlink" title="第四题 RCNB"></a>第四题 RCNB</h2><p>解压得到<code>RCNB.md</code>，内容如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># ȐĆŅƃȓƇńƃȒċƝÞɌÇńßɌĉŇƅŕƇŃbȒȼȵßȒĆȵƁȓĉnƁɌćǸß</span><br><span class="line"></span><br><span class="line">ƦćƝƁȓĉnƅȓčƞÞɌćÑbȒČŃbȒċÑbŕƇŃþȒČNƃȒĈÑƄȓĊÑƄŕƇņÞȓčƞÞɌćÑbȒċƝÞŘcǸÞȐĆŅBƦĊȵþřÇȵƅȐċŇbɌcńþȓČŇƁŕƇNƀȒČŃBɌćÑBɌċnƄȓĈƝbŗƇƞÞŗčnBŕƇnþȒȻŃBȓĉnƅȒČNƅȒƈŇþŕčȠßŕƇŃƃřčȠbřċȵƀ</span><br><span class="line"></span><br><span class="line">ȐčNƄŕƇņƃɌcŅƄɌċnþŕƇŇƁȓƇńƁŕƇńþɌcńƄŕƇńþɌCňƀƦȻƝƃŕƇńþɌCňƀȐĉņþŗcŅƅȒĈÑƄȓĊǸƅȓĈȵþɌćƞßŕƇņÞȒȻŃþɌCňƀɌćǸbȒȼǹßȓĈƝB</span><br><span class="line"></span><br><span class="line">[ƦĉņƃŖċŅþŕƇŅƀȒCŅƀȒƈŇþɌcŅƄɌĉŇßŕƇņÞȓčƞÞȒƈňþŕƇńþȓĉnþȓČŇBŗcŅƅɌćƞƁȓćŅƁŕƇņÞȒȻŃþɌCňƁ](//rcnb.xyz)</span><br><span class="line"></span><br><span class="line">řĊÑbȒĉȠƀɌćÑbȒċƝÞȓćŅƁɌƈȠƃŕƇŃþȒȻŃþȒĈƞÞȑÇǹƄɌCȠƄƦȻŇƅɌćƞBȐčnÞŗÇÑBřĊÑbɌĆnþŗÇǹb</span><br><span class="line"></span><br><span class="line">ȐȼŃßɌćÑbŕƇņÞȒȻŃƄŕƇņÞɌcńþȒCŅbŕȻ</span><br><span class="line"></span><br><span class="line">ŘĈÑƀƝƄŘȻŖĊǸƀrcnƃňßɍĉƞƀRČņbRÇrcnbrcnbrcnbŖĊƝƃrcnbrcnbrcnbrČNþȓĉƞƁnƅŔƇńÞrćǹƁȓĆÑƅŔȼŕÇƞƅƞßȐCŅƁȐƇŖĆňƁɌƇȵƃȑĈȠƃNƃƦčƝƄȓĉŕČňƃŇbȐĆȑćnƅŘȼȵßƞßRĆǸƄɌCƞBȑĊŅÞŗĊɌȼŃßŇƁŔcŔƈǹÞȠƁɌĆńƅɍĉƝÞŖÇɌcŇƅŖĆnþńƁȓČňƄŘȻȓȻnƃǸƁɌCȒćȵƁȵƄɌCŅƅȐčŃƀřCřƇŇƁǸþřÇƞbƦČnbRCƝßȐćǹƁŔȻřȻņBǹBȑċŗÇƞƃȠBɌĆÑƃŕčņƃȓƇńbŖčÑbɌĊŗƈÑBRcƞƁȑƇńÞƦČǹƀǸƀŘcŘȻnƅRCņƃŅƄȐĉNÞŘĈÑƄŕčȐćǹbŇÞȓćǹßɌĈŔȻňƀƝbȐÇrCǹÞȓȻŃBńƄɍċńbɌČŗƇnƅȵƀŗċņßRCŇbřČřćÑƀȐĊŃbǸƅɍcȑCȵbǸßȑƇȑCǹƅŘȻŃƃřċŃþnƄRċǹBrƇńƃŖĈȑĉņbƞƅƦĆrCƝÞƦĆÑBņƄrćȑƇÑƅńƄƦƇŗĆnƀŔĆȠƄȐćNƀÑƅƦȼȓĉŇƄȵßȑCǹƄȐȼŗćȠƃŅBȓCȠƁŔċƝßřcŘčŅbƦĊƝƃɌċƞƀnƁŘȻÑbŖčŗCnþȒȻÑƅNþřȼrƈNƁŕĆƝBȐÇňƅȐCŃßŅƄrćƞƀȓĊńƃŖƇǸƁřċŘćŃƁŘȼÑƅȑċȵƀŃþrƇŃßŕĉrćNþȒȻƝƁɌƈȠbƦĊNƅŔCƝßȓČńÞƦċŇbŖƈņƃŖĉȵþnƃɍĉɌƈňÞřčǹBȠbŕĉřċńþņƄȑÇƞƁȒcŘĉǸƅňƃȒcŔĈńßǹƁƦćȓȼǹƁÑƁƦCȑċŇƄȓƈnƄȵƄrcŘčnƃȵßRčȑcNƁrĊNƅȐÇŇƁņƁȒčnƀɌČňbɌĆrȼƞÞŇƃɌCřÇnþňƅȒȼƝBȑcȐȻnBňƁȑċȓcȠbǹþȑƇǹƁrĈŖƈňƁŗcȵbňþřȼƦĈŃƅňßŗcŃƀƦĊŔcńÞŖĉȠƅŃƁȑĊȐÇȠþƞÞɌƇȵƅȐȼɍĉÑBrƇŇƅŔčƞßnƅŗĈɍĆȵƅŖČņbŖĆȠÞȒċÑƃŗċNƃŕȻŃÞNÞŔčŕĆƞƃNƃRČȐĆņƁŃƀřċŃbȓčƝƃȑcŔĆNþȑčȠbŗĆNþŇƁȓčrčŃƄȑĉnþŅþȓȻřcÑƄŖƇÑßȐĆńbŅbŕĊŃßŕČŇÞȒcÑƁȑĆŘÇńƃRƈǸƅŕcȠbņÞȑċRƈŇƀȐcňþńÞƦĈɍCȠƀÑBRĉǸƁŗȼȑƇnƁȵßŕƇŖċƞƅřƇǹþŇƄŖÇȠƃRĈǸƅŕƇņþŔĊřƈňbƝßrƈŕÇǸþŃÞȐĆnbȑĉȑȻǸƃǹƀRƇrƈNbnƄrċrĉŅBƦcňþRċňƁnBŗȼÑƁŕċƞßɍĈŗćņƀǹƁȑĈŅþŔƇňƅŗƇrĊǹƄǸßȒƈǹßŕȻȠBŔćƝþŔȻÑBȓĆǸÞȑċŕĉŃþŃƀŘcřȻÑBŅƀɌƈńƄŔĊÑÞƦĈƞƃȓȼņƁŘȻnƄŔćŖċǸƄŅBŖÇȓĉŅBňƄȐȼŖÇņbǹƅrȻÑÞŔČŅßŔĊNþɌƇȠÞRĉnþřčŕċNþȠþƦȼȠƅRĆÑƄŗćŘčŃƄŖÇÑƄǹbȑĆŖÇǹþƞƄȓcƞƁRCǸƄɍćȒČNƅȓȻňÞņBRĆƞbřƇŖcȠbřȻńƄŗĆŃÞŃBƦĉŗĊNþřĊņßȒĆȠƁȑĊŅBȐƈȵBǹƁřcrĉƞbnƀƦċŘȼÑƀȒÇńƁŗCȠƁƝßrĊǹþŗȻŃƀȒȻɍċNßŖĉǸßŃÞrƇȒȼȠƃřƇŃƃNbŘċƦČňƅŔČnBŗČƞbƞßŔȼŔĊȠƀnƅŖċŕčŇƄǹBŔCřċǹƅȐČňƀƝƀřĈŖČȵßńÞɌCǹƃŔćȓċÑþŕȼƝƄȒcńbǹbȓƈƝƅɌĆȠƄŖćǹBŖƈŘÇƝƅƦĉŃƁŃßŖĉNƃŔĉÑƄŖĈƞþȑČȑČnBŃƁŔČnƃȒĈȓĈNBǸßȐCȠßȐčŅbɍĉƞþƦĉrȻŅBŇßȒȻǸƁŘȼŘċńBňbŘčnƄŘÇȒƈŇƅǹÞřćȐćŅÞƦċŇƄŇbɌƇƦƇńƀňƁrČRČņbȑÇŅßȵƅřȼŖĆǸƀŔCƝƀņÞȓƇrĊŇþňbŕÇŃƄŔƈńÞŘČȐĊƝbřȻǹƃɌČȠBńƄȒƇNþřĊɌćņBŕȼȠƃŖƇňþÑßȓȼȑČÑƅnƄɍĉnÞŗcŘƈňßȓĉȵƄȑcNbȠßƦÇŅƃɍĈƦĊnƁŖÇŅBŔcŃƁńƁɌċňÞŕĉƦCņƅƦȻȵƅȓÇǹƃȓĆȠƃRȻňƃřćǸƀŗƈǹßřĉňbȐČńƁɍĈŇÞÑÞŘćŗÇNbŗȻÑÞRƈǸƃǹƀŕȻRĉƞBńþŘȻŔĆƝƁņBŕȻNBRĉņƃȓČƝƁȐċÑƀRČŕƈňƀrčŇƅȐĊŅÞƦȼǹƁňƃȓĊnþřĈŘCnþȠƀȒcƞƃɌćɌĊȵƅŕƇňƃnƄŔčńÞRČřȼńbŇßŕĊňþŘCǹbŔĈnbŕĊńþȑcŃƄŔĈŔčńbȐčȠBřĉŅƃņƃŘƈɌÇÑÞŇƄȓĉɍċňƅńþŗCřČƝƄRCņÞƝƁŔĈRȼNƅȒCnƃɌƇǹßńÞŕƈŇBŘCŕȼÑBȒÇŃÞǸƁȓȼŕČȠþȵƁȑƈńƀŔcȑƇÑßrƈǸÞrcŃÞŇƅȓćɌćńƀɍćňƀȠƅŘȼǸƁɍĊřčƞÞņƃrĊǸƀŗcȓƈńƀŇƀȐcrĊŅBȓĈȠƁɍćnƁnÞɌƇÑƃȐȼƞßŔCɍćƞbƝBȒcņƁrċnBŗƈȓȻńƃɌCÑBƞƀȒČňßŔƇřƇǹbŖcņƃŕĆňþŕČņƅȒĉŇƅȐĈŇƁȠƃRĉŔƇǸþŘĊȵßŔȼńbȑƈȠBǹBɌčȵƃrčǹƄŔȻƞƅŗȼȒĆƞƀŖĉȵbŕcƝÞȒȼńBrċǸƅŘcȠÞȐčƝbȓĊŅbŘCȠƀɍĆȠƅŕĉNƀȠÞŖćřċńƁńþȓĉȠƁƦȻnƀȓÇɍĈŅƅǸƀȓčȒȻņƀǹÞɍcȑĆȵƃrȻƝƀɌCŃþɍĈȵþŖČņßňƅŗĉÑÞŕƈȑcŃƁǸßȒƇȐÇƞßńbŕƈȵBŕƇnƄȓċȑȼȠBɍċŅÞŗċŅƃƦčńƄňÞRÇrcŅƄȐÇȠÞřčȠÞƞBɌȼɍĈŇþɍĉÑƅǸBrĆňƃŖȻŕčȵbņßŘĊƞƀȐƈnþŘčȓȻÑÞŕcńþņbŔȼɌČÑBɌčȵbȑĈŅBŕĉƞƄÑþȒÇȓȻNƀÑßŘĈÑƀȐȼƝBŔĈȵþɍĊÑßŕĉȒȼnþŕÇņbńþɍĆŅÞŗĊŃƃRċņƅŘcNþȑĆŅƁrƈǸƄȒCƝþŖȻrÇŇbřĊŅƅȑƈŃBƦċnßňƅƦĉÑþȓĈřȼŃƀɍcŃƄȵþɌCřĆNƄǹƄƦȻŔčŅƃnƅrċrCǸƄȓƈŃƀrÇnƁrCÑƅrCȵƀrƈǹßrƈȵƁRĆƞƁrÇŇÞȵßƦČȑȼǸƁǹBȑcɌƈƝÞȒĆŅÞrĆňƃRćŇƁȠƅȓcrc</span><br></pre></td></tr></table></figure>
+
+<p>有一个明显的网址<code>rcnb.xyz</code>，浏览器打开发现，所谓RC就是一个自定义的编码方式（因为开头有R结尾有C？），将内容解码得到</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># Prove your Niubility</span><br><span class="line"></span><br><span class="line">Hello there, Welcome to the 52PoJiE Spring Festival 2019 Challenge - RCNB.</span><br><span class="line"></span><br><span class="line">To prove you are as NB as RC, complete this trial!</span><br><span class="line"></span><br><span class="line">[It&#x27;s dangerous to go alone, take this!](//rcnb.xyz)</span><br><span class="line"></span><br><span class="line">And the key: Which_is_N0t_Th3_Answ3r</span><br><span class="line"></span><br><span class="line">With the trial:</span><br></pre></td></tr></table></figure>
+
+<p>后面的解出来是个7z的文件，但是由于转化成了字符串，所以很多字节丢失了，解码出来变成了问号。所以需要修改js代码，让它返回16进制字符串，方便直接转化成文件</p>
+<h3 id="修改js代码"><a href="#修改js代码" class="headerlink" title="修改js代码"></a>修改js代码</h3><p>定位到editor.js代码的rc2str函数，将它修改为</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">rc2str</span>(<span class="params">str</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (str === <span class="string">&#x27;&#x27;</span>) <span class="keyword">return</span> <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    <span class="keyword">var</span> res = rcnb.decode(str.trim())</span><br><span class="line">    <span class="keyword">return</span> Bytes2Str(res);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Bytes2Str函数是直接网上找的</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Bytes2Str</span>(<span class="params">arr</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> str = <span class="string">&quot;&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;arr.length; i++)</span><br><span class="line">    &#123;</span><br><span class="line">       <span class="keyword">var</span> tmp = arr[i].toString(<span class="number">16</span>);</span><br><span class="line">       <span class="keyword">if</span>(tmp.length == <span class="number">1</span>)</span><br><span class="line">       &#123;</span><br><span class="line">           tmp = <span class="string">&quot;0&quot;</span> + tmp;</span><br><span class="line">       &#125;</span><br><span class="line">       str += tmp;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> str;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后就可以得到一串16进制字符串，转化为文件保存即可。<br>压缩包的密码就是之前得到的<code>Which_is_N0t_Th3_Answ3r</code><br>得到一个nb文件，直接记事本打开，得到</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ȐȼŃƁȓĉnƅŕƇŅƀȓƇŃƅȒċƝþŕƇNƄɌćŃÞɌCȵBȒČNƄɌCňƀɌćÑbȒCŅÞŕƇŇƁȓƇńƁŕƇŅƅȒCņbȒċƝÞȒƈƝƀȒČnƁɌćŃÞȓƈȠƅȓƇNþɌcńBȓĊǸƁȒȼȵbȒƈnbɌCȵßȒȼȠÞȓĉNƁŗćƝƅRćŇbƞƅRȻÑßŘȻŇƁrĊńßŕčȠþRĉNƁƦĈņBƦcǹÞƦćŃbƦĈNƁƦĈȒćƝÞnƅŔĆņÞrȼȒćƝþǸßRĊńþrȻNþrČńßŕčǸÞRĊȵÞrȼȵbŕƇŇÞrĊnÞŔĆnBŘÇƝƃrĉǹþƦćņƅƦcȵƀƦćņBƦcǹÞƦćŃbƦĈNƁƦĈȒćƝÞnƃŔĆǸþRĊƝƃrĉňÞƦĉřƇƞþȵƅrȼņbrCnƃŔĆņßRćńßrȻńßŕčŃBRĊƞƅřȻƞƀřƇǹþƦćȵÞřƈƞþřȻŅþƦcǸƁřȻņƄƦcƞÞřȻŇbřƇǹÞƦćNþƦĈƞƄřȻņƀƦcǸƁřȻņƄƦcƞßřȻņƁƦcǹþƦćņƄƦcƞƄřȻņBƦcǹÞƦćŃbƦĈȵƀƦćȒćƝÞŃƄŔCƞÞřȻŅþƦcňÞƦĉřƇƞþȵƅrȼņbrCŃƄŔCƞßřȻŅÞƦcǹÞƦćȵƄřƈȵƀƦćŅÞƦcňÞƦĉȵƁřƈŅßřƇȒćƝþŃBRĊƞßřȻņƀƦcňÞƦĉȵƄřƈƞÞřȻņƀƦcǹÞƦćNþƦĈƞƅřȻņƀƦcňÞƦĉȵƄřƈƞþřȻŇbřƇǸƁřȻņƄƦcƞÞřȻŇbřƇǹÞƦćNþƦĈƞƄřȻņƀƦcǸƁřȻņƄƦcƞƄřȻȒćƝÞnƃŔĆǸþRĊŇƅrĊŃBrČŃƃŔċńþrȻŅbrċǹÞƦćȵÞřƈȓčnÞnƅrćǸƃŔćÑþŘȻȠBŘĊȵƅŕċRćņßƝƃŔƇȵƅrƇŅÞƦcǹÞƦćȵƁřƈȓčnƄNþřĆŃƃŔċÑƀrÇƞƀřƇǹþƦćņƄƦcƞƅřȻņƁƦcňÞƦĉņƄƦcňßƦcņƀƦcǸßřȻȵƃřƈňßƦcŇBřƇǸƄřȻņƄƦcȵƀƦćȒćƝÞǸbŔćňÞRČNƅŘCǹÞƦćŃbƦĈňÞƦcƞƀřƇǸƄřȻȒĉŅBǹÞrčȠbrčŅÞŔcÑƃRCȵbŕƇnƅrćŃƄŔCƞßřȻŅÞƦcňÞƦĉȵƁřƈƞƄřȻŇbřƇňÞƦĉȵƁřƈŅßřƇŇBřƇǸƁřȻņƄƦcƞßřȻƞƀřƇǹþƦćȵÞřƈÑbřȻřČȵßǸÞRĊǸþRĊǹÞrčȠbrčǸbŔćņþRćȠƃŘĊŃƄrČŃBRĊƞƅřȻņƀƦcǸƁřȻņƄƦcƞƅřȻƞƀřƇǹÞƦćȵƀřƈNƁƦĈƞƀřƇňÞƦĉȵƄřƈƞþřȻŇbřƇǸƁřȻņƄƦcƞƄřȻņBƦcǸßřȻȵþřƈȵƀƦćȒćƝƄȵƅŔȻNƅRĉǸƅŘCņbrCȠBŔĆŅßřƇřČȵƁȵƅŔȻńþrȻƝƃrĉǸƃřȻȵÞřƈNƁƦĈņBƦcňÞƦĉȵƁřƈŇbƦĆŅÞƦcǹþƦćņƅƦcȵƀƦćŇBřƇǸƅřȻȵþřƈƞßřȻņƀƦcǸƄřȻȵƄřƈȵƀƦćņƀƦcǹÞƦćŃbƦĈNƁƦĈņƁƦcǹÞƦćNþƦĈƞßřȻřČȵƅnƃŔĆƝƃrƈǹƀŕĉŇÞrĊnƃŔĆȵƁrȼņbŔcŃƃrČǸbŔćņßRćÑƀrƇǸßřȻņƄƦcƦȼŇƅnßrćǹbRĊŅbrȻǹÞŕĊňÞƦĉřƇÑbǸþŕĉńƅŕčƞƀRȻÑBRCƝBrƈŃbřĆŃÞŖĊnƀŘÇǹƀŕĉŇƄrĊƝƃŔƇȵƄrȼŃƀrČņBrCȠþRĉňßƦcřċÑƅRĆŇþŖƇŃÞǹƅƦćȒĉŅBȵƁrȼňßŕċȠßŔčƞßřȻņƁƦcǹÞƦćřƇƞþǹÞrčņbrCnƃŔĆÑƃRCȵbŕƇņbrCnÞŔĆnBŘÇŇƅrĊŃƄrČŃBRĊƞƅřȻņƀƦcǸƃřȻȵßřƈƞßřȻƞƀřƇǸƁřȻņƄƦcƞÞřȻŇbřƇǹÞƦćNþƦĈƞƄřȻņƀƦcǸƁřȻņƄƦcƞßřȻƞƀřƇǹÞƦćȵÞřƈƞƄřȻŇBřƇǸƅřȻȵþřƈƞƅřȻȒćƝƅŃÞŖĊnBŘÇŅbrȻȠBrčǸÞRĊǸßRĊŅßŔcŃƁřĆǹbRĊȵßrȼƞbŘČŇþrĊǸÞRĊÑBRCǹƄrčńƅŕčŃƄŔCƞßřȻņƁƦcǹÞƦćȵÞřƈȓČŃƅƝƅƦcNþƦĈňßƦcņBƦcǹßƦćńßřƇňßƦcņƀƦcǸƅřȻřčȠbŅþƦcǹƅƦćȵƄřƈƞÞřȻƞƀřƇ</span><br></pre></td></tr></table></figure>
+<p>拿去网站解码（不需要16进制了，所以用原本的js即可）<br>得到</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Well done! It seems that you have great programming skills.</span><br><span class="line"></span><br><span class="line">ȐȼŃßɌCȵƃȒȼȵbȒƈnbɌÇńßɌĈȠƃȒȻŃBȓƈȠƃȒȼȵbȒČŃBɌCňƀȒĊŇßɌcńþȓČŇƁŕƇņÞȒȻŃƄŕƇŅƅȓƇŃƃȒȼȠbȒCņƁɌCňƀȒCŅƀȒĉȠƀɌćÑbɌcŅƄɌĉņƄȒȻńƄɌĉŇÞŕƇņÞȒȻŃƄŕƇŃbȒČŃƄŕƇńBȒČnƁȓȼǸß</span><br><span class="line"></span><br><span class="line">ŗĆnƀȒćnþŕƇnþȓƇńƅɌƇƝƄřĈƝßŗƇȠbȓčȵbȒȼƞþŗcŅƅȑĉȠƁȒCŅƀɌćŃÞɌćÑßŕƇŅþȓČňBɌČŅƅȓĊǸƄɌcńƄŕƇńþȒĆȵþɌĉŇÞŕƇŃƃřčȠbřċȵƀȓCÑBřćŃBŖČȵƃɌćǸƀȓƈȠßŘčŅƄŗĉȠƄȒȼȵƅȒȻŅBȒĆƝƃȒĈÑƄȓĊņBřƇNƁɌƇƞbɌCƝßȐĉņþƦȻƝƃŗĈńƀɌCƝB</span><br><span class="line"></span><br><span class="line">;) ȐcňÞŗcŅƅȒCŅƀȒĉȠƀȒȻŃƄɌcńƄŖċŅþŕƇņÞȒȻŃƄŕƇŅþȒČŃßŘčńbƦȻŇƅɌČÑþɌƈǹƃɌĉŅßȒCŅƅȒČnBƦȻƝƃȑÇƝƄŘCNƁȐĉņþ</span><br></pre></td></tr></table></figure>
+
+<p>继续解码就可以得到key了</p>
+<h2 id="—-简单的分割线—"><a href="#—-简单的分割线—" class="headerlink" title="—-简单的分割线—-"></a>—-简单的分割线—-</h2><p>迟来的<del>新年</del>元宵快乐！</p>
+<p>PS: 活动规则所限，活动结束之后才能发布解题方法</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/02/16/ubuntu-install/" rel="prev" title="Ubuntu18.04安装记录(与Win10双系统共存)">
+      <i class="fa fa-chevron-left"></i> Ubuntu18.04安装记录(与Win10双系统共存)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/28/android-reverse-fix-arsc/" rel="next" title="修复反编译资源文件报错问题(resource spec)">
+      修复反编译资源文件报错问题(resource spec) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%98%E7%9B%AE%E6%89%93%E5%8C%85%E4%B8%8B%E8%BD%BD%E5%9C%B0%E5%9D%80"><span class="nav-number">1.</span> <span class="nav-text">题目打包下载地址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E9%A2%98-%E7%AD%BE%E5%88%B0%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">第一题 签到题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E9%A2%98-CrackMe"><span class="nav-number">3.</span> <span class="nav-text">第二题 CrackMe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E9%A2%98-%E9%80%86%E5%90%91%E9%A2%98"><span class="nav-number">4.</span> <span class="nav-text">第三题 逆向题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#go%E8%AF%AD%E8%A8%80%E4%BB%A3%E7%A0%81"><span class="nav-number">4.1.</span> <span class="nav-text">go语言代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E9%A2%98-RCNB"><span class="nav-number">5.</span> <span class="nav-text">第四题 RCNB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9js%E4%BB%A3%E7%A0%81"><span class="nav-number">5.1.</span> <span class="nav-text">修改js代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%80%94-%E7%AE%80%E5%8D%95%E7%9A%84%E5%88%86%E5%89%B2%E7%BA%BF%E2%80%94"><span class="nav-number">6.</span> <span class="nav-text">—-简单的分割线—-</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">南冥有熊也 (XhyEax)</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://xhyeax.cn/" title="生活博客 → https:&#x2F;&#x2F;xhyeax.cn" rel="noopener" target="_blank"><i class="fa fa-user fa-fw"></i>生活博客</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.cyyself.name/" title="https:&#x2F;&#x2F;blog.cyyself.name" rel="noopener" target="_blank">cyyself's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

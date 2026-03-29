@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="最终效果使用frida实现功能破解，未完全绕过完整性检测，猜测解密so文件时有校验 app分析文件结构游戏引擎为il2cpp，libil2cpp.so代码段加密，global-metadata.dat和filelist被加密。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gslab2021 决赛 - 安卓客户端安全">
+<meta property="og:url" content="https://blog.xhyeax.com/2021/04/10/gslab2021-final-android/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="最终效果使用frida实现功能破解，未完全绕过完整性检测，猜测解密so文件时有校验 app分析文件结构游戏引擎为il2cpp，libil2cpp.so代码段加密，global-metadata.dat和filelist被加密。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-final-1.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-final-2.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-final-3.png">
+<meta property="article:published_time" content="2021-04-10T12:30:32.366Z">
+<meta property="article:modified_time" content="2025-06-07T10:33:25.794Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="CTF">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-final-1.png">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2021/04/10/gslab2021-final-android/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>gslab2021 决赛 - 安卓客户端安全 | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/04/10/gslab2021-final-android/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="南冥有熊也 (XhyEax)">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gslab2021 决赛 - 安卓客户端安全
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-10 20:30:32" itemprop="dateCreated datePublished" datetime="2021-04-10T20:30:32+08:00">2021-04-10</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="最终效果"><a href="#最终效果" class="headerlink" title="最终效果"></a>最终效果</h2><p>使用frida实现功能破解，未完全绕过完整性检测，猜测解密so文件时有校验</p>
+<h3 id="app分析"><a href="#app分析" class="headerlink" title="app分析"></a>app分析</h3><h4 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h4><p>游戏引擎为<code>il2cpp</code>，<code>libil2cpp.so</code>代码段加密，<code>global-metadata.dat</code>和<code>filelist</code>被加密。</p>
+<span id="more"></span>
+<h4 id="逆向分析过程"><a href="#逆向分析过程" class="headerlink" title="逆向分析过程"></a>逆向分析过程</h4><h5 id="获取global-metadata-dat"><a href="#获取global-metadata-dat" class="headerlink" title="获取global-metadata.dat"></a>获取global-metadata.dat</h5><p>使用frida，从内存中dump并修复<code>libil2cpp.so</code>。然后使用IDA打开，搜索字符串<code>global-metadata.dat</code>，定位到<code>MetadataCache__Initialize</code>（偏移值<code>5580FC</code>），<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-final-1.png"></p>
+<p>由此获取到<code>s_GlobalMetadata</code>偏移值为<code>760E90</code>，hook该函数，dump出解密后的<code>global-metadata.dat</code>（需修复文件头）<br>（之后没用上这个）</p>
+<h5 id="参考正向编程的逻辑"><a href="#参考正向编程的逻辑" class="headerlink" title="参考正向编程的逻辑"></a>参考正向编程的逻辑</h5><p>参考<a target="_blank" rel="noopener" href="https://github.com/dgkanatsios/FlappyBirdStyleGame">FlappyBirdStyleGame</a>代码，得知碰撞检测函数为<code>OnTriggerEnter2D</code>（水管）和<code>OnCollisionEnter2D</code>（地面）</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">OnTriggerEnter2D</span>(<span class="params">Collider2D col</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (GameStateManager.GameState == GameState.Playing)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (col.gameObject.tag == <span class="string">&quot;Pipeblank&quot;</span>) <span class="comment">//pipeblank is an empty gameobject with a collider between the two pipes</span></span><br><span class="line">        &#123;</span><br><span class="line">            GetComponent&lt;AudioSource&gt;().PlayOneShot(ScoredAudioClip);</span><br><span class="line">            ScoreManagerScript.Score++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (col.gameObject.tag == <span class="string">&quot;Pipe&quot;</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            FlappyDies();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">OnCollisionEnter2D</span>(<span class="params">Collision2D col</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (GameStateManager.GameState == GameState.Playing)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (col.gameObject.tag == <span class="string">&quot;Floor&quot;</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            FlappyDies();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以之后重点关注<code>OnTriggerEnter2D</code>函数</p>
+<h5 id="hook-il2cpp-runtime-invoke"><a href="#hook-il2cpp-runtime-invoke" class="headerlink" title="hook il2cpp_runtime_invoke"></a>hook il2cpp_runtime_invoke</h5><p>由于该app会检测frida默认端口，故需要修改监听端口（如 1234）启动frida服务端</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell su -c &quot;/data/fs -l 0.0.0.0:1234 &amp;&quot;</span><br></pre></td></tr></table></figure>
+<p>转发端口并spawn模式启动：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">adb devices</span><br><span class="line">adb forward tcp:1234 tcp:1234</span><br><span class="line">frida-ps -H 127.0.0.1:1234</span><br><span class="line">frida -H 127.0.0.1:1234 -f com.personal.flappybird -l script.js --no-pause</span><br></pre></td></tr></table></figure>
+
+<p>使用frida hook <code>libil2cpp.so</code> 的 <code>il2cpp_runtime_invoke</code>函数，打印被调用的函数地址及函数名。<br>由于该函数被魔改，所以需要对比il2cpp源码（位于<code>..\Unity\Editor\Data\il2cpp\libil2cpp</code>），同时使用Unity手动编译一份apk，反编译进行参考对比（笔者编译的是同类游戏<a target="_blank" rel="noopener" href="https://github.com/dgkanatsios/FlappyBirdStyleGame">FlappyBirdStyleGame</a>）</p>
+<p>该函数参数为<code>(const MethodInfo * method, void *obj, void **params, Il2CppException **exc)</code></p>
+<p>其中method包含函数名及函数地址，所以只需要通过多级指针+偏移的方式，即可找到命名空间、类名、函数名及函数地址</p>
+<p>直接hook，打印输出为空，可知偏移值被修改了。通过对比正常编译的 libil2cpp.so（并穷举偏移），找到正确的偏移值，frida脚本如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dump_class</span>(<span class="params">p</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> off = <span class="number">48</span></span><br><span class="line">    <span class="keyword">var</span> namespaze = ptr(p).readPointer().readPointer().readCString()</span><br><span class="line">    <span class="keyword">var</span> s = ptr(p).add(off).readPointer().readCString()</span><br><span class="line">    <span class="keyword">return</span> namespaze + <span class="string">&quot; &quot;</span> + (s)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">dump_method</span>(<span class="params">p, soAddr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> off = <span class="number">24</span></span><br><span class="line">    <span class="keyword">var</span> name = ptr(p).add(off).readPointer().readCString()</span><br><span class="line">    <span class="keyword">var</span> k = dump_class(ptr(p).add(off + <span class="number">4</span>).readPointer());</span><br><span class="line">    <span class="keyword">var</span> method_ptr = ptr(p).add(<span class="number">40</span>).readPointer().sub(soAddr)</span><br><span class="line">    <span class="keyword">return</span> k + <span class="string">&quot;.&quot;</span> + name + <span class="string">&quot; &quot;</span> + method_ptr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hook_il2cpp</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> libbase = Module.findBaseAddress(<span class="string">&quot;libil2cpp.so&quot;</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(libbase);</span><br><span class="line"></span><br><span class="line">    addr = Module.findExportByName(<span class="string">&quot;libil2cpp.so&quot;</span>, <span class="string">&quot;il2cpp_runtime_invoke&quot;</span>);</span><br><span class="line">    <span class="keyword">var</span> il2cpp_runtime_invoke = <span class="keyword">new</span> NativeFunction(addr, <span class="string">&#x27;pointer&#x27;</span>, [<span class="string">&#x27;pointer&#x27;</span>, <span class="string">&#x27;pointer&#x27;</span>, <span class="string">&#x27;pointer&#x27;</span>, <span class="string">&#x27;pointer&#x27;</span>]);</span><br><span class="line">    Interceptor.replace(addr, <span class="keyword">new</span> NativeCallback(<span class="function"><span class="keyword">function</span> (<span class="params">mtd, obj, params, exec</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (obj != <span class="number">0x0</span> &amp;&amp; obj != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">var</span> method = dump_method(mtd, libbase);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (method.indexOf(<span class="string">&quot;Assembly-CSharp&quot;</span>) != -<span class="number">1</span> &amp;&amp; method.indexOf(<span class="string">&quot;Update&quot;</span>) == -<span class="number">1</span>) &#123;</span><br><span class="line">                <span class="built_in">console</span>.warn(<span class="string">&quot;il2cpp_runtime_invoke() called!&quot;</span>, method);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//不调用该函数</span></span><br><span class="line">            <span class="keyword">if</span> (method.indexOf(<span class="string">&quot;PlayerController.OnTriggerEnter2D&quot;</span>) != -<span class="number">1</span>) &#123;</span><br><span class="line">                <span class="keyword">var</span> paramobj = params.readPointer();</span><br><span class="line">                <span class="keyword">var</span> klass = params.readPointer().readPointer()</span><br><span class="line">                <span class="built_in">console</span>.warn(<span class="string">&quot;il2cpp_runtime_invoke() called!&quot;</span>, mtd, obj, params, paramobj, klass);</span><br><span class="line">                <span class="built_in">console</span>.log(method, dump_class(klass));</span><br><span class="line">                <span class="comment">// return 0</span></span><br><span class="line">                <span class="keyword">return</span> ptr(<span class="number">0x0</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> il2cpp_runtime_invoke(mtd, obj, params, exec);</span><br><span class="line">    &#125;, <span class="string">&#x27;pointer&#x27;</span>, [<span class="string">&#x27;pointer&#x27;</span>, <span class="string">&#x27;pointer&#x27;</span>, <span class="string">&#x27;pointer&#x27;</span>, <span class="string">&#x27;pointer&#x27;</span>]));</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="打印被调用函数"><a href="#打印被调用函数" class="headerlink" title="打印被调用函数"></a>打印被调用函数</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">il2cpp_runtime_invoke() called! Assembly-CSharp.dll PlayerController.OnTriggerEnter2D 0x540d04</span><br><span class="line">il2cpp_runtime_invoke() called! Assembly-CSharp.dll ObstacleSpawner.OnTriggerEnter2D 0x5403b0</span><br></pre></td></tr></table></figure>
+<p>显然<code>PlayerController.OnTriggerEnter2D</code>就是我们要找的函数，由此可得到偏移值<code>0x540d04</code></p>
+<h5 id="查看-libil2cpp-so"><a href="#查看-libil2cpp-so" class="headerlink" title="查看 libil2cpp.so"></a>查看 libil2cpp.so</h5><p>从内存中dump libil2cpp.so并修复，使用IDA打开。<br>由于之前已使用frida定位到函数地址<code>0x540d04</code>，跳转到此函数，按F5分析。</p>
+<p>可找到判断障碍物的关键位置（找到之后发现可以通过getGameObject、getTag、GameObject_CompareTag等函数，查看交叉引用定位到此处）：</p>
+<p><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-final-2.png"></p>
+<p>等libil2cpp.so解密后，动态patch此处即可<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/gslab2021-final-3.png"></p>
+<p>使用frida验证，发现可以实现功能</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hook_il2cpp</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> libbase = Module.findBaseAddress(<span class="string">&quot;libil2cpp.so&quot;</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(libbase);</span><br><span class="line">    <span class="keyword">var</span> addr = libbase.add(<span class="number">0x540e60</span>);</span><br><span class="line">    <span class="keyword">var</span> barr = [<span class="number">0xe2</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xea</span>];</span><br><span class="line">    Memory.protect(addr, <span class="number">0x4</span>, <span class="string">&#x27;rwx&#x27;</span>);</span><br><span class="line">    Memory.writeByteArray(addr, barr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="去检测（未完成）"><a href="#去检测（未完成）" class="headerlink" title="去检测（未完成）"></a>去检测（未完成）</h4><p>使用堆栈回溯法逐一去除检测（即每当app崩溃，就使用日志查看堆栈，修改<code>libsec2021.so</code>的相应位置）<br>结果还是未完全绕过，猜测解密so文件时有校验</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"># Android</a>
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/04/gslab2021-pre-android/" rel="prev" title="gslab2021 初赛 - 安卓客户端安全">
+      <i class="fa fa-chevron-left"></i> gslab2021 初赛 - 安卓客户端安全
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/08/01/fix-hexo-node-mismatch/" rel="next" title="迁移Hexo到Node.js 14 解决部署时报错">
+      迁移Hexo到Node.js 14 解决部署时报错 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E6%95%88%E6%9E%9C"><span class="nav-number">1.</span> <span class="nav-text">最终效果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#app%E5%88%86%E6%9E%90"><span class="nav-number">1.1.</span> <span class="nav-text">app分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.1.</span> <span class="nav-text">文件结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%86%E5%90%91%E5%88%86%E6%9E%90%E8%BF%87%E7%A8%8B"><span class="nav-number">1.1.2.</span> <span class="nav-text">逆向分析过程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96global-metadata-dat"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">获取global-metadata.dat</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%AD%A3%E5%90%91%E7%BC%96%E7%A8%8B%E7%9A%84%E9%80%BB%E8%BE%91"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">参考正向编程的逻辑</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#hook-il2cpp-runtime-invoke"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">hook il2cpp_runtime_invoke</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%89%93%E5%8D%B0%E8%A2%AB%E8%B0%83%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">打印被调用函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B-libil2cpp-so"><span class="nav-number">1.1.2.5.</span> <span class="nav-text">查看 libil2cpp.so</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%BB%E6%A3%80%E6%B5%8B%EF%BC%88%E6%9C%AA%E5%AE%8C%E6%88%90%EF%BC%89"><span class="nav-number">1.1.3.</span> <span class="nav-text">去检测（未完成）</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">南冥有熊也 (XhyEax)</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://xhyeax.cn/" title="生活博客 → https:&#x2F;&#x2F;xhyeax.cn" rel="noopener" target="_blank"><i class="fa fa-user fa-fw"></i>生活博客</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.cyyself.name/" title="https:&#x2F;&#x2F;blog.cyyself.name" rel="noopener" target="_blank">cyyself's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="ReverseVery easy得到一个pyc文件，在线反编译得到python源码。 1234567891011121314151617181920 import base64correct &#x3D; &amp;#x27;VlxRV2uAiXOPeSWPhiOCaY91JGOJj4Qgj4JVhlVigyNt&amp;#x27;def encode(message):    s &#x3D; &amp;#x27;&amp;#x27;    fo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="isc2019 Reverse&amp;Misc&amp;Crypto&amp;Android Writeup">
+<meta property="og:url" content="https://blog.xhyeax.com/2019/05/28/isc-2019-wp/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="ReverseVery easy得到一个pyc文件，在线反编译得到python源码。 1234567891011121314151617181920 import base64correct &#x3D; &amp;#x27;VlxRV2uAiXOPeSWPhiOCaY91JGOJj4Qgj4JVhlVigyNt&amp;#x27;def encode(message):    s &#x3D; &amp;#x27;&amp;#x27;    fo">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-flagnothere.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-ida-flagnothere.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-patched.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-ida-df.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-ida-md5.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-ida-compare.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev2-dnspy-click1.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev2-dnspy-click2.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-driver-ida-de.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-driver-ida-init.png">
+<meta property="og:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-driver-ida-eidc.png">
+<meta property="article:published_time" content="2019-05-28T04:43:22.558Z">
+<meta property="article:modified_time" content="2025-06-07T10:33:25.798Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="CTF">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-flagnothere.png">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2019/05/28/isc-2019-wp/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>isc2019 Reverse&Misc&Crypto&Android Writeup | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/05/28/isc-2019-wp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="南冥有熊也 (XhyEax)">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          isc2019 Reverse&Misc&Crypto&Android Writeup
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-05-28 12:43:22" itemprop="dateCreated datePublished" datetime="2019-05-28T12:43:22+08:00">2019-05-28</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Reverse"><a href="#Reverse" class="headerlink" title="Reverse"></a>Reverse</h2><h3 id="Very-easy"><a href="#Very-easy" class="headerlink" title="Very easy"></a>Very easy</h3><p>得到一个<code>pyc</code>文件，在线反编译得到python源码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">import</span> base64</span><br><span class="line">correct = <span class="string">&#x27;VlxRV2uAiXOPeSWPhiOCaY91JGOJj4Qgj4JVhlVigyNt&#x27;</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encode</span>(<span class="params">message</span>):</span></span><br><span class="line">    s = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> message:</span><br><span class="line">        x = <span class="built_in">ord</span>(i) ^ <span class="number">32</span></span><br><span class="line">        <span class="built_in">print</span> <span class="built_in">ord</span>(i)</span><br><span class="line">        x = x + <span class="number">16</span></span><br><span class="line">        s += <span class="built_in">chr</span>(x)</span><br><span class="line">    <span class="keyword">return</span> base64.b64encode(s)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">flag = <span class="string">&#x27;&#x27;</span></span><br><span class="line">decode()</span><br><span class="line"><span class="built_in">print</span> <span class="string">&#x27;Input flag:&#x27;</span></span><br><span class="line">flag = raw_input()</span><br><span class="line"><span class="keyword">if</span> encode(flag) == correct:</span><br><span class="line">    <span class="built_in">print</span> <span class="string">&#x27;correct&#x27;</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span> <span class="string">&#x27;wrong&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>逻辑是将输入的字符串逐位与32异或，再加十六，转回ascii码。</p>
+<span id="more"></span>
+<h2 id="解密函数"><a href="#解密函数" class="headerlink" title="解密函数"></a>解密函数</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line">correct = <span class="string">&#x27;VlxRV2uAiXOPeSWPhiOCaY91JGOJj4Qgj4JVhlVigyNt&#x27;</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decode</span>():</span></span><br><span class="line">    s = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    message = base64.b64decode(correct)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> message:</span><br><span class="line">        x = (<span class="built_in">ord</span>(i)-<span class="number">16</span>)^<span class="number">32</span></span><br><span class="line">        s+= <span class="built_in">chr</span>(x)</span><br><span class="line">    <span class="built_in">print</span> s</span><br></pre></td></tr></table></figure>
+<p>调用解得flag<br><code>flag&#123;PYC_I5_V3Ry_E4sY_T0_ReVerS3&#125;</code></p>
+<h3 id="Rev1"><a href="#Rev1" class="headerlink" title="Rev1"></a>Rev1</h3><p>运行发现点击动态菜单后左上角会出现菜单，点击后弹出提示<code>flag不在这里,一定是你的打开方式不对</code>。<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-flagnothere.png"><br>应该是C++编写的GUI程序，IDA打开。Shift+F12找到该字符串，定位到关键代码<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-ida-flagnothere.png"><br><code>Show flag</code>菜单并没有出现，对应的点击事件是7u，非常可疑。于是把点击<code>flag不在这里...</code>对应的id改成7(截图中已修改，原本为6)，这样就会跳转到case 7u了。<br>保存后运行：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-patched.png"><br>直接点击确定弹出提示框<code>failed</code>，于是搜索字符串定位到<code>DialogFunc</code>函数：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-ida-df.png"><br>可以看到它取了前两个输入框字符串的前十位，再转化成int，点开<code>sub_4022C0</code>函数，功能是将这两个int值存入数组，由下面两个数字看出，是md5算法（后面动态调试也验证了），所以a b分别为：1732584193，-271733879;<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-ida-md5.png"><br>看关键函数sub_401920，只有它返回1才会提示”success”<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev1-ida-compare.png"><br>（sub_4019B0是一个计算的函数，后面会贴出来。）<br>逻辑就是将md5后得到的字节集逐位比较，如果16位的计算结果全部符合才不会返回0。Dump出dword_407060 和dword_407064写程序爆破即可。<br>代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">check1</span><span class="params">(<span class="keyword">int</span> a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> xx = ((<span class="number">4</span> * (<span class="number">4</span> * (<span class="number">4</span> * (a1 ^ <span class="number">276</span>) ^ <span class="number">1300</span>) ^ <span class="number">6425</span>) ^ <span class="number">2064</span>) &gt;&gt; <span class="number">4</span>) &amp; <span class="number">255</span>;</span><br><span class="line">    <span class="keyword">return</span> xx;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> arr0[] = &#123;<span class="number">0xAF</span>, <span class="number">0x97</span>, <span class="number">0x9B</span>, <span class="number">0xBF</span>, <span class="number">0xAF</span>, <span class="number">0xAB</span>, <span class="number">0x93</span>, <span class="number">0x97</span>, <span class="number">0x97</span>, <span class="number">0xAF</span>, <span class="number">0x9B</span>, <span class="number">0xAF</span>, <span class="number">0x83</span>, <span class="number">0xAB</span>, <span class="number">0xB3</span>, <span class="number">0xB3</span>, <span class="number">0x8F</span>, <span class="number">0x9F</span>, <span class="number">0x9F</span>, <span class="number">0xBF</span>, <span class="number">0xB3</span>, <span class="number">0x83</span>, <span class="number">0xA3</span>, <span class="number">0x97</span>, <span class="number">0x83</span>, <span class="number">0xBF</span>, <span class="number">0x9F</span>, <span class="number">0xA3</span>, <span class="number">0xB3</span>, <span class="number">0xA3</span>, <span class="number">0x9F</span>, <span class="number">0xBB</span>&#125;;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> arr1[] = &#123;<span class="number">0x97</span>, <span class="number">0x9B</span>, <span class="number">0xBF</span>, <span class="number">0xAF</span>, <span class="number">0xAB</span>, <span class="number">0x93</span>, <span class="number">0x97</span>, <span class="number">0x97</span>, <span class="number">0xAF</span>, <span class="number">0x9B</span>, <span class="number">0xAF</span>, <span class="number">0x83</span>, <span class="number">0xAB</span>, <span class="number">0xB3</span>, <span class="number">0xB3</span>, <span class="number">0x8F</span>, <span class="number">0x9F</span>, <span class="number">0x9F</span>, <span class="number">0xBF</span>, <span class="number">0xB3</span>, <span class="number">0x83</span>, <span class="number">0xA3</span>, <span class="number">0x97</span>, <span class="number">0x83</span>, <span class="number">0xBF</span>, <span class="number">0x9F</span>, <span class="number">0xA3</span>, <span class="number">0xB3</span>, <span class="number">0xA3</span>, <span class="number">0x9F</span>, <span class="number">0xBB</span>&#125;;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> arrRes[<span class="number">16</span>] = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">16</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">0xff</span>; ++j)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">check1</span>(j / <span class="number">16</span>) == arr1[<span class="number">2</span> * i] &amp;&amp; <span class="built_in">check1</span>(j % <span class="number">16</span>) == arr1[<span class="number">2</span> * i])</span><br><span class="line">            &#123;</span><br><span class="line">                arrRes[i] = j;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//处理arrRes</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>arrRes转成16进制字符串得到<code>b56fba455b6b0acc377fc0850f78c87e</code><br>cmd5查询得到<code>inithex</code><br>所以flag为：<br><code>flag&#123;inithex&#125;</code></p>
+<h3 id="Rev2"><a href="#Rev2" class="headerlink" title="Rev2"></a>Rev2</h3><p>是一个<code>.Net</code>编写的程序，使用<code>DnSpy</code>反编译，定位到按钮点击事件<code>btnLogin_Click</code>，关键代码：（将53个int转换为char并提示框输出）<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev2-dnspy-click1.png"><br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-rev2-dnspy-click2.png"><br>直接将这块if判断去掉（省得输入账户名和密码，其实只是明文比较），然后删掉提示框和退出代码，改为<code>this.txtUsername.Text = expr_1B;</code>（方便复制）<br>点击登录后得到flag:<br><code>flag&#123;ST0RING_STAT1C_PA55WORDS_1N_FIL3S_1S_N0T_S3CUR3&#125;</code></p>
+<h3 id="Confused"><a href="#Confused" class="headerlink" title="Confused"></a>Confused</h3><p>这题是DDCTF2019的原题改编，大致思路是还原成vm分支，并反编译出原始的字节码，再看逻辑。但是由于有官方以及其他大佬的writeup，就可以直接跳过这一步了。<br>直接dump出vmp的字节码（0000000100001984到0000000100001A5F段），使用脚本提取并转换得到flag，脚本如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> string</span><br><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">rot2</span>(<span class="params">s</span>):</span></span><br><span class="line">    res = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> s:</span><br><span class="line">        <span class="keyword">if</span> i <span class="keyword">in</span> string.ascii_lowercase:</span><br><span class="line">            res += <span class="built_in">chr</span>((<span class="built_in">ord</span>(i)+<span class="number">2</span>-<span class="number">97</span>)%<span class="number">26</span>+<span class="number">97</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            res += <span class="built_in">chr</span>((<span class="built_in">ord</span>(i)+<span class="number">2</span>-<span class="number">65</span>)%<span class="number">26</span>+<span class="number">65</span>)</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line">f=<span class="built_in">open</span>(<span class="string">&#x27;code&#x27;</span> ,<span class="string">&#x27;rb&#x27;</span>)</span><br><span class="line">byte = f.read()</span><br><span class="line">hexstr = binascii.b2a_hex(byte).decode(<span class="string">&quot;utf-8&quot;</span>)</span><br><span class="line">f.close()</span><br><span class="line">code = <span class="built_in">str</span>(<span class="built_in">bytes</span>.fromhex(hexstr))</span><br><span class="line">data = re.findall(<span class="string">r&quot;\\xf0\\x10(.)&quot;</span>, code)</span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> data:</span><br><span class="line">    <span class="built_in">print</span>(rot2(x),end=<span class="string">&quot;&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>得到<code>wellDoneYouGotFlag</code>，补上flag{}, 即为<br><code>flag&#123;wellDoneYouGotFlag&#125;</code></p>
+<h3 id="Driver"><a href="#Driver" class="headerlink" title="Driver"></a>Driver</h3><p>这是一道windows x64驱动题，IDAx64打开，发现是kmdf驱动，在驱动入口(<code>DriverEntry</code>)找到初始化函数<code>sub_14000136C</code><br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-driver-ida-de.png"><br><code>sub_14000136C</code>伪代码（已重命名<code>DeviceIOControl</code>对应的函数为<code>EvtIoDeviceControl</code>）：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-driver-ida-init.png"><br>查<code>MajorFunction ARRAY</code>得知<code>MajorFunction[14]</code>对应的就是<code>DeviceIOControl</code>的回调事件，点开该函数：<br><img src="https://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/isc2019-driver-ida-eidc.png"><br>有一个判断，比较IRP结构体中的某个参数，猜测<code>2236608</code>就是<code>DeviceIOControl</code>的控制码，转为16进制得到<code>0x2220C0</code>，得到flag：<code>flag&#123;0x2220C0&#125;</code></p>
+<h2 id="Crypto"><a href="#Crypto" class="headerlink" title="Crypto"></a>Crypto</h2><h3 id="这不是RSA"><a href="#这不是RSA" class="headerlink" title="这不是RSA"></a>这不是RSA</h3><p>解压得到加密脚本和密文txt，加密脚本如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line">n=<span class="number">78254248636015593835240633798863091700627717386691577477092682528163871016876505150029125504913239471031625603543714863111930320484046060277104490993992760201739654592985790646481874929501002685674693070932718419433233282362127481768346180682337775258548134665766168438958869215232287958331412209851903015993147813403335636241185471268696861237357489</span></span><br><span class="line">e=<span class="number">65537</span></span><br><span class="line">flag=<span class="string">&quot;&quot;</span></span><br><span class="line">m = bytes_to_long(flag)</span><br><span class="line">cipher= <span class="built_in">pow</span>(m, e, n)</span><br><span class="line"><span class="built_in">print</span> <span class="string">&#x27;enc =\n&#x27;</span>, long_to_bytes(cipher).encode(<span class="string">&#x27;base64&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>使用<code>yafu</code>分解n得到三个素数，所以并不是常见的双素数RSA（照应标题）<br>计算逆元<code>d=gmpy2.invert(e,(p-1)*(q-1)*(r-1))</code>，然后解密<br>完整解密脚本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"></span><br><span class="line">e = <span class="number">65537</span></span><br><span class="line">p = <span class="number">770844001450150079027</span></span><br><span class="line">q = <span class="number">770844001450150079027</span></span><br><span class="line">r = <span class="number">131696711774631388724696374141133302602864637655367012223684455998047506211758798362800780190209887743575322213844983227253151336958534430970453483593114760962550640332722427237065424337658925348481895740606075180895738536517015514878001551520897972712812008434603925106486775952953967700332121413344165370441</span></span><br><span class="line">p = gmpy2.mpz(p)</span><br><span class="line">q = gmpy2.mpz(q)</span><br><span class="line">r = gmpy2.mpz(r)</span><br><span class="line">N = p*q*r</span><br><span class="line"></span><br><span class="line">phi = (p)*(q-<span class="number">1</span>)*(r-<span class="number">1</span>)</span><br><span class="line">d = gmpy2.invert(e,phi)</span><br><span class="line">c = <span class="string">&quot;6BVlzzRsSLMRXld3VuLjsFLWMk4BbsF/o5aCfj/CMv4HCnLeBX6Iejhy4+NstQtTL/zb6cPv5RJVpddt7ddoT0iyTBmKZl2qmwMg7aoXqCobfhbj/hstU0T/Rod0TPIteLWUKUXMvdPZZYXSeMyqAy9ZrkD2uDvetieZaMZD0BpmyERB4nVSVxPhG9NPq+P36Q==&quot;</span></span><br><span class="line">c = base64.b64decode(c)</span><br><span class="line">c = binascii.hexlify(c)</span><br><span class="line">c = <span class="built_in">int</span>(c,<span class="number">16</span>)</span><br><span class="line">res = gmpy2.powmod(c,d,N)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;dec&quot;</span>,res)</span><br><span class="line">hexstr = <span class="built_in">hex</span>(res)[<span class="number">2</span>:]</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;dec_hex&quot;</span>,hexstr)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;dec_ascii&quot;</span>,binascii.unhexlify(hexstr).decode(<span class="string">&quot;utf-8&quot;</span>))</span><br></pre></td></tr></table></figure>
+
+<h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><h3 id="签到题"><a href="#签到题" class="headerlink" title="签到题"></a>签到题</h3><p>提示查看公告，公告部分内容如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">5. 未特殊说明, flag的形式均为flag&#123;xxx&#125;</span><br><span class="line">6. Have fun;</span><br><span class="line">▢我已阅读并同意遵守公告内容</span><br></pre></td></tr></table></figure>
+<p><code>xxx</code>和<code>我已阅读并同意遵守公告内容</code>的背景色相同，所以flag为：<br><code>flag&#123;我已阅读并同意遵守公告内容&#125;</code></p>
+<h3 id="流浪地球"><a href="#流浪地球" class="headerlink" title="流浪地球"></a>流浪地球</h3><p>2019iscc Misc中的welcome，稍作修改<br>文本中只出现了这两个词组，频率如下：</p>
+<blockquote>
+<p>點燃 木星：6270<br>流浪地球 計劃：3802<br>所以把前者替换为0，后者替换为1，得到一大串二进制数。<br>根据提示：八位小端，写脚本转换</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">b = <span class="string">&quot;0110101000000100110100101110101011110010100100100000010011000010111010101111001001101010100100101000101000110100000001000010101000011010011100100000010001101010000001000101001011101010000010101000101001101010101100101001001001001010000001001100001011101010100010100111001000000100111010101000001000000100011100101010101010010010110000100000010000100010010010101001001000000100000010101110101001110010000001000101101011101010010010100111001010101010000001001110101010000010000001001100101011101010011010100000101011001010000001000111001011101010000001000111001010101010100100100000010001110010101010101001001000100010011100101001001001001010011101000000010001110010101010101001001000000100011100100100101000100010011010101101001010010010010010100000010000101010111010100001101011001010101010100111001000000100110000101001001000000100011100101110101000000100011100101010101010010010000001000111001010101010100100100010001001110010100100100100101000000100100000101110101001001010000001001000101010010010111100101001001001001010001000101101001000000100010010101001001000100010100010101110101000001010100010100111010001010000010100000100010001011010101010100010001001110010000001000101101001101010110100101101001000000100101010100010001000110010001100101001001000001010000001000110101010000010000001000111001010101010100100100000010010001010000110100000101000000100101100100110101010001010001000100011001000110010100100100010001001001010111111000100010000000100010001001010101011101010010110100000010010101010000110101100001000100010000010100000010000101010100100100110101000001010110010101000101000000100100010100001101001001010111100100110101011110010100100100000010001101010100000100000010001110010101010101001001000000100100010100001101000001010000001001001001010100010001100101101001011101010101100101001001010001010111111000100010000000100011100101010101010010010010010101001001000000100001000100100101010010010000001001100101011101010111010101011001000000100100000100110101001010010011100100110101011101010000010101000101000000100001000100000101010110010000001001000101010010010010010100110101011101010000110101000101000000100100010100101001001101010100100100000101001010010100100100000010000101010100100101010101001101010000010101011001000000100011100101010101010010010000001000111001001011010111010100000010001000010000110101001001010001010011100100110101011101010000010101000101000110100000001000010101000011010011100100000010001110010101010101001001001001010100100100000010001101010100010100000010000001010100100101111001010010010010010100000010000100010000001001100001011101010111100100110101010010010000001000111001000100010110100101110001001101010000010101100101000000100001000100010101011101010000110100111001000000100011010100111001001110100010100000101000011000010001000101110001001101010000010101100101000000100001000100000010011001010111010101110101010110010000001001000101001010010011010101011010010000010011010100011010000000100100110101110101000011010000001000000101010010010100100101011001000000100110010101110101011101010101100100000010010001010010100100110101010010010000010100101001010010010000001000010101010010010101010100110101000001010101100100000010001101010011100100111010000000100011100101010101010010010010010101001001000000100001000100100101010010010000001000010001000000100110100101110101001110010000001001110101010000010000001000011001010101010100110101000101001101010010100101000101000000100010000100110010000100010000001001000001011101010010010100000010010001010110000100010001011010010110100100000010010110010100100100111001000100010011010101101001010001010000001000110101000001010000001000111001010101010011010101000101000000100110000101110101011110010011010101001001001110100000001000100010001011010101010101001101000000100000010101110101001110010000001000110001000011010100010100111001000000100001010100001101001101010110100101011001000000100010010101110101001010010111000101001001001110010000001001000101010101010011010100011001010001010000001000010001000001010101100100000010001110010001000101110001010010010000001001010101000011010110000100010001000001010000001000010101010010010011010100000101011001010100010100000010001110010111010100000010000100010000010101110101001110010101010101001001001001010000001000011001011010010001000100000101010010010011100101111110001000100000001000100010001011010101010101001101000000100001000100111001011000010111010101000101000110010101010101001001001001010100100100000010000110010010010101001001010001010100010100001101001001010100100100000010010101010001000101000101000000100001000100000101010011010011100101010101001101010000010101100101000000100011100101110101000000100101100101110101000000100010110100110101001110010101010100000010011010010011010101000001001110010000001001000001011101010010010100101001010010010000001001000001011101010010010100000010000100010000010100000010000100010011010100100101001010010010010100010001010000010011100101111110001000100000001000101101010101010100100100000101000000100011010100000010001011010001000101000101000000100001000100000010011100010011010101011001000110100000001000110101000000100000110101000101010010010101100100000010001110010111010100000010001110010101010100110101000001010111000100000010000100010110100101101001000000100100010100101001001101010101101001000001001101010000001001100001011101010111100100110101010010010100010100000010010001010101010101110101000011010110100101011001000000100110000100010001011100010100100100000010010001010010100100110101010010010000010100111001001101010100000100110101001010010000001001000101010010010000010101000101010010010011101000000010001101010000001000100101010010010001000101101001001101010000100101001001010110010000001001010101011101010010110100000010000110010010010101001001001010010011010101110101000011010100010100000010001101010011100100000010001101010100010100000010000100010000001001000101001010010011010101011010010000010011010100000010011000010111010101111001001101010100100100000010001010010101010101110101011101010100010101001001000000100011100101110101000000100100010100111001001101010010100101110001000000100011100101110101000000100100010100101001001101010100100100000101001110010011010101000001001101010010100100000010000100010010100100101001000011010010010100010001001110010100100100111010000000100100100101111001010010010000010100000010001011010101010101001001000001010000001000110101000001010111100101001001010001010011100101110101001001010000001000101101001101010011100101010101010110010010010101001001001011010000001000111001010101010100100100000010011000010111010100000101010010010100110100000010000101010100100100101001000100010000110101000101010010010000001000111001010101010100100101001101000000100011100101010101001101010000010101110001000000100011010101000101000000100011100101110101011101010000001001010101000100010010010101011001010110100010100101110101001001010100100100000010000100010000010101011001000000100010110100110101011010010110100100000010010101010001000101111001010010010000001000000101011101010000001001100001000100010010010101110001010010010011100100111010001010000010100000111001010101010100100100000010010001010011100101110101001001010100110100011010000000100011010101000101000000100010010101001001000100010110100101101001010011010000001000010001000101010111010100001101001110010000001001010101011101010010110100000010000110010100100101110101000110010110100101001001000000100010100101010101011101010111010101000101010010010000001000111001011101010000001001010101010010010110100100011001000000100100100100010001001010010101010100000010011101010011100101010101010010010010010100000010000100010000010101011001000000100001010101110101000001010101100100000010001011010011010100111001010101010000001001001001000100010010100101010101000000100111010100111001010101010100100100100101000000100001000100000101010110010000001001010101011101010010110100000010000110010100100101110101000110010110100101001001000000100010100101010101011101010111010101000101010010010000001000111001011101010000001001000101000100010010100100100101001101010100000100110101001010010100100100111010000000100011100101010101010010010000001001110101000001010110100101001101000000100100010100011001011101010011010101101001010010010010010100000010001101010000001000101101001101010110100101101001000000100011100101001001011010010110100100000010010011010111010100001101000000100011010101000101001011100010100000101000000101010100100100110101001100010011010100000101011001010000001000000101011101010011101001100110000000100011100100100101000100010000010101000101000110010111010100100101001110010001000100111001001101010111010100000101000000100101100100110101011110010011010101000101001101010111010100000101000000100010010101001001011000010011010100000101010110010100010100000010010011010111010100001101001110100000001000100101011101010000110100111001010010010100010100000010000100010010010101001001000000100010100101110101000011010000010100111001011010010100100101000101010001010011101000000010010001010001000101000001010010010011100101001101000000100011010101000101000000100100000101110101001001010100100101100001011101010100010100111001001110100000001000001101000001010010010101001001011001010000110101101001000100010011100101001001010110010000001001011001001001010011010101111001001101010000010101100101001110100000001001101001011101010111100101001001010110010000001001110101000001010100100101000101000000100100100100000101010110010000001000001101000110010000001000110101000001010000001000111001010010010001000100100101010001010011101000101000001010000001000100000101010110010000001000011001001001010100100100011001000100010010010101001001000000100011100101110101000000100010100100100101010011010000001001000001011101010010010100000010001110010101010101001001000000100100010100111001011101010010010101001101001110100010100000101000010000010110100100010001011001010110111100111001010101010100100100101101000100010000010101011001010010010010010100110101000001010110010101001001000100010010010100111001010101010111110101001101001100010111000100100001001000010100110100111001001000010110100101101001010111110&quot;</span></span><br><span class="line"></span><br><span class="line">flag = <span class="string">&quot;&quot;</span></span><br><span class="line">i = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> i &lt; <span class="built_in">len</span>(b):</span><br><span class="line">    s = b[i:i+<span class="number">8</span>]<span class="comment">#8位</span></span><br><span class="line">    s= s[::-<span class="number">1</span>]<span class="comment">#小端</span></span><br><span class="line">    flag += <span class="built_in">chr</span>(<span class="built_in">int</span>(s,<span class="number">2</span>))</span><br><span class="line">    i += <span class="number">8</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(flag)</span><br></pre></td></tr></table></figure>
+<p>得到：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">V KWOI CWOVIQ, TXN V JWPQVMIR CWQN WA NUIC DRI PWN ZWRNU WA SWVPS NW NUI NUIDNIR. NUI NRDVKIR TWXSUN CI NW NUI NUIDNIR AWR QIOIRDK RIDQWPQ.</span><br><span class="line"></span><br><span class="line">&quot;ZUDN ZVKK UDLLIP VA NUI QXP MVQDLLIDR?&quot; &quot;UWZ UXCDP TIVPSQ QXROVOI VA NUI QXP IELKWMIQ?&quot; NUIRI DRI SWWM AVJNVWPQ DPM QIRVWXQ QJVIPJI TIUVPM NUI NZW BXIQNVWPQ, TXN NUIRI VQ PIOIR D CWOVI NDKGVPS DTWXN VN.</span><br><span class="line"></span><br><span class="line">CDGVPS D SWWM QJV-AV, YWX PIIM SWWM QJVIPJI TIUVPM VN. NUIRI DRI D KWN WA LUYQVJQ B&amp;D AWR QCDKK MINDVKQ VP NUVQ CWOVI. &quot;ZUY PWN FXQN TXVKM RWJGIN QUVLQ DPM</span><br><span class="line">NDGI UXCDP TIVPSQ NW DPWNUIR LKDPIN?&quot; &quot;ZUY DNCWQLUIRI LRIQQXRI UDQ DPYNUVPS NW MW ZVNU KVAN AWRJI AWR DP DVRJRDAN?&quot; ZUIP V ZDQ D GVM, V XQIM NW NUVPG DKK QJV-AV CWOVIQ QUWXKM CDGI QJVIPNVAVJ QIPQI. V RIDKVHIM UWZ LRIJVWXQ VN VQ D QJV-AV CWOVI JUWWQI NW QNVJG NW QJVIPNVAVJ DJJXRDNI. IOIP ZUIP VPOIQNWR ZVNUMRIZ NUI CWPIY TIJDXQI NUIY NUVPG VQ NWW UDRM-JWRI DPM ZVKK UDOI PW CDRGIN.</span><br><span class="line"></span><br><span class="line">NUI QNWRY, VQ RIDKKY DTWXN UWZ LIWLKI JUWWQI NW UIKL IDJU WNUIR DPM TWPM ZVNU IDJU WNUIR DPM UWZ LIWLKI JUWWQI NW QDJRVAVJI. NUI WPKY QLWVKIR V ZVKK NIKK YWX VQ:</span><br><span class="line"></span><br><span class="line">TIVFVPS PW.3 NRDPQLWRNDNVWP MVOVQVWP RICVPMQ YWX. RWXNIQ DRI JWXPNKIQQ. QDAINY VQ AWRICWQN. XPRISXKDNIM MRVOVPS. KWOIM WPIQ IPM XL VP NIDRQ.</span><br><span class="line"></span><br><span class="line">DPM LRILDRI NW JRY AWR NUI QNWRY.</span><br><span class="line"></span><br><span class="line">AKDS&#123;NUIZDPMIRVPSIDRNU_YFGBBYNBKK&#125;</span><br></pre></td></tr></table></figure>
+<p>使用<code>WinCrypto</code>进行词频分析，得到flag<br><code>FLAG&#123;THEWANDERINGEARTH_YJKQQYTQLL&#125;</code></p>
+<h3 id="Executable"><a href="#Executable" class="headerlink" title="Executable"></a>Executable</h3><p>得到一个后缀名为exe的文件，使用<code>010Editor</code>打开，发现实际上是由PNG和ZIP拼接而成，第一个字节做了修改，修正后得到一张二维码，解析得到<br><code>pass&#123;Nope!&#125;</code><br>压缩包密码：<code>Nope!</code><br>压缩包中有100个二维码png，使用脚本解析发现是base64后的字符串，再次解码得到提示：<code>flag_is_not_here</code><br>所以flag不在二维码中<br>查看这一百个文件发现有一个大小异常，10k（其他都是1k, 2k）<br>使用<code>010Editor</code>打开，发现后面附有一个zip文件，解压后打开txt得到flag<br><code>flag&#123;U_R_S0_Sp3ciA1&#125;</code></p>
+<h2 id="Android"><a href="#Android" class="headerlink" title="Android"></a>Android</h2><h3 id="HelloCTF"><a href="#HelloCTF" class="headerlink" title="HelloCTF"></a>HelloCTF</h3><p>逆向发现是Flutter框架写的，以前没逆向过这种app，所以这题卡了很久。<br>查看网上关于该框架源码的解析，突然想到会不会输出日志。<br>于是打开<code>Android Studio</code>，连上手机，查看LogCat<br>点击获取flag按钮后，app输出了一串base64后的字符串，尝试输入base64解码后的字符串，提示密码错误。<br>直接填入base64后的字符串得到flag<br><code>flag&#123;h4l10_Ctffff&#125;</code></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-933705-1-1.html">2019DDCTF部分wp</a><br><a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/178414">DDCTF2019官方Write Up——Reverse篇</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/de8ad7c070c9">iscc2019 misc</a></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/05/07/cpp-template-class-cout-overload/" rel="prev" title="C++中模板类的输出流重载">
+      <i class="fa fa-chevron-left"></i> C++中模板类的输出流重载
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/03/cpp_vscode_segmentation_fault_cygwinS/" rel="next" title="修复VSCode Segmentation Fault in cygwinS">
+      修复VSCode Segmentation Fault in cygwinS <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Reverse"><span class="nav-number">1.</span> <span class="nav-text">Reverse</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Very-easy"><span class="nav-number">1.1.</span> <span class="nav-text">Very easy</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%AF%86%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">解密函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Rev1"><span class="nav-number">2.1.</span> <span class="nav-text">Rev1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Rev2"><span class="nav-number">2.2.</span> <span class="nav-text">Rev2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Confused"><span class="nav-number">2.3.</span> <span class="nav-text">Confused</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Driver"><span class="nav-number">2.4.</span> <span class="nav-text">Driver</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Crypto"><span class="nav-number">3.</span> <span class="nav-text">Crypto</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%99%E4%B8%8D%E6%98%AFRSA"><span class="nav-number">3.1.</span> <span class="nav-text">这不是RSA</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Misc"><span class="nav-number">4.</span> <span class="nav-text">Misc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%BE%E5%88%B0%E9%A2%98"><span class="nav-number">4.1.</span> <span class="nav-text">签到题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%81%E6%B5%AA%E5%9C%B0%E7%90%83"><span class="nav-number">4.2.</span> <span class="nav-text">流浪地球</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Executable"><span class="nav-number">4.3.</span> <span class="nav-text">Executable</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android"><span class="nav-number">5.</span> <span class="nav-text">Android</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HelloCTF"><span class="nav-number">5.1.</span> <span class="nav-text">HelloCTF</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">南冥有熊也 (XhyEax)</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://xhyeax.cn/" title="生活博客 → https:&#x2F;&#x2F;xhyeax.cn" rel="noopener" target="_blank"><i class="fa fa-user fa-fw"></i>生活博客</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.cyyself.name/" title="https:&#x2F;&#x2F;blog.cyyself.name" rel="noopener" target="_blank">cyyself's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

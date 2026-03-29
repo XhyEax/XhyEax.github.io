@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="概述在之前比赛时尝试的基础上，参考官方题解进行复现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hackersgame 2019 的一些失败尝试及复现">
+<meta property="og:url" content="https://blog.xhyeax.com/2019/10/22/hackersgame-2019-fails/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="概述在之前比赛时尝试的基础上，参考官方题解进行复现">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-10-22T01:14:14.335Z">
+<meta property="article:modified_time" content="2025-06-07T10:33:25.794Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="CTF">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2019/10/22/hackersgame-2019-fails/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Hackersgame 2019 的一些失败尝试及复现 | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2019/10/22/hackersgame-2019-fails/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="南冥有熊也 (XhyEax)">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Hackersgame 2019 的一些失败尝试及复现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-22 09:14:14" itemprop="dateCreated datePublished" datetime="2019-10-22T09:14:14+08:00">2019-10-22</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在之前比赛时尝试的基础上，参考<a target="_blank" rel="noopener" href="https://github.com/ustclug/hackergame2019-writeups/">官方题解</a>进行复现</p>
+<span id="more"></span>
+<h2 id="（√）天书残篇"><a href="#（√）天书残篇" class="headerlink" title="（√）天书残篇"></a>（√）天书残篇</h2><h3 id="Try"><a href="#Try" class="headerlink" title="Try"></a>Try</h3><p>三种字符，统计结果:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">20 00100000 : 2100</span><br><span class="line">09 00001001 : 1353</span><br><span class="line">0a 00001010 : 646</span><br></pre></td></tr></table></figure>
+<p>各种尝试无果（因为以为是密码学的题，方向完全错了）<br>没想到跟去年一样，又是一种语言</p>
+<h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>使用<a target="_blank" rel="noopener" href="https://vii5ard.github.io/whitespace/">在线反编译器</a>，单步调试分析<br>首先把<code>Please input your flag:</code>push入栈，然后读取输入<br>随便输入一个值，进行一系列操作后打印<code>I think your flag is incorrect!</code><br>该字符在<code>label_6</code>入栈，所以回溯即可找到判断代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">label_4:</span><br><span class="line">push 2</span><br><span class="line">add</span><br><span class="line">push 127</span><br><span class="line">sub</span><br><span class="line">jz label_5</span><br><span class="line">jmp label_6</span><br></pre></td></tr></table></figure>
+<p>127-2=125, 对应flag的最后一个字符<code>&#125;</code>，dump出ascii码，加2后转换，最后倒序即可</p>
+<h2 id="（√）无限猴子定理"><a href="#（√）无限猴子定理" class="headerlink" title="（√）无限猴子定理"></a>（√）无限猴子定理</h2><h3 id="Try-1"><a href="#Try-1" class="headerlink" title="Try"></a>Try</h3><p>发现有一些字符不会被随机到</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nolist = [<span class="number">3114</span>, <span class="number">6563</span>, <span class="number">10012</span>, <span class="number">13461</span>, <span class="number">16910</span>, <span class="number">20359</span>, <span class="number">23808</span>, <span class="number">27257</span>, <span class="number">30706</span>, <span class="number">34155</span>, <span class="number">37604</span>, <span class="number">41053</span>, <span class="number">44502</span>, <span class="number">47951</span>, <span class="number">51400</span>, <span class="number">54849</span>, <span class="number">58298</span>, <span class="number">61747</span>, <span class="number">65196</span>, <span class="number">65531</span>, <span class="number">65532</span>, <span class="number">65533</span>, <span class="number">65534</span>]</span><br><span class="line"><span class="string">&quot;+a+8tGa0edrn++eLArC&quot;</span></span><br></pre></td></tr></table></figure>
+<p>各种拼接，提交无果<br>没想到是直接传入进行取值 = =</p>
+<h3 id="Solution-1"><a href="#Solution-1" class="headerlink" title="Solution"></a>Solution</h3><p>修改代码为</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i = <span class="built_in">iter</span>(random_iter(<span class="number">3114</span>))</span><br></pre></td></tr></table></figure>
+<p>输出<code>flag&#123;Generat0r+A+8ad+LC&#125;</code><br>根据条件：</p>
+<blockquote>
+<p>flag 一定代表一串有意义的英文单词序列，但本题完全不需要任何程度的基于机器的自然语言识别。<br>和本次比赛的其他 flag 类似，本题的对应 flag 中可能有英文字母被替换混淆。<br>flag 代表的第一个英文单词既不会是名词，也不会是形容词。</p>
+</blockquote>
+<p>所以为<br><code>flag&#123;A+8ad+LC+Generat0r&#125;</code><br>PS: 个人拼接出了一个<code>A+CLear+Garden+80t</code><br>感觉还挺正常的，不过含义跟题目无关 = =</p>
+<h2 id="（√）失落的圣物"><a href="#（√）失落的圣物" class="headerlink" title="（√）失落的圣物"></a>（√）失落的圣物</h2><h3 id="Try-2"><a href="#Try-2" class="headerlink" title="Try"></a>Try</h3><p>分析完kvm执行流程之后，由于当时没有安装虚拟环境，就暂时搁置了<br>没有直接使用IDA分析系统镜像，不然应该能做出来</p>
+<h3 id="Solution-2"><a href="#Solution-2" class="headerlink" title="Solution"></a>Solution</h3><p> <code>run_long_mode</code>中把系统镜像复制到内存中，然后进行装载<br>在此处下断可以分析<code>binary_guest64_img_start</code>（按C强制转换为函数）<br>首先加载了一些数据，再调用<code>sub_5569F1E0215B</code>函数进行解密，观察得知算法是<code>XXTEA</code>算法（根据常数<code>0x9E3779B9</code> <code>0x61C88647</code>以及<code>6 + 52 / n</code>）<br>dump出数据解密即可</p>
+<h2 id="（X）宇宙终极问题"><a href="#（X）宇宙终极问题" class="headerlink" title="（X）宇宙终极问题"></a>（X）宇宙终极问题</h2><h3 id="Try-3"><a href="#Try-3" class="headerlink" title="Try"></a>Try</h3><p>没搜到分解整数的网页，GG</p>
+<h3 id="Solution-3"><a href="#Solution-3" class="headerlink" title="Solution"></a>Solution</h3><h4 id="Everything"><a href="#Everything" class="headerlink" title="Everything"></a>Everything</h4><p><a target="_blank" rel="noopener" href="https://www.alpertron.com.ar/FSQUARES.HTM">分解成平方和</a><br><a target="_blank" rel="noopener" href="https://www.alpertron.com.ar/FCUBES.HTM">分解成立方和</a></p>
+<h2 id="（X）不同寻常的Python考试"><a href="#（X）不同寻常的Python考试" class="headerlink" title="（X）不同寻常的Python考试"></a>（X）不同寻常的Python考试</h2><h3 id="Try-4"><a href="#Try-4" class="headerlink" title="Try"></a>Try</h3><p>基本考察python的内建函数和各种数据类型之间的转换，<br>对python不是很熟，一半都没做出来….<br>可在github搜索<code>wtf moments in python</code>参考</p>
+<h3 id="Solution-4"><a href="#Solution-4" class="headerlink" title="Solution"></a>Solution</h3><p>to be added…</p>
+<h2 id="（X）无法利用的漏洞"><a href="#（X）无法利用的漏洞" class="headerlink" title="（X）无法利用的漏洞"></a>（X）无法利用的漏洞</h2><h3 id="Try-5"><a href="#Try-5" class="headerlink" title="Try"></a>Try</h3><p>IDA打开，发现存在后门函数，所以关键是要调整EIP到这里</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">unsigned __int64 sub_96B()</span><br><span class="line">&#123;</span><br><span class="line">  char buf; // [rsp+0h] [rbp-10h]</span><br><span class="line">  char v2; // [rsp+7h] [rbp-9h]</span><br><span class="line">  unsigned __int64 v3; // [rsp+8h] [rbp-8h]</span><br><span class="line"></span><br><span class="line">  v3 = __readfsqword(0x28u);</span><br><span class="line">  puts(&quot;that&#x27;s impossible!&quot;);</span><br><span class="line">  read(0, &amp;buf, 7uLL);</span><br><span class="line">  v2 = 0;</span><br><span class="line">  system(&amp;buf);</span><br><span class="line">  return __readfsqword(0x28u) ^ v3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>checksec</code>查询，发现保护全开，所以不能简单栈溢出，需要用到一些高级操作，第一次做pwn，没时间研究了</p>
+<h3 id="Solution-5"><a href="#Solution-5" class="headerlink" title="Solution"></a>Solution</h3><p>to be added…</p>
+<h2 id="（X）驴啃计算器"><a href="#（X）驴啃计算器" class="headerlink" title="（X）驴啃计算器"></a>（X）驴啃计算器</h2><h3 id="Try-6"><a href="#Try-6" class="headerlink" title="Try"></a>Try</h3><p>可以使用meet in middle算法进行搜索，没写代码实现</p>
+<h3 id="Solution-6"><a href="#Solution-6" class="headerlink" title="Solution"></a>Solution</h3><p>to be added…</p>
+<h2 id="（X）十次方根"><a href="#（X）十次方根" class="headerlink" title="（X）十次方根"></a>（X）十次方根</h2><h3 id="Try-7"><a href="#Try-7" class="headerlink" title="Try"></a>Try</h3><blockquote>
+<p>「只要你的输入 n 代入后满足约束条件，flag 就是你的。」</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">x = <span class="number">130095999494467643631574289251374479743427759332282644620931023932981730612064829262332840253969261363881910701276769455728130421459878658660627330362688856751252524519341435317968272275310598639991033512763704530123231772642623291899534454658707761230166809620539187116816778418242273580873637781313957589597</span></span><br><span class="line">y = <span class="number">116513882455567447431772208851676203256471727099349255694179213039239989833646726805040167642952589899809273716764673737423792812107737304956679717082391151505476360762847773608327055926832394948293052633869637754201186227370594688119795413400655007893009882742908697688490841023621108562593724732469462968731</span></span><br><span class="line">z = <span class="number">88688615046438957657148589794574470139777919686383514327296565433247300792803913489977671293854830459385807133302995575774658605472491904258624914486448276269854207404533062581134557448023142028865220726281791025833570337140263511960407206818858439353134327592503945131371190285416230131136007578355799517986306208039490339159501009668785839201465041101739825050371023956782364610889969860432267781626941824596468923354157981771773589236462813563647577651117020694251283103175874783965004467136515096081442018965974870665038880840823708377340101510978112755669470752689525778937276250835072011344062132449232775717960070624563850487919381138228636278647776184490240264110748648486121139328569423969642059474027527737521891542567351630545570488901368570734520954996585774666946913854038917494322793749823245652065062604226133920469926888309742466030087045251385865707151307850662127591419171619721200858496299127088429333831383287417361021420824398501423875648199373623572614151830871182111045650469239575676312393555191890749537174702485617397506191658938798937462708198240714491454507874141432982611857838173469612147092460359775924447976521509874765598726655964369735759375793871985156532139719500175158914354647101621378769238233</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    n = <span class="built_in">int</span>(<span class="built_in">input</span>())</span><br><span class="line">    <span class="keyword">if</span> <span class="number">0</span> &lt; n &lt; z <span class="keyword">and</span> n ** <span class="number">10</span> % (x * y * y * y) == z:</span><br><span class="line">        flag = <span class="built_in">bytes</span>.fromhex(<span class="built_in">hex</span>(n)[<span class="number">2</span>:]).decode()</span><br><span class="line">        <span class="keyword">if</span> flag.startswith(<span class="string">&quot;flag&quot;</span>):</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;Flag:&quot;</span>, flag[:<span class="number">32</span>])</span><br><span class="line">            exit()</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Wrong!&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>可以得出约束条件:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0</span> &lt; n &lt; z</span><br><span class="line"><span class="built_in">pow</span>(n,<span class="number">10</span>,(x*y*y*y)) == z</span><br><span class="line">flag = <span class="built_in">bytes</span>.fromhex(<span class="built_in">hex</span>(n)[<span class="number">2</span>:]).decode()<span class="comment">#每一位字符都是可打印的,即0x20-0x7f</span></span><br><span class="line">flag.startswith(<span class="string">&quot;flag&quot;</span>) <span class="comment"># 即转化成十六进制以666c6167开头</span></span><br></pre></td></tr></table></figure>
+<p>尝试使用z3约束器求解，跑不出结果，于是继续分析<br>注意到x和y都是309位的数字，猜测是使用<code>random_prime</code>函数生成的，使用sympy进行素性测试，发现确实是素数，于是想到rsa算法</p>
+<blockquote>
+<p>加密明文m：c = pow(m, e, N)，得到的c即为密文<br>解密密文c：m = pow(c, d, N)，得到的m即为明文</p>
+</blockquote>
+<p>已知约束<code>pow(n,10,(x*y*y*y)) == z</code>，也就是</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">e=10, N=(x * y * y * y), c = z</span><br></pre></td></tr></table></figure>
+<p>所以需要把d求出来，才能解密出flag<br>参考rsa中d的生成算法：</p>
+<blockquote>
+<p>计算φ = (p-1) * (q-1) 即N的欧拉函数，然后选择一个e (1&lt;e&lt;φ)，且e和φ互质<br>取e的模反数为d，计算方法: d=e^-1 mod (p-1)(q-1)</p>
+</blockquote>
+<p>本题已知<code>e=10</code>，所以关键在于求出φ<br>根据欧拉函数定义，计算出$φ(n)=(p-1) *(q-1)*q * q$</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">205777062822855196204557259074204338863038877637508486991101948465308135853880119111298068410289942295119552877315995448483302052425384602998841067955989953532845673085938551734361886384957239104845083274605794116053692298274075954846274045387790432296780713156217096516442834594918827862540823117379119661764619290734086685907363261513580137663874870284095783503058795808164041247072364419239866222057499427540588679887524968959272826964100134564431765857617785871632054905292345277712079341783082012212706688061094998296147702680236639550101982604019253080207087085614227084574908094202693850747452248476172169172988025295138860040086705252643613747942616761475965636304045008301477874434092164471640329043047768806832761725356175958693573828929796609421973244181058162273249948507989984964176737160126969440713901163378524487913052802448828878557913452548831503041309225019783292421104846983044294553488830895031906282691942377484591183173552068835852478319307261641554425552804754002477048056545092966316064552607875541020758891571430248441211430296946142454465137812875546208385522654977654027563707207023062358869162899849260716308794744184245547839510008610288699881144289526736391055307563993152525081699163811563126251241880</span><br></pre></td></tr></table></figure>
+<p>使用gmpy2寻找逆元，提示逆元不存在<br>尝试暴力搜索，没得到结果，GG<br>(没注意到是因为phi和e不互素)</p>
+<h3 id="Solution-7"><a href="#Solution-7" class="headerlink" title="Solution"></a>Solution</h3><p>中国剩余定理是啥 = =</p>
+<h2 id="（X）2077-海底捞针"><a href="#（X）2077-海底捞针" class="headerlink" title="（X）2077 海底捞针"></a>（X）2077 海底捞针</h2><h3 id="Try-8"><a href="#Try-8" class="headerlink" title="Try"></a>Try</h3><p>no try, too hard for me</p>
+<h3 id="Solution-8"><a href="#Solution-8" class="headerlink" title="Solution"></a>Solution</h3><p>to be added…</p>
+<h2 id="（X）大整数分解锦标赛"><a href="#（X）大整数分解锦标赛" class="headerlink" title="（X）大整数分解锦标赛"></a>（X）大整数分解锦标赛</h2><h3 id="Try-9"><a href="#Try-9" class="headerlink" title="Try"></a>Try</h3><p>分析sympy的源码，发现调用的是random库来实现的随机，继续往下分析<br>最终跟踪到Python源码的<code>_randommodule.c</code><br>随机数生成采用mt19937算法，而Python默认是获取系统的随机值，所以需要对状态进行恢复<br>可以通过不断调用Help函数来生成比特，然后就卡这了</p>
+<h3 id="Solution-9"><a href="#Solution-9" class="headerlink" title="Solution"></a>Solution</h3><p>to be added…</p>
+<h2 id="（X）Flag-红包"><a href="#（X）Flag-红包" class="headerlink" title="（X）Flag 红包"></a>（X）Flag 红包</h2><h3 id="Try-10"><a href="#Try-10" class="headerlink" title="Try"></a>Try</h3><p>设计一个AI来对抗它，没写代码实现<br>结果直接左右互搏？！</p>
+<h3 id="Solution-10"><a href="#Solution-10" class="headerlink" title="Solution"></a>Solution</h3><p>to be added…</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/22/hackersgame-2019-writeup/" rel="prev" title="Hackersgame 2019 部分writeup">
+      <i class="fa fa-chevron-left"></i> Hackersgame 2019 部分writeup
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/04/wsl-install-mysql/" rel="next" title="WSL安装并运行MySQL Server">
+      WSL安装并运行MySQL Server <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E2%88%9A%EF%BC%89%E5%A4%A9%E4%B9%A6%E6%AE%8B%E7%AF%87"><span class="nav-number">2.</span> <span class="nav-text">（√）天书残篇</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Try"><span class="nav-number">2.1.</span> <span class="nav-text">Try</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution"><span class="nav-number">2.2.</span> <span class="nav-text">Solution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E2%88%9A%EF%BC%89%E6%97%A0%E9%99%90%E7%8C%B4%E5%AD%90%E5%AE%9A%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">（√）无限猴子定理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Try-1"><span class="nav-number">3.1.</span> <span class="nav-text">Try</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-1"><span class="nav-number">3.2.</span> <span class="nav-text">Solution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E2%88%9A%EF%BC%89%E5%A4%B1%E8%90%BD%E7%9A%84%E5%9C%A3%E7%89%A9"><span class="nav-number">4.</span> <span class="nav-text">（√）失落的圣物</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Try-2"><span class="nav-number">4.1.</span> <span class="nav-text">Try</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-2"><span class="nav-number">4.2.</span> <span class="nav-text">Solution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88X%EF%BC%89%E5%AE%87%E5%AE%99%E7%BB%88%E6%9E%81%E9%97%AE%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">（X）宇宙终极问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Try-3"><span class="nav-number">5.1.</span> <span class="nav-text">Try</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-3"><span class="nav-number">5.2.</span> <span class="nav-text">Solution</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Everything"><span class="nav-number">5.2.1.</span> <span class="nav-text">Everything</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88X%EF%BC%89%E4%B8%8D%E5%90%8C%E5%AF%BB%E5%B8%B8%E7%9A%84Python%E8%80%83%E8%AF%95"><span class="nav-number">6.</span> <span class="nav-text">（X）不同寻常的Python考试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Try-4"><span class="nav-number">6.1.</span> <span class="nav-text">Try</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-4"><span class="nav-number">6.2.</span> <span class="nav-text">Solution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88X%EF%BC%89%E6%97%A0%E6%B3%95%E5%88%A9%E7%94%A8%E7%9A%84%E6%BC%8F%E6%B4%9E"><span class="nav-number">7.</span> <span class="nav-text">（X）无法利用的漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Try-5"><span class="nav-number">7.1.</span> <span class="nav-text">Try</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-5"><span class="nav-number">7.2.</span> <span class="nav-text">Solution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88X%EF%BC%89%E9%A9%B4%E5%95%83%E8%AE%A1%E7%AE%97%E5%99%A8"><span class="nav-number">8.</span> <span class="nav-text">（X）驴啃计算器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Try-6"><span class="nav-number">8.1.</span> <span class="nav-text">Try</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-6"><span class="nav-number">8.2.</span> <span class="nav-text">Solution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88X%EF%BC%89%E5%8D%81%E6%AC%A1%E6%96%B9%E6%A0%B9"><span class="nav-number">9.</span> <span class="nav-text">（X）十次方根</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Try-7"><span class="nav-number">9.1.</span> <span class="nav-text">Try</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-7"><span class="nav-number">9.2.</span> <span class="nav-text">Solution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88X%EF%BC%892077-%E6%B5%B7%E5%BA%95%E6%8D%9E%E9%92%88"><span class="nav-number">10.</span> <span class="nav-text">（X）2077 海底捞针</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Try-8"><span class="nav-number">10.1.</span> <span class="nav-text">Try</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-8"><span class="nav-number">10.2.</span> <span class="nav-text">Solution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88X%EF%BC%89%E5%A4%A7%E6%95%B4%E6%95%B0%E5%88%86%E8%A7%A3%E9%94%A6%E6%A0%87%E8%B5%9B"><span class="nav-number">11.</span> <span class="nav-text">（X）大整数分解锦标赛</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Try-9"><span class="nav-number">11.1.</span> <span class="nav-text">Try</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-9"><span class="nav-number">11.2.</span> <span class="nav-text">Solution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88X%EF%BC%89Flag-%E7%BA%A2%E5%8C%85"><span class="nav-number">12.</span> <span class="nav-text">（X）Flag 红包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Try-10"><span class="nav-number">12.1.</span> <span class="nav-text">Try</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-10"><span class="nav-number">12.2.</span> <span class="nav-text">Solution</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">南冥有熊也 (XhyEax)</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://xhyeax.cn/" title="生活博客 → https:&#x2F;&#x2F;xhyeax.cn" rel="noopener" target="_blank"><i class="fa fa-user fa-fw"></i>生活博客</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.cyyself.name/" title="https:&#x2F;&#x2F;blog.cyyself.name" rel="noopener" target="_blank">cyyself's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

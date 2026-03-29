@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.xhyeax.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="更新简易Android ARM&amp;ARM64 GOT Hook (二)基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址 概述本文以Hook公共库libc.so的getpid函数为例，基于ELF的链接视图(Linking View)，讨论Android ARM&amp;ARM64架构的GOT&#x2F;PLT Hook。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简易Android ARM&amp;ARM64 GOT Hook (一)">
+<meta property="og:url" content="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/index.html">
+<meta property="og:site_name" content="Xhy&#39;s Blog">
+<meta property="og:description" content="更新简易Android ARM&amp;ARM64 GOT Hook (二)基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址 概述本文以Hook公共库libc.so的getpid函数为例，基于ELF的链接视图(Linking View)，讨论Android ARM&amp;ARM64架构的GOT&#x2F;PLT Hook。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-header.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-str.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-got.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-output.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-log.png">
+<meta property="og:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-got-hook-log.png">
+<meta property="article:published_time" content="2021-08-23T02:56:25.000Z">
+<meta property="article:modified_time" content="2025-06-07T10:33:25.776Z">
+<meta property="article:author" content="Xhy">
+<meta property="article:tag" content="Android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-header.png">
+
+<link rel="canonical" href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>简易Android ARM&ARM64 GOT Hook (一) | Xhy's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ae4f03127de1b8f146f8fe365efac8c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xhy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Reverse and Think</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-th fa-fw"></i>工具</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.xhyeax.com/2021/08/23/android-arm-got-hook/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/img/avatar.jpg">
+      <meta itemprop="name" content="Xhy">
+      <meta itemprop="description" content="南冥有熊也 (XhyEax)">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xhy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          简易Android ARM&ARM64 GOT Hook (一)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-08-23 10:56:25" itemprop="dateCreated datePublished" datetime="2021-08-23T10:56:25+08:00">2021-08-23</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><p><a href="https://blog.xhyeax.com/2021/08/30/android-arm-plt-hook/">简易Android ARM&amp;ARM64 GOT Hook (二)</a><br>基本思路为：基于执行视图，解析内存中的ELF，查找导入符号并替换函数地址</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本文以Hook公共库<code>libc.so</code>的<code>getpid</code>函数为例，基于ELF的链接视图(<code>Linking View</code>)，讨论<code>Android</code> <code>ARM&amp;ARM64</code>架构的<code>GOT/PLT Hook</code>。</p>
+<span id="more"></span>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>程序<code>加载</code>后，在执行之前，需要先进行<code>动态链接</code>，并进行<code>重定位</code>。</p>
+<p>调用外部函数时，需要先跳转到PLT(<code>Procedure Link Table</code> 程序链接表，位于代码段)，再跳转到GOT(<code>Global Offset Table</code> 全局偏移表，位于数据段)，执行目标函数。</p>
+<p>延迟绑定(<code>Lazy Binding</code>)：当外部函数被调用时，才进行地址解析和重定位</p>
+<p><strong>由于Android ARM架构不支持延迟绑定，在linker重定位后，GOT已被填充为内存地址</strong> (可使用IDA动态调试验证)</p>
+<p>因此，可以通过比对函数地址，修改指定模块的对应GOT表项，实现对外部导入函数的Hook</p>
+<h2 id="具体思路"><a href="#具体思路" class="headerlink" title="具体思路"></a>具体思路</h2><p>编写so库，在so加载的构造函数（<code>linker</code>会主动调用）中完成以下操作：定位目标模块基址、基于链接视图解析ELF文件，得到GOT表地址及大小、遍历GOT表替换目标函数地址。</p>
+<h2 id="注入方式"><a href="#注入方式" class="headerlink" title="注入方式"></a>注入方式</h2><p>使用<code>LIEF</code>修改ELF文件，导入该动态库。</p>
+<h2 id="编译环境"><a href="#编译环境" class="headerlink" title="编译环境"></a>编译环境</h2><p><code>Android Studio 2020.3.1</code>、<code>Gradle 7.0.1</code>、<code>CMake 3.18.1</code>、<code>NDK 23.0.7599858</code><br><code>ABI</code>: <code>armeabi-v7a,arm64-v8a</code></p>
+<p>PS：其实也可以脱离<code>Android Studio</code>手动编译，见<a href="https://blog.xhyeax.com/2021/08/22/arm-compile-without-as/">使用CMake交叉编译Android ARM程序</a></p>
+<h2 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h2><p>使用<code>Android Studio</code>创建<code>Native C++</code>项目，然后增加两个<code>Android Native Library</code>模块，分别命名为<code>victim</code>和<code>inject</code></p>
+<h3 id="待注入程序"><a href="#待注入程序" class="headerlink" title="待注入程序"></a>待注入程序</h3><h4 id="victim-cpp"><a href="#victim-cpp" class="headerlink" title="victim.cpp"></a>victim.cpp</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;my pid: %d\n&quot;</span>, <span class="built_in">getpid</span>());</span><br><span class="line">    <span class="comment">// getchar();</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>调用<code>getpid</code>获取进程id（IDA动态调试时使用<code>getchar</code>，方便查看内存）</p>
+<h4 id="CMakeLists-txt"><a href="#CMakeLists-txt" class="headerlink" title="CMakeLists.txt"></a>CMakeLists.txt</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION <span class="number">3.18</span><span class="number">.1</span>)</span><br><span class="line">project(victim)</span><br><span class="line"></span><br><span class="line">add_executable(victim victim.cpp)</span><br></pre></td></tr></table></figure>
+<p>编译为可执行文件</p>
+<h3 id="注入动态库"><a href="#注入动态库" class="headerlink" title="注入动态库"></a>注入动态库</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 基于链接视图解析ELF</span></span><br><span class="line"><span class="function"><span class="keyword">uintptr_t</span> <span class="title">hackBySection</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *module_name, <span class="keyword">const</span> <span class="keyword">char</span> *target_lib, <span class="keyword">const</span> <span class="keyword">char</span> *target_func,</span></span></span><br><span class="line"><span class="params"><span class="function">                        <span class="keyword">uintptr_t</span> replace)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">LOGE</span>(<span class="string">&quot;hackBySection start.\n&quot;</span>);</span><br><span class="line">    <span class="comment">// 获取目标函数地址</span></span><br><span class="line">    <span class="keyword">void</span> *handle = <span class="built_in">dlopen</span>(target_lib, RTLD_LAZY);</span><br><span class="line">    <span class="keyword">auto</span> ori = (<span class="keyword">uintptr_t</span>) <span class="built_in">dlsym</span>(handle, target_func);</span><br><span class="line"><span class="comment">//    LOGE(&quot;ori addr: %&quot; SCNxPTR &quot;\n&quot;, ori);</span></span><br><span class="line">    <span class="keyword">int</span> GOTSize = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 获取GOT表地址及大小 (解析Section)</span></span><br><span class="line">    <span class="keyword">uintptr_t</span> GOTBase = <span class="built_in">getGOTBase</span>(GOTSize, module_name);</span><br><span class="line">    <span class="comment">// 遍历GOT表，查找符号地址</span></span><br><span class="line">    <span class="keyword">uintptr_t</span> addrArray[MAX_ADDRARRAY_SIZE];</span><br><span class="line">    <span class="keyword">int</span> addrArraySize = <span class="built_in">getSymAddrInGOT</span>(GOTBase, GOTSize, ori, addrArray);</span><br><span class="line">    <span class="comment">// 替换地址</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; addrArraySize; i++) &#123;</span><br><span class="line">        <span class="keyword">uintptr_t</span> replaceAddr = addrArray[i];</span><br><span class="line">        <span class="built_in">replaceFunction</span>(replaceAddr, replace, ori);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ori;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 原方法的备份</span></span><br><span class="line"><span class="built_in"><span class="keyword">int</span></span> (*getpidOri)();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 替换方法</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getpidReplace</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">LOGE</span>(<span class="string">&quot;before hook getpid\n&quot;</span>);</span><br><span class="line">    <span class="comment">//调用原方法</span></span><br><span class="line">    <span class="keyword">int</span> pid = (<span class="keyword">int</span>) <span class="built_in">getpidOri</span>();</span><br><span class="line">    <span class="built_in">LOGE</span>(<span class="string">&quot;after hook getpid: %d\n&quot;</span>, pid);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">233333</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//so加载时由linker调用</span></span><br><span class="line"><span class="keyword">void</span> __attribute__((constructor)) <span class="built_in">init</span>() &#123;</span><br><span class="line">    <span class="keyword">uintptr_t</span> ori = <span class="built_in">hackBySection</span>(MODULE_PATH, <span class="string">&quot;libc.so&quot;</span>, <span class="string">&quot;getpid&quot;</span>,</span><br><span class="line">                                  (<span class="keyword">uintptr_t</span>) getpidReplace);</span><br><span class="line">    getpidOri = (<span class="built_in"><span class="keyword">int</span></span> (*)()) (ori);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意：<code>Android 7.0</code>以上，<code>dlopen</code>只能加载公共库，加载非公共库需要绕过命名空间限制。</p>
+<h3 id="子函数"><a href="#子函数" class="headerlink" title="子函数"></a>子函数</h3><h4 id="获取模块基址"><a href="#获取模块基址" class="headerlink" title="获取模块基址"></a>获取模块基址</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">uintptr_t</span> <span class="title">getModuleBase</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *modulePath)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">uintptr_t</span> addr = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">char</span> buff[<span class="number">256</span>] = <span class="string">&quot;\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">    FILE *fp = <span class="built_in">fopen</span>(<span class="string">&quot;/proc/self/maps&quot;</span>, <span class="string">&quot;r&quot;</span>);</span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">fgets</span>(buff, <span class="built_in"><span class="keyword">sizeof</span></span>(buff), fp)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">strstr</span>(buff, <span class="string">&quot;r-xp&quot;</span>) &amp;&amp; <span class="built_in">strstr</span>(buff, modulePath) &amp;&amp;</span><br><span class="line">            <span class="built_in">sscanf</span>(buff, <span class="string">&quot;%lx&quot;</span>, &amp;addr) == <span class="number">1</span>)</span><br><span class="line">            <span class="keyword">return</span> addr;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//    LOGE(&quot;buff: %s&quot;, buff);</span></span><br><span class="line">    <span class="built_in">LOGE</span>(<span class="string">&quot;[%s] moduleBase not found!\n&quot;</span>, modulePath);</span><br><span class="line">    <span class="built_in">fclose</span>(fp);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>遍历<code>/proc/self/maps</code>文件内容，根据权限及模块路径找到基址。</p>
+<h4 id="获取GOT表地址及其大小"><a href="#获取GOT表地址及其大小" class="headerlink" title="获取GOT表地址及其大小"></a>获取GOT表地址及其大小</h4><p>篇幅所限，此处仅给出思路（以<code>ARM</code>为例），完整代码见<a target="_blank" rel="noopener" href="https://github.com/XhyEax/AndroidGotHook">AndroidGotHook</a></p>
+<p>根据模块路径打开ELF文件（本例为<code>/data/local/tmp/victim-patch-arm</code>），解析ELF文件结构（图片为<code>010Editor</code> ELF模板解析结果）:</p>
+<p>首先从<code>elf header</code>中得到<code>section header table</code>的起始偏移（<code>e_shoff</code>）、字符串表索引（<code>e_shstrndx</code>）、<code>section header</code>大小(<code>e_shentsize</code>)和总<code>section header</code>个数（<code>e_shnum</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-header.png"></p>
+<p>然后计算出字符串表<code>section header</code>的偏移地址（<code>e_shoff</code> + <code>e_shstrndx</code> * <code>e_shentsize</code>），从而得到字符串表的偏移值（<code>s_offset</code>）及大小（<code>s_size</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-str.png"></p>
+<p>再遍历<code>section header table</code>，查找<code>sh_type</code>为<code>SHT_PROGBITS</code> 且 section名（通过<code>sh_name</code>查询字符串表）为<code>.got</code>的<code>section header</code>，得到GOT表偏移值（<code>s_offset</code>）及大小（<code>s_size</code>）<br><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-elf-got.png"></p>
+<p>最终将GOT表偏移值与模块基址相加，得到GOT表地址。</p>
+<h4 id="查找目标函数地址"><a href="#查找目标函数地址" class="headerlink" title="查找目标函数地址"></a>查找目标函数地址</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">uintptr_t</span> <span class="title">getSymAddrInGOT</span><span class="params">(<span class="keyword">uintptr_t</span> GOTBase, <span class="keyword">int</span> GOTSize, <span class="keyword">uintptr_t</span> ori)</span> </span>&#123;</span><br><span class="line"> <span class="keyword">if</span> (GOTBase == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">LOGE</span>(<span class="string">&quot;getSymAddrInGOT failed! addr [%lX] is wrong\n&quot;</span>, GOTBase);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; GOTSize; ++i) &#123;</span><br><span class="line">        <span class="keyword">uintptr_t</span> addr = GOTBase + i * <span class="number">4</span>;</span><br><span class="line">        <span class="keyword">uintptr_t</span> item = *(<span class="keyword">uintptr_t</span> *) (addr);</span><br><span class="line"><span class="comment">//        LOGE(&quot;GOT [%d]: %lX\n&quot;, i, item);</span></span><br><span class="line">        <span class="keyword">if</span> (item == ori) &#123;</span><br><span class="line">            <span class="keyword">return</span> addr;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">LOGE</span>(<span class="string">&quot;getSymAddrInGOT %lX not found!\n&quot;</span>, ori);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>遍历GOT表，查找目标函数地址。</p>
+<h4 id="替换函数地址"><a href="#替换函数地址" class="headerlink" title="替换函数地址"></a>替换函数地址</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">replaceFunction</span><span class="params">(<span class="keyword">uintptr_t</span> addr, <span class="keyword">uintptr_t</span> replace, <span class="keyword">uintptr_t</span> ori)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (addr == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">LOGE</span>(<span class="string">&quot;replace failed! addr is wrong\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 比对函数地址</span></span><br><span class="line">    <span class="keyword">uintptr_t</span> item = *(<span class="keyword">uintptr_t</span> *) (addr);</span><br><span class="line">    <span class="keyword">if</span> (item == replace) &#123;</span><br><span class="line">        <span class="built_in">LOGE</span>(<span class="string">&quot;function has been replaced!\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (item != ori) &#123;</span><br><span class="line">        <span class="built_in">LOGE</span>(<span class="string">&quot;replace failed! unexpected function address %X\n&quot;</span>, item);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//修改权限、替换地址、清空指令缓存</span></span><br><span class="line">    <span class="built_in">LOGE</span>(<span class="string">&quot;replace %X to %X\n&quot;</span>, ori, replace);</span><br><span class="line">    <span class="built_in">mprotect</span>((<span class="keyword">void</span> *) <span class="built_in">PAGE_START</span>(addr), PAGE_SIZE, PROT_READ | PROT_WRITE);</span><br><span class="line">    *(<span class="keyword">uintptr_t</span> *) addr = replace;</span><br><span class="line">    __builtin___clear_cache((<span class="keyword">char</span> *) <span class="built_in">PAGE_START</span>(addr), (<span class="keyword">char</span> *) <span class="built_in">PAGE_END</span>(addr));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先判断函数是否已被替换，然后与期望值相比较，如果一致，则进行以下操作：<br>将该地址权限设置为可读可写，然后替换函数地址，并清空指令缓存。</p>
+<h4 id="适配ARM64"><a href="#适配ARM64" class="headerlink" title="适配ARM64"></a>适配ARM64</h4><p>添加宏，将<code>Elf32_w</code>替换为<code>ELFW(w)</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__LP64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELFW(what) Elf64_ ## what</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ELFW(what) Elf32_ ## what</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<p>根据架构使用不同的路径：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(__LP64__)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MODULE_PATH <span class="meta-string">&quot;victim-patch-arm64&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MODULE_PATH <span class="meta-string">&quot;victim-patch-arm&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="使用LIEF添加依赖"><a href="#使用LIEF添加依赖" class="headerlink" title="使用LIEF添加依赖"></a>使用LIEF添加依赖</h2><p>编译完成后，打开<code>victim/build/intermediates/cmake/debug/obj/CPU架构/</code>，使用<code>LIEF</code>注入<code>victim</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lief,sys</span><br><span class="line"></span><br><span class="line">abi = <span class="string">&quot;armeabi-v7a&quot;</span></span><br><span class="line">tail = <span class="string">&quot;-arm&quot;</span></span><br><span class="line"><span class="keyword">if</span>(<span class="built_in">len</span>(sys.argv) &gt; <span class="number">1</span> <span class="keyword">and</span> sys.argv[<span class="number">1</span>] == <span class="string">&quot;arm64-v8a&quot;</span>):</span><br><span class="line">    abi = sys.argv[<span class="number">1</span>]</span><br><span class="line">    tail = <span class="string">&quot;-arm64&quot;</span></span><br><span class="line"></span><br><span class="line">path = <span class="string">&quot;../victim/build/intermediates/cmake/debug/obj/&quot;</span>+abi+<span class="string">&quot;/victim&quot;</span></span><br><span class="line">elf = lief.parse(path)</span><br><span class="line">elf.add_library(<span class="string">&quot;/data/local/tmp/libinject&quot;</span>+tail+<span class="string">&quot;.so&quot;</span>)</span><br><span class="line">elf.write(<span class="string">&quot;victim-patch&quot;</span>+tail)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;patch success&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>打开<code>inject/build/intermediates/cmake/debug/obj/CPU架构/</code>，<br>使用<code>adb</code>将生成的<code>libinject.so</code>和<code>victim-patch-arm</code>发送到手机的<code>/data/local/tmp/</code>目录（so需要重命名）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb push libinject.so /data/local/tmp/libinject-arm.so</span><br><span class="line">adb push victim-patch-arm /data/local/tmp</span><br></pre></td></tr></table></figure>
+
+<p>设置可执行权限后，运行<code>victim-patch-arm</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb shell chmod +x /data/local/tmp/victim-patch-arm</span><br><span class="line">adb shell /data/local/tmp/victim-patch-arm</span><br></pre></td></tr></table></figure>
+<p>（<code>ARM64</code>同理）</p>
+<h2 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h2><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-output.png"></p>
+<p>成功实现对<code>getpid</code>函数的<code>GOT Hook</code>。</p>
+<h2 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h2><h3 id="ARM"><a href="#ARM" class="headerlink" title="ARM"></a>ARM</h3><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm-got-hook-log.png"></p>
+<h3 id="ARM64"><a href="#ARM64" class="headerlink" title="ARM64"></a>ARM64</h3><p><img src="http://xhy-1252675344.cos.ap-beijing.myqcloud.com/imgs/arm64-got-hook-log.png"></p>
+<h2 id="存在的问题"><a href="#存在的问题" class="headerlink" title="存在的问题"></a>存在的问题</h2><ol>
+<li>未绕过<code>dlopen</code>命名空间限制，在<code>Android 7</code>以上无法打开非公共库</li>
+<li>未hook<code>dlopen</code>，无法实时修改加载模块的GOT表</li>
+<li>解析maps获取模块基址，兼容性可能存在一定问题</li>
+<li>基于链接视图静态解析ELF，无法处理加壳的so</li>
+<li>静态注入可执行文件，无法绕过完整性检测</li>
+<li>未提供卸载函数，无法恢复GOT表</li>
+<li>模块路径硬编码，通用性不足</li>
+<li>未处理全局函数指针调用</li>
+<li>…</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本项目，学习了<code>GOT Hook</code>原理和ELF文件结构，并适配了<code>ARM64</code>架构，目的基本达到。虽然功能还不够完善，但<del>短期内应该不会再改动了</del>（俗话说得好：不要重复造轮子）。</p>
+<p>实际应用可以考虑使用字节的<a target="_blank" rel="noopener" href="https://github.com/bytedance/bhook">bhook</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/byhook/article/details/103500524">android中基于plt/got的hook实现原理</a><br><a href="%5Bhttps://linyt.blog.csdn.net/article/details/51636753%5D">聊聊Linux动态链接中的PLT和GOT(2)——延迟重定位</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/108274829">constructor属性函数在动态库加载中的执行顺序</a><br><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-948942-1-1.html">Android7.0以上命名空间详解(dlopen限制)</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/u011247544/article/details/78564564">Android中GOT表HOOK手动实现</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/mmmmar/p/8228391.html">Android GOT Hook</a></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/assets/img/alipay.jpg" alt="Xhy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"># Android</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/08/22/arm-compile-without-as/" rel="prev" title="使用CMake交叉编译Android ARM&ARM64 程序">
+      <i class="fa fa-chevron-left"></i> 使用CMake交叉编译Android ARM&ARM64 程序
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/08/24/ndk-warning-dt-flags/" rel="next" title="解决WARNING linker unsupported flags DT_FLAGS_1">
+      解决WARNING linker unsupported flags DT_FLAGS_1 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0"><span class="nav-number">1.</span> <span class="nav-text">更新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number"></span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number"></span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E6%80%9D%E8%B7%AF"><span class="nav-number"></span> <span class="nav-text">具体思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E6%96%B9%E5%BC%8F"><span class="nav-number"></span> <span class="nav-text">注入方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83"><span class="nav-number"></span> <span class="nav-text">编译环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E7%A0%81"><span class="nav-number"></span> <span class="nav-text">编码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%85%E6%B3%A8%E5%85%A5%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text">待注入程序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#victim-cpp"><span class="nav-number">1.1.</span> <span class="nav-text">victim.cpp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CMakeLists-txt"><span class="nav-number">1.2.</span> <span class="nav-text">CMakeLists.txt</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E5%8A%A8%E6%80%81%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">注入动态库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%90%E5%87%BD%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">子函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%A8%A1%E5%9D%97%E5%9F%BA%E5%9D%80"><span class="nav-number">3.1.</span> <span class="nav-text">获取模块基址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96GOT%E8%A1%A8%E5%9C%B0%E5%9D%80%E5%8F%8A%E5%85%B6%E5%A4%A7%E5%B0%8F"><span class="nav-number">3.2.</span> <span class="nav-text">获取GOT表地址及其大小</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E6%89%BE%E7%9B%AE%E6%A0%87%E5%87%BD%E6%95%B0%E5%9C%B0%E5%9D%80"><span class="nav-number">3.3.</span> <span class="nav-text">查找目标函数地址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9B%BF%E6%8D%A2%E5%87%BD%E6%95%B0%E5%9C%B0%E5%9D%80"><span class="nav-number">3.4.</span> <span class="nav-text">替换函数地址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%82%E9%85%8DARM64"><span class="nav-number">3.5.</span> <span class="nav-text">适配ARM64</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8LIEF%E6%B7%BB%E5%8A%A0%E4%BE%9D%E8%B5%96"><span class="nav-number"></span> <span class="nav-text">使用LIEF添加依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95"><span class="nav-number"></span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="nav-number"></span> <span class="nav-text">运行结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%BF%97"><span class="nav-number"></span> <span class="nav-text">日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ARM"><span class="nav-number">1.</span> <span class="nav-text">ARM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ARM64"><span class="nav-number">2.</span> <span class="nav-text">ARM64</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number"></span> <span class="nav-text">存在的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number"></span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number"></span> <span class="nav-text">参考</span></a></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xhy"
+      src="/assets/img/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xhy</p>
+  <div class="site-description" itemprop="description">南冥有熊也 (XhyEax)</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">150</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://xhyeax.cn/" title="生活博客 → https:&#x2F;&#x2F;xhyeax.cn" rel="noopener" target="_blank"><i class="fa fa-user fa-fw"></i>生活博客</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/XhyEax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XhyEax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:me@xhyeax.com" title="E-Mail → mailto:me@xhyeax.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.0x002.com/" title="https:&#x2F;&#x2F;www.0x002.com" rel="noopener" target="_blank">Yunen's Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.cyyself.name/" title="https:&#x2F;&#x2F;blog.cyyself.name" rel="noopener" target="_blank">cyyself's Blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xhy</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
